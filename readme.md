@@ -25,3 +25,4 @@ Implement an application that allows user to:
 ## (Optional) Advanced tasks
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
 - Profile page should allow to add/remove any social account
+- Add authentication to your Accounting App
