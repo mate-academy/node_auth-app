@@ -1,7 +1,7 @@
 {
-  "name": "node_auth-server",
+  "name": "node_auth-app",
   "version": "1.0.0",
-  "description": "Auth server",
+  "description": "Auth app",
   "main": "src/app.js",
   "scripts": {
     "init": "mate-scripts init",
