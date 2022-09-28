@@ -41,7 +41,7 @@ const create = async(userData) => {
 };
 
 const patchById = async(id, patchData) => {
-  const foundUser = await User.getById(id);
+  const foundUser = await User.findByPk(id);
 
   if (!foundUser) {
     return null;

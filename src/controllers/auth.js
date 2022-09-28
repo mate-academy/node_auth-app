@@ -7,34 +7,13 @@ const usersService = require('../services/users');
 const tokenService = require('../services/token');
 const jwtService = require('../services/jwt');
 const emailService = require('../services/email');
-
-function validateUsername(value) {
-  if (!value) {
-    return 'Username is required';
-  }
-}
-
-function validateEmail(value) {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-}
-
-function validatePassword(value) {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-}
+const {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+  validateEmailChange,
+  validateUserPassword,
+} = require('../utils/authValidators');
 
 async function register(req, res, next) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -93,6 +72,212 @@ async function register(req, res, next) {
         });
     },
   );
+}
+
+async function patch(req, res, next) {
+  const userId = req.params.userId;
+  const user = await usersService.getById(userId);
+
+  const {
+    username,
+    email,
+    password,
+    passwordNew,
+  } = req.body;
+
+  const emailNew = email !== user.email;
+  const needPasswordCheck = password || passwordNew || emailNew;
+
+  const errors = {
+    username: validateUsername(username),
+    email: await validateEmailChange(email, userId),
+    password: needPasswordCheck && validateUserPassword(password, user),
+    passwordNew: passwordNew !== '' && validatePassword(passwordNew),
+  };
+
+  if (
+    errors.username
+      || errors.email
+      || errors.password
+      || errors.passwordNew
+  ) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
+
+  try {
+    const hashedPassword = passwordNew
+      ? crypto
+        .pbkdf2Sync(passwordNew, user.salt, 310000, 32, 'sha256')
+        .toString('hex')
+      : user.hashed_password;
+
+    const activationToken = emailNew ? uuidv4() : null;
+
+    const userData = {
+      username,
+      hashed_password: hashedPassword,
+      salt: user.salt,
+      email,
+      activationToken,
+      resetToken: null,
+    };
+
+    usersService
+      .patchById(userId, userData)
+      .then(() => {
+        if (emailNew) {
+          emailService.sendEmailChanged(email, user.email);
+          emailService.sendActivationLink(email, activationToken);
+        }
+
+        tokenService.remove(userId);
+
+        res.send(
+          { user: usersService.normalize(
+            {
+              ...userData,
+              id: userId,
+            }
+          ),
+          accessToken: null }
+        );
+      })
+      .catch(error => {
+        throw ApiError.UnexpectedError(error);
+      });
+  } catch (error) {
+    throw ApiError.UnexpectedError(error);
+  }
+}
+
+async function remove(req, res, next) {
+  const userId = req.params.userId;
+  const user = await usersService.getById(userId);
+
+  const {
+    password,
+  } = req.body;
+
+  const errors = {
+    password: validateUserPassword(password, user),
+  };
+
+  if (errors.password) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
+
+  try {
+    usersService
+      .removeById(userId)
+      .then(() => {
+        tokenService.remove(userId);
+        emailService.sendAccountRemoved(user.email);
+
+        res.send({ user: null, accessToken: null });
+      })
+      .catch(error => {
+        throw ApiError.UnexpectedError(error);
+      });
+  } catch (error) {
+    throw ApiError.UnexpectedError(error);
+  }
+}
+
+async function reset(req, res, next) {
+  const {
+    email,
+  } = req.body;
+
+  const errors = {
+    email: validateEmail(email),
+  };
+
+  if (errors.email) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
+
+  const user = await usersService.getOneByField({ email });
+
+  if (!user) {
+    throw ApiError.BadRequest('User not found');
+  }
+
+  if (user.resetToken) {
+    if (jwtService.validateResetToken(user.resetToken)) {
+      throw ApiError.BadRequest(
+        'Request token has been already sent to your email'
+      );
+    }
+  }
+
+  try {
+    const userData = usersService.normalize(user);
+    const resetToken = jwtService.generateResetToken(userData);
+
+    user.resetToken = resetToken;
+
+    user.save();
+
+    emailService.sendResetLink(email, resetToken);
+
+    res.sendStatus(200);
+  } catch (error) {
+    throw ApiError.UnexpectedError(error);
+  }
+}
+
+async function setPassword(req, res, next) {
+  const {
+    password,
+    resetToken,
+  } = req.body;
+
+  if (!resetToken) {
+    throw ApiError.BadRequest('Reset token is required');
+  }
+
+  const errors = {
+    password: validatePassword(password),
+  };
+
+  if (errors.password) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
+
+  const user = await usersService.getOneByField({ resetToken });
+
+  if (!user) {
+    throw ApiError.BadRequest('User not found or token has expired');
+  }
+
+  try {
+    const hashedPassword = crypto
+      .pbkdf2Sync(password, user.salt, 310000, 32, 'sha256')
+      .toString('hex');
+
+    const userData = {
+      username: user.username,
+      hashed_password: hashedPassword,
+      salt: user.salt,
+      email: user.email,
+      activationToken: null,
+      resetToken: null,
+    };
+
+    usersService
+      .patchById(user.id, userData)
+      .then(async(patchedUser) => {
+        await sendAuthentication(res, {
+          ...userData,
+          id: user.id,
+        });
+      })
+      .catch(error => {
+        throw ApiError.UnexpectedError(error);
+      });
+  } catch (error) {
+    throw ApiError.UnexpectedError(error);
+  }
 }
 
 async function activate(req, res, next) {
@@ -199,4 +384,8 @@ module.exports = {
   login,
   logout,
   refresh,
+  patch,
+  remove,
+  reset,
+  setPassword,
 };
