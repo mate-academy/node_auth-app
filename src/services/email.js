@@ -33,4 +33,45 @@ function sendActivationLink(email, token) {
   });
 }
 
-module.exports = { send, sendActivationLink };
+function sendEmailChanged(email, newEmail) {
+  return send({
+    email,
+    subject: 'Account email changed',
+    html: `
+      <h1>Account email changed</h1>
+      <p>Your account in Expenses App is connected to ${newEmail}</p>
+    `,
+  });
+}
+
+function sendAccountRemoved(email) {
+  return send({
+    email,
+    subject: 'Account removed',
+    html: `
+      <h1>Account removed</h1>
+      <p>Thank you for using our app!</p>
+    `,
+  });
+}
+
+function sendResetLink(email, token) {
+  const link = `${process.env.CLIENT_URL}/reset-password/${token}`;
+
+  return send({
+    email,
+    subject: 'Reset password',
+    html: `
+      <h1>Reset account password</h1>
+      <a href="${link}">${link}</a>
+    `,
+  });
+}
+
+module.exports = {
+  send,
+  sendActivationLink,
+  sendResetLink,
+  sendEmailChanged,
+  sendAccountRemoved,
+};
