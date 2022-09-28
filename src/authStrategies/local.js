@@ -14,6 +14,12 @@ const localStrategy = new LocalStrategy({
         });
       }
 
+      if (user.activationToken) {
+        return next(null, false, {
+          message: 'Account activation not completed, check your mail',
+        });
+      }
+
       crypto.pbkdf2(
         password,
         user.salt,
