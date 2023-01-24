@@ -1,9 +1,9 @@
 'use strict';
 
-import { sequelize } from '../utils/db';
-import { DataTypes } from 'sequelize';
+const { sequelize } = require('../utils/db');
+const { DataTypes } = require('sequelize');
 
-export const User = sequelize.define('user', {
+const User = sequelize.define('user', {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -26,3 +26,5 @@ export const User = sequelize.define('user', {
     allowNull: true,
   },
 });
+
+module.exports = { User };

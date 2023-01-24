@@ -1,8 +1,8 @@
 'use strict';
 
-import { Sequelize } from 'sequelize';
+const { Sequelize } = require('sequelize');
 
-export const sequelize = new Sequelize({
+const sequelize = new Sequelize({
   dialect: 'postgres',
   host: process.env.POSTGRES_HOST,
   database: process.env.POSTGRES_DB,
@@ -10,3 +10,5 @@ export const sequelize = new Sequelize({
   password: process.env.POSTGRES_PASSWORD,
   logging: false,
 });
+
+module.exports = { sequelize };

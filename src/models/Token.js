@@ -1,8 +1,8 @@
 'use strict';
 
-import { sequelize } from '../utils/db';
-import { DataTypes } from 'sequelize';
-import { User } from './User';
+const { sequelize } = require('../utils/db');
+const { DataTypes } = require('sequelize');
+const { User } = require('./User');
 
 const Token = sequelize.define('token', {
   refreshToken: {
