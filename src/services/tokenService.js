@@ -1,6 +1,6 @@
 'use strict';
 
-const { Token } = require('../models/Token');
+import { Token } from '../models/Token.js';
 
 const save = async(userId, refreshToken) => {
   const token = await Token.findOne({
@@ -32,6 +32,4 @@ const remove = async(userId) => {
   });
 };
 
-module.exports = {
-  save, getByToken, remove,
-};
+export default { save, getByToken, remove };

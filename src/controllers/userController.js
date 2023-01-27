@@ -1,11 +1,12 @@
 'use strict';
 
-const userService = require('../services/userService');
+import userService from '../services/userService.js';
 
 const getAll = async(req, res) => {
   const users = await userService.getAllActive();
+  const normalizedUsers = users.map(userService.normalize);
 
-  res.send(users.map(userService.normalize));
+  res.status(200).send(normalizedUsers);
 };
 
-module.exports = { getAll };
+export default { getAll };

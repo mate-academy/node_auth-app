@@ -1,6 +1,6 @@
 'use strict';
 
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const generateAccessToken = (user) => {
   return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '30m' });
@@ -26,7 +26,7 @@ const validateRefreshToken = (token) => {
   }
 };
 
-module.exports = {
+export default {
   generateAccessToken,
   generateRefreshToken,
   validateAccessToken,

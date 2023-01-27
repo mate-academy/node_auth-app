@@ -1,8 +1,7 @@
 'use strict';
 
-require('dotenv/config');
-
-const { send } = require('./services/emailService');
+import 'dotenv/config';
+import { send } from './services/emailService.js';
 
 send({
   email: 'revof43862@dentaltz.com',

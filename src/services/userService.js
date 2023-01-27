@@ -1,10 +1,12 @@
 'use strict';
 
-const { User } = require('../models/User');
-const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcrypt');
-const emailService = require('./emailService');
-const { ApiError } = require('../exceptions/ApiError');
+import { User } from '../models/User.js';
+import { ApiError } from '../exceptions/ApiError.js';
+import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
+import emailService from './emailService.js';
+import jwtService from './jwtService.js';
+import tokenService from './tokenService.js';
 
 const getAllActive = () => {
   return User.findAll({
@@ -58,12 +60,33 @@ const reset = async(email) => {
   await emailService.sendPasswordResetLink(email, resetToken);
 };
 
+const checkIfAuthorized = async(refreshToken) => {
+  const userData = jwtService.validateRefreshToken(refreshToken);
+
+  if (!userData) {
+    throw ApiError.Unauthorized();
+  }
+
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!token) {
+    throw ApiError.Unauthorized();
+  }
+
+  return userData;
+};
+
 const normalize = ({ id, name, email }) => {
   return {
     id, name, email,
   };
 };
 
-module.exports = {
-  getAllActive, getByEmail, register, normalize, reset,
+export default {
+  getAllActive,
+  getByEmail,
+  register,
+  normalize,
+  checkIfAuthorized,
+  reset,
 };

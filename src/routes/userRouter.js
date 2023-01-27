@@ -1,15 +1,14 @@
 'use strict';
 
-const express = require('express');
-const userController = require('../controllers/userController');
-const { authMiddleware } = require('../middlewares/authMiddleware');
-const { catchError } = require('../utils/catchError');
+import express from 'express';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { catchError } from '../utils/catchError.js';
+import userController from '../controllers/userController.js';
 
-const userRouter = new express.Router();
+export const userRouter = new express.Router();
 
 userRouter.get(
   '/',
   catchError(authMiddleware),
-  catchError(userController.getAll));
-
-module.exports = { userRouter };
+  catchError(userController.getAll)
+);

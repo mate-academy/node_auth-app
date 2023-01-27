@@ -1,6 +1,6 @@
 'use strict';
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(status, message, errors = {}) {
     super(message);
 
@@ -20,5 +20,3 @@ class ApiError extends Error {
     return new ApiError(404, 'Not Found');
   }
 }
-
-module.exports = { ApiError };

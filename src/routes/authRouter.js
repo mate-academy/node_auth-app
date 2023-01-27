@@ -1,10 +1,10 @@
 'use strict';
 
-const express = require('express');
-const authController = require('../controllers/authController');
-const { catchError } = require('../utils/catchError');
+import express from 'express';
+import { catchError } from '../utils/catchError.js';
+import authController from '../controllers/authController.js';
 
-const authRouter = new express.Router();
+export const authRouter = new express.Router();
 
 authRouter.post('/registration', catchError(authController.register));
 
@@ -22,4 +22,11 @@ authRouter.post('/change-name', catchError(authController.changeName));
 authRouter.post('/change-email', catchError(authController.changeEmail));
 authRouter.post('/change-password', catchError(authController.changePassword));
 
-module.exports = { authRouter };
+authRouter.get('/authenticate/google',
+  catchError(authController.loginWithGoogle));
+
+authRouter.get('/authenticate/github',
+  catchError(authController.loginWithGithub));
+
+authRouter.get('/authenticate/facebook',
+  catchError(authController.loginWithFacebook));

@@ -1,6 +1,6 @@
 'use strict';
 
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -26,8 +26,6 @@ const send = ({ email, subject, html }) => {
 const sendActivalionLink = (email, token) => {
   const link = `http://127.0.0.1:3001/activate/${token}`;
 
-  console.log(`Send to ${email}`);
-
   return send({
     email,
     subject: 'Account activation',
@@ -52,8 +50,6 @@ const sendPasswordResetLink = (email, token) => {
 };
 
 const sendEmailChangeNotification = (email) => {
-  console.log(`Send to ${email}`);
-
   return send({
     email,
     subject: 'Auth App',
@@ -64,6 +60,9 @@ const sendEmailChangeNotification = (email) => {
   });
 };
 
-module.exports = {
-  send, sendActivalionLink, sendPasswordResetLink, sendEmailChangeNotification,
+export default {
+  send,
+  sendActivalionLink,
+  sendPasswordResetLink,
+  sendEmailChangeNotification,
 };

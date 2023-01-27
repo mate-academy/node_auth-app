@@ -1,9 +1,9 @@
 'use strict';
 
-const { sequelize } = require('../utils/db');
-const { DataTypes } = require('sequelize');
+import { sequelize } from '../utils/db.js';
+import { DataTypes } from 'sequelize';
 
-const User = sequelize.define('user', {
+export const User = sequelize.define('user', {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -25,6 +25,19 @@ const User = sequelize.define('user', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  isGoogleConnected: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    default: false,
+  },
+  isGithubConnected: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    default: false,
+  },
+  isFacebookConnected: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    default: false,
+  },
 });
-
-module.exports = { User };

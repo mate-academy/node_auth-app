@@ -1,53 +1,24 @@
 'use strict';
 
-const bcrypt = require('bcrypt');
-const { User } = require('../models/User');
-const userService = require('../services/userService');
-const jwtService = require('../services/jwtService');
-const tokenService = require('../services/tokenService');
-const { ApiError } = require('../exceptions/ApiError');
-const emailService = require('../services/emailService');
-const { v4: uuidv4 } = require('uuid');
-
-const validateName = (value) => {
-  if (!value) {
-    return 'Name is required';
-  }
-
-  if (value.length < 3) {
-    return 'Ate least 3 characters';
-  }
-};
-
-const validateEmail = (value) => {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-};
-
-const validatePassword = (value) => {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-};
+import validation from '../utils/validation.js';
+import { ApiError } from '../exceptions/ApiError.js';
+import userService from '../services/userService.js';
+import { User } from '../models/User.js';
+import bcrypt from 'bcrypt';
+import jwtService from '../services/jwtService.js';
+import tokenService from '../services/tokenService.js';
+import emailService from '../services/emailService.js';
+import { v4 as uuidv4 } from 'uuid';
+import socialNetworksAuthService from
+'../services/socialNetworksAuthService.js';
 
 const register = async(req, res, next) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    name: validateName(name),
-    email: validateEmail(email),
-    password: validatePassword(password),
+    name: validation.validateName(name),
+    email: validation.validateEmail(email),
+    password: validation.validatePassword(password),
   };
 
   if (errors.name || errors.email || errors.password) {
@@ -56,7 +27,7 @@ const register = async(req, res, next) => {
 
   await userService.register(name, email, password);
 
-  res.send({ message: 'OK' });
+  res.status(200).send({ message: 'OK' });
 };
 
 const activate = async(req, res, next) => {
@@ -143,7 +114,7 @@ const sendAuthentication = async(res, user) => {
     secure: true,
   });
 
-  res.send({
+  res.status(201).send({
     user: userData,
     accessToken,
   });
@@ -154,7 +125,7 @@ const reset = async(req, res) => {
 
   await userService.reset(email);
 
-  res.send({ message: 'OK' });
+  res.status(200).send({ message: 'OK' });
 };
 
 const resetPassword = async(req, res) => {
@@ -169,16 +140,16 @@ const resetPassword = async(req, res) => {
     throw ApiError.NotFound('Wrong reset token');
   }
 
-  if (newPassword !== passwordConfirmation) {
-    throw ApiError.BadRequest('Passwords did not match');
-  }
-
   const errors = {
-    newPassword: validatePassword(newPassword),
-    passwordConfirmation: validatePassword(passwordConfirmation),
+    newPassword: validation.validatePassword(newPassword),
+    passwordConfirmation: validation.validatePassword(passwordConfirmation),
+    passwordsMatching: validation
+      .validatePasswordsMatching(newPassword, passwordConfirmation),
   };
 
-  if (errors.newPassword || errors.passwordConfirmation) {
+  if (errors.newPassword
+    || errors.passwordConfirmation
+    || errors.passwordsMatching) {
     throw ApiError('Validation error', errors);
   }
 
@@ -189,27 +160,17 @@ const resetPassword = async(req, res) => {
 
   await user.save();
 
-  res.send({ message: 'OK' });
+  res.status(200).send({ message: 'OK' });
 };
 
 const changeName = async(req, res) => {
   const { refreshToken } = req.cookies;
   const { newName } = req.body;
 
-  const userData = jwtService.validateRefreshToken(refreshToken);
-
-  if (!userData) {
-    throw ApiError.Unauthorized();
-  }
-
-  const token = await tokenService.getByToken(refreshToken);
-
-  if (!token) {
-    throw ApiError.Unauthorized();
-  }
+  const userData = await userService.checkIfAuthorized(refreshToken);
 
   const errors = {
-    newName: validateName(newName),
+    newName: validation.validateName(newName),
   };
 
   if (errors.newName) {
@@ -229,20 +190,10 @@ const changeEmail = async(req, res) => {
   const { refreshToken } = req.cookies;
   const { password, newEmail } = req.body;
 
-  const userData = jwtService.validateRefreshToken(refreshToken);
-
-  if (!userData) {
-    throw new ApiError.Unauthorized();
-  }
-
-  const token = await tokenService.getByToken(refreshToken);
-
-  if (!token) {
-    throw new ApiError.Unauthorized();
-  }
+  const userData = await userService.checkIfAuthorized(refreshToken);
 
   const errors = {
-    newEmail: validateEmail(newEmail),
+    newEmail: validation.validateEmail(newEmail),
   };
 
   if (errors.newEmail) {
@@ -276,24 +227,14 @@ const changeEmail = async(req, res) => {
 
   await emailService.sendActivalionLink(newEmail, activationToken);
 
-  res.send({ message: 'OK' });
+  res.status(200).send({ message: 'OK' });
 };
 
 const changePassword = async(req, res) => {
   const { password, newPassword, passwordConfirmation } = req.body;
   const { refreshToken } = req.cookies;
 
-  const userData = jwtService.validateRefreshToken(refreshToken);
-
-  if (!userData) {
-    throw ApiError.Unauthorized();
-  }
-
-  const token = await tokenService.getByToken(refreshToken);
-
-  if (!token) {
-    throw ApiError.Unauthorized();
-  }
+  const userData = await userService.checkIfAuthorized(refreshToken);
 
   const user = await userService.getByEmail(userData.email);
 
@@ -304,16 +245,16 @@ const changePassword = async(req, res) => {
   }
 
   const errors = {
-    newPassword: validatePassword(newPassword),
-    passwordConfirmation: validatePassword(passwordConfirmation),
+    newPassword: validation.validatePassword(newPassword),
+    passwordConfirmation: validation.validatePassword(passwordConfirmation),
+    passwordsMatching: validation
+      .validatePasswordsMatching(newPassword, passwordConfirmation),
   };
 
-  if (errors.newPassword || errors.passwordConfirmation) {
+  if (errors.newPassword
+    || errors.passwordConfirmation
+    || errors.passwordsMatching) {
     throw ApiError.BadRequest('Validation error', errors);
-  }
-
-  if (newPassword !== passwordConfirmation) {
-    throw ApiError.BadRequest('Passwords did not match');
   }
 
   const hash = await bcrypt.hash(newPassword, 10);
@@ -325,7 +266,64 @@ const changePassword = async(req, res) => {
   await sendAuthentication(res, user);
 };
 
-module.exports = {
+const loginWithGoogle = async(req, res) => {
+  const code = req.query.code;
+  const accessToken = await socialNetworksAuthService
+    .getGoogleAccessTokenFromCode(code);
+  const userData = await socialNetworksAuthService
+    .getGoogleUserInfo(accessToken);
+
+  const refreshToken = jwtService.generateRefreshToken(userData);
+
+  res.cookie('refreshTokenGoogle', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  res.redirect(process.env.CLIENT_URL);
+};
+
+const loginWithGithub = async(req, res) => {
+  const code = req.query.code;
+  const accessToken = await socialNetworksAuthService
+    .getGithubAccessTokenFromCode(code);
+  const userData = await socialNetworksAuthService
+    .getGithubUserInfo(accessToken);
+
+  const refreshToken = jwtService.generateRefreshToken(userData);
+
+  res.cookie('refreshTokenGithub', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  res.redirect(process.env.CLIENT_URL);
+};
+
+const loginWithFacebook = async(req, res) => {
+  const code = req.query.code;
+  const accessToken = await socialNetworksAuthService
+    .getFacebookAccessTokenFromCode(code);
+  const userData = await socialNetworksAuthService
+    .getFacebookUserInfo(accessToken);
+
+  const refreshToken = jwtService.generateRefreshToken(userData);
+
+  res.cookie('refreshTokenFacebook', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  res.redirect(process.env.CLIENT_URL);
+};
+
+export default {
   register,
   activate,
   login,
@@ -336,4 +334,7 @@ module.exports = {
   changeName,
   changeEmail,
   changePassword,
+  loginWithGoogle,
+  loginWithGithub,
+  loginWithFacebook,
 };

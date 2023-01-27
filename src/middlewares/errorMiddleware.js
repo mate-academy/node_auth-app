@@ -1,8 +1,8 @@
 'use strict';
 
-const { ApiError } = require('../exceptions/ApiError');
+import { ApiError } from '../exceptions/ApiError.js';
 
-const errorMiddleware = (error, req, res, next) => {
+export const errorMiddleware = (error, req, res, next) => {
   if (error instanceof ApiError) {
     const { status, message, errors } = error;
 
@@ -17,5 +17,3 @@ const errorMiddleware = (error, req, res, next) => {
     message: 'Unexpected error',
   });
 };
-
-module.exports = { errorMiddleware };

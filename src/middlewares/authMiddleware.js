@@ -1,9 +1,9 @@
 'use strict';
 
-const jwtService = require('../services/jwtService');
-const { ApiError } = require('../exceptions/ApiError');
+import { ApiError } from '../exceptions/ApiError.js';
+import jwtService from '../services/jwtService.js';
 
-const authMiddleware = (req, res, next) => {
+export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader) {
@@ -24,5 +24,3 @@ const authMiddleware = (req, res, next) => {
 
   next();
 };
-
-module.exports = { authMiddleware };
