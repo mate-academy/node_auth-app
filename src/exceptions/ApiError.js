@@ -19,4 +19,8 @@ export class ApiError extends Error {
   static NotFound() {
     return new ApiError(404, 'Not Found');
   }
+
+  static UnprocessableEntity(message) {
+    return new ApiError(422, message);
+  }
 }

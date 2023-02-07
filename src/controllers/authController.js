@@ -9,8 +9,8 @@ import jwtService from '../services/jwtService.js';
 import tokenService from '../services/tokenService.js';
 import emailService from '../services/emailService.js';
 import { v4 as uuidv4 } from 'uuid';
-import socialNetworksAuthService from
-'../services/socialNetworksAuthService.js';
+import socialAuthServices from '../services/socialAuthServices.js';
+import { GoogleData } from '../models/GoogleData.js';
 
 const register = async(req, res, next) => {
   const { name, email, password } = req.body;
@@ -70,6 +70,7 @@ const login = async(req, res, next) => {
 
 const refresh = async(req, res, next) => {
   const { refreshToken } = req.cookies;
+
   const userData = jwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {
@@ -105,7 +106,7 @@ const sendAuthentication = async(res, user) => {
   const accessToken = jwtService.generateAccessToken(userData);
   const refreshToken = jwtService.generateRefreshToken(userData);
 
-  await tokenService.save(user.id, refreshToken);
+  await tokenService.save(userData.id, refreshToken);
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -266,61 +267,131 @@ const changePassword = async(req, res) => {
   await sendAuthentication(res, user);
 };
 
-const loginWithGoogle = async(req, res) => {
-  const code = req.query.code;
-  const accessToken = await socialNetworksAuthService
-    .getGoogleAccessTokenFromCode(code);
-  const userData = await socialNetworksAuthService
-    .getGoogleUserInfo(accessToken);
+const authWithGoogle = async(req, res) => {
+  const { code } = req.query;
 
-  const refreshToken = jwtService.generateRefreshToken(userData);
+  const token = await socialAuthServices.getGoogleAccessTokenFromCode(code);
+  const userData = await socialAuthServices.getGoogleUserInfo(token);
 
-  res.cookie('refreshTokenGoogle', refreshToken, {
+  if (!userData.verified_email) {
+    throw ApiError.UnprocessableEntity('Email does not verified by Google');
+  }
+
+  const existingUser = await userService.getByEmail(userData.email);
+  let userId = existingUser?.id || null;
+  let normalizedUser = existingUser
+    ? userService.normalize(existingUser)
+    : null;
+
+  if (!existingUser) {
+    const createdUser = await userService.createUser({
+      name: userData.given_name, email: userData.email, isGoogleConnected: true,
+    });
+
+    userId = createdUser.dataValues.id;
+    normalizedUser = userService.normalize(createdUser.dataValues);
+  }
+
+  const googleData = await socialAuthServices
+    .getGoogleData(userId);
+
+  if (!googleData) {
+    await socialAuthServices.saveGoogleData({
+      email: userData.email,
+      verifiedEmail: userData.verified_email,
+      name: userData.name,
+      givenName: userData.given_name,
+      familyName: userData.family_name,
+      userId,
+    });
+  }
+
+  const refreshToken = jwtService.generateRefreshToken(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'none',
     secure: true,
   });
 
-  res.redirect(process.env.CLIENT_URL);
+  res.redirect(302, process.env.CLIENT_URL);
 };
 
-const loginWithGithub = async(req, res) => {
-  const code = req.query.code;
-  const accessToken = await socialNetworksAuthService
-    .getGithubAccessTokenFromCode(code);
-  const userData = await socialNetworksAuthService
-    .getGithubUserInfo(accessToken);
+const connectGoogle = async(req, res) => {
+  const { code } = req.query;
+  const { refreshToken } = req.cookies;
 
-  const refreshToken = jwtService.generateRefreshToken(userData);
+  const existingUser = await jwtService.validateRefreshToken(refreshToken);
 
-  res.cookie('refreshTokenGithub', refreshToken, {
+  if (!existingUser) {
+    throw ApiError.Unauthorized();
+  }
+
+  const existingToken = await tokenService.getByToken(refreshToken);
+
+  if (!existingToken) {
+    throw ApiError.Unauthorized();
+  }
+
+  const token = await socialAuthServices
+    .getGoogleConnectAccessTokenFromCode(code);
+  const userData = await socialAuthServices.getGoogleUserInfo(token);
+
+  const foundedUser = await userService.getByEmail(existingUser.email);
+
+  foundedUser.isGoogleConnected = true;
+  await foundedUser.save();
+
+  await socialAuthServices.saveGoogleData({
+    email: userData.email,
+    verifiedEmail: userData.verified_email,
+    name: userData.name,
+    givenName: userData.given_name,
+    familyName: userData.family_name,
+    userId: foundedUser.id,
+  });
+
+  res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'none',
     secure: true,
   });
 
-  res.redirect(process.env.CLIENT_URL);
+  res.redirect(302, process.env.CLIENT_URL);
 };
 
-const loginWithFacebook = async(req, res) => {
-  const code = req.query.code;
-  const accessToken = await socialNetworksAuthService
-    .getFacebookAccessTokenFromCode(code);
-  const userData = await socialNetworksAuthService
-    .getFacebookUserInfo(accessToken);
+const disconnectGoogle = async(req, res) => {
+  const { refreshToken } = req.cookies;
 
-  const refreshToken = jwtService.generateRefreshToken(userData);
+  const existingUser = await jwtService.validateRefreshToken(refreshToken);
 
-  res.cookie('refreshTokenFacebook', refreshToken, {
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+  if (!existingUser) {
+    throw ApiError.Unauthorized();
+  }
+
+  const existingToken = await tokenService.getByToken(refreshToken);
+
+  if (!existingToken) {
+    throw ApiError.Unauthorized();
+  }
+
+  const updatedUser = await userService.getByEmail(existingUser.email);
+
+  updatedUser.isGoogleConnected = false;
+
+  await updatedUser.save();
+
+  await GoogleData.destroy({
+    where: {
+      userId: existingUser.id,
+    },
   });
 
-  res.redirect(process.env.CLIENT_URL);
+  res.send({ updatedUser: userService.normalize(updatedUser) });
 };
 
 export default {
@@ -334,7 +405,7 @@ export default {
   changeName,
   changeEmail,
   changePassword,
-  loginWithGoogle,
-  loginWithGithub,
-  loginWithFacebook,
+  authWithGoogle,
+  connectGoogle,
+  disconnectGoogle,
 };

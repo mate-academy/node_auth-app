@@ -2,6 +2,8 @@
 
 import nodemailer from 'nodemailer';
 
+const userOrigin = process.env.CLIENT_ORIGIN || '';
+
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   host: process.env.SMTP_HOST,
@@ -24,7 +26,7 @@ const send = ({ email, subject, html }) => {
 };
 
 const sendActivalionLink = (email, token) => {
-  const link = `http://127.0.0.1:3001/activate/${token}`;
+  const link = `${userOrigin}/login-app/#/activate/${token}`;
 
   return send({
     email,
@@ -37,7 +39,7 @@ const sendActivalionLink = (email, token) => {
 };
 
 const sendPasswordResetLink = (email, token) => {
-  const link = `http://127.0.0.1:3001/reset/${token}`;
+  const link = `${userOrigin}/login-app/#/reset/${token}`;
 
   return send({
     email,

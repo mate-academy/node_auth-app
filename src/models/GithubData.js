@@ -4,7 +4,7 @@ import { sequelize } from '../utils/db.js';
 import { DataTypes } from 'sequelize';
 import { User } from './User.js';
 
-export const GithubData = sequelize.define('githabData', {
+export const GithubData = sequelize.define('githubData', {
   login: {
     type: DataTypes.STRING,
     allowNull: false,

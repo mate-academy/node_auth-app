@@ -9,10 +9,10 @@ import { errorMiddleware } from './middlewares/errorMiddleware.js';
 import { userRouter } from './routes/userRouter.js';
 
 const app = express();
-const PORT = process.env.PORT || 6000;
+const PORT = process.env.PORT || 3002;
 
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: process.env.CLIENT_ORIGIN,
   credentials: true,
 }));
 app.use(cookieParser());

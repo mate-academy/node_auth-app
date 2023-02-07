@@ -6,7 +6,7 @@ import { DataTypes } from 'sequelize';
 
 export const Token = sequelize.define('token', {
   refreshToken: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(3000),
     allowNull: false,
   },
 });

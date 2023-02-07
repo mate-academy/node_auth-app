@@ -1,10 +1,11 @@
 'use strict';
 
 import 'dotenv/config';
-import { send } from './services/emailService.js';
 
-send({
-  email: 'revof43862@dentaltz.com',
+import emailService from './services/emailService.js';
+
+emailService.send({
+  email: 'test@gmail.com',
   subject: 'Test',
   html: '123',
 });

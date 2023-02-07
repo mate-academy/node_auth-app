@@ -26,7 +26,7 @@ const getByToken = (refreshToken) => {
   });
 };
 
-const remove = async(userId) => {
+const remove = (userId) => {
   return Token.destroy({
     where: { userId },
   });
