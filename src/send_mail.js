@@ -4,7 +4,7 @@ require('dotenv').config();
 const { send } = require('./services/emailService');
 
 send({
-  email: 'memig58540@dogemn.com',
+  email: 'vovzin43@gmail.com',
   subject: 'test',
-  html: '<h1>Its working!!!</h1>',
+  html: '<h1>Может еще одно задание бахнем?!!</h1>',
 });
