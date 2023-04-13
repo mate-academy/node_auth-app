@@ -6,6 +6,7 @@ const cors = require('cors');
 const authRouter = require('./routes/authRouter');
 const express = require('express');
 const { userRouter } = require('./routes/userRouter');
+const { errorMiddleware } = require('./middlewares/errorMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,8 +16,11 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
 app.use(authRouter);
 app.use('/users', userRouter);
+
+app.use(errorMiddleware);
 
 app.get('/', (req, res) => {
   res.send('Hello');

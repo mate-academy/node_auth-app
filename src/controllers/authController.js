@@ -1,24 +1,15 @@
 'use strict';
 
-const { v4: uuidv4 } = require('uuid');
-
 const { User } = require('../models/user');
-const emailService = require('../services/emailService');
 const userService = require('../services/userService');
 const jwtService = require('../services/jwtService');
 
 const register = async(req, res, next) => {
   const { email, password } = req.body;
-  const activationToken = uuidv4();
-  const user = await User.create({
-    email,
-    password,
-    activationToken,
-  });
 
-  await emailService.sendActivationLink(email, activationToken);
+  await userService.register(email, password);
 
-  res.send(user);
+  res.send({ message: 'OK' });
 };
 
 const activate = async(req, res, next) => {
@@ -43,6 +34,8 @@ const login = async(req, res, next) => {
 
   if (password !== user.password) {
     res.sendStatus(401);
+
+    return;
   };
 
   const userData = userService.normalize(user);
