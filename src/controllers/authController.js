@@ -186,7 +186,6 @@ const changePassword = async(req, res, next) => {
   } else {
     res.sendStatus(402);
   }
-
 };
 
 module.exports = {
