@@ -1,6 +1,7 @@
 'use strict';
 
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 
 const { User } = require('../models/user');
 const emailService = require('../services/emailService');
@@ -18,14 +19,19 @@ const getByEmail = (email) => {
   });
 };
 
-const normalize = ({ id, email }) => {
+const getById = (id) => {
+  return User.findOne({
+    where: { id },
+  });
+};
+
+const normalize = ({ id, email, name }) => {
   return {
-    id, email,
+    id, email, name,
   };
 };
 
-const register = async(email, password) => {
-  const activationToken = uuidv4();
+const register = async(email, password, name) => {
   const existingUser = await getByEmail(email);
 
   if (existingUser) {
@@ -34,15 +40,26 @@ const register = async(email, password) => {
     });
   }
 
+  const activationToken = uuidv4();
+  const hash = await bcrypt.hash(password, 10);
+
   await User.create({
+    name,
     email,
-    password,
+    password: hash,
     activationToken,
   });
 
   await emailService.sendActivationLink(email, activationToken);
 };
 
+const generateRestoreCode = () => {
+  const min = 100000;
+  const max = 999999;
+
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 module.exports = {
-  getAllActive, normalize, getByEmail, register,
+  getAllActive, normalize, getByEmail, register, getById, generateRestoreCode,
 };

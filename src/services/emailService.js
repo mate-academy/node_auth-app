@@ -31,7 +31,7 @@ const send = async({ email, subject, html }) => {
 };
 
 const sendActivationLink = (email, token) => {
-  const link = `${CLIENT_URL}/activate/${token}`;
+  const link = `${CLIENT_URL}/auth/activate/${token}`;
 
   return send({
     email,
@@ -43,6 +43,14 @@ const sendActivationLink = (email, token) => {
   });
 };
 
+const sendRestoreCode = (email, code) => {
+  return send({
+    email,
+    subject: 'Restore Code',
+    html: `<h1>Restore Code: ${code}</h1>`,
+  });
+};
+
 module.exports = {
-  send, sendActivationLink,
+  send, sendActivationLink, sendRestoreCode,
 };

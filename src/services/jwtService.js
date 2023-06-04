@@ -5,7 +5,11 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
 const generateAccessToken = (user) => {
-  return jwt.sign(user, process.env.JWT_ACCESS_SECRET);
+  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '10m' });
+};
+
+const generateRefreshToken = (user) => {
+  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: '1d' });
 };
 
 const validateAccessToken = (token) => {
@@ -15,7 +19,17 @@ const validateAccessToken = (token) => {
     return null;
   }
 };
+const validateRefreshToken = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  } catch (error) {
+    return null;
+  }
+};
 
 module.exports = {
-  generateAccessToken, validateAccessToken,
+  generateAccessToken,
+  validateAccessToken,
+  generateRefreshToken,
+  validateRefreshToken,
 };

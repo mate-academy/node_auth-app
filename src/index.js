@@ -3,8 +3,10 @@
 require('dotenv').config();
 
 const cors = require('cors');
-const authRouter = require('./routes/authRouter');
 const express = require('express');
+const cookieParser = require('cookie-parser');
+
+const authRouter = require('./routes/authRouter');
 const { userRouter } = require('./routes/userRouter');
 const { errorMiddleware } = require('./middlewares/errorMiddleware');
 
@@ -15,6 +17,7 @@ app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
 }));
+app.use(cookieParser());
 app.use(express.json());
 
 app.use(authRouter);
