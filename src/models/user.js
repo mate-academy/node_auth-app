@@ -24,6 +24,10 @@ const User = sequelize.define('user', {
   restoreCode: {
     type: DataTypes.STRING,
   },
+  withGoogle: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 module.exports = { User };

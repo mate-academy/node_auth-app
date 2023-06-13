@@ -46,6 +46,22 @@ const register = async(req, res, next) => {
   res.send({ message: 'OK' });
 };
 
+const registerWithGoogle = async(req, res, next) => {
+  const { email, name, id } = req.body;
+  const errors = {
+    email: validateEmai(email),
+  };
+
+  if (errors.email || errors.password) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
+  await userService.registerWithGoogle(email, id, name);
+
+  const user = await userService.getByEmail(email);
+
+  await sendAuthentication(res, user);
+};
+
 const activate = async(req, res, next) => {
   const { activationToken } = req.params;
   const user = await User.findOne({
@@ -190,6 +206,7 @@ const changePassword = async(req, res, next) => {
 
 module.exports = {
   register,
+  registerWithGoogle,
   activate,
   login,
   refresh,

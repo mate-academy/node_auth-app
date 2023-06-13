@@ -25,9 +25,9 @@ const getById = (id) => {
   });
 };
 
-const normalize = ({ id, email, name }) => {
+const normalize = ({ id, email, name, withGoogle }) => {
   return {
-    id, email, name,
+    id, email, name, withGoogle,
   };
 };
 
@@ -53,6 +53,23 @@ const register = async(email, password, name) => {
   await emailService.sendActivationLink(email, activationToken);
 };
 
+const registerWithGoogle = async(email, password, name) => {
+  const existingUser = await getByEmail(email);
+
+  if (existingUser) {
+    throw ApiError.BadRequest('User already exists');
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+
+  await User.create({
+    name,
+    email,
+    password: hash,
+    withGoogle: true,
+  });
+};
+
 const generateRestoreCode = () => {
   const min = 100000;
   const max = 999999;
@@ -61,5 +78,11 @@ const generateRestoreCode = () => {
 };
 
 module.exports = {
-  getAllActive, normalize, getByEmail, register, getById, generateRestoreCode,
+  getAllActive,
+  normalize,
+  getByEmail,
+  register,
+  getById,
+  generateRestoreCode,
+  registerWithGoogle,
 };

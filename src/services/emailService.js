@@ -7,7 +7,7 @@ const {
   SMTP_PORT,
   SMTP_USER,
   SMTP_PASSWORD,
-  CLIENT_URL,
+  CLIENT_URL_MAIL,
 } = process.env;
 
 const transporter = nodemailer.createTransport({
@@ -31,7 +31,7 @@ const send = async({ email, subject, html }) => {
 };
 
 const sendActivationLink = (email, token) => {
-  const link = `${CLIENT_URL}/auth/activate/${token}`;
+  const link = `${CLIENT_URL_MAIL}/auth/activate/${token}`;
 
   return send({
     email,
