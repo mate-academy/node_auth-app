@@ -5,6 +5,7 @@
 # Node
 node_modules
 .env
+package-lock.json
 
 # MacOS
 .DS_Store
