@@ -1,11 +1,14 @@
 import jwt from 'jsonwebtoken';
 
+const expiresInAccess = { expiresIn: '3600s'};
+const expiresInRefresh = { expiresIn: '3600000s'};
+
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '3600s'});
+  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, expiresInAccess);
 }
 
 function generateRefreshToken(user) {
-  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: '3600000s'});
+  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, expiresInRefresh);
 }
 
 function validateAccessToken(user) {

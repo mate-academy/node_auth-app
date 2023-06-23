@@ -5,13 +5,12 @@ import { userService } from '../services/userServices.js';
 import { jwtService } from '../services/jwtService.js';
 import { ApiError } from '../exceptions/ApiError.js';
 import { tokenService } from '../services/tokenService.js';
+import { emailPattern } from '../utils/emailPattern.js';
 
 function validateEmail(value) {
   if (!value) {
     return 'Email is required';
   }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
   if (!emailPattern.test(value)) {
     return 'Email is not valid';
@@ -77,7 +76,6 @@ async function activate(req, res, next) {
   user.activationToken = null;
   await user.save();
 
-  // res.send(user);
   await sendAuthentication(res, user)
 };
 
@@ -139,12 +137,11 @@ async function sendAuthentication(res, user) {
   const refreshToken = jwtService.generateRefreshToken(userData);
 
   await tokenService.save(user.id, refreshToken);
+  const maxAge = 30 * 24 * 60 * 60 * 1000;
   
   res.cookie('refreshToken', refreshToken, {
-    maxAge: 30 * 24 * 60 * 60 * 1000,
+    maxAge,
     httpOnly: true,
-    sameSite: none,
-    secure: true,
   });
 
   res.send({
