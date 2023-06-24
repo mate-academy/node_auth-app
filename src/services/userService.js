@@ -13,9 +13,7 @@ function validateEmail(email) {
     throw ApiError.BadRequest('Email is required', {
       email: 'Email is required',
     });
-  }
-
-  if (!emailRegex.test(email)) {
+  } else if (!emailRegex.test(email)) {
     throw ApiError.BadRequest('Email is invalid', {
       email: 'Email is invalid',
     });
@@ -23,16 +21,10 @@ function validateEmail(email) {
 }
 
 function validatePassword(password) {
-  if (!password) {
-    throw ApiError.BadRequest('Password is required', {
-      password: 'Password is required',
-    });
-  }
+  if (!password || password.length < 6) {
+    const errMsg = !password ? 'Password is required' : 'Password is too short';
 
-  if (password.length < 6) {
-    throw ApiError.BadRequest('Password is too short', {
-      password: 'Password is too short',
-    });
+    throw ApiError.BadRequest(errMsg, { password: errMsg });
   }
 }
 

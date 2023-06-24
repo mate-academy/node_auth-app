@@ -6,12 +6,15 @@ const { ApiError } = require('../exceptions/ApiError.js');
 async function register(req, res) {
   const { name, email, password } = req.body;
 
-  const errors = {
-    email: userService.validateEmail(email),
-    password: userService.validatePassword(password),
-  };
+  const emailError = userService.validateEmail(email);
+  const passwordError = userService.validatePassword(password);
 
-  if (Object.values(errors).some((error) => error)) {
+  if (emailError || passwordError) {
+    const errors = {
+      email: emailError,
+      password: passwordError,
+    };
+
     throw ApiError.BadRequest('Validation error', errors);
   }
 
