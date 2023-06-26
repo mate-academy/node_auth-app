@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const userService = require('../services/userService.js');
 const jwtService = require('../services/jwtService.js');
 const tokenService = require('../services/tokenService.js');
+const emailService = require('../services/emailService.js');
 const { ApiError } = require('../exceptions/ApiError.js');
 const { User } = require('../models/User.js');
 
@@ -63,22 +64,6 @@ async function login(req, res) {
   await sendAuthentication(res, user);
 }
 
-async function sendAuthentication(res, user) {
-  const userData = userService.normalize(user);
-  const refreshToken = jwtService.generateRefreshToken(userData);
-
-  await tokenService.save(user.id, refreshToken);
-
-  res.cookie('refreshToken', refreshToken, {
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
-  });
-
-  res.redirect('/profile');
-}
-
 async function refresh(req, res) {
   const { refreshToken } = req.cookies;
 
@@ -114,6 +99,82 @@ async function logout(req, res) {
   res.redirect('/login');
 }
 
+async function sendRestorePasswordLink(req, res) {
+  const { email } = req.body;
+  const user = await userService.getByEmail(email);
+
+  if (!user) {
+    throw ApiError.BadRequest('User does not exist!');
+  }
+
+  user.restorePasswordToken = userService.generateRestorePasswordToken();
+  await user.save();
+
+  await emailService.sendRestorePasswordLink({
+    email,
+    restorePasswordToken: user.restorePasswordToken,
+  });
+
+  res.send({ message: 'OK' });
+}
+
+async function checkRestoreCode(req, res) {
+  const { restorePasswordToken } = req.body;
+
+  if (!restorePasswordToken) {
+    throw ApiError.BadRequest('Please provide restore password token');
+  }
+
+  const user = await User.findOne({
+    where: { restorePasswordToken },
+  });
+
+  if (!user) {
+    throw ApiError.BadRequest('Restore Code is incorrect');
+  }
+
+  user.restorePasswordToken = null;
+  await user.save();
+
+  res.sendStatus(200);
+}
+
+async function changePassword(req, res) {
+  const { email, password } = req.body;
+  const user = await userService.getByEmail(email);
+
+  if (user) {
+    const newPasswordHash = await bcrypt.hash(password, 10);
+
+    user.password = newPasswordHash;
+    await user.save();
+
+    res.send({ message: 'Password is updated!' });
+  } else {
+    res.sendStatus(402);
+  }
+}
+
+async function sendAuthentication(res, user) {
+  const userData = userService.normalize(user);
+  const accessToken = jwtService.generateAccessToken(userData);
+  const refreshToken = jwtService.generateRefreshToken(userData);
+
+  await tokenService.save(user.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  res.send({
+    user: userData,
+    accessToken,
+  });
+}
+
 module.exports = {
   authController: {
     register,
@@ -121,5 +182,8 @@ module.exports = {
     login,
     refresh,
     logout,
+    sendRestorePasswordLink,
+    checkRestoreCode,
+    changePassword,
   },
 };

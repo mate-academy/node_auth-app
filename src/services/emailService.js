@@ -35,9 +35,21 @@ function sendActivationLink({ email, activationToken }) {
   });
 }
 
-const emailService = {
+function sendRestorePasswordLink({ email, restorePasswordToken }) {
+  const link = `${process.env.CLIENT_URL}/restore/${restorePasswordToken}`;
+
+  return send({
+    email,
+    subject: 'Password Restore',
+    html: `
+      <h1>Password Restore</h1>
+      <a href="${link}">${link}</a>
+    `,
+  });
+}
+
+module.exports = {
   send,
   sendActivationLink,
+  sendRestorePasswordLink,
 };
-
-module.exports = { emailService };

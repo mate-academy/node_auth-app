@@ -57,6 +57,10 @@ async function register({ name, email, password }) {
   });
 }
 
+function generateRestorePasswordToken() {
+  return uuidv4();
+}
+
 function normalize({ id, email }) {
   return {
     id,
@@ -69,4 +73,6 @@ module.exports = {
   validateEmail,
   normalize,
   register,
+  generateRestorePasswordToken,
+  getByEmail,
 };

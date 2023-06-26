@@ -17,6 +17,14 @@ const User = sequelize.define('user', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  activationToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  restoreCode: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 module.exports = { User };
