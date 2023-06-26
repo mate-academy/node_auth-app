@@ -1,5 +1,6 @@
 'use strict';
 
+const bcrypt = require('bcrypt');
 const userService = require('../services/userService.js');
 const jwtService = require('../services/jwtService.js');
 const tokenService = require('../services/tokenService.js');
@@ -45,9 +46,25 @@ async function activate(req, res) {
   await sendAuthentication(res, user);
 }
 
+async function login(req, res) {
+  const { email, password } = req.body;
+  const user = await userService.getByEmail(email);
+
+  if (!user) {
+    throw ApiError.BadRequest('User not found');
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.BadRequest('Password is invalid');
+  }
+
+  await sendAuthentication(res, user);
+}
+
 async function sendAuthentication(res, user) {
   const userData = userService.normalize(user);
-  const accessToken = jwtService.generateAccessToken(userData);
   const refreshToken = jwtService.generateRefreshToken(userData);
 
   await tokenService.save(user.id, refreshToken);
@@ -59,15 +76,13 @@ async function sendAuthentication(res, user) {
     secure: true,
   });
 
-  res.send({
-    user: userData,
-    accessToken,
-  });
+  res.redirect('/profile');
 }
 
 module.exports = {
   authController: {
     register,
     activate,
+    login,
   },
 };

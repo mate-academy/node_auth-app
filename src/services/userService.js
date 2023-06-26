@@ -57,8 +57,16 @@ async function register({ name, email, password }) {
   });
 }
 
+function normalize({ id, email }) {
+  return {
+    id,
+    email,
+  };
+}
+
 module.exports = {
   validatePassword,
   validateEmail,
+  normalize,
   register,
 };
