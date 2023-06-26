@@ -79,10 +79,47 @@ async function sendAuthentication(res, user) {
   res.redirect('/profile');
 }
 
+async function refresh(req, res) {
+  const { refreshToken } = req.cookies;
+
+  const userData = jwtService.validateRefreshToken(refreshToken);
+
+  if (!userData) {
+    throw ApiError.Unauthorized();
+  }
+
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!token) {
+    throw ApiError.Unauthorized();
+  }
+
+  const user = await userService.getByEmail(userData.email);
+
+  await sendAuthentication(res, user);
+}
+
+async function logout(req, res) {
+  const { refreshToken } = req.cookies;
+
+  const userData = jwtService.validateRefreshToken(refreshToken);
+
+  res.clearCookie('refreshToken');
+
+  if (userData) {
+    await tokenService.remove(userData.id);
+  }
+
+  res.sendStatus(204);
+  res.redirect('/login');
+}
+
 module.exports = {
   authController: {
     register,
     activate,
     login,
+    refresh,
+    logout,
   },
 };
