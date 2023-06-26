@@ -42,6 +42,7 @@ async function activate(req, res) {
   }
 
   user.activationToken = null;
+  user.isActivated = true;
   await user.save();
 
   await sendAuthentication(res, user);
@@ -53,6 +54,10 @@ async function login(req, res) {
 
   if (!user) {
     throw ApiError.BadRequest('User not found');
+  }
+
+  if (!user.isActivated) {
+    throw ApiError.BadRequest('User is not activated');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
