@@ -145,19 +145,23 @@ async function checkRestoreCode(req, res) {
 }
 
 async function changePassword(req, res) {
-  const { email, password } = req.body;
+  const { email, password, confirmationPassword } = req.body;
   const user = await userService.getByEmail(email);
 
-  if (user) {
-    const newPasswordHash = await bcrypt.hash(password, 10);
-
-    user.password = newPasswordHash;
-    await user.save();
-
-    res.send({ message: 'Password is updated!' });
-  } else {
-    res.sendStatus(402);
+  if (!user) {
+    throw ApiError.BadRequest('User does not exist!');
   }
+
+  if (password !== confirmationPassword) {
+    throw ApiError.BadRequest('Passwords do not match!');
+  }
+
+  const newPasswordHash = await bcrypt.hash(password, 10);
+
+  user.password = newPasswordHash;
+  await user.save();
+
+  res.send({ message: 'Password is updated!' });
 }
 
 async function sendAuthentication(res, user) {
