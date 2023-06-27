@@ -48,8 +48,21 @@ function sendRestorePasswordLink({ email, restorePasswordToken }) {
   });
 }
 
+function sendChangeEmailNotification({ email }) {
+  return send({
+    email,
+    subject: 'User Email Changed',
+    html: `
+      <h1>User Email Changed</h1>
+      <p>Hello!</p>
+      <p>Your email has been changed.</p>
+    `,
+  });
+}
+
 module.exports = {
   send,
   sendActivationLink,
   sendRestorePasswordLink,
+  sendChangeEmailNotification,
 };

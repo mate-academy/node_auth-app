@@ -145,14 +145,14 @@ async function checkRestoreCode(req, res) {
 }
 
 async function changePassword(req, res) {
-  const { email, password, confirmationPassword } = req.body;
+  const { email, password, confirmation } = req.body;
   const user = await userService.getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('User does not exist!');
   }
 
-  if (password !== confirmationPassword) {
+  if (password !== confirmation) {
     throw ApiError.BadRequest('Passwords do not match!');
   }
 

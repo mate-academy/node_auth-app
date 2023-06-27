@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { authRouter } = require('./routes/authRouter.js');
+const { profileRouter } = require('./routes/profileRouter.js');
 
 const app = express();
 
@@ -18,5 +19,6 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(authRouter);
+app.use(profileRouter);
 
 app.listen(PORT);

@@ -68,6 +68,18 @@ function normalize({ id, email }) {
   };
 }
 
+function updateName(userId, name) {
+  return User.update({ name }, { where: { id: userId } });
+}
+
+function updatePassword(userId, password) {
+  return User.update({ password }, { where: { id: userId } });
+}
+
+function updateEmail(userId, email) {
+  return User.update({ email }, { where: { id: userId } });
+}
+
 module.exports = {
   validatePassword,
   validateEmail,
@@ -75,4 +87,7 @@ module.exports = {
   register,
   generateRestorePasswordToken,
   getByEmail,
+  updateName,
+  updatePassword,
+  updateEmail,
 };
