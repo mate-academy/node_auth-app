@@ -8,19 +8,19 @@ const { catchError } = require('../utils/catchError');
 const profileRouter = new express.Router();
 
 profileRouter.post(
-  '/profile/update-name',
+  '/profile/update-name/:userId',
   catchError(authMiddleware),
   catchError(profileController.updateName)
 );
 
 profileRouter.post(
-  '/profile/update-password',
+  '/profile/update-password/:userId',
   catchError(authMiddleware),
   catchError(profileController.updatePassword)
 );
 
 profileRouter.post(
-  '/profile/update-email',
+  '/profile/update-email/:userId',
   catchError(authMiddleware),
   catchError(profileController.updateEmail)
 );

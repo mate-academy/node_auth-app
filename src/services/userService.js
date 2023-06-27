@@ -32,6 +32,10 @@ function getByEmail(email) {
   return User.findOne({ where: { email } });
 }
 
+function getById(userId) {
+  return User.findByPk(userId);
+}
+
 async function register({ name, email, password }) {
   const existingUser = getByEmail(email);
 
@@ -87,6 +91,7 @@ module.exports = {
   register,
   generateRestorePasswordToken,
   getByEmail,
+  getById,
   updateName,
   updatePassword,
   updateEmail,

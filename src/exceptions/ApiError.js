@@ -19,6 +19,10 @@ class ApiError extends Error {
   static NotFound() {
     return new ApiError('Not found', 404);
   }
+
+  static InternalServerError() {
+    return new ApiError('Internal server error', 500);
+  }
 }
 
 module.exports = { ApiError };
