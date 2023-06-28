@@ -25,13 +25,15 @@ async function register(req, res) {
     throw ApiError.BadRequest('Validation error', { password: passwordError });
   }
 
-  await userService.register({
-    name,
+  const userData = {
     email,
     password,
-  });
+    name,
+  };
 
-  res.send({ message: 'User created' });
+  await userService.register(userData);
+
+  res.send(userData);
 }
 
 async function activate(req, res) {
@@ -44,7 +46,7 @@ async function activate(req, res) {
     },
     {
       where: { activationToken },
-      returning: true, // needed for affectedRows to be populated
+      returning: true,
     }
   );
 
@@ -146,7 +148,7 @@ async function sendRestorePasswordLink(req, res) {
     throw ApiError.InternalServerError('Failed to update user!');
   }
 
-  res.send({ message: 'OK' });
+  res.send({ message: 'Restore password link is sent!' });
 }
 
 async function checkRestoreCode(req, res) {

@@ -9,12 +9,12 @@ async function save(userId, refreshToken) {
     token.refreshToken = refreshToken;
 
     await token.save();
+  } else {
+    await Token.create({
+      userId,
+      refreshToken,
+    });
   }
-
-  await Token.create({
-    userId,
-    refreshToken,
-  });
 }
 
 function getByToken(refreshToken) {

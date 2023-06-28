@@ -37,7 +37,7 @@ function getById(userId) {
 }
 
 async function register({ name, email, password }) {
-  const existingUser = getByEmail(email);
+  const existingUser = await getByEmail(email);
 
   if (existingUser) {
     throw ApiError.BadRequest('User already exists', {

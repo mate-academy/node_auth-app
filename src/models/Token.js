@@ -8,6 +8,7 @@ const Token = sequelize.define('Token', {
   refreshToken: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
   },
 });
 
