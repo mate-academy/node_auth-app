@@ -1,18 +1,26 @@
 'use strict';
 
+const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../utils/db.js');
-const { DataTypes } = require('sequelize');
-const { User } = require('./User.js');
+const { User } = require('./User');
 
-const Token = sequelize.define('Token', {
+class Token extends Model {
+  static associate(model) {
+    this.belongsTo(model, { foreignKey: 'userId' });
+  }
+}
+
+Token.init({
   refreshToken: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
   },
+}, {
+  sequelize,
+  modelName: 'Token',
 });
 
-Token.belongsTo(User);
-User.hasOne(Token);
+Token.associate(User);
 
 module.exports = { Token };

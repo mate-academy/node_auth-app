@@ -1,9 +1,16 @@
 'use strict';
 
-const { DataTypes } = require('sequelize');
+const { DataTypes, Model } = require('sequelize');
 const { sequelize } = require('../utils/db.js');
+const { Token } = require('./Token');
 
-const User = sequelize.define('user', {
+class User extends Model {
+  static associate(model) {
+    this.hasOne(model, { foreignKey: 'userId' });
+  }
+}
+
+User.init({
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -42,6 +49,11 @@ const User = sequelize.define('user', {
     allowNull: false,
     defaultValue: false,
   },
+}, {
+  sequelize,
+  modelName: 'user',
 });
+
+User.associate(Token);
 
 module.exports = { User };
