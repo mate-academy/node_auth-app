@@ -56,9 +56,7 @@ async function updatePassword(req, res) {
     throw ApiError.BadRequest('Incorrect old password');
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  await userService.updatePassword(user.id, hashedPassword);
+  await userService.updatePassword(user.id, newPassword);
 
   res.send({ message: 'Password updated' });
 }

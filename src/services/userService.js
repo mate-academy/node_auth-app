@@ -77,7 +77,11 @@ function updateName(userId, name) {
 }
 
 function updatePassword(userId, password) {
-  return User.update({ password }, { where: { id: userId } });
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  return User.update({
+    password: hashedPassword,
+  }, { where: { id: userId } });
 }
 
 function updateEmail(userId, email) {
