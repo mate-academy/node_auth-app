@@ -2,20 +2,30 @@
 
 const jwt = require('jsonwebtoken');
 
+const config = require('../config/config');
+
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '5d' });
+  return jwt.sign(user, config.jwtAccessSecret, { expiresIn: '5d' });
 }
 
 function generateRefreshToken(user) {
-  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+  return jwt.sign(user, config.jwtRefreshSecret, { expiresIn: '7d' });
 }
 
 function validateAccessToken(token) {
-  return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+  try {
+    return jwt.verify(token, config.jwtAccessSecret);
+  } catch (error) {
+    return error;
+  }
 }
 
 function validateRefreshToken(token) {
-  return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+  try {
+    return jwt.verify(token, config.jwtRefreshSecret);
+  } catch (error) {
+    return error;
+  }
 }
 
 module.exports = {

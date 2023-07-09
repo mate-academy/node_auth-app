@@ -14,7 +14,12 @@ const Token = sequelize.define('token', {
   tableName: 'token',
 });
 
-Token.belongsTo(User);
-User.hasOne(Token);
+Token.belongsTo(User, {
+  foreignKey: 'userId',
+});
+
+User.hasOne(Token, {
+  foreignKey: 'userId',
+});
 
 module.exports = { Token };

@@ -1,9 +1,9 @@
 'use strict';
 
-const ExceptionsErrors = require('../../exceptions/exceptions.errors');
+const ApplicationErrors = require('../../exceptions/application.errors');
 
-function errorMiddleware(error, req, res, next) {
-  if (error instanceof ExceptionsErrors) {
+function errorMiddleware(error, req, res) {
+  if (error instanceof ApplicationErrors) {
     const { status, message, errors } = error;
 
     res.status(status).send({
@@ -11,7 +11,7 @@ function errorMiddleware(error, req, res, next) {
     });
   }
 
-  res.status(500).send({ message: 'Unexpected error' });
+  return res.status(500).send({ message: 'Unexpected error' });
 }
 
 module.exports = errorMiddleware;

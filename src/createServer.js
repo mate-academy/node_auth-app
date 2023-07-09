@@ -2,11 +2,11 @@
 
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const UsersRouter = require('./components/routes/users.routes');
 const AuthRouter = require('./components/routes/auth.routes');
 const UsersService = require('./components/users/users.service');
@@ -40,17 +40,24 @@ function createServer() {
   const app = express();
 
   app.get('/', (req, res) => {
-    res.send('Home');
+    res.redirect('/auth/login');
   });
 
+  app.use(express.json());
   app.use(cors());
   app.use(cookieParser());
-  app.use(bodyParser.json());
+
+  app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: Boolean(process.env.RESAVE),
+    saveUninitialized: Boolean(process.env.SAVEUNINITIALIZED),
+  }));
+
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use('/users', UsersRouter);
   app.use('/auth', AuthRouter);
   app.use(errorMiddleware);
-  app.use(passport.initialize());
-  app.use(passport.session());
 
   return app;
 }

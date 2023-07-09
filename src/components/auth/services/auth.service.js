@@ -8,27 +8,29 @@ const EmailService = require('./email.service');
 const JwtService = require('./jwt.service');
 const TokenService = require('./token.service');
 
-const ExceptionsErrors = require('../../exceptions/exceptions.errors');
+const ApplicationErrors = require('../../exceptions/application.errors');
 
 const validateEmail = (email) => {
   if (!email) {
-    return 'Email should be added';
+    throw ApplicationErrors.BadRequest('Email should be added');
   }
 
   const emailPattern = /^[\w.-]+@[\w.-]+\.\w+$/;
 
   if (!emailPattern.test(email)) {
-    return 'Email should be valid';
+    throw ApplicationErrors.BadRequest('Email should be valid');
   }
 };
 
 const validatePassword = (password) => {
   if (!password) {
-    return 'Password is required';
+    throw ApplicationErrors.BadRequest('Password is required');
   }
 
   if (password.length < 8) {
-    return 'The password length should not be less than 8 characters';
+    throw ApplicationErrors.BadRequest(
+      'The password length should not be less than 8 characters'
+    );
   }
 };
 
@@ -39,13 +41,13 @@ const register = async(email, password) => {
   };
 
   if (errors.email || errors.password) {
-    throw ExceptionsErrors.BadRequest('Validation error', errors);
+    throw ApplicationErrors.BadRequest('Validation error', errors);
   }
 
   const existUser = await UsersService.getOneByEmail(email);
 
-  if (existUser.dataValues) {
-    throw ExceptionsErrors.BadRequest(
+  if (existUser) {
+    throw ApplicationErrors.BadRequest(
       'BadRequestException', { email: 'User already exists with such email' }
     );
   }
@@ -67,10 +69,8 @@ const activate = async(activationToken) => {
   const user = await UsersService.findOneByActivationToken(activationToken);
 
   if (!user) {
-    throw ExceptionsErrors.NotFound();
+    throw ApplicationErrors.NotFound();
   }
-
-  user.activationToken = null;
 
   await user.save();
 
@@ -83,7 +83,7 @@ const logIn = async(email, password) => {
   if (!user.dataValues
     || !await bcrypt.compare(password, user.dataValues.password)
   ) {
-    throw ExceptionsErrors.Unauthorized();
+    throw ApplicationErrors.Unauthorized();
   }
 
   const accessToken = JwtService.generateAccessToken(user.dataValues);
@@ -105,20 +105,21 @@ const refresh = async(refreshToken) => {
   const userData = JwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {
-    throw ExceptionsErrors.Unauthorized();
+    throw ApplicationErrors.Unauthorized();
   }
 
   const token = await TokenService.getByToken(refreshToken);
 
   if (!token) {
-    throw ExceptionsErrors.Unauthorized();
+    throw ApplicationErrors.Unauthorized();
   }
 
   const user = await UsersService.getOneByEmail(userData.email);
 
   const accessToken = JwtService.generateAccessToken(user.dataValues);
-  // eslint-disable-next-line max-len
-  const generatedRefreshToken = JwtService.generateRefreshToken(user.dataValues);
+  const generatedRefreshToken = JwtService.generateRefreshToken(
+    user.dataValues
+  );
 
   await TokenService.save(user.dataValues.id, generatedRefreshToken);
 
@@ -146,16 +147,16 @@ const refreshPassword = async(email, password) => {
   };
 
   if (errors.email || errors.password) {
-    throw ExceptionsErrors.BadRequest('Validation error', errors);
+    throw ApplicationErrors.BadRequest('Validation error', errors);
   }
 
   const user = await UsersService.getOneByEmail(email);
 
   if (!user) {
-    throw ExceptionsErrors.NotFound('User not found');
+    throw ApplicationErrors.NotFound('User not found');
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await UsersService.hashPassword(password);
 
   await UsersService.updatePassword(hashedPassword, user.id);
 };
