@@ -1,0 +1,747 @@
+@import "./vars";
+@import "./mixins";
+
+.RegularButton {
+  box-sizing: border-box;
+  width: $control-width;
+  height: $control-height;
+  padding: 10px;
+  background-color: $elements-dark-bg-color;
+  font-weight: $main-font-weight;
+  font-size: $main-font-size;
+  border: none;
+  border-radius: $control-border-radius;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $light-font-color;
+  transition: 0.2s;
+
+  &:hover {
+    cursor: pointer !important;
+    transform: scale(1.01);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+
+  &_Contrast {
+    background-color: $secondary-bg-color;
+    color: $light-font-color;
+  }
+
+  &_Centered {
+    max-width: $content-max-width;
+    margin: 0 auto;
+  }
+
+  @include onDesktop {
+    //font-size: $main-font-size-desktop;
+  }
+}
+
+.RegularTitle {
+  font-weight: $title-font-weight;
+  font-size: $large-font-size;
+  line-height: 1.4em;
+  text-align: center;
+
+  @include onDesktop {
+    font-size: $large-font-size-desktop;
+  }
+
+  &_Small {
+    font-size: $main-font-size;
+
+    @include onDesktop {
+      font-size: $main-font-size-desktop;
+    }
+  }
+
+  &_Left {
+    text-align: left;
+  }
+}
+
+.FormControl {
+  box-sizing: border-box;
+  width: $control-width;
+  height: $control-height;
+  padding: 10px;
+  border: 1px solid $pale-font-color;
+  border-radius: $control-border-radius;
+  color: $pale-font-color;
+  font-weight: $pale-font-weight;
+  font-size: $small-font-size;
+
+  &:focus {
+    outline: none;
+    border: 2px solid $main-font-color;
+  }
+
+  @include onDesktop {
+    font-size: $small-font-size-desktop;
+  }
+}
+
+.AlertNotification {
+  color: $elements-dark-bg-color;
+  font-size: $small-font-size;
+}
+
+.Centered {
+  text-align: center;
+}
+
+.Avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background-color: $additional-bg-color;
+  object-fit: cover;
+  object-position: center;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  &-Screen {
+    margin: 0 auto;
+    min-width: $content-min-width + $scroll-bar-width;
+    width: $content-width;
+    max-width: $content-max-width;
+
+    @include onDesktop {
+      min-width: $content-max-width-desktop;
+      width: $content-max-width-desktop;
+      max-width: $content-max-width-desktop;
+    }
+
+    &_Narrow {
+      @include onDesktop {
+        margin: 0 auto;
+        min-width: $content-max-width;
+        width: $content-max-width;
+        max-width: $content-max-width;
+      }
+    }
+  }
+
+  &-RulesAndPolicy {
+    margin: 0 auto;
+  }
+}
+
+.Header {
+  width: 100%;
+  height: $header-height;
+  background-color: $elements-light-bg-color;
+  box-sizing: border-box;
+
+  @include onTablet {
+    height: $header-height-tablet;
+  }
+
+  @include onDesktop {
+    background-color: transparent;
+    height: $header-height-desktop;
+  }
+
+  &-Auth {
+    height: 0.6 * $control-height;
+
+    @include onDesktop {
+      height: $control-height;
+    }
+  }
+
+  &_Dark {
+    background-color: $secondary-bg-color;
+  }
+
+  &-Content {
+    margin: 0 auto;
+    width: $content-width;
+    max-width: $content-max-width;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @include onTablet {
+      max-width: 100%;
+    }
+
+    @include onDesktop {
+      width: $content-max-width-desktop;
+      max-width: $content-max-width-desktop;
+    }
+  }
+
+  &-Left {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  &-AppName {
+    padding-left: $standard-gap / 2;
+    text-transform: uppercase;
+
+    @include onDesktop {
+      color: $light-font-color;
+      padding-left: $standard-gap-desktop / 2;
+      padding-right: $standard-gap-desktop;
+    }
+  }
+
+  &-Right {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+
+  &-Auth {
+    border: 1px solid $elements-light-bg-color;
+    background-color: transparent;
+    border-radius: $control-secondary-border-radius;
+    max-width: 80px;
+    // text-transform: uppercase;
+    // display: none;
+
+    @include onDesktop {
+      display: flex;
+      max-width: 100px;
+    }
+
+    &:hover {
+      background-color: $elements-dark-bg-color;
+    }
+  }
+
+  &-Title {
+    color: $light-font-color;
+    text-align: center;
+  }
+
+  &-NewIndicator {
+    position: absolute;
+    top: 50%;
+    right: $standard-gap / 4;
+    transform: translateY(-50%);
+
+    @include onTablet {
+      right: $standard-gap;
+    }
+  }
+}
+
+.Logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  @include onTablet {
+    width: 60px;
+    height: 60px;
+  }
+
+  @include onDesktop {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+.NavMenu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &-Item {
+    padding: 5px;
+    text-decoration: none;
+    color: $light-font-color;
+
+    &_Active {
+      color: $elements-dark-bg-color;
+    }
+  }
+
+  &-IconForAdmin {
+    font-size: 24px;
+  }
+}
+
+.StartPage {
+  height: 100%;
+  box-sizing: border-box;
+  flex-grow: 1;
+
+  @include onDesktop {
+    background: url("../public/greeting-bg.webp");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+
+  &-Content {
+    margin: 0 auto;
+    min-width: $content-min-width;
+    width: $content-width;
+    max-width: $content-max-width;
+
+    @include onDesktop {
+      max-width: $content-max-width-desktop;
+    }
+  }
+
+  &-Title {
+    margin-bottom: $standard-gap;
+
+    @include onDesktop {
+      margin-bottom: $standard-gap-desktop;
+      font-size: $large-font-size-desktop * 1.3;
+      color: $light-font-color;
+      text-transform: uppercase;
+    }
+  }
+
+  &-Description {
+    margin-bottom: $standard-gap * 2;
+    text-align: center;
+
+    @include onDesktop {
+      margin-bottom: $standard-gap-desktop;
+      color: $light-font-color;
+    }
+  }
+
+  &-LoginButton {
+    margin: 0 auto $standard-gap;
+    width: 250px;
+
+    @include onDesktop {
+      margin: 0 auto $standard-gap-desktop;
+    }
+  }
+
+  &-RegisterButton {
+    margin: 0 auto $standard-gap;
+    width: 250px;
+    background-color: $secondary-bg-color;
+
+    @include onDesktop {
+      margin: 0 auto $standard-gap-desktop;
+    }
+  }
+}
+
+.GreetingImageContainer {
+  width: 100%;
+  height: 400px;
+  max-height: 50vh;
+  background-image: url("../public/greeting-picture.svg");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  @include onTablet {
+    display: none;
+  }
+
+  @include onDesktop {
+    display: none;
+  }
+}
+
+.Login {
+  &-Form {
+    margin: 0 auto;
+  }
+}
+
+.LoginContainer {
+  display: flex;
+  flex-direction: column;
+
+  @include onTablet {
+    flex-direction: row;
+  }
+
+  @include onDesktop {
+    margin: 0 auto;
+    //padding-top: $standard-gap-desktop * 2;
+    flex-direction: row;
+    width: $content-max-width-desktop;
+  }
+
+  &-ImageContainer {
+    margin-bottom: $standard-gap;
+    align-self: center;
+
+    @include onTablet {
+      //flex-grow: 1;
+      //order: 1;
+    }
+
+    @include onDesktop {
+      margin-bottom: $standard-gap-desktop;
+      flex-grow: 1;
+      order: 1;
+    }
+  }
+
+  &-LoginForm {
+    margin: 0 auto;
+  }
+}
+
+.LoginImage {
+  @include onDesktop {
+    width: 100%;
+  }
+}
+
+.Form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: $content-min-width;
+  width: $content-width;
+  max-width: $content-max-width;
+
+  @include onDesktop {
+    width: $content-max-width;
+  }
+
+  &-Item {
+    position: relative;
+    margin-bottom: $standard-gap;
+    width: 100%;
+
+    @include onDesktop {
+      margin-bottom: $standard-gap-desktop;
+      width: $content-width;
+      max-width: $content-max-width;
+    }
+  }
+
+  &-Label {
+    display: block;
+    margin-bottom: $standard-gap / 2;
+    text-align: left;
+
+    @include onDesktop {
+      margin-bottom: $standard-gap-desktop / 2;
+    }
+  }
+
+  &-InputContainer {
+    position: relative;
+  }
+
+  &-Input {
+    padding-left: 44px;
+  }
+
+  &-InputIcon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 15px;
+  }
+
+  &-InputIconRight {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 15px;
+  }
+
+  &-TextContainer {
+    margin: 0;
+    display: flex;
+    justify-content: right;
+  }
+
+  &-Text {
+    text-align: right;
+    padding-right: 15px;
+    text-decoration: none;
+    color: $pale-font-color;
+    font-weight: $pale-font-weight;
+
+    @include onDesktop {
+      font-size: $small-font-size-desktop;
+    }
+  }
+
+  &-RegisterButton {
+    margin: 0 auto;
+    background-color: $secondary-bg-color;
+
+    @include onDesktop {
+      margin: 0 auto $standard-gap-desktop;
+    }
+  }
+
+  &-RulesLink {
+    margin-bottom: $standard-gap * 1.5;
+
+    @include onDesktop {
+      margin-bottom: $standard-gap-desktop * 1.5;
+    }
+  }
+}
+
+.EyeIcon {
+  width: 24px;
+  height: 20px;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.PasswordInputWithText {
+  font-weight: $title-font-weight;
+  color: $elements-dark-bg-color;
+}
+
+.RulesLinkContainer {
+  display: flex;
+  align-items: center;
+  gap: $standard-gap / 2;
+
+  &-CheckBox {
+    width: $standard-gap;
+    height: $standard-gap;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
+  &-Text {
+    text-align: left;
+    color: $elements-dark-bg-color;
+    font-size: $small-font-size * 0.8;
+    line-height: 1.2em;
+
+    &:hover {
+      color: $elements-dark-bg-color;
+    }
+
+    @include onDesktop {
+      color: $main-font-color;
+      text-decoration: none;
+    }
+  }
+}
+
+.SideRegisterServices {
+  width: 100%;
+
+  &-TextContainer {
+    margin-bottom: $standard-gap;
+    padding: 0 8px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+
+    @include onDesktop {
+      margin-bottom: $standard-gap-desktop;
+    }
+  }
+
+  &-Line {
+    background-color: $pale-font-color;
+    flex-grow: 1;
+    width: 100%;
+    height: 1.5px;
+
+    @include onDesktop {
+      width: 90px;
+    }
+  }
+
+  &-Text {
+    min-width: 100px;
+    font-weight: $pale-font-weight;
+    font-size: $small-font-size;
+    text-align: center;
+
+    @include onDesktop {
+      font-size: $small-font-size-desktop;
+    }
+  }
+
+  &-Buttons {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &-Button {
+    width: 100px;
+    border: 1px solid $pale-font-color;
+    background-color: transparent;
+
+    @include onDesktop {
+      width: $content-max-width / 4;
+    }
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.Loader {
+  height: 200px;
+  width: 200px;
+  transform-origin: center center;
+  animation: spin 2s linear infinite;
+}
+
+.LoaderWrapper {
+  height: calc(100vh - $header-height);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @include onTablet {
+    height: calc(100vh - $header-height-tablet);
+  }
+
+  @include onDesktop {
+    height: calc(100vh - $header-height-desktop);
+  }
+}
+
+.RegistrationPage {
+  padding-top: $header-height;
+
+  @include onTablet {
+    padding-top: $header-height-tablet;
+  }
+
+  @include onDesktop {
+    padding-top: $header-height-desktop;
+  }
+
+  &-RegistrationForm {
+    margin: 0 auto;
+  }
+
+  &-AddVehicle {
+    margin: 0 auto;
+  }
+}
+
+.RegistrationFormContainer {
+  &-RegistrationForm {
+    margin: 0 auto;
+  }
+}
+
+.InputsRowBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.RulesAndPolicy {
+  width: $content-width;
+
+  @include onDesktop {
+    width: $content-max-width-desktop;
+  }
+}
+
+.InfoPage {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: red;
+}
+
+.Notification {
+  box-sizing: border-box;
+  width: 400px;
+  height: 60px;
+  border-radius: 4px;
+  font-weight: 600;
+  padding: 5px 10px;
+  font-size: 16px;
+  line-height: 50px;
+
+  &_Danger {
+    color: red;
+    background-color: #ff000022;
+  }
+
+  &_Success {
+    color: green;
+    background-color: #00ff0022;
+  }
+}
+
+.ImageContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.TryAgainLink {
+  text-decoration: none;
+  min-width: 100px;
+
+  &:hover {
+    color: $light-font-color;
+  }
+}
+
+.ProfileData {
+  &-Input {
+    display: flex;
+    align-items: center;
+    background-color: $additional-bg-color;
+    color: $elements-dark-bg-color;
+    font-weight: $bold-font-weight;
+  }
+
+  &-Edit {
+    position: absolute;
+    top: 50%;
+    right: $standard-gap;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    width: 18px;
+    height: 18px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
