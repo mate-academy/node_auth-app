@@ -13,9 +13,9 @@ async function updateName(req, res, next) {
 
     await userService.updateName(email, fullName);
 
-    res.send({ status: "OK" });
+    res.status(200).send({ message: "OK" });
   } catch (error) {
-    res.send({ status: "FAILED" });
+    res.status(500).send({ message: "FAILED" });
   }
 }
 
@@ -26,15 +26,15 @@ async function updateEmail(req, res, next) {
     const updatedUser = await userService.updateEmail(oldEmail, newEmail);
 
     if (updatedUser) {
-      res.send({
+      res.status(200).send({
         user: updatedUser,
-        status: "OK",
+        message: "OK",
       });
     } else {
-      res.send({ status: "FAILED" });
+      res.status(404).send({ message: "FAILED" });
     }
   } catch (error) {
-    res.send({ status: "FAILED" });
+    res.status(500).send({ message: "FAILED" });
   }
 }
 

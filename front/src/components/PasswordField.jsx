@@ -39,7 +39,10 @@ const PasswordField = ({
           }
           type={isPasswordVisible ? "text" : "password"}
           placeholder={"Password"}
-          onChange={(event) => handleChange(fieldName, event.target.value)}
+          name={fieldName}
+          onChange={(event) =>
+            handleChange(event.target.name, event.target.value)
+          }
           value={value}
         />
 

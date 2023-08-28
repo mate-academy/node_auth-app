@@ -13,82 +13,80 @@ const Header = ({ addClasses = "" }) => {
 
   // #region Render
   return (
-    <React.Fragment>
-      <header className={`Header Header_Dark ${addClasses}`}>
-        <div className={"Header-Content"}>
-          <div className={"Header-Left"}>
-            <img
-              src={"./logo.svg"}
-              className={"Logo Header-Logo"}
-              alt={"Logo react"}
-              onClick={() => {
-                navigate("/");
-              }}
-            />
+    <header className={`Header Header_Dark ${addClasses}`}>
+      <div className={"Header-Content"}>
+        <div className={"Header-Left"}>
+          <img
+            src={"./logo.svg"}
+            className={"Logo Header-Logo"}
+            alt={"Logo react"}
+            onClick={() => {
+              navigate("/");
+            }}
+          />
 
-            <nav className={"Header-Nav NavMenu"}>
-              <NavLink
-                to={"/"}
-                className={({ isActive }) =>
-                  isActive ? "NavMenu-Item NavMenu-Item_Active" : "NavMenu-Item"
-                }
-              >
-                Home
-              </NavLink>
+          <nav className={"Header-Nav NavMenu"}>
+            <NavLink
+              to={"/"}
+              className={({ isActive }) =>
+                isActive ? "NavMenu-Item NavMenu-Item_Active" : "NavMenu-Item"
+              }
+            >
+              Home
+            </NavLink>
 
-              {user?.id && (
-                <>
-                  <NavLink
-                    to={"users"}
-                    className={({ isActive }) =>
-                      isActive
-                        ? "NavMenu-Item NavMenu-Item_Active"
-                        : "NavMenu-Item"
-                    }
-                  >
-                    Users
-                  </NavLink>
+            {user?.id && (
+              <>
+                <NavLink
+                  to={"users"}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "NavMenu-Item NavMenu-Item_Active"
+                      : "NavMenu-Item"
+                  }
+                >
+                  Users
+                </NavLink>
 
-                  <NavLink
-                    to={"profile"}
-                    className={({ isActive }) =>
-                      isActive
-                        ? "NavMenu-Item NavMenu-Item_Active"
-                        : "NavMenu-Item"
-                    }
-                  >
-                    Profile
-                  </NavLink>
-                </>
-              )}
-            </nav>
-          </div>
-
-          <div className={"Header-Right"}>
-            {user?.id ? (
-              <button
-                type={"button"}
-                className={"RegularButton Header-Auth"}
-                onClick={() => {
-                  logout();
-                  navigate("/login");
-                }}
-              >
-                Logout
-              </button>
-            ) : (
-              <button
-                type={"button"}
-                className={"RegularButton Header-Auth"}
-                onClick={() => navigate("/login")}
-              >
-                Login
-              </button>
+                <NavLink
+                  to={"profile"}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "NavMenu-Item NavMenu-Item_Active"
+                      : "NavMenu-Item"
+                  }
+                >
+                  Profile
+                </NavLink>
+              </>
             )}
-          </div>
+          </nav>
         </div>
-      </header>
-    </React.Fragment>
+
+        <div className={"Header-Right"}>
+          {user?.id ? (
+            <button
+              type={"button"}
+              className={"RegularButton Header-Auth"}
+              onClick={() => {
+                logout();
+                navigate("/login");
+              }}
+            >
+              Logout
+            </button>
+          ) : (
+            <button
+              type={"button"}
+              className={"RegularButton Header-Auth"}
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </button>
+          )}
+        </div>
+      </div>
+    </header>
   );
   // #endregion
 };

@@ -9,3 +9,7 @@ node_modules
 
 # MacOS
 .DS_Store
+
+#Env
+./front/.env
+./back/.env

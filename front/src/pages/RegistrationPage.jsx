@@ -145,7 +145,7 @@ const RegistrationPage = ({ addClasses = "" }) => {
               type={"text"}
               value={userData?.fullName || ""}
               onChange={(event) =>
-                changeInputValueHandler("fullName", event.target.value)
+                changeInputValueHandler(event.target.name, event.target.value)
               }
             />
           </div>
@@ -172,10 +172,14 @@ const RegistrationPage = ({ addClasses = "" }) => {
               <input
                 type={"checkbox"}
                 onChange={(event) =>
-                  changeInputValueHandler("rulesAccepted", event.target.checked)
+                  changeInputValueHandler(
+                    event.target.name,
+                    event.target.checked
+                  )
                 }
                 checked={userData?.rulesAccepted || false}
                 className={"RulesLinkContainer-CheckBox"}
+                name={"rulesAccepted"}
               />
             </div>
 

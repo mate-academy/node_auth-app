@@ -13,41 +13,37 @@ const StartPage = ({ addClasses = "" }) => {
 
   //#region Render
   return (
-    <React.Fragment>
-      <div className={`StartPage ${addClasses}`}>
-        <div className={"StartPage-Content"}>
-          <div
-            className={"GreetingImageContainer StartPage-GreetingImage"}
-          ></div>
+    <div className={`StartPage ${addClasses}`}>
+      <div className={"StartPage-Content"}>
+        <div className={"GreetingImageContainer StartPage-GreetingImage"}></div>
 
-          <h2 className={"RegularTitle StartPage-Title"}>Try auth app</h2>
+        <h2 className={"RegularTitle StartPage-Title"}>Try auth app</h2>
 
-          <p className={"StartPage-Description"}>
-            You can try how auth app works here
-          </p>
+        <p className={"StartPage-Description"}>
+          You can try how auth app works here
+        </p>
 
-          {!user?.id && (
-            <>
-              <button
-                type={"button"}
-                onClick={() => navigate("/login")}
-                className={"RegularButton StartPage-LoginButton"}
-              >
-                Login
-              </button>
+        {!user?.id && (
+          <>
+            <button
+              type={"button"}
+              onClick={() => navigate("/login")}
+              className={"RegularButton StartPage-LoginButton"}
+            >
+              Login
+            </button>
 
-              <button
-                type={"button"}
-                onClick={() => navigate("/register")}
-                className={"RegularButton StartPage-RegisterButton"}
-              >
-                Register
-              </button>
-            </>
-          )}
-        </div>
+            <button
+              type={"button"}
+              onClick={() => navigate("/register")}
+              className={"RegularButton StartPage-RegisterButton"}
+            >
+              Register
+            </button>
+          </>
+        )}
       </div>
-    </React.Fragment>
+    </div>
   );
   //#endregion
 };

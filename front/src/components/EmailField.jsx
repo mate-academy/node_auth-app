@@ -23,7 +23,8 @@ const EmailField = ({
           className={"FormControl Form-Input"}
           type={"text"}
           placeholder={label}
-          onChange={(event) => handleChange(fieldName, event.target.value)}
+          name={fieldName}
+          onChange={(event) => handleChange(event.target.name, event.target.value)}
           value={value}
         />
 

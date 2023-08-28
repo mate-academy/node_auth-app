@@ -73,11 +73,11 @@ async function recover(req, res, next) {
 
     await emailService.sendRecoverLink(email, token);
 
-    res.send({
-      status: "OK",
+    res.status(200).send({
+      message: "OK",
     });
   } catch (error) {
-    res.sendStatus(500);
+    res.status(500);
   }
 }
 
@@ -92,17 +92,17 @@ async function checkRecoverToken(req, res, next) {
     }
 
     if (user.recoverToken === token) {
-      res.send({
-        status: "OK",
+      res.status(200).send({
+        message: "OK",
       });
     } else {
-      res.send({
-        status: "DECLINED",
+      res.status(406).send({
+        message: "DECLINED",
       });
     }
   } catch (error) {
-    res.sendStatus(500).send({
-      status: "error",
+    res.status(500).send({
+      message: "error",
     });
   }
 }
@@ -113,12 +113,12 @@ async function reset(req, res, next) {
   try {
     await userService.reset(email, password);
 
-    res.send({
-      status: "OK",
+    res.status(200).send({
+      message: "OK",
     });
   } catch (error) {
-    res.sendStatus(500).send({
-      status: "error",
+    res.status(500).send({
+      message: "error",
     });
   }
 }
@@ -227,12 +227,12 @@ async function reauth(req, res, next) {
   const user = await checkPassword(email, password);
 
   if (user) {
-    res.send({
-      status: "OK",
+    res.status(200).send({
+      message: "OK",
     });
   } else {
-    res.send({
-      status: "Failed",
+    res.status(404).send({
+      message: "Failed",
     });
   }
 }

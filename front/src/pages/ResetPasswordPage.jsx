@@ -62,7 +62,7 @@ const ResetPasswordPage = ({ addClasses = "" }) => {
       if (validationResult.isValid) {
         const result = await authService.reset(email, password);
 
-        if (result?.status === "OK") {
+        if (result?.message === "OK") {
           setIsSuccessScreen(true);
         } else {
           messageService.showError("Something went wrong");
@@ -78,86 +78,84 @@ const ResetPasswordPage = ({ addClasses = "" }) => {
 
   //#region Render
   return (
-    <React.Fragment>
-      <div className={`Form ${addClasses}`}>
-        {isLinkValid ? (
-          <>
-            {isSuccessScreen && (
-              <>
-                <div className={"Form-Item"}></div>
-                <div className={"Form-Item"}>
-                  <div className={"ImageContainer"}>
-                    <img src={"/happy-face.svg"} alt={"Happy face"} />
-                  </div>
+    <div className={`Form ${addClasses}`}>
+      {isLinkValid ? (
+        <>
+          {isSuccessScreen && (
+            <>
+              <div className={"Form-Item"}></div>
+              <div className={"Form-Item"}>
+                <div className={"ImageContainer"}>
+                  <img src={"/happy-face.svg"} alt={"Happy face"} />
                 </div>
-                <div className={"Form-Item"}>
-                  <h2 className={"RegularTitle"}>Password was changed</h2>
-                </div>
-
-                <div className={"Form-Item"}>
-                  <Link className={"RegularButton TryAgainLink"} to={"/login"}>
-                    Login
-                  </Link>
-                </div>
-              </>
-            )}
-
-            {!isSuccessScreen && (
-              <>
-                <div className={"Form-Item"}>
-                  <h2 className={"RegularTitle RegularTitle_Small"}>
-                    Password reset
-                  </h2>
-                </div>
-
-                <PasswordField
-                  handleChange={updateSignInData}
-                  value={signInData?.password || ""}
-                  fieldName={"password"}
-                  label={"New Password"}
-                />
-
-                <PasswordField
-                  handleChange={updateSignInData}
-                  value={signInData?.repeatPassword || ""}
-                  fieldName={"repeatPassword"}
-                  label={"Confirm new password"}
-                />
-
-                <div className={"Form-Item"}>
-                  <button
-                    type={"button"}
-                    className={"RegularButton"}
-                    onClick={() =>
-                      resetPassword(
-                        signInData.email,
-                        signInData.password,
-                        signInData.repeatPassword
-                      )
-                    }
-                  >
-                    Save
-                  </button>
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <div className={"Form-Item"}></div>
-            <div className={"Form-Item"}>
-              <div className={"ImageContainer"}>
-                <img src={"/sad-face.svg"} alt={"Sad face"} />
               </div>
-            </div>
+              <div className={"Form-Item"}>
+                <h2 className={"RegularTitle"}>Password was changed</h2>
+              </div>
 
-            <div className={"Form-Item"}>
-              <h2 className={"RegularTitle"}>{"Link is not valid"}</h2>
+              <div className={"Form-Item"}>
+                <Link className={"RegularButton TryAgainLink"} to={"/login"}>
+                  Login
+                </Link>
+              </div>
+            </>
+          )}
+
+          {!isSuccessScreen && (
+            <>
+              <div className={"Form-Item"}>
+                <h2 className={"RegularTitle RegularTitle_Small"}>
+                  Password reset
+                </h2>
+              </div>
+
+              <PasswordField
+                handleChange={updateSignInData}
+                value={signInData?.password || ""}
+                fieldName={"password"}
+                label={"New Password"}
+              />
+
+              <PasswordField
+                handleChange={updateSignInData}
+                value={signInData?.repeatPassword || ""}
+                fieldName={"repeatPassword"}
+                label={"Confirm new password"}
+              />
+
+              <div className={"Form-Item"}>
+                <button
+                  type={"button"}
+                  className={"RegularButton"}
+                  onClick={() =>
+                    resetPassword(
+                      signInData.email,
+                      signInData.password,
+                      signInData.repeatPassword
+                    )
+                  }
+                >
+                  Save
+                </button>
+              </div>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          <div className={"Form-Item"}></div>
+          <div className={"Form-Item"}>
+            <div className={"ImageContainer"}>
+              <img src={"/sad-face.svg"} alt={"Sad face"} />
             </div>
-          </>
-        )}
-      </div>
-    </React.Fragment>
+          </div>
+
+          <div className={"Form-Item"}>
+            <h2 className={"RegularTitle"}>{"Link is not valid"}</h2>
+          </div>
+        </>
+      )}
+    </div>
   );
   //#endregion
 };

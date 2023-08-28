@@ -65,7 +65,7 @@ const Profile = ({ addClasses = "" }) => {
     try {
       const result = await userService.updateEmail(oldEmail, newEmail);
 
-      if (result.status === "OK") {
+      if (result.message === "OK") {
         setTimeout(() => {
           setIsActivated(false);
           setUser(result.user);
@@ -112,12 +112,6 @@ const Profile = ({ addClasses = "" }) => {
   };
   //#endregion
 
-  //#region Manage password visibility
-  const [isOldPasswordVisible, setIsOldPasswordVisible] = useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isRepeatPasswordVisible, setIsRepeatPasswordVisible] = useState(false);
-  //#endregion
-
   //#region Handling form fields editing
   const updateUserData = (fieldName, newValue) => {
     setUserData((user) => ({
@@ -136,7 +130,7 @@ const Profile = ({ addClasses = "" }) => {
 
       const result = await authService.reauth(user.email, userData.oldPassword);
 
-      if (result.status === "OK") {
+      if (result.message === "OK") {
         setIsReauth(false);
 
         if (isEmailEditing) {
@@ -195,7 +189,9 @@ const Profile = ({ addClasses = "" }) => {
             name={"fullName"}
             type={"text"}
             value={userData?.fullName || ""}
-            onChange={(event) => updateUserData("fullName", event.target.value)}
+            onChange={(event) =>
+              updateUserData(event.target.name, event.target.value)
+            }
           />
 
           {isNameEditing ? (
