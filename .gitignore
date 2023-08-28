@@ -4,6 +4,14 @@
 
 # Node
 node_modules
+./front/node_modules
+./back/node_modules
 
 # MacOS
 .DS_Store
+
+#Env
+./front/.env
+./back/.env
+
+.gitignore
