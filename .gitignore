@@ -13,3 +13,5 @@ node_modules
 #Env
 ./front/.env
 ./back/.env
+
+.gitignore
