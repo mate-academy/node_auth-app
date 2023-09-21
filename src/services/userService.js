@@ -73,7 +73,15 @@ export const updateName = async(email, fullName) => {
   await user.save();
 };
 
-export const updateEmail = async(oldEmail, newEmail) => {
+export const updateEmail = async(oldEmail, newEmail, pass) => {
+  const userpass = await User.password;
+
+  if (!pass || pass !== userpass) {
+    throw ApiError.badRequest('Validation error', {
+      password: 'Password is wrong',
+    });
+  }
+
   const user = await findByEmail(oldEmail);
 
   if (!user) {
@@ -82,14 +90,16 @@ export const updateEmail = async(oldEmail, newEmail) => {
     });
   }
 
-  const activationToken = uuidv4();
+  emailService.changeEmail(oldEmail, newEmail);
 
-  user.email = newEmail;
+  // const activationToken = uuidv4();
 
-  user.activationToken = activationToken;
+  // user.email = newEmail;
 
-  await emailService.sendActivationLink(newEmail, activationToken);
-  await emailService.sendEmailChanged(oldEmail);
+  // user.activationToken = activationToken;
+
+  // await emailService.sendActivationLink(newEmail, activationToken);
+  // await emailService.sendEmailChanged(oldEmail);
   await user.save();
 
   return user;

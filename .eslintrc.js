@@ -1,10 +1,14 @@
 module.exports = {
-  extends: '@mate-academy/eslint-config',
-  env: {
-    jest: true
+  "extends":"@mate-academy/eslint-config",
+  "env":{
+    "jest":true
   },
-  rules: {
-    'no-proto': 0
+  "rules":{
+    "no-proto":0
   },
-  plugins: ['jest']
+  "plugins": ['jest'],
+  parserOptions: {
+    sourceType: "module",
+    allowImportExportEverywhere: true,
+  },
 };

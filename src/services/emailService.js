@@ -2,6 +2,8 @@
 import 'dotenv/config';
 
 import nodemailer from 'nodemailer';
+import { v4 as uuidv4 } from 'uuid';
+import { userService } from '../services/userService';
 
 const {
   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, CLIENT_URL,
@@ -50,8 +52,22 @@ const sendEmailChanged = (email) => {
   });
 };
 
+const changeEmail = async(email, newEmail) => {
+  const user = await userService.findByEmail(email);
+
+  const activationToken = uuidv4();
+
+  user.email = newEmail;
+
+  user.activationToken = activationToken;
+
+  await sendActivationLink(newEmail, activationToken);
+  await sendEmailChanged(email);
+};
+
 export const emailService = {
   send,
   sendActivationLink,
   sendEmailChanged,
+  changeEmail,
 };
