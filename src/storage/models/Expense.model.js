@@ -19,7 +19,7 @@ const Expense = sequelize.define('Expense', {
     allowNull: false,
   },
   amount: {
-    type: DataTypes.FLOAT,
+    type: DataTypes.NUMBER,
     allowNull: false,
   },
   category: {

@@ -3,6 +3,9 @@
 const crypto = require('crypto');
 const usersService = require('../services/users');
 
+// Define constants for minimum password length
+const MIN_PASSWORD_LENGTH = 6;
+
 function validateUsername(value) {
   if (!value) {
     return 'Username is required';
@@ -25,7 +28,7 @@ async function validateEmailChange(email, id) {
   const existedUser = await usersService.getOneByField({ email });
 
   if (existedUser && existedUser.id !== +id) {
-    return 'User with this email is already exists';
+    return 'User with this email already exists';
   }
 
   return validateEmail(email);
@@ -36,8 +39,8 @@ function validatePassword(value) {
     return 'Password is required';
   }
 
-  if (value.length < 6) {
-    return 'At least 6 characters';
+  if (value.length < MIN_PASSWORD_LENGTH) {
+    return `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
   }
 }
 
