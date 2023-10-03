@@ -1,6 +1,7 @@
 
 import 'dotenv/config';
+import { sequelize } from './utils/db.js';
+import './models/User.js';
+import './models/Token.js';
 
-const { User } = require('./models/User.js');
-
-User.sync({ force: true });
+sequelize.sync({ force: true });

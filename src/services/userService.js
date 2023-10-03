@@ -8,14 +8,12 @@ import bcrypt from 'bcrypt';
 export const getAllActive = () => {
   return User.findAll({
     where: { activationToken: null },
+    order: ['id'],
   });
 };
 
 export const normalize = ({ id, email }) => {
-  return {
-    id,
-    email,
-  };
+  return { id, email };
 };
 
 export const findByEmail = (email) => {
@@ -25,8 +23,6 @@ export const findByEmail = (email) => {
 };
 
 export const register = async(email, password) => {
-  const activationToken = uuidv4();
-
   const existUser = await findByEmail(email);
 
   if (existUser) {
@@ -35,8 +31,13 @@ export const register = async(email, password) => {
     });
   }
 
+  const activationToken = uuidv4();
+  const hash = await bcrypt.hash(password, 10);
+
   await User.create({
-    email, password, activationToken,
+    email,
+    password: hash,
+    activationToken,
   });
 
   await emailService.sendActivationLink(email, activationToken);
@@ -92,14 +93,6 @@ export const updateEmail = async(oldEmail, newEmail, pass) => {
 
   emailService.changeEmail(oldEmail, newEmail);
 
-  // const activationToken = uuidv4();
-
-  // user.email = newEmail;
-
-  // user.activationToken = activationToken;
-
-  // await emailService.sendActivationLink(newEmail, activationToken);
-  // await emailService.sendEmailChanged(oldEmail);
   await user.save();
 
   return user;

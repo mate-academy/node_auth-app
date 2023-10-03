@@ -20,15 +20,8 @@ export const User = sequelize.define('user', {
   activationToken: {
     type: DataTypes.STRING,
   },
-  restoreCode: {
-    type: DataTypes.STRING,
-  },
-  withGoogle: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
 });
 
-sequelize.sync({
-  force: true,
-});
+// sequelize.sync({
+//   force: true,
+// });

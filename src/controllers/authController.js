@@ -4,7 +4,7 @@ import { jwtService } from '../services/jwtService.js';
 import { ApiError } from '../exeptions/apiError.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/tokenService.js';
-import { userService } from '../services/userService';
+import { userService } from '../services/userService.js';
 
 const validateEmai = (email) => {
   if (!email) {
@@ -42,9 +42,9 @@ async function register(req, res, next) {
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await register(email, hashedPass);
+  await userService.register(email, hashedPass);
 
-  res.send({ message: 'OK' });
+  res.status(200).json({message: 'ok'});
 };
 
 async function reset(req, res, next) {

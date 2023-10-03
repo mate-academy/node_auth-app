@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 import nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
-import { userService } from '../services/userService';
+import { userService } from '../services/userService.js';
 
 const {
   SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, CLIENT_URL,
@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const send = ({ email, subject, html }) => {
+export function send({ email, subject, html }) {
   return transporter.sendMail({
     from: 'Auth API',
     to: email,
@@ -29,7 +29,7 @@ const send = ({ email, subject, html }) => {
   });
 };
 
-const sendActivationLink = (email, token) => {
+export function sendActivationLink(email, token) {
   const link = `${CLIENT_URL}/auth/activate/${token}`;
 
   return send({
@@ -42,7 +42,7 @@ const sendActivationLink = (email, token) => {
   });
 };
 
-const sendEmailChanged = (email) => {
+export function sendEmailChanged(email)  {
   return send({
     email,
     subject: 'Email reset',
@@ -52,7 +52,7 @@ const sendEmailChanged = (email) => {
   });
 };
 
-const changeEmail = async(email, newEmail) => {
+export async function changeEmail(email, newEmail) {
   const user = await userService.findByEmail(email);
 
   const activationToken = uuidv4();

@@ -5,7 +5,7 @@ async function save(userId, refreshToken) {
     where: { userId },
   });
 
-  if (!token) {
+  if (token) {
     token.refreshToken = refreshToken;
 
     await token.save();
