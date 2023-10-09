@@ -109,10 +109,39 @@ const login = async(req, res) => {
   await generateToken(res, user);
 };
 
+const refresh = async(req, res) => {
+  const { refreshToken } = req.cookies;
+  const userData = await jwtService.verifyRefresh(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!userData || !token) {
+    throw ApiError.unauthorized();
+  };
+
+  const user = await userService.findByEmail(userData.email);
+
+  await generateToken(res, user);
+};
+
+const logout = async(req, res) => {
+  const { refreshToken } = req.cookies;
+  const userData = await jwtService.verifyRefresh(refreshToken);
+
+  if (!userData || !refreshToken) {
+    throw ApiError.unauthorized();
+  }
+
+  await tokenService.remove(userData.id);
+
+  res.sendStatus(204);
+};
+
 const authController = {
   register,
   activate,
   login,
+  refresh,
+  logout,
 };
 
 module.exports = {

@@ -11,6 +11,8 @@ authRouter.post('/registration', catchError(authController.register));
 authRouter.get('/activation/:activationToken',
   catchError(authController.activate));
 authRouter.post('/login', catchError(authController.login));
+authRouter.post('/refresh', catchError(authController.refresh));
+authRouter.post('/logout', catchError(authController.logout));
 
 module.exports = {
   authRouter,
