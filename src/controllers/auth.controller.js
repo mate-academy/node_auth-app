@@ -2,9 +2,10 @@
 
 const { User } = require('../models/user');
 const { userService } = require('../services/user.service');
-// const jwtService = require('../services/jwt.service.js');
+const { jwtService } = require('../services/jwt.service.js');
 const { ApiError } = require('../exceptions/api.error');
-// const tokenService = require('../services/token.service.js');
+const bcrypt = require('bcrypt');
+const { tokenService } = require('../services/token.service');
 
 function validateEmail(value) {
   if (!value) {
@@ -16,7 +17,7 @@ function validateEmail(value) {
   if (!emailPattern.test(value)) {
     return 'Email is not valid';
   }
-}
+};
 
 function validatePassword(value) {
   if (!value) {
@@ -36,6 +37,24 @@ function validateUsername(value) {
   if (value.length < 3) {
     return 'At least 3 characters';
   }
+};
+
+async function generateToken(res, user) {
+  const normalizedUser = userService.normalizeUser(user);
+  const accessToken = jwtService.sign(normalizedUser);
+  const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    HttpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
+  res.send({
+    user: normalizedUser,
+    accessToken,
+  });
 }
 
 const register = async(req, res, next) => {
@@ -73,9 +92,27 @@ const activate = async(req, res) => {
   res.send(user);
 };
 
+const login = async(req, res) => {
+  const { email, password } = req.body;
+  const user = await userService.findByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  };
+
+  await generateToken(res, user);
+};
+
 const authController = {
   register,
   activate,
+  login,
 };
 
 module.exports = {

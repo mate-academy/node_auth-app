@@ -6,6 +6,14 @@ const uuidv4 = require('uuid').v4;
 const bcrypt = require('bcrypt');
 const { emailService } = require('../services/email.service');
 
+function normalizeUser({ id, name, email }) {
+  return {
+    id,
+    name,
+    email,
+  };
+}
+
 function findByEmail(email) {
   return User.findOne({
     where: {
@@ -39,6 +47,7 @@ async function registration({ name, email, password }) {
 const userService = {
   registration,
   findByEmail,
+  normalizeUser,
 };
 
 module.exports = {

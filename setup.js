@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 'use strict';
 
 require('dotenv').config();
 
-// eslint-disable-next-line no-unused-vars
+const { Token } = require('./src/models/token');
 const { User } = require('./src/models/user');
 const { client } = require('./src/utils/db');
 
