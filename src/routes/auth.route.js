@@ -13,6 +13,10 @@ authRouter.get('/activation/:activationToken',
 authRouter.post('/login', catchError(authController.login));
 authRouter.post('/refresh', catchError(authController.refresh));
 authRouter.post('/logout', catchError(authController.logout));
+authRouter.post('/reset', catchError(authController.reset));
+
+authRouter.post('/new_password/:resetToken',
+  catchError(authController.setNewPassword));
 
 module.exports = {
   authRouter,

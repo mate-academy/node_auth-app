@@ -34,9 +34,24 @@ function sendActivationEmail(email, token) {
   });
 };
 
+function sendResetEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/new_password/${token}`;
+  const html = `
+  <h1>Reset password</h1>
+  <a href="${href}">${href}</a>
+  `;
+
+  return send({
+    email,
+    subject: 'Reset',
+    html,
+  });
+}
+
 const emailService = {
   sendActivationEmail,
   send,
+  sendResetEmail,
 };
 
 module.exports = {

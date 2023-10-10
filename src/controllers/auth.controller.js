@@ -27,6 +27,32 @@ function validatePassword(value) {
   if (value.length < 6) {
     return 'At least 6 characters';
   }
+
+  if (/^\s*$/.test(value)) {
+    return 'Password cannot consist of only spaces';
+  }
+};
+
+function validateNewPassword(password, newPassword, confirmation) {
+  if (!newPassword || !confirmation) {
+    return 'Password and confirmation are required';
+  }
+
+  if (newPassword.length < 6) {
+    return 'New password should be at least 6 characters long';
+  }
+
+  if (newPassword === password) {
+    return 'New password is the same as the current password';
+  }
+
+  if (newPassword !== confirmation) {
+    return 'Confirmation does not match the new password';
+  }
+
+  if (/^\s*$/.test(newPassword)) {
+    return 'Password cannot consist of only spaces';
+  }
 };
 
 function validateUsername(value) {
@@ -136,12 +162,50 @@ const logout = async(req, res) => {
   res.sendStatus(204);
 };
 
+const reset = async(req, res) => {
+  const { email } = req.body;
+
+  await userService.resetPassword(email);
+
+  res.send({ message: 'OK' });
+};
+
+const setNewPassword = async(req, res) => {
+  const { resetToken } = req.params;
+  const { newPassword, confirmation } = req.body;
+
+  const user = await User.findOne({ where: { resetToken } });
+
+  if (!user) {
+    res.sendStatus(404);
+
+    return;
+  }
+
+  const isValidNewPassword = validateNewPassword(
+    user.password,
+    newPassword,
+    confirmation);
+
+  if (isValidNewPassword) {
+    throw ApiError.badRequest('Validation error', { isValidNewPassword });
+  }
+
+  user.password = newPassword;
+  user.resetToken = null;
+  user.save();
+
+  res.send(userService.normalizeUser(user));
+};
+
 const authController = {
   register,
   activate,
   login,
   refresh,
   logout,
+  reset,
+  setNewPassword,
 };
 
 module.exports = {
