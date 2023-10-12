@@ -36,13 +36,9 @@ function verifyRefresh(token) {
   }
 };
 
-const jwtService = {
+module.exports = {
   sign,
   verify,
   signRefresh,
   verifyRefresh,
-};
-
-module.exports = {
-  jwtService,
 };

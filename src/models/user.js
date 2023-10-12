@@ -23,6 +23,10 @@ const User = client.define('user', {
   resetToken: {
     type: DataTypes.STRING,
   },
+  newEmail: {
+    type: DataTypes.STRING,
+    unique: true,
+  },
 }, {
   tableName: 'users',
 });

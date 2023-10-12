@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const express = require('express');
 const { authRouter } = require('./routes/auth.route');
-// const { userRouter } = require('./routes/user.route.js');
+const { userRouter } = require('./routes/user.route');
 const { errorMiddleware } = require('./middlewares/errorMiddleware');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -22,8 +22,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(authRouter);
+app.use('/user', userRouter);
 
-// app.use('/users', userRouter);
 app.get('/', (req, res) => {
   res.send('Hello world');
 });

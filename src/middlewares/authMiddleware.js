@@ -1,6 +1,6 @@
 'use strict';
 
-const { jwtService } = require('../services/jwt.service');
+const jwtService = require('../services/jwt.service');
 
 const authMiddleware = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';

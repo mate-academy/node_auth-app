@@ -1,69 +1,12 @@
 'use strict';
 
 const { User } = require('../models/user');
-const { userService } = require('../services/user.service');
-const { jwtService } = require('../services/jwt.service.js');
+const userService = require('../services/user.service');
+const jwtService = require('../services/jwt.service.js');
 const { ApiError } = require('../exceptions/api.error');
 const bcrypt = require('bcrypt');
-const { tokenService } = require('../services/token.service');
-
-function validateEmail(value) {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-};
-
-function validatePassword(value) {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-
-  if (/^\s*$/.test(value)) {
-    return 'Password cannot consist of only spaces';
-  }
-};
-
-function validateNewPassword(password, newPassword, confirmation) {
-  if (!newPassword || !confirmation) {
-    return 'Password and confirmation are required';
-  }
-
-  if (newPassword.length < 6) {
-    return 'New password should be at least 6 characters long';
-  }
-
-  if (newPassword === password) {
-    return 'New password is the same as the current password';
-  }
-
-  if (newPassword !== confirmation) {
-    return 'Confirmation does not match the new password';
-  }
-
-  if (/^\s*$/.test(newPassword)) {
-    return 'Password cannot consist of only spaces';
-  }
-};
-
-function validateUsername(value) {
-  if (!value) {
-    return 'Name is required';
-  }
-
-  if (value.length < 3) {
-    return 'At least 3 characters';
-  }
-};
+const tokenService = require('../services/token.service');
+const validator = require('../utils/validators');
 
 async function generateToken(res, user) {
   const normalizedUser = userService.normalizeUser(user);
@@ -87,9 +30,9 @@ const register = async(req, res, next) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
-    name: validateUsername(name),
+    email: validator.email(email),
+    password: validator.password(password),
+    name: validator.username(name),
   };
 
   if (errors.email || errors.password || errors.name) {
@@ -124,6 +67,10 @@ const login = async(req, res) => {
 
   if (!user) {
     throw ApiError.badRequest('No such user');
+  }
+
+  if (user.activationToken) {
+    throw ApiError.badRequest('Activate user, check your email');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -182,7 +129,7 @@ const setNewPassword = async(req, res) => {
     return;
   }
 
-  const isValidNewPassword = validateNewPassword(
+  const isValidNewPassword = validator.newPassword(
     user.password,
     newPassword,
     confirmation);
@@ -191,14 +138,16 @@ const setNewPassword = async(req, res) => {
     throw ApiError.badRequest('Validation error', { isValidNewPassword });
   }
 
-  user.password = newPassword;
+  const hashedNewPas = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedNewPas;
   user.resetToken = null;
   user.save();
 
   res.send(userService.normalizeUser(user));
 };
 
-const authController = {
+module.exports = {
   register,
   activate,
   login,
@@ -206,8 +155,4 @@ const authController = {
   logout,
   reset,
   setNewPassword,
-};
-
-module.exports = {
-  authController,
 };

@@ -29,12 +29,8 @@ function remove(userId) {
   return Token.destroy({ where: { userId } });
 }
 
-const tokenService = {
+module.exports = {
   save,
   getByToken,
   remove,
-};
-
-module.exports = {
-  tokenService,
 };
