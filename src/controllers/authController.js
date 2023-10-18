@@ -60,7 +60,6 @@ async function generateToken(res, user) {
   });
 
   res.send({
-    user: normalizedUser,
     accessToken,
   });
 }
@@ -68,16 +67,8 @@ async function generateToken(res, user) {
 async function login(req, res) {
   const { email, password } = req.body;
 
-  if (!email) {
-    throw ApiError.badRequest('Email is required', {
-      email: 'Email is required',
-    });
-  }
-
-  if (!password) {
-    throw ApiError.badRequest('Password is required', {
-      password: 'Password is required',
-    });
+  if (!email || !password) {
+    throw ApiError.badRequest('Email and password are required');
   }
 
   const user = await userService.findByEmail(email);
@@ -95,7 +86,7 @@ async function login(req, res) {
   await generateToken(res, user);
 }
 
-async function refresh(req, res) {
+async function refreshToken(req, res) {
   const { refreshToken } = req.cookies;
 
   const userData = jwtService.verifyRefresh(refreshToken);
@@ -148,7 +139,7 @@ async function resetRequest(req, res) {
 
 async function resetConfirm(req, res) {
   const { resetToken } = req.params;
-  const { password, confirmation } = req.body;
+  const { password, confirmNewPassword } = req.body;
 
   const user = await User.findOne({ where: { resetToken }});
 
@@ -164,7 +155,7 @@ async function resetConfirm(req, res) {
     throw ApiError.badRequest('Validation error', errors.password);
   }
 
-  if (password !== confirmation) {
+  if (password !== confirmNewPassword) {
     throw ApiError.badRequest('Passwords do not match');
   }
 
@@ -182,7 +173,7 @@ export const authController = {
   register,
   activate,
   login,
-  refresh,
+  refreshToken,
   logout,
   resetRequest,
   resetConfirm,

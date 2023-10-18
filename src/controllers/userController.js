@@ -33,14 +33,18 @@ const changeName = async (req, res) => {
 
 const changePassword = async (req, res) => {
   const { id } = req.params;
-  const { password, newPassword, confirmation } = req.body;
+  const { password, newPassword, confirmNewPassword } = req.body;
 
   const user = await userService.isAuthenticated(id);
+
+  if (!user) {
+    throw ApiError.unauthorized();
+  }
 
   const errors = {
     password: validators.validatePassword(password),
     newPassword: validators.validatePassword(newPassword),
-    confirmation: validators.validatePassword(confirmation),
+    confirmNewPassword: validators.validatePassword(confirmNewPassword),
   };
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -49,11 +53,7 @@ const changePassword = async (req, res) => {
     throw ApiError.badRequest('Wrong password');
   }
 
-  if (!user) {
-    throw ApiError.unauthorized();
-  }
-
-  if (errors.password || errors.newPassword || errors.confirmation) {
+  if (errors.password || errors.newPassword || errors.confirmNewPassword) {
     throw ApiError.badRequest('Validation error', errors);
   }
 
@@ -61,7 +61,7 @@ const changePassword = async (req, res) => {
     throw ApiError.badRequest('Old and new passwords are the same');
   }
 
-  if (newPassword !== confirmation) {
+  if (newPassword !== confirmNewPassword) {
     throw ApiError.badRequest('Passwords do not match');
   }
 
