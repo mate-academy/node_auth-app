@@ -13,17 +13,9 @@ const getUser = async(req, res) => {
 
 const updateName = async(req, res) => {
   const { id } = req.params;
-  const { validatedName } = req;
+  const { name } = req.body;
 
-  const user = await userService.getUserById(id);
-
-  if (validatedName === user.name) {
-    res.status(400).send({ error: 'Name is the same as the current name' });
-
-    return;
-  }
-
-  await userService.updateName(id, validatedName);
+  await userService.updateName(id, name);
 
   res.send({ message: 'Name updated' });
 };
