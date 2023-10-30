@@ -3,6 +3,15 @@
 const express = require('express');
 const authController = require('../controllers/auth.controller');
 const { catchError } = require('../utils/catchError');
+const {
+  checkEmailInRequestBody,
+} = require('../middlewares/checkEmailInRequestBody');
+const {
+  checkRefreshTokenInCookies,
+} = require('../middlewares/checkRefreshTokenInCookies');
+const {
+  checkRestoreCodeInParams,
+} = require('../middlewares/checkRestoreCodeInParams');
 
 const authRouter = new express.Router();
 
@@ -13,12 +22,22 @@ authRouter.get(
   catchError(authController.activate)
 );
 authRouter.post('/login', catchError(authController.login));
-authRouter.get('/refresh', catchError(authController.refresh));
-authRouter.post('/logout', catchError(authController.logout));
-authRouter.post('/restore', catchError(authController.restorePassword));
+
+authRouter.get('/refresh',
+  checkRefreshTokenInCookies,
+  catchError(authController.refresh));
+
+authRouter.post('/logout',
+  checkRefreshTokenInCookies,
+  catchError(authController.logout));
+
+authRouter.post('/restore',
+  checkEmailInRequestBody,
+  catchError(authController.restorePassword));
 
 authRouter.get(
   '/restore/:restoreCode',
+  checkRestoreCodeInParams,
   catchError(authController.useRestore)
 );
 

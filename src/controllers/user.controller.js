@@ -3,10 +3,8 @@
 const { ApiError } = require('../exceptions/errors');
 const userService = require('../services/user.service');
 const emailService = require('../services/email.service');
-const { validateName,
-  validatePassword,
-  validateEmail } = require('../utils/validators');
 const bcrypt = require('bcrypt');
+const validator = require('validator');
 
 const getUser = async(req, res) => {
   const { id } = req.params;
@@ -21,11 +19,15 @@ const updateName = async(req, res) => {
 
   const user = await userService.getUserById(id);
 
-  const isValidName = validateName(name);
-
-  if (!isValidName || name === user.name) {
+  if (!validator.isLength(name, {
+    min: 2, max: 20,
+  })) {
     throw ApiError.badRequest('Invalid name');
-  };
+  }
+
+  if (name === user.name) {
+    throw ApiError.badRequest('Name is the same as the current name');
+  }
 
   await userService.updateName(id, name);
 
@@ -38,10 +40,12 @@ const updatePassword = async(req, res) => {
 
   const user = await userService.getUserById(id);
 
-  const isValidPass = validatePassword(newPassword);
+  const isValidNewPass = validator.isLength(newPassword, { min: 6 });
 
-  if (!isValidPass || newPassword !== confirmation) {
-    throw ApiError.badRequest('Not valid password');
+  if (!isValidNewPass || newPassword !== confirmation) {
+    throw ApiError.badRequest(
+      'Invalid password or confirmation does not match'
+    );
   }
 
   const validPassword = await bcrypt.compare(password, user.password);
@@ -61,10 +65,12 @@ const updateEmail = async(req, res) => {
 
   const user = await userService.getUserById(id);
 
-  const isValidMail = validateEmail(newEmail);
+  const isValidNewEmail = validator.isEmail(newEmail);
 
-  if (!isValidMail || newEmail !== confirmation) {
-    throw ApiError.badRequest('Email is invalid');
+  if (!isValidNewEmail || newEmail !== confirmation) {
+    throw ApiError.badRequest(
+      'Email is invalid or confirmation does not match'
+    );
   }
 
   const validPassword = await bcrypt.compare(password, user.password);

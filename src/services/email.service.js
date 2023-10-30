@@ -50,7 +50,7 @@ function sendRestorePassword({ email, restorePasswordCode }) {
 }
 
 function sendChangedEmail({ email }) {
-  const href = `${process.env.CLIENT_URL}`;
+  const href = `${process.env.CLIENT_URL}/login`;
 
   const html = `
   <h1>User Email Changed</h1>

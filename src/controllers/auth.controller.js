@@ -2,13 +2,11 @@
 
 const { ApiError } = require('../exceptions/errors');
 const { User } = require('../models/user');
+const validator = require('validator');
 const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
 const bcrypt = require('bcrypt');
-const { validateEmail,
-  validatePassword,
-  validateName } = require('../utils/validators');
 
 async function generateTokens(res, user) {
   const normalizedUser = userService.normalize(user);
@@ -32,12 +30,21 @@ const register = async(req, res, next) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
-    name: validateName(name),
+    email: !validator.isEmail(email) ? 'Invalid email address' : null,
+    password: !validator.isLength(password, { min: 6 })
+      ? 'Password must be at least 6 characters'
+      : null,
+    name: !validator.isLength(name,
+      {
+        min: 2, max: 20,
+      })
+      ? 'Name must be between 2 and 20 characters'
+      : null,
   };
 
-  if (errors.email || errors.password || errors.name) {
+  const hasErrors = Object.values(errors).some((error) => error !== null);
+
+  if (hasErrors) {
     throw ApiError.badRequest('Bad request', errors);
   }
 
@@ -96,7 +103,7 @@ const logout = async(req, res) => {
   const { refreshToken } = req.cookies;
   const userData = await jwtService.verifyRefresh(refreshToken);
 
-  if (!userData || !refreshToken) {
+  if (!userData) {
     throw ApiError.unauthorized();
   }
 
@@ -106,23 +113,13 @@ const logout = async(req, res) => {
 };
 
 const restorePassword = async(req, res) => {
-  const { email } = req.body;
+  await userService.restorePassword(req.body.email);
 
-  if (!email) {
-    throw ApiError.notFound('Email not found');
-  }
-
-  await userService.restorePassword(email);
-
-  res.sendStatus({ message: 'Restore password is sent!' });
+  res.status(200).send({ message: 'Restore password is sent!' });
 };
 
 const useRestore = async(req, res) => {
   const { restoreCode } = req.params;
-
-  if (!restoreCode) {
-    throw ApiError.badRequest('Password restore token not found');
-  }
 
   const user = await User.findOne({
     where: { restoreCode },
