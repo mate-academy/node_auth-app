@@ -1,15 +1,18 @@
 'use strict';
 
-const checkRefreshTokenInCookies = (req, res, next) => {
-  const { refreshToken } = req.cookies;
+const jwtService = require('../services/jwt.service');
 
-  if (!refreshToken) {
-    res.status(401).send({
-      error: 'Refresh token not found in cookies',
-    });
+const checkRefreshTokenInCookies = async(req, res, next) => {
+  const { refreshToken } = req.cookies;
+  const userData = await jwtService.verifyRefresh(refreshToken);
+
+  if (!userData) {
+    res.status(401).send({ error: 'Unauthorized' });
 
     return;
   }
+
+  req.userData = userData;
   next();
 };
 

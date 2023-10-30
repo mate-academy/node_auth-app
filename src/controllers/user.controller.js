@@ -1,10 +1,8 @@
 'use strict';
 
-const { ApiError } = require('../exceptions/errors');
 const userService = require('../services/user.service');
 const emailService = require('../services/email.service');
 const bcrypt = require('bcrypt');
-const validator = require('validator');
 
 const getUser = async(req, res) => {
   const { id } = req.params;
@@ -14,74 +12,60 @@ const getUser = async(req, res) => {
 };
 
 const updateName = async(req, res) => {
-  const { name } = req.body;
   const { id } = req.params;
+  const { validatedName } = req;
 
   const user = await userService.getUserById(id);
 
-  if (!validator.isLength(name, {
-    min: 2, max: 20,
-  })) {
-    throw ApiError.badRequest('Invalid name');
+  if (validatedName === user.name) {
+    res.status(400).send({ error: 'Name is the same as the current name' });
+
+    return;
   }
 
-  if (name === user.name) {
-    throw ApiError.badRequest('Name is the same as the current name');
-  }
-
-  await userService.updateName(id, name);
+  await userService.updateName(id, validatedName);
 
   res.send({ message: 'Name updated' });
 };
 
 const updatePassword = async(req, res) => {
-  const { password, newPassword, confirmation } = req.body;
   const { id } = req.params;
+  const { validatedNewPassword } = req;
+  const { password } = req.body;
 
   const user = await userService.getUserById(id);
-
-  const isValidNewPass = validator.isLength(newPassword, { min: 6 });
-
-  if (!isValidNewPass || newPassword !== confirmation) {
-    throw ApiError.badRequest(
-      'Invalid password or confirmation does not match'
-    );
-  }
 
   const validPassword = await bcrypt.compare(password, user.password);
 
   if (!validPassword) {
-    throw ApiError.badRequest('Incorrect old password');
+    res.status(400).send({ error: 'Incorrect old password' });
+
+    return;
   }
 
-  await userService.updatePassword(user.id, newPassword);
+  await userService.updatePassword(user.id, validatedNewPassword);
 
   res.send({ message: 'Password updated' });
 };
 
 const updateEmail = async(req, res) => {
-  const { password, newEmail, confirmation } = req.body;
   const { id } = req.params;
+  const { validatedNewEmail } = req;
+  const { password } = req.body;
 
   const user = await userService.getUserById(id);
-
-  const isValidNewEmail = validator.isEmail(newEmail);
-
-  if (!isValidNewEmail || newEmail !== confirmation) {
-    throw ApiError.badRequest(
-      'Email is invalid or confirmation does not match'
-    );
-  }
 
   const validPassword = await bcrypt.compare(password, user.password);
 
   if (!validPassword) {
-    throw ApiError.badRequest('Password is invalid');
+    res.status(400).json({ error: 'Password is invalid' });
+
+    return;
   }
 
-  await userService.updateEmail(user.id, newEmail);
+  await userService.updateEmail(user.id, validatedNewEmail);
 
-  await emailService.sendChangedEmail({ email: newEmail });
+  await emailService.sendChangedEmail({ email: validatedNewEmail });
 
   res.send({ message: 'Email updated' });
 };

@@ -1,6 +1,5 @@
 'use strict';
 
-const { ApiError } = require('../exceptions/errors');
 const { User } = require('../models/user');
 const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
@@ -53,13 +52,17 @@ const login = async(req, res) => {
   const user = await userService.findByEmail(email);
 
   if (!user) {
-    throw ApiError.badRequest('No such user');
+    res.status(400).send({ error: 'No such user' });
+
+    return;
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw ApiError.badRequest('Wrong password');
+    res.status(400).send({ error: 'Wrong password' });
+
+    return;
   };
 
   await generateTokens(res, user);
@@ -71,7 +74,9 @@ const refresh = async(req, res) => {
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
-    throw ApiError.unauthorized();
+    res.status(401).send({ error: 'Unauthorized' });
+
+    return;
   };
 
   const user = await userService.findByEmail(userData.email);
@@ -80,14 +85,9 @@ const refresh = async(req, res) => {
 };
 
 const logout = async(req, res) => {
-  const { refreshToken } = req.cookies;
-  const userData = await jwtService.verifyRefresh(refreshToken);
+  const { id } = req.userData;
 
-  if (!userData) {
-    throw ApiError.unauthorized();
-  }
-
-  await tokenService.remove(userData.id);
+  await tokenService.remove(id);
 
   res.sendStatus(204);
 };
@@ -106,7 +106,9 @@ const useRestore = async(req, res) => {
   });
 
   if (!user) {
-    throw ApiError.badRequest('Incorrect restore password');
+    res.status(400).send({ error: 'Incorrect restore password' });
+
+    return;
   }
 
   user.restoreCode = null;
@@ -120,11 +122,15 @@ const changePassword = async(res, req) => {
   const user = await userService.getByEmail(email);
 
   if (!user) {
-    throw ApiError.badRequest('User not found');
+    res.status(400).send({ error: 'User not found' });
+
+    return;
   }
 
   if (password !== confirmation) {
-    throw ApiError.badRequest('Password mismatch');
+    res.status(400).send({ error: 'Password mismatch' });
+
+    return;
   }
 
   const newHashedPass = await bcrypt.hash(password, 10);
