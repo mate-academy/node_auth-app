@@ -2,7 +2,6 @@
 
 const { ApiError } = require('../exceptions/errors');
 const { User } = require('../models/user');
-const validator = require('validator');
 const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
@@ -26,27 +25,8 @@ async function generateTokens(res, user) {
   });
 }
 
-const register = async(req, res, next) => {
+const register = async(req, res) => {
   const { name, email, password } = req.body;
-
-  const errors = {
-    email: !validator.isEmail(email) ? 'Invalid email address' : null,
-    password: !validator.isLength(password, { min: 6 })
-      ? 'Password must be at least 6 characters'
-      : null,
-    name: !validator.isLength(name,
-      {
-        min: 2, max: 20,
-      })
-      ? 'Name must be between 2 and 20 characters'
-      : null,
-  };
-
-  const hasErrors = Object.values(errors).some((error) => error !== null);
-
-  if (hasErrors) {
-    throw ApiError.badRequest('Bad request', errors);
-  }
 
   await userService.register(name, email, password);
   res.send({ message: 'OK' });

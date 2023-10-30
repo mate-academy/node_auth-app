@@ -35,7 +35,7 @@ function sendActivationEmail(email, token) {
 };
 
 function sendRestorePassword({ email, restorePasswordCode }) {
-  const href = `${process.env.CLIENT_URL}/restore/${restorePasswordCode}`;
+  const href = `${process.env.CLIENT_HOST}/restore/${restorePasswordCode}`;
 
   const html = `
   <h1>Password Restore</h1>
@@ -50,7 +50,7 @@ function sendRestorePassword({ email, restorePasswordCode }) {
 }
 
 function sendChangedEmail({ email }) {
-  const href = `${process.env.CLIENT_URL}/login`;
+  const href = `${process.env.CLIENT_HOST}/login`;
 
   const html = `
   <h1>User Email Changed</h1>

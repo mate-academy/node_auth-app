@@ -12,10 +12,17 @@ const {
 const {
   checkRestoreCodeInParams,
 } = require('../middlewares/checkRestoreCodeInParams');
+const {
+  validateRegistrationInput,
+} = require('../middlewares/validateRegistrationInput');
 
 const authRouter = new express.Router();
 
-authRouter.post('/registration', catchError(authController.register));
+authRouter.post(
+  '/registration',
+  validateRegistrationInput,
+  catchError(authController.register)
+);
 
 authRouter.get(
   '/activation/:activationToken',
@@ -25,15 +32,18 @@ authRouter.post('/login', catchError(authController.login));
 
 authRouter.get('/refresh',
   checkRefreshTokenInCookies,
-  catchError(authController.refresh));
+  catchError(authController.refresh)
+);
 
 authRouter.post('/logout',
   checkRefreshTokenInCookies,
-  catchError(authController.logout));
+  catchError(authController.logout)
+);
 
 authRouter.post('/restore',
   checkEmailInRequestBody,
-  catchError(authController.restorePassword));
+  catchError(authController.restorePassword)
+);
 
 authRouter.get(
   '/restore/:restoreCode',
