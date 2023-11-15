@@ -7,6 +7,7 @@ const {
   sendActivationEmail,
   sendResetLink,
   sendNotifyOldEmail,
+  sendConfirmationEmail,
 } = require('./email.service.js');
 const { ApiError } = require('../exceptions/api.error.js');
 const { jwtService } = require('./jwt.service.js');
@@ -100,6 +101,40 @@ const resetPassword = async(resetToken, newPassword) => {
   return foundUser;
 };
 
+const updateName = async(foundUser, updatedName) => {
+  foundUser.name = updatedName;
+
+  await foundUser.save();
+};
+
+const updatePassword = async(foundUser, newPassword) => {
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  foundUser.password = hashedPassword;
+
+  await foundUser.save();
+};
+
+const sendEmailConfirmation = async(foundUser, email, res) => {
+  const confirmationToken = jwtService.generateToken(
+    {
+      userId: foundUser.id,
+      newEmail: email,
+    },
+    'JWT_CONFIRMATION_SECRET',
+    '3600s'
+  );
+
+  res.cookie('confirmationToken', confirmationToken, {
+    maxAge: 3600,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  await sendConfirmationEmail(foundUser.name, email, confirmationToken);
+};
+
 const updateEmail = async(confirmationToken) => {
   const decodedToken = jwtService.verifyToken(
     confirmationToken,
@@ -141,6 +176,9 @@ const userService = {
   resetPassword,
   getUserById,
   updateEmail,
+  updateName,
+  updatePassword,
+  sendEmailConfirmation,
 };
 
 module.exports = { userService };

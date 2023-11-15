@@ -9,7 +9,19 @@ const { userService } = require('../services/user.service.js');
 const { jwtService } = require('../services/jwt.service.js');
 const { tokenService } = require('../services/token.service.js');
 const bcrypt = require('bcrypt');
-const { sendConfirmationEmail } = require('../services/email.service.js');
+
+const checkUserExistence = (user, id) => {
+  if (!user) {
+    throw ApiError.notFound(`There's no such user with id ${id}`);
+  }
+};
+
+const successfulMessage = (user, updatedValueName) => {
+  return {
+    message: `Your ${updatedValueName} has been successfully updated!`,
+    updatedUser: user,
+  };
+};
 
 const register = async(req, res) => {
   const { name, email, password } = req.body;
@@ -193,142 +205,103 @@ const resetPassword = async(req, res) => {
   });
 };
 
-const updateProfile = async(req, res) => {
+const updateName = async(req, res) => {
   const { id } = req.params;
-  const {
-    updatedName,
-    oldPassword,
-    newPassword,
-    confirmation,
-    email,
-    passwordForEmail,
-  } = req.body;
+  const { updatedName } = req.body;
 
   const foundUser = await userService.getUserById(id);
-  const updates = {};
 
-  if (!foundUser) {
-    throw ApiError.notFound(`There's no user with id ${id}`);
+  checkUserExistence(foundUser, id);
+
+  if (!updatedName) {
+    throw ApiError.badRequest('You need to provide an updated name!');
   }
 
-  if (
-    !updatedName
-    && !oldPassword
-    && !newPassword
-    && !confirmation
-    && !email
-    && !passwordForEmail
-  ) {
-    throw ApiError.badRequest('You need to provide data you want to change');
+  if (updatedName === foundUser.name) {
+    throw ApiError.badRequest('No need to change your name!', {
+      name: 'Your updated name is the same as the old one!',
+    });
   }
 
-  if (updatedName) {
-    if (updatedName === foundUser.name) {
-      throw ApiError.badRequest('No need to change your name!', {
-        name: 'Your updated name is the same as the old one!',
-      });
-    }
+  await userService.updateName(foundUser, updatedName);
 
-    const updateName = async() => {
-      foundUser.name = updatedName;
+  res.status(200).send(successfulMessage(foundUser, 'name'));
+};
 
-      await foundUser.save();
-    };
+const updatePassword = async(req, res) => {
+  const { id } = req.params;
+  const { oldPassword, newPassword, confirmation } = req.body;
 
-    if (!Object.keys(req.body).every((key) => key === 'name')) {
-      updates.name = updateName;
-    } else {
-      await updateName();
-    }
-  }
-
-  if (oldPassword && newPassword && confirmation) {
-    if (!(await bcrypt.compare(oldPassword, foundUser.password))) {
-      throw ApiError.badRequest('Old Password is wrong!');
-    }
-
-    if (newPassword === oldPassword) {
-      throw ApiError.badRequest(
-        'New password should be different from your old one!'
-      );
-    }
-
-    const passwordValidationError = validatePassword(newPassword);
-
-    if (passwordValidationError) {
-      throw ApiError.badRequest('Validation error', {
-        newPassword: passwordValidationError,
-      });
-    }
-
-    if (newPassword !== confirmation) {
-      throw ApiError.badRequest(
-        'The new password and confirmation do not match'
-      );
-    }
-
-    const updatePassword = async() => {
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-      foundUser.password = hashedPassword;
-
-      await foundUser.save();
-    };
-
-    if (updatedName || email) {
-      updates.password = updatePassword;
-    } else {
-      updatePassword();
-    }
-  }
-
-  if (email && passwordForEmail) {
-    if (!(await bcrypt.compare(passwordForEmail, foundUser.password))) {
-      throw ApiError.badRequest('Incorrect password for changing email!');
-    }
-
-    if (email === foundUser.email) {
-      throw ApiError.badRequest(
-        'Your new email should be different from your current one!'
-      );
-    }
-
-    const confirmationToken = jwtService.generateToken(
-      {
-        userId: foundUser.id,
-        newEmail: email,
-      },
-      'JWT_CONFIRMATION_SECRET',
-      '3600s'
+  if (!oldPassword || !newPassword || !confirmation) {
+    throw ApiError.badRequest(
+      'You need to provide old password, new password and confirmation!'
     );
+  }
 
-    res.cookie('confirmationToken', confirmationToken, {
-      maxAge: 3600,
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+  const foundUser = await userService.getUserById(id);
 
-    await sendConfirmationEmail(foundUser.name, email, confirmationToken);
+  checkUserExistence(foundUser, id);
 
-    res.send({
-      message:
-        `Confirm your new email please!
-          You have been sent an email with confirmation!`,
+  if (!(await bcrypt.compare(oldPassword, foundUser.password))) {
+    throw ApiError.badRequest('Old Password is wrong!');
+  }
+
+  if (newPassword === oldPassword) {
+    throw ApiError.badRequest(
+      'New password should be different from your old one!'
+    );
+  }
+
+  const passwordValidationError = validatePassword(newPassword);
+
+  if (passwordValidationError) {
+    throw ApiError.badRequest('Validation error', {
+      newPassword: passwordValidationError,
     });
   }
 
-  for (const update of Object.values(updates)) {
-    await update();
+  if (newPassword !== confirmation) {
+    throw ApiError.badRequest('The new password and confirmation do not match');
   }
 
-  res.send({
-    message: 'Profile updated successfully',
-    user: foundUser,
+  await userService.updatePassword(foundUser, newPassword);
+
+  res.status(200).send(successfulMessage(foundUser, 'password'));
+};
+
+const sendEmailConfirmation = async(req, res) => {
+  const { id } = req.params;
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw ApiError.badRequest(
+      'You need to provide a new email and current password!'
+    );
+  }
+
+  const foundUser = await userService.getUserById(id);
+
+  checkUserExistence(foundUser, id);
+
+  if (!(await bcrypt.compare(password, foundUser.password))) {
+    throw ApiError.badRequest('Incorrect password for changing email!');
+  }
+
+  if (email === foundUser.email) {
+    throw ApiError.badRequest(
+      'Your new email should be different from your current one!'
+    );
+  }
+
+  await userService.sendEmailConfirmation(foundUser, email, res);
+
+  res.status(200).send({
+    message: `Confirm your new email please!
+        You have been sent an email with confirmation!`,
   });
 };
 
-const changeEmail = async(req, res) => {
+const updateEmail = async(req, res) => {
   const { confirmationToken } = req.params;
 
   if (!confirmationToken) {
@@ -354,8 +327,10 @@ const authController = {
   refresh,
   forgotPassword,
   resetPassword,
-  updateProfile,
-  changeEmail,
+  updateEmail,
+  updateName,
+  updatePassword,
+  sendEmailConfirmation,
 };
 
 module.exports = { authController };
