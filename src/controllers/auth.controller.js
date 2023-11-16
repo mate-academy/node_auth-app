@@ -318,6 +318,38 @@ const updateEmail = async(req, res) => {
   });
 };
 
+const authorizeWithGoogle = (req, res) => {
+  const { displayName, emails, accessToken } = req.user;
+
+  if (!displayName || !emails || !accessToken) {
+    throw ApiError.badRequest(
+      'Something went wrong! Try to authorize with google again'
+    );
+  }
+
+  res.status(200).send({
+    message: 'Authenticated with google!',
+    user: {
+      name: displayName,
+      email: emails[0].value,
+    },
+    accessToken,
+  });
+};
+
+const logoutWithGoogle = async(req, res) => {
+  const { userId } = req.params;
+
+  await tokenService.remove(userId);
+
+  req.session.destroy((err) => {
+    if (err) {
+      throw ApiError.unAuthorized('Error destroying session', { error: err });
+    }
+    res.redirect('/auth/google');
+  });
+};
+
 const authController = {
   register,
   activate,
@@ -331,6 +363,8 @@ const authController = {
   updateName,
   updatePassword,
   sendEmailConfirmation,
+  authorizeWithGoogle,
+  logoutWithGoogle,
 };
 
 module.exports = { authController };

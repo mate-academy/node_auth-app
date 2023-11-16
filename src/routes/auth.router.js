@@ -4,6 +4,7 @@ const express = require('express');
 const { catchError } = require('../middlewares/catchError.js');
 const { authController } = require('../controllers/auth.controller.js');
 const { authMiddleware } = require('../middlewares/authMiddleware.js');
+const passport = require('passport');
 
 const authRouter = express.Router();
 
@@ -45,6 +46,30 @@ authRouter.patch(
   '/update-email/:confirmationToken',
   catchError(authMiddleware),
   catchError(authController.updateEmail)
+);
+
+authRouter.get(
+  '/auth/google',
+  passport.authenticate('google', {
+    scope: [
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/userinfo.email',
+    ],
+    accessType: 'offline',
+    prompt: 'consent',
+  }),
+  catchError()
+);
+
+authRouter.get(
+  '/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  catchError(authController.authorizeWithGoogle)
+);
+
+authRouter.get(
+  '/auth/google/logout/:userId',
+  catchError(authController.logoutWithGoogle)
 );
 
 module.exports = { authRouter };

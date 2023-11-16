@@ -18,6 +18,10 @@ const save = async(userId, refreshToken) => {
   });
 };
 
+const getByUserId = async(userId) => {
+  return Token.findOne({ where: { userId } });
+};
+
 const getByToken = async(refreshToken) => {
   return Token.findOne({ where: { refreshToken } });
 };
@@ -30,6 +34,7 @@ const tokenService = {
   remove,
   getByToken,
   save,
+  getByUserId,
 };
 
 module.exports = { tokenService };
