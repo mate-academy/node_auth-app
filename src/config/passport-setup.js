@@ -34,7 +34,7 @@ passport.use(
       try {
         const user = await userService.getUserByEmail(email);
 
-        if (user !== null) {
+        if (user) {
           const isUserAuthorized = await tokenService.getByUserId(user.id);
 
           if (isUserAuthorized) {

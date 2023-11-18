@@ -62,36 +62,36 @@ const activate = async(req, res) => {
   res.send(foundUser);
 };
 
-const login = async(req, res) => {
-  const { email, password } = req.body;
+  const login = async(req, res) => {
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw ApiError.badRequest('Bad request');
-  }
+    if (!email || !password) {
+      throw ApiError.badRequest('Bad request');
+    }
 
-  const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    const errors = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+
+    if (errors.email || errors.password) {
+      throw ApiError.badRequest('Validation error', errors);
+    }
+
+    const foundUser = await userService.getUserByEmail(email);
+
+    if (!foundUser) {
+      throw ApiError.badRequest('User with this email does not exist!');
+    }
+
+    const passwordsMatch = await bcrypt.compare(password, foundUser.password);
+
+    if (!passwordsMatch) {
+      throw ApiError.badRequest('Password is incorrect!');
+    }
+
+    await sendAuthentication(res, foundUser);
   };
-
-  if (errors.email || errors.password) {
-    throw ApiError.badRequest('Validation error', errors);
-  }
-
-  const foundUser = await userService.getUserByEmail(email);
-
-  if (!foundUser) {
-    throw ApiError.badRequest('User with this email does not exist!');
-  }
-
-  const passwordsMatch = await bcrypt.compare(password, foundUser.password);
-
-  if (!passwordsMatch) {
-    throw ApiError.badRequest('Password is incorrect!');
-  }
-
-  await sendAuthentication(res, foundUser);
-};
 
 const logout = async(req, res) => {
   const { userId } = req.params;
