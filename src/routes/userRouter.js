@@ -1,9 +1,12 @@
-import express from 'express';
-import { catchError } from '../middlewares/catchError.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
-import { userController } from '../controllers/userController.js';
+'use strict';
 
-export const userRouter = new express.Router();
+const express = require('express');
+
+const { catchError } = require('../middlewares/catchError');
+const { authMiddleware } = require('../middlewares/authMiddleware');
+const userController = require('../controllers/userController');
+
+const userRouter = new express.Router();
 
 userRouter.patch(
   '/name',
@@ -22,3 +25,5 @@ userRouter.patch(
   catchError(authMiddleware),
   catchError(userController.updatePassword),
 );
+
+module.exports = { userRouter };

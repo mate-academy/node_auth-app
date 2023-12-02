@@ -1,9 +1,12 @@
-import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcrypt';
-import { ApiError } from '../exceptions/ApiError.js';
-import { User } from '../models/User.js';
-import { emailService } from './emailService.js';
-import { tokenService } from './tokenService.js';
+'use strict';
+
+const { v4 } = require('uuid');
+const bcrypt = require('bcrypt');
+
+const { ApiError } = require('../exceptions/ApiError');
+const { User } = require('../models/User');
+const emailService = require('./emailService');
+const tokenService = require('./tokenService');
 
 function normalize({ id, name, email }) {
   return {
@@ -26,7 +29,7 @@ async function registration({ name, email, password }) {
     throw ApiError.BadRequest('User with such email already exist');
   }
 
-  const confirmEmailToken = uuidv4();
+  const confirmEmailToken = v4();
   const hash = await bcrypt.hash(password, 10);
 
   await User.create({
@@ -46,7 +49,7 @@ async function sendResetPasswordMail(email) {
     throw ApiError.BadRequest('User not found');
   }
 
-  const confirmEmailToken = uuidv4();
+  const confirmEmailToken = v4();
 
   user.confirmEmailToken = confirmEmailToken;
   await user.save();
@@ -85,7 +88,7 @@ async function updateEmail(id, email) {
   }
 
   const user = await User.findOne({ where: { id } });
-  const confirmEmailToken = uuidv4();
+  const confirmEmailToken = v4();
   const oldEmail = user.email;
 
   user.email = email;
@@ -109,7 +112,7 @@ async function updatePassword(id, password) {
   await tokenService.remove(id);
 }
 
-export const userService = {
+const userService = {
   normalize,
   getByEmail,
   registration,
@@ -119,3 +122,5 @@ export const userService = {
   updateEmail,
   updatePassword,
 };
+
+module.exports = userService;

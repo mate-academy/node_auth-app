@@ -1,4 +1,6 @@
-import jwt from 'jsonwebtoken';
+'use strict';
+
+const jwt = require('jsonwebtoken');
 
 function generateAccessToken(user) {
   return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
@@ -24,9 +26,11 @@ function validateRefreshToken(token) {
   }
 }
 
-export const jwtService = {
+const jwtService = {
   generateAccessToken,
   generateRefreshToken,
   validateAccessToken,
   validateRefreshToken,
 };
+
+module.exports = jwtService;

@@ -1,8 +1,10 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../utils/db.js';
-import { User } from './User.js';
+'use strict';
 
-export const Token = sequelize.define('token', {
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../utils/db');
+const { User } = require('./User');
+
+const Token = sequelize.define('token', {
   refreshToken: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -12,16 +14,4 @@ export const Token = sequelize.define('token', {
 Token.belongsTo(User);
 User.hasOne(Token);
 
-// import { DataTypes } from 'sequelize';
-// import { sequelize } from '../utils/db.js';
-// import { User } from './User.js';
-
-// export const Token = sequelize.define('token', {
-//   refreshToken: {
-//     type: DataTypes.STRING,
-//     allowNull: false,
-//   },
-// });
-
-// Token.belongsTo(User);
-// User.hasOne(Token);
+module.exports = { Token };

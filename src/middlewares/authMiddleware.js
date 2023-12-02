@@ -1,7 +1,9 @@
-import { ApiError } from '../exceptions/ApiError.js';
-import { jwtService } from '../services/jwtService.js';
+'use strict';
 
-export function authMiddleware(req, res, next) {
+const { ApiError } = require('../exceptions/ApiError');
+const jwtService = require('../services/jwtService');
+
+function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader) {
@@ -22,3 +24,5 @@ export function authMiddleware(req, res, next) {
 
   next();
 }
+
+module.exports = { authMiddleware };

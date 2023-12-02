@@ -1,7 +1,9 @@
 /* eslint-disable no-console */
-import { ApiError } from '../exceptions/ApiError.js';
+'use strict';
 
-export function errorMiddleware(error, req, res, next) {
+const { ApiError } = require('../exceptions/ApiError');
+
+function errorMiddleware(error, req, res, next) {
   if (error instanceof ApiError) {
     const { status, message, errors } = error;
 
@@ -20,3 +22,5 @@ export function errorMiddleware(error, req, res, next) {
     message: 'Unexpected error',
   });
 }
+
+module.exports = { errorMiddleware };

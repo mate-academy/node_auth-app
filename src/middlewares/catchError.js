@@ -1,4 +1,6 @@
-export function catchError(action) {
+'use strict';
+
+function catchError(action) {
   return async(req, res, next) => {
     try {
       await action(req, res, next);
@@ -7,3 +9,5 @@ export function catchError(action) {
     }
   };
 }
+
+module.exports = { catchError };

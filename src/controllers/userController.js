@@ -1,8 +1,10 @@
-import bcrypt from 'bcrypt';
-import { ApiError } from '../exceptions/ApiError.js';
-import { jwtService } from '../services/jwtService.js';
-import { userService } from '../services/userService.js';
-import { validation } from '../utils/validation.js';
+'use strict';
+
+const bcrypt = require('bcrypt');
+const { ApiError } = require('../exceptions/ApiError');
+const jwtService = require('../services/jwtService');
+const userService = require('../services/userService');
+const validation = require('../utils/validation');
 
 async function updateName(req, res) {
   const { refreshToken } = req.cookies;
@@ -91,8 +93,10 @@ async function updatePassword(req, res) {
   res.send({ message: 'Password updated, login please' });
 }
 
-export const userController = {
+const userController = {
   updateName,
   updateEmail,
   updatePassword,
 };
+
+module.exports = userController;

@@ -1,11 +1,14 @@
-import { validate } from 'uuid';
-import bcrypt from 'bcrypt';
-import { ApiError } from '../exceptions/ApiError.js';
-import { userService } from '../services/userService.js';
-import { User } from '../models/User.js';
-import { jwtService } from '../services/jwtService.js';
-import { tokenService } from '../services/tokenService.js';
-import { validation } from '../utils/validation.js';
+'use strict';
+
+const { validate } = require('uuid');
+const bcrypt = require('bcrypt');
+
+const { ApiError } = require('../exceptions/ApiError');
+const userService = require('../services/userService');
+const { User } = require('../models/User');
+const jwtService = require('../services/jwtService');
+const tokenService = require('../services/tokenService');
+const validation = require('../utils/validation');
 
 async function registration(req, res) {
   const { name, email, password } = req.body;
@@ -107,7 +110,6 @@ async function confirmPassword(req, res) {
   }
 
   await userService.resetPassword(password, confirmEmailToken);
-
   res.send({ message: 'Success, login please' });
 }
 
@@ -150,7 +152,7 @@ async function sendAuthentication(res, user) {
   });
 }
 
-export const authController = {
+const authController = {
   registration,
   activate,
   login,
@@ -159,3 +161,5 @@ export const authController = {
   confirmPassword,
   refresh,
 };
+
+module.exports = authController;

@@ -1,8 +1,11 @@
-import express from 'express';
-import { catchError } from '../middlewares/catchError.js';
-import { authController } from '../controllers/authController.js';
+'use strict';
 
-export const authRouter = new express.Router();
+const express = require('express');
+
+const { catchError } = require('../middlewares/catchError');
+const authController = require('../controllers/authController');
+
+const authRouter = new express.Router();
 
 authRouter.post('/registration', catchError(authController.registration));
 authRouter.post('/login', catchError(authController.login));
@@ -19,3 +22,5 @@ authRouter.get(
   '/activate/:confirmEmailToken',
   catchError(authController.activate)
 );
+
+module.exports = { authRouter };

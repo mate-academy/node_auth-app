@@ -1,4 +1,6 @@
-export class ApiError extends Error {
+'use strict';
+
+class ApiError extends Error {
   constructor(status, message, error = {}) {
     super(message);
     this.status = status;
@@ -9,10 +11,6 @@ export class ApiError extends Error {
     return new ApiError(400, message);
   }
 
-  // static BadRequest(message, errors) {
-  //   return new ApiError(400, message, errors);
-  // }
-
   static Unauthorized() {
     return new ApiError(401, 'User is not authorized');
   }
@@ -21,3 +19,5 @@ export class ApiError extends Error {
     return new ApiError(404, 'Not found');
   }
 }
+
+module.exports = { ApiError };
