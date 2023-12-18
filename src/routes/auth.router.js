@@ -17,4 +17,15 @@ authRoute.post(
   catchError(authController.register)
 );
 
+authRoute.get(
+  '/activate/:activationToken',
+  catchError(authController.activate)
+);
+
+authRoute.post(
+  '/login',
+  catchError(reqBodyValidation),
+  catchError(authController.login)
+);
+
 exports.authRoute = authRoute;

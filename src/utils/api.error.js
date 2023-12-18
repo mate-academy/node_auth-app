@@ -15,8 +15,8 @@ class ApiError extends Error {
     return new ApiError(400, message, errors);
   }
 
-  static Unauthorized() {
-    return new ApiError(401, 'User is not authorized');
+  static Unauthorized(message) {
+    return new ApiError(401, message || 'User is not authorized');
   }
 }
 
