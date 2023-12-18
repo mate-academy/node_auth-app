@@ -8,6 +8,8 @@ const { sequelize } = require('./db.js');
 const createServer = (PORT) => {
   const app = express();
 
+  app.use(express.json());
+
   app.listen(PORT, () => {
     sequelize
       .authenticate()
