@@ -1,6 +1,6 @@
 'use strict';
 
-const { tokenService } = require('../services/token.service');
+const { jwtService } = require('../services/jwt.service');
 const { ApiError } = require('../utils/api.error');
 
 const authMiddleware = (req, res, next) => {
@@ -16,7 +16,7 @@ const authMiddleware = (req, res, next) => {
     throw ApiError.Unauthorized();
   }
 
-  const tokenData = tokenService.readAccessToken(token);
+  const tokenData = jwtService.readAccessToken(token);
 
   if (tokenData === null) {
     throw ApiError.Unauthorized();

@@ -20,6 +20,9 @@ const User = sequelize.define('user', {
   activationToken: {
     type: DataTypes.STRING,
   },
+  resetToken: {
+    type: DataTypes.STRING,
+  },
 });
 
 module.exports = {

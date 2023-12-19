@@ -5,6 +5,10 @@ const bcrypt = require('bcrypt');
 const { ApiError } = require('../utils/api.error.js');
 const { User } = require('../models/user.js');
 
+const hashPassword = (password) => {
+  return bcrypt.hash(password, 10);
+};
+
 const create = async (newUser) => {
   const existingUser = await User.findOne({ where: { email: newUser.email } });
 
@@ -14,7 +18,7 @@ const create = async (newUser) => {
     });
   }
 
-  const hashedPassword = await bcrypt.hash(newUser.password, 10);
+  const hashedPassword = await hashPassword(newUser.password);
 
   const user = await User.create({
     ...newUser,
@@ -26,7 +30,7 @@ const create = async (newUser) => {
 
 const checkPassword = async (password, user) => {
   if (!(await bcrypt.compare(password, user.password))) {
-    throw ApiError.BadRequest("Email and password don't match!");
+    throw ApiError.BadRequest('Wrong password!');
   }
 };
 
@@ -48,12 +52,45 @@ const findActiveUser = async (email) => {
   return user;
 };
 
-const findByToken = (activationToken) => {
-  return User.findOne({ where: { activationToken } });
+const findByToken = (tokenType, token) => {
+  return User.findOne({ where: { [tokenType]: token } });
 };
 
-const activateUser = async (user) => {
-  user.activationToken = null;
+const updatePassword = async (user, password) => {
+  const hashedPassword = await hashPassword(password);
+
+  user.password = hashedPassword;
+
+  return user.save();
+};
+
+const updateName = async (user, name) => {
+  user.name = name;
+
+  await user.save();
+
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+  };
+};
+
+const updateEmail = async (user, email, activationToken) => {
+  user.activationToken = activationToken;
+  user.email = email;
+
+  await user.save();
+};
+
+const updateResetToken = (resetToken, user) => {
+  user.resetToken = resetToken;
+
+  return user.save();
+};
+
+const consumeToken = async (tokenType, user) => {
+  user[tokenType] = null;
 
   await user.save();
 
@@ -63,7 +100,11 @@ const activateUser = async (user) => {
 exports.userService = {
   create,
   findByToken,
-  activateUser,
+  consumeToken,
   findActiveUser,
   checkPassword,
+  updateResetToken,
+  updatePassword,
+  updateName,
+  updateEmail,
 };

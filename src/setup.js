@@ -2,6 +2,7 @@
 
 require('dotenv/config');
 require('./models/user.js');
+require('./models/token.js');
 
 const { sequelize } = require('./utils/db.js');
 

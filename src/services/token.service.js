@@ -1,26 +1,29 @@
 'use strict';
 
-const { v4: uuidv4 } = require('uuid');
-const jwt = require('jsonwebtoken');
+const { Token } = require('../models/token.js');
 
-const generateActivationToken = () => {
-  return uuidv4();
+const createRefreshToken = async (userId, refreshToken) => {
+  const [token] = await Token.findOrCreate({
+    where: { userId },
+    defaults: {
+      refreshToken,
+      userId,
+    },
+  });
+
+  return token;
 };
 
-const createAccessToken = (data) => {
-  return jwt.sign(data, process.env.JWT_SECRET);
+const getByToken = (refreshToken) => {
+  return Token.findOne({ where: { refreshToken } });
 };
 
-const readAccessToken = (token) => {
-  try {
-    jwt.verify(token, process.env.JWT_SECRET);
-  } catch (error) {
-    return null;
-  }
+const remove = async (userId) => {
+  return Token.destroy({ where: { userId } });
 };
 
 exports.tokenService = {
-  generateActivationToken,
-  createAccessToken,
-  readAccessToken,
+  createRefreshToken,
+  getByToken,
+  remove,
 };

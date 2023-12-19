@@ -3,7 +3,7 @@
 const { validators } = require('../utils/validators.js');
 const { ApiError } = require('../utils/api.error.js');
 
-const reqBodyValidation = (req, res, next) => {
+const emailAndPasswordValidation = (req, res, next) => {
   const { email, password } = req.body;
 
   const passwordError = validators.validatePassword(password);
@@ -19,7 +19,7 @@ const reqBodyValidation = (req, res, next) => {
   next();
 };
 
-const additionalValidation = (req, res, next) => {
+const nameValidation = (req, res, next) => {
   const { name } = req.body;
 
   const nameError = validators.validateName(name);
@@ -33,5 +33,5 @@ const additionalValidation = (req, res, next) => {
   next();
 };
 
-exports.reqBodyValidation = reqBodyValidation;
-exports.additionalValidation = additionalValidation;
+exports.emailAndPasswordValidation = emailAndPasswordValidation;
+exports.nameValidation = nameValidation;
