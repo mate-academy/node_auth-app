@@ -10,3 +10,4 @@ export const usersRouter = new express.Router();
 
 usersRouter.get('/', authMiddleware, usersController.getAllActivated);
 usersRouter.patch('/email', authMiddleware, catchError(usersController.changeEmail));
+usersRouter.patch('/password', authMiddleware, catchError(usersController.changePassword));

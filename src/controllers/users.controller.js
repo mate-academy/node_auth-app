@@ -44,6 +44,33 @@ const changeEmail = async (req, res) => {
   return res.status(200).send({ message: 'Email updated, confirm your new email' });
 };
 
+const changePassword = async(req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const userData = jwtService.verifyRefresh(refreshToken);
+
+  if (!userData) {
+    throw ApiError.unauthorized();
+  }
+
+  const { oldPassword, newPassword } = req.body;
+
+  const user = await authService.getOneUserByEmail(userData.email);
+
+  const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Bad password');
+  }
+
+  console.log(user.id);
+
+  await usersService.changePassword(user.id, newPassword);
+
+  res.clearCookie('refreshToken');
+  res.send({ message: 'Password updated, login please' });
+};
+
 export const usersController = {
-  getAllActivated, changeEmail,
+  getAllActivated, changeEmail, changePassword,
 };

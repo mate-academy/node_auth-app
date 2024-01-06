@@ -3,6 +3,7 @@ import {ApiError} from "../exeptions/api.error.js";
 import {v4} from "uuid";
 import {tokenService} from "./token.service.js";
 import {emailService} from "./email.service.js";
+import bcrypt from "bcrypt";
 
 const getAllActivated = async() => {
   return User.findAll({ where: { activationToken: null }});
@@ -42,6 +43,15 @@ async function updateEmail(id, email) {
   await emailService.sendChangeMail(oldEmail);
 }
 
+async function changePassword(id, newPassword) {
+  const user = await User.findOne({ where: { id } });
+
+  const hash = await bcrypt.hash(newPassword, 10);
+
+  user.password = hash;
+  user.save();
+}
+
 export const usersService = {
-  getAllActivated, normalize, updateEmail,
+  getAllActivated, normalize, updateEmail, changePassword,
 };
