@@ -61,7 +61,7 @@ const login = async (req, res) => {
     throw ApiError.badRequest('Please check email and activate ur account');
   }
 
-  const isPassValid = bcrypt.compare(password, user.password)
+  const isPassValid = await bcrypt.compare(password, user.password)
 
   if (!user || !isPassValid) {
     throw ApiError.badRequest('Wrong password');
@@ -73,7 +73,7 @@ const login = async (req, res) => {
 const refresh = async(req, res) => {
   const { refreshToken } = req.cookies;
 
-  const user = jwtService.verifyRefresh(refreshToken);
+  const user = await jwtService.verifyRefresh(refreshToken);
   const token = await tokenService.getByToken(refreshToken)
 
   if (!user || !token) {
@@ -86,8 +86,8 @@ const refresh = async(req, res) => {
 const generateTokens = async (res, user) => {
   const normalizedUser = usersService.normalize(user);
 
-  const accessToken = jwtService.sign(normalizedUser);
-  const refreshToken = jwtService.signRefresh(normalizedUser);
+  const accessToken = await jwtService.sign(normalizedUser);
+  const refreshToken = await jwtService.signRefresh(normalizedUser);
 
   await tokenService.save(normalizedUser.id, refreshToken);
 

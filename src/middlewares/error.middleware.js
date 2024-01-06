@@ -1,19 +1,21 @@
 import {ApiError} from "../exeptions/api.error.js";
 
-export const errorMiddleware = (error, req, res, next) => {
+export function errorMiddleware(error, req, res, next) {
   if (error instanceof ApiError) {
-    res.status(error.status).send({
-      message: error.message,
-      errors: error.errors,
-    });
-  }
+    const { status, message, errors } = error;
 
-  if (error) {
-    res.sendStatus(500);
+    res.status(status);
+
     res.send({
-      message: 'Server error',
+      message, errors,
     });
+
+    return;
   }
 
-  next();
-};
+  console.log(error);
+
+  res.status(500).send({
+    message: 'Unexpected error',
+  });
+}
