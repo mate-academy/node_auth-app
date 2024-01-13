@@ -35,7 +35,32 @@ function sendActivationEmail(email, token) {
   });
 }
 
+function sendResetMail(email, resetToken) {
+  const link = `${process.env.CLIENT_URL}/reset/${resetToken}`;
+
+  return send({
+    email,
+    subject: 'Reset password',
+    html: `
+    <p>Follow the link below to reset your password </p>
+    <a href=${link}>${link}</a>
+    `,
+  });
+};
+
+function sendChangeMail(email) {
+  return send({
+    email,
+    subject: 'Email removed',
+    html: `
+      <h1>This email was removed from app</h1>
+    `,
+  });
+};
+
 module.exports = {
   send,
   sendActivationEmail,
+  sendResetMail,
+  sendChangeMail,
 };

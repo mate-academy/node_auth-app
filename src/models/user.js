@@ -3,7 +3,7 @@
 const { client } = require('../utils/db');
 const { DataTypes } = require('sequelize');
 
-const User = client.define('user', {
+const User = client.define('users', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
