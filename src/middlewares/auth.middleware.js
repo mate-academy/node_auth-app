@@ -4,7 +4,7 @@ const { ApiError } = require('../exceptions/ApiError.js');
 const jwtService = require('../services/jwt.service.js');
 
 function authMiddleware(req, res, next) {
-  const authHeader = req.headers['authorization'];
+  const authHeader = req.headers['Authorization'];
 
   if (!authHeader) {
     throw ApiError.Unauthorized();

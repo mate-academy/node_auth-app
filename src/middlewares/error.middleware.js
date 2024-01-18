@@ -13,11 +13,8 @@ function errorMiddleware(error, req, res) {
     return;
   }
 
-  // eslint-disable-next-line no-console
-  console.log(error);
-
   res.status(500).send({
-    message: 'Unexpected error',
+    message: 'Internal server error',
   });
 }
 

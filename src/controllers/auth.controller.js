@@ -56,7 +56,7 @@ async function register(req, res) {
     name, email, password,
   });
 
-  res.send({ message: 'OK' });
+  res.status(201).send({ message: 'OK' }, 201);
 }
 
 async function activate(req, res) {
@@ -167,7 +167,7 @@ async function resetPasswordConfirm(req, res) {
     resetToken: !resetToken ? 'resetToken is required' : null,
   };
 
-  if (!resetToken || !newPassword) {
+  if (errors.resetToken || errors.newPassword) {
     throw ApiError.BadRequest('Validation error', errors);
   }
 
