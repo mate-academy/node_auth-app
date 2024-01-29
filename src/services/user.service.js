@@ -80,7 +80,7 @@ async function changeEmail(req, res) {
   const { password, newEmail } = req.body;
   const { id } = req.user;
 
-  const user = await findOne(id);
+  const user = await User.findOne(id);
 
   const oldEmail = user.email;
 
