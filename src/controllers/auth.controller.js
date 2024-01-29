@@ -1,17 +1,15 @@
 'use strict';
 
-const express = require('express');
-const uuidv4 = require('uuid');
 const { ApiError } = require('../exeptions/api.error');
 
 const { User } = require('../models/User');
-const { sendActivationEmail, sendResetPassword } = require('../services/email.service');
+const bcrypt = require('bcrypt');
+const { sendResetPassword } = require('../services/email.service');
 const { sing, singRefresh, verifyRefresh } = require('../services/jwt.service');
+const { remove, save, getByToken } = require('../services/tokenService');
 const { normalize, findByEmail } = require('../services/user.service');
-const cookieParser = require('cookie-parser');
-const { validateName, validateEmail, validatePassword } = require('../utils/validationFunction');
-
-
+const { validateName, validateEmail, validatePassword }
+  = require('../utils/validationFunction');
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -26,7 +24,7 @@ const register = async (req, res) => {
     throw ApiError.BadRequest('Validation error', errors)
   }
 
-  await userService.register({name, email, password });
+  await register({name, email, password });
 
   res.send({ message: 'OK' });
 
@@ -75,7 +73,7 @@ const refresh = async (req, res, next) => {
     throw ApiError.unauthorized();
   }
 
-  const token = await tokenService.getByToken(refreshToken);
+  const token = await getByToken(refreshToken);
 
   if (!token) {
     throw ApiError.unauthorized();
@@ -91,7 +89,7 @@ async function sendAuthentication(res, user) {
   const accessToken = sing(userData);
   const refreshToken = singRefresh(userData);
 
-  await tokenService.save(user.id, refreshToken);
+  await save(user.id, refreshToken);
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -108,12 +106,12 @@ async function sendAuthentication(res, user) {
 
 async function logout(req, res, next) {
   const { refreshToken } = req.cookies;
-  const userData = jwtService.verifyRefresh(refreshToken);
+  const userData = verifyRefresh(refreshToken);
 
   res.clearCookie('refreshToken');
 
   if (userData) {
-    await tokenService.remove(userData.id);
+    await remove(userData.id);
   }
 
   res.sendStatus(204);
@@ -126,13 +124,13 @@ async function resetPassword(req, res) {
     throw ApiError.BadRequest('Email is required');
   }
 
-  const user = await userService.findByEmail(email);
+  const user = await findByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('User with this email does not exist');
   }
 
-  const token = await refreshPasswordService.save(user.id, randomUUID());
+  const token = await save(user.id, randomUUID());
 
   await sendResetPassword(email, token.refreshPasswordToken);
 
@@ -151,8 +149,7 @@ async function resetPasswordConfirm(req, res) {
     throw ApiError.BadRequest('Validation error', errors);
   }
 
-  const resetPasswordToken = await refreshPasswordService
-    .getByToken(resetToken);
+  const resetPasswordToken = await getByToken(resetToken);
 
   if (!resetPasswordToken) {
     throw ApiError.BadRequest('resetToken is invalid');

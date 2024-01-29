@@ -1,8 +1,5 @@
 'use strict';
 
-const express = require('express');
-const uuidv4 = require('uuid');
-
 const { getAllUserActivated, normalize } = require('../services/user.service');
 
 

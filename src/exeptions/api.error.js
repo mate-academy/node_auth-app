@@ -1,3 +1,5 @@
+'use strict';
+
 class ApiError extends Error {
   constructor({message, status, errors = {} }) {
     super(message);

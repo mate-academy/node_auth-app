@@ -1,3 +1,5 @@
+'use strict';
+
 const e = require("express");
 const { Token } = require("../models/Token");
 

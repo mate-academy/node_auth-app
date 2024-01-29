@@ -1,6 +1,5 @@
 'use strict';
 const { Sequelize } = require('sequelize');
-const { DataTypes } = require('sequelize');
 
 const client = new Sequelize('postgres', 'postgres', '1439810', {
   host: process.env.DB_HOST,

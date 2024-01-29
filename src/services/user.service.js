@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const { randomUUID } = require('crypto');
 const { sendActivationEmail, sendNewEmail } = require("./email.service");
 const { validatePassword, validateEmail } = require("../utils/validationFunction");
+const { ApiError } = require("../exeptions/api.error");
 
 
 function getAllUserActivated() {
@@ -34,7 +35,7 @@ async function register({ name, email, password }) {
   }
 
   const activationToken = randomUUID();
-  const hash = await bcryp.hash(password, 10);
+  const hash = await bcrypt.hash(password, 10);
 
   await User.create({
     name,
@@ -49,7 +50,7 @@ async function register({ name, email, password }) {
 async function changePassword(req, res) {
   const { newPassword, oldPassword } = req.body;
   const { email } = req.user;
-  const user = await userService.findByEmail(email);
+  const user = await findByEmail(email);
 
   const errors = {
     newPassword: validatePassword(newPassword),
@@ -76,7 +77,7 @@ async function changeEmail(req, res) {
   const { password, newEmail } = req.body;
   const { id } = req.user;
 
-  const user = await userService.findOne(id);
+  const user = await findOne(id);
 
   const oldEmail = user.email;
 
@@ -105,7 +106,7 @@ async function changeEmail(req, res) {
   await sendNewEmail(oldEmail, newEmail);
   await sendNewEmail(newEmail, newEmail);
 
-  res.send(userService.normalize(user));
+  res.send(normalize(user));
 }
 
 module.exports = {

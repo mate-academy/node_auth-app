@@ -1,11 +1,11 @@
 'use strict';
 
-import { User } from './User';
+const { User } = require('./User');
 const DataTypes = require('sequelize');
 const { client } = require('../utils/bd');
 
 
-export const Token = client.define('token', {
+const Token = client.define('token', {
   refreshToken: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -14,3 +14,7 @@ export const Token = client.define('token', {
 
 Token.belongsTo(User);
 User.hasOne(Token);
+
+module.exports = {
+  Token,
+}
