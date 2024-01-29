@@ -3,6 +3,7 @@
 const { ApiError } = require('../exeptions/api.error');
 
 const { User } = require('../models/User');
+const { randomUUID } = require('crypto');
 const bcrypt = require('bcrypt');
 const { sendResetPassword } = require('../services/email.service');
 const { sing, singRefresh, verifyRefresh } = require('../services/jwt.service');

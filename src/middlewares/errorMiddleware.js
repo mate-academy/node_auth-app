@@ -1,6 +1,6 @@
 'use strict';
 
-const { ApiError } = require("../exeptions/api.error");
+const { ApiError } = require('../exeptions/api.error');
 
 const errorMiddleware = (error,req, res, next) => {
   if(error instanceof ApiError) {

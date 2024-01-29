@@ -1,11 +1,12 @@
 "use strict";
 
-const { User } = require("../models/User");
+const { User } = require('../models/User');
 const bcrypt = require('bcrypt');
 const { randomUUID } = require('crypto');
-const { sendActivationEmail, sendNewEmail } = require("./email.service");
-const { validatePassword, validateEmail } = require("../utils/validationFunction");
-const { ApiError } = require("../exeptions/api.error");
+const { sendActivationEmail, sendNewEmail } = require('./email.service');
+const { validatePassword, validateEmail }
+  = require('../utils/validationFunction');
+const { ApiError } = require('../exeptions/api.error');
 
 
 function getAllUserActivated() {
@@ -21,7 +22,9 @@ function normalize({ id, email }) {
 }
 
 function findByEmail(email) {
-  return User.findOne({where: { email }});
+  return User.findOne({
+    where: { email },
+  });
 
 }
 

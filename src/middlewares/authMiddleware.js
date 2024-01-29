@@ -1,6 +1,6 @@
 'use strict';
 
-const { verify } = require("jsonwebtoken");
+const { verify } = require('jsonwebtoken');
 
 const authMiddleware = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';

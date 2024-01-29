@@ -1,7 +1,6 @@
 'use strict';
 
-const e = require("express");
-const { Token } = require("../models/Token");
+const { Token } = require('../models/Token');
 
 async function save(userId, refreshToken) {
   const token = await Token.findOne({

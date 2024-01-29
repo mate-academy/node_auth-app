@@ -1,7 +1,16 @@
 'use strict';
 
 const express = require('express');
-const { register, activate, login, refresh, logout, resetPassword, resetPasswordConfirm } = require('../controllers/auth.controller');
+const {
+  register,
+  activate,
+  login,
+  refresh,
+  logout,
+  resetPassword,
+  resetPasswordConfirm
+}
+  = require('../controllers/auth.controller');
 const { catchError } = require('../utils/catchError');
 const authRouter = express.Router();
 
