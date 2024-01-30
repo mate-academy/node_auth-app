@@ -3,7 +3,8 @@
 const { ApiError } = require('../exeptions/api.error');
 const { getAllUserActivated, normalize, getById, findByEmail }
   = require('../services/user.service');
-const { validatePassword, validateEmail } = require('../utils/validationFunction');
+const { validatePassword, validateEmail }
+  = require('../utils/validationFunction');
 const bcrypt = require('bcrypt');
 const { sendNewEmail } = require('../services/email.service');
 
