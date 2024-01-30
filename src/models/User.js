@@ -20,7 +20,7 @@ const User = client.define('user', {
     type: DataTypes.STRING,
   }
 }, {
-  tableName: 'users',
+  tableName: 'Users',
 });
 
 module.exports = {

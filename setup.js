@@ -1,6 +1,5 @@
 'use strict';
 
-const { User } = require('./bd');
-const { client } = require('../utils/bd');
+const { User } = require("./src/models/User");
 
 User.sync({ force: true });

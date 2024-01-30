@@ -1,9 +1,9 @@
 'use strict';
 
 const express = require('express');
-const { getAllActivated } = require('../controllers/user.controller');
+const { getAllActivated, changePassword, changeEmail } = require('../controllers/user.controller');
 const { authMiddleware } = require('../middlewares/authMiddleware');
-const { changePassword, changeEmail } = require('../services/user.service');
+
 const { catchError } = require('../utils/catchError');
 const userRouter = express.Router();
 
