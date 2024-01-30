@@ -1,7 +1,8 @@
 'use strict';
 
 const express = require('express');
-const { getAllActivated, changePassword, changeEmail } = require('../controllers/user.controller');
+const { getAllActivated, changePassword, changeEmail }
+  = require('../controllers/user.controller');
 const { authMiddleware } = require('../middlewares/authMiddleware');
 
 const { catchError } = require('../utils/catchError');

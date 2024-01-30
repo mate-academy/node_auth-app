@@ -1,7 +1,11 @@
 'use strict';
 
-const { getAllUserActivated, normalize, getById } = require('../services/user.service');
-
+const { ApiError } = require('../exeptions/api.error');
+const { getAllUserActivated, normalize, getById, findByEmail }
+  = require('../services/user.service');
+const { validatePassword, validateEmail } = require('../utils/validationFunction');
+const bcrypt = require('bcrypt');
+const { sendNewEmail } = require('../services/email.service');
 
 const getAllActivated = async (req, res) => {
   const users = await getAllUserActivated();
@@ -70,8 +74,6 @@ async function changeEmail(req, res) {
 
   res.send(normalize(user));
 }
-
-
 
 module.exports = {
   getAllActivated,

@@ -3,9 +3,7 @@
 const { User } = require('../models/User');
 const bcrypt = require('bcrypt');
 const { randomUUID } = require('crypto');
-const { sendActivationEmail, sendNewEmail } = require('./email.service');
-const { validatePassword, validateEmail }
-  = require('../utils/validationFunction');
+const { sendActivationEmail } = require('./email.service');
 const { ApiError } = require('../exeptions/api.error');
 
 
