@@ -46,8 +46,6 @@ const activate = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  console.log("password: ", password);
-
   const user = await usersService.findByEmail(email);
 
   if (!user) {

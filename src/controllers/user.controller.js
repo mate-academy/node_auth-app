@@ -66,8 +66,6 @@ async function changeEmail(req, res) {
 
   const userData = await jwtService.verifyRefresh(refreshToken);
 
-  console.log(userData);
-
   if (!userData || !refreshToken) {
     throw ApiError.unauthorized();
   }
