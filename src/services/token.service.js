@@ -33,6 +33,8 @@ const save = async({ userId, token, type }) => {
     await Token.create({
       userId, [type]: hashedToken,
     });
+
+    return;
   }
 
   userToken[type] = hashedToken;

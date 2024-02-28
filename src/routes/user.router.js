@@ -7,22 +7,22 @@ const { catchError } = require('../middlewares/catchError');
 
 const userRouter = express.Router();
 
-userRouter.post(
+userRouter.patch(
   '/change-username', authMiddleware,
   catchError(userController.changeUsername)
 );
 
-userRouter.post(
+userRouter.patch(
   '/change-password', authMiddleware,
   catchError(userController.changePassword)
 );
 
 userRouter.post(
-  '/change-email', authMiddleware,
+  '/request-email-change', authMiddleware,
   catchError(userController.requestEmailChange)
 );
 
-userRouter.get(
+userRouter.patch(
   '/change-email', authMiddleware,
   catchError(userController.changeEmail)
 );

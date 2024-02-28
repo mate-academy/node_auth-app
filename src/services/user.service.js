@@ -140,6 +140,21 @@ const confirmForReset = async({ token, id }) => {
   });
 };
 
+const resetPassword = async({ email, newPassword }) => {
+  const user = await getByEmail(email);
+
+  if (!user) {
+    throw ApiError.NotFound('User not found');
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    newPassword, Number(process.env.BCRYPT_SALT)
+  );
+
+  user.password = hashedPassword;
+  await user.save();
+};
+
 const changePassword = async({ userId, oldPassword, newPassword }) => {
   const user = await getById(userId);
 
@@ -200,7 +215,7 @@ const requestEmailChange = async(password, oldEmail, newEmail) => {
   });
 };
 
-const changeEmail = async({ token, id, newEmail }) => {
+const confirmEmailChange = async({ token, id }) => {
   const user = await getById(id);
 
   if (!user) {
@@ -226,6 +241,14 @@ const changeEmail = async({ token, id, newEmail }) => {
     userId: id,
     type: 'newEmailToken',
   });
+};
+
+const changeEmail = async({ userId, newEmail }) => {
+  const user = await getById(userId);
+
+  if (!user) {
+    throw ApiError.NotFound('User not found');
+  }
 
   const oldEmail = user.email;
 
@@ -244,8 +267,10 @@ module.exports = {
   login,
   requestForReset,
   confirmForReset,
+  resetPassword,
   changePassword,
   changeUsername,
   requestEmailChange,
+  confirmEmailChange,
   changeEmail,
 };

@@ -4,6 +4,11 @@ const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
 const { ApiError } = require('../exceptions/ApiError');
+const {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+} = require('../utils/validation');
 
 require('dotenv').config();
 
@@ -20,7 +25,7 @@ const sendAuthData = async(res, user) => {
 
   res.cookie('refreshToken', refreshToken,
     {
-      maxAge: 10 * 60 * 60 * 1000,
+      maxAge: 10 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       sameSite: 'none',
       secure: true,
@@ -54,6 +59,13 @@ const refresh = async(req, res) => {
 
 const register = async(req, res) => {
   const { username, email, password } = req.body;
+  const isRequestValid = validateUsername(username)
+    && validateEmail(email)
+    && validatePassword(password);
+
+  if (!isRequestValid) {
+    throw ApiError.BadRequest('Invalid request');
+  }
 
   await userService.register({
     username, email, password,
@@ -65,37 +77,56 @@ const register = async(req, res) => {
 const activate = async(req, res) => {
   const { token, id } = req.query;
 
+  if (!token || !id) {
+    throw ApiError.BadRequest('Invalid request parameters');
+  }
+
   await userService.activate({
     token, id,
   });
 
-  const user = userService.getById(id);
+  const user = await userService.getById(id);
 
   await sendAuthData(res, user);
 };
 
 const login = async(req, res) => {
   const { email, password } = req.body;
+  const isRequestValid = validateEmail(email)
+    && validatePassword(password);
+
+  if (!isRequestValid) {
+    throw ApiError.BadRequest('Invalid request');
+  }
 
   await userService.login({
     email, password,
   });
 
-  const user = userService.getByEmail(email);
+  const user = await userService.getByEmail(email);
 
   await sendAuthData(res, user);
 };
 
-const requestEmailConfirmation = async(req, res) => {
+const requestPasswordReset = async(req, res) => {
   const { email } = req.body;
+  const isRequestValid = validateEmail(email);
+
+  if (!isRequestValid) {
+    throw ApiError.BadRequest('Invalid request');
+  }
 
   await userService.requestForReset(email);
 
   res.sendStatus(204);
 };
 
-const confirmReset = async(req, res) => {
+const confirmPasswordReset = async(req, res) => {
   const { token, id } = req.query;
+
+  if (!token || !id) {
+    throw ApiError.BadRequest('Invalid request parameters');
+  }
 
   await userService.confirmForReset({
     token, id,
@@ -103,20 +134,44 @@ const confirmReset = async(req, res) => {
 
   const user = await userService.getById(id);
 
-  res.send(userService.normalize(user));
+  res.send({ email: user.email });
 };
 
 const resetPassword = async(req, res) => {
   const { email, newPassword } = req.body;
+  const isRequestValid = validateEmail(email)
+    && validatePassword(newPassword);
 
-  await userService.changePassword(email, newPassword);
+  if (!isRequestValid) {
+    throw ApiError.BadRequest('Invalid request');
+  }
+
+  await userService.resetPassword({
+    email, newPassword,
+  });
 
   res.sendStatus(204);
 };
 
+const confirmEmailChange = async(req, res) => {
+  const { token, id } = req.query;
+
+  if (!token || !id) {
+    throw ApiError.BadRequest('Invalid request parameters');
+  }
+
+  await userService.confirmEmailChange({
+    token, id,
+  });
+
+  const user = await userService.getById(id);
+
+  await sendAuthData(res, user);
+};
+
 const logout = async(req, res) => {
   const { refreshToken } = req.cookies;
-  const userData = jwtService.validateRefreshToken(refreshToken);
+  const userData = jwtService.verifyRefresh(refreshToken);
 
   res.clearCookie('refreshToken');
 
@@ -128,12 +183,14 @@ const logout = async(req, res) => {
 };
 
 module.exports = {
+  sendAuthData,
   register,
   activate,
   login,
-  requestEmailConfirmation,
-  confirmReset,
+  requestPasswordReset,
+  confirmPasswordReset,
   resetPassword,
+  confirmEmailChange,
   refresh,
   logout,
 };

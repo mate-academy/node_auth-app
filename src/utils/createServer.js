@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const { authRouter } = require('../routes/auth.router');
 const { userRouter } = require('../routes/user.router');
 const { errorMiddleware } = require('../middlewares/errorMiddleware');
+const expenseRouter = require('../routes/expense.router');
+const categoryRouter = require('../routes/category.router');
 
 require('dotenv').config();
 
@@ -21,6 +23,8 @@ function createServer() {
 
   app.use('/', authRouter);
   app.use('/user', userRouter);
+  app.use('/expenses', expenseRouter);
+  app.use('/categories', categoryRouter);
 
   app.use(errorMiddleware);
 
