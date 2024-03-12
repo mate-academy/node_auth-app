@@ -1,3 +1,4 @@
+import { AxiosResponse } from 'axios';
 import { httpClient } from '../http/httpClient';
 
 function getAll() {

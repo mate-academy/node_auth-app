@@ -4,13 +4,13 @@ import MainLayout from "../layout/MainLayout";
 import { userService } from "../services/userService";
 
 const Users: FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  // fix types later
+  const [users, setUsers] = useState<any>([]);
 
   const fetchUsers = async () => {
     try {
       const response = await userService.getAll();
-      const users: User[] = response.data;
-      setUsers(users);
+      setUsers(response);
     } catch (error) {
       console.log('Error fetching users:', error);
     }
@@ -26,7 +26,7 @@ const Users: FC = () => {
         <>
           <Typography>Users List</Typography>
           <List>
-            {users.map(user => (
+            {users.map((user: User) => (
               <ListItem key={user.id}>{user.email}</ListItem>
             ))}
           </List>
