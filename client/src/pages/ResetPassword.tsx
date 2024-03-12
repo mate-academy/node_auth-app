@@ -7,7 +7,6 @@ import { routes } from "../router/routes";
 import { Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LoginLayout from "../layout/LoginLayout";
-import CustomTextField from "../components/CustomTextField";
 
 const ResetPassword: FC = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

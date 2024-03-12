@@ -3,11 +3,7 @@ import { NavLink } from "react-router-dom";
 import { routes } from "../router/routes";
 import { useAuthContext } from "../context/AuthProvider";
 
-type CustomAppMenuWithLabelProps = {
-};
-
-const CustomAppMenu: React.FC<CustomAppMenuWithLabelProps> = ({
-}) => {
+const CustomAppMenu: React.FC = () => {
   const { logout } = useAuthContext();
 
   return (

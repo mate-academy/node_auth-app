@@ -1,7 +1,7 @@
-import { authClient } from '../http/auth';
+import { httpClient } from '../http/httpClient';
 
 function getAll() {
-  return authClient.get('/users');
+  return httpClient.get('/users');
 }
 
 export const userService = { getAll };

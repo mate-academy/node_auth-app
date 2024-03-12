@@ -50,8 +50,12 @@ const SignIn: FC = () => {
       <>
         <AvatarWithText text="Sign in" />
         <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
-          {textFields.map(({ name, type }) => (
-            <CustomTextField label={name} field={type} formik={formik} />
+          {textFields.map(({ name, type }, index) => (
+            <CustomTextField
+              key={`${type}_${index}`}
+              label={name} field={type}
+              formik={formik}
+            />
           ))}
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}

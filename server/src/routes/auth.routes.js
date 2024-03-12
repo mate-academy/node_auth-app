@@ -13,7 +13,7 @@ authRouter.post(
 authRouter.post('/activation', (req, res) => res.send('activation'));
 authRouter.post(
   '/login',
-  // authMiddleware.validateEmailAndPasswordReqParams,
+  authMiddleware.validateEmailAndPasswordReqParams,
   authControler.login,
 );
 authRouter.post('/logout', (req, res) => res.send('logout'));

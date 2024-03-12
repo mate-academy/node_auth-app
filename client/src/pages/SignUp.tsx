@@ -49,8 +49,12 @@ const SignUp: FC = () => {
       <>
         <AvatarWithText text="Sign up" />
         <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 3 }}>
-          {textFields.map(({ name, type }) => (
-            <CustomTextField label={name} field={type} formik={formik} />
+          {textFields.map(({ name, type }, index) => (
+            <CustomTextField
+              key={`${type}_${index}`}
+              label={name} field={type}
+              formik={formik}
+            />
           ))}
 
           <Button

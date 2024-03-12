@@ -1,4 +1,4 @@
-import { authClient } from '../http/auth';
+import { authClient } from '../http/authClient';
 
 function register({ email, password }) {
   return authClient.post('/registration', { email, password })

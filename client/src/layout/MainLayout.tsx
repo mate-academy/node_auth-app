@@ -1,6 +1,5 @@
 import { FC } from "react";
 import Box from "@mui/material/Box";
-import { Container } from "@mui/material";
 import CustomAppMenu from "../components/CustomAppMenu";
 
 type Props = {
