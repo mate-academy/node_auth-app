@@ -1,5 +1,5 @@
-import { createClient } from './index.js';
+import { createClient } from "./index.js";
 
 export const httpClient = createClient();
 
-httpClient.interceptors.response.use(res => res.data);
+httpClient.interceptors.response.use((res) => res.data);

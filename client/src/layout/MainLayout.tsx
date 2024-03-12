@@ -10,9 +10,7 @@ const MainLayout: FC<Props> = ({ children }) => {
   return (
     <>
       <CustomAppMenu />
-      <Box p={2}>
-        {children}
-      </Box>
+      <Box p={2}>{children}</Box>
     </>
   );
 };

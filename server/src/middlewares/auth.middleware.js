@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 /* eslint-disable object-curly-newline */
 
-const { checkIsReqBodyValid } = require('../utils/checkIsReqBodyValid');
+const { checkIsReqBodyValid } = require("../utils/checkIsReqBodyValid");
 
 function checkIsEmailValid(email) {
   const emailRegex = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
@@ -18,14 +18,11 @@ function checkIsPasswordValid(password) {
 
 function validateEmailAndPasswordReqParams(req, res, next) {
   const listOfExpectedParams = [
-    { key: 'email', type: 'string' },
-    { key: 'password', type: 'string' },
+    { key: "email", type: "string" },
+    { key: "password", type: "string" },
   ];
 
-  const isReqBodyValid = checkIsReqBodyValid(
-    req.body,
-    listOfExpectedParams,
-  );
+  const isReqBodyValid = checkIsReqBodyValid(req.body, listOfExpectedParams);
 
   if (!isReqBodyValid) {
     res.sendStatus(400);

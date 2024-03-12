@@ -5,43 +5,46 @@ import { Box, Stack } from "@mui/material";
 import { routes } from "../router/routes";
 import LoginLayout from "../layout/LoginLayout";
 import AvatarWithText from "../components/AvatarWithText";
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import CustomTextField from "../components/CustomTextField";
 import { useAuthContext } from "../context/AuthProvider";
 
-const textFields = [{
-  type: "email",
-  name: "Email Address",
-},{
-  type: "password",
-  name: "Password",
-}];
+const textFields = [
+  {
+    type: "email",
+    name: "Email Address",
+  },
+  {
+    type: "password",
+    name: "Password",
+  },
+];
 
 const SignUp: FC = () => {
   const { registration } = useAuthContext();
 
   const formik = useFormik({
     initialValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
     validationSchema: Yup.object().shape({
       email: Yup.string()
-        .email('Invalid email address')
-        .required('Email is required'),
+        .email("Invalid email address")
+        .required("Email is required"),
       password: Yup.string()
         // .min(8, 'Password must be at least 8 characters')
         // .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
         // .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
         // .matches(/[0-9]/, 'Password must contain at least one number')
-        .required('Password is required'),
+        .required("Password is required"),
     }),
     onSubmit: (values) => {
       console.log(values);
 
       registration(values);
-    }
+    },
   });
 
   return (
@@ -52,7 +55,8 @@ const SignUp: FC = () => {
           {textFields.map(({ name, type }, index) => (
             <CustomTextField
               key={`${type}_${index}`}
-              label={name} field={type}
+              label={name}
+              field={type}
               formik={formik}
             />
           ))}

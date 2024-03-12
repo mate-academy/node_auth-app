@@ -8,6 +8,6 @@ const Home: FC = () => {
       <Typography>Welcome to the APP</Typography>
     </MainLayout>
   );
-}
+};
 
 export default Home;

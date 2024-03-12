@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function checkIsReqBodyValid(params, listOfExpectedParams) {
   if (Object.keys(params).length === 0) {
@@ -18,11 +18,11 @@ function isValidParam(paramValue, type) {
   }
 
   switch (type) {
-    case 'string':
-      return typeof paramValue === 'string';
+    case "string":
+      return typeof paramValue === "string";
 
-    case 'number':
-      return typeof paramValue === 'number';
+    case "number":
+      return typeof paramValue === "number";
 
     default:
       return;

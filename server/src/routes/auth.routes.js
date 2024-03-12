@@ -1,21 +1,21 @@
-const express = require('express');
-const authControler = require('../controlers/auth.controler');
-const authMiddleware = require('../middlewares/auth.middleware');
+const express = require("express");
+const authControler = require("../controlers/auth.controler");
+const authMiddleware = require("../middlewares/auth.middleware");
 
 const authRouter = new express.Router();
 
-authRouter.get('/', authControler.getAll);
+authRouter.get("/", authControler.getAll);
 authRouter.post(
-  '/registration',
+  "/registration",
   authMiddleware.validateEmailAndPasswordReqParams,
-  authControler.register,
+  authControler.register
 );
-authRouter.post('/activation', (req, res) => res.send('activation'));
+authRouter.post("/activation", (req, res) => res.send("activation"));
 authRouter.post(
-  '/login',
+  "/login",
   authMiddleware.validateEmailAndPasswordReqParams,
-  authControler.login,
+  authControler.login
 );
-authRouter.post('/logout', (req, res) => res.send('logout'));
+authRouter.post("/logout", (req, res) => res.send("logout"));
 
 module.exports = authRouter;

@@ -1,6 +1,6 @@
-import { createContext, useContext, useState } from 'react';
-import { authService } from '../services/authService';
-import { accessTokenService } from '../services/accessTokenService';
+import { createContext, useContext, useState } from "react";
+import { authService } from "../services/authService";
+import { accessTokenService } from "../services/accessTokenService";
 
 const AuthContext = createContext();
 
@@ -8,19 +8,19 @@ export const useAuthContext = () => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error('useAuthContext must be used within an AuthProvider');
+    throw new Error("useAuthContext must be used within an AuthProvider");
   }
 
   return context;
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState('shhshs');
-  
+  const [user, setUser] = useState("shhshs");
+
   async function registration({ email, password }) {
     const data = await authService.register({ email, password });
 
-    console.log('registration', data);
+    console.log("registration", data);
   }
 
   async function login({ email, password }) {

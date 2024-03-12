@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 function sign(user) {
   const token = jwt.sign(user, process.env.JWT_KEY);
