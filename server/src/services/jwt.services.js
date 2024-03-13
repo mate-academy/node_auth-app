@@ -13,4 +13,9 @@ function verifyToken(token) {
   }
 }
 
+// function remove(userId) {
+//   //change here Token
+//   return Token.destroy({ where: { userId } });
+// }
+
 module.exports = { sign, verifyToken };

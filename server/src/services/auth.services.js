@@ -5,6 +5,7 @@ const getAll = () => User.findAll();
 const getByEmail = (email) => User.findOne({ where: { email } });
 
 const create = ({ email, password }) => {
+  console.log("create");
   return User.create({ email, password });
 };
 

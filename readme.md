@@ -1,4 +1,10 @@
 # Login App
+
 Сonsists of client part (React.js) and server part (Node.js).
 
-Run `npm ci` and `npm start` to use it with the [auth-api](https://github.com/mate-academy/nodejs-auth-api-done)
+## To run app:
+
+1. to run the server part, go to ./server and run `npm run dev`
+2. to run the client part, go to ./client and run `npm run start`
+
+You can test the app here: [auth-app](https://github.com/mate-academy/nodejs-auth-api-done)

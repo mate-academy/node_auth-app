@@ -1,8 +1,7 @@
-import { AxiosResponse } from 'axios';
-import { httpClient } from '../http/httpClient';
+import { httpClient } from "../http/httpClient";
 
 function getAll() {
-  return httpClient.get('/users');
+  return httpClient.get("/users");
 }
 
 export const userService = { getAll };

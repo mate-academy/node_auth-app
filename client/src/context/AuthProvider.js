@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import { authService } from "../services/authService";
 import { accessTokenService } from "../services/accessTokenService";
+import useCheckResponseCode from "../hooks/useCheckResponseCode";
 
 const AuthContext = createContext();
 
@@ -15,28 +16,53 @@ export const useAuthContext = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState("shhshs");
+  const [user, setUser] = useState();
+  const checkResponseCode = useCheckResponseCode();
 
   async function registration({ email, password }) {
-    const data = await authService.register({ email, password });
-
-    console.log("registration", data);
+    try {
+      await authService.register({ email, password });
+    } catch (error) {
+      checkResponseCode({
+        code: error.response.status.toString(),
+        message: error.message,
+      });
+    }
   }
 
   async function login({ email, password }) {
-    const { accessToken, user } = await authService.login({ email, password });
+    try {
+      const { accessToken, user } = await authService.login({
+        email,
+        password,
+      });
+      // console.log("accessToken", accessToken);
+      // console.log("user", user);
 
-    console.log(accessToken, user);
-    accessTokenService.save(accessToken);
-    setUser(user);
+      accessTokenService.save(accessToken);
+      setUser(user);
+    } catch (error) {
+      checkResponseCode({
+        code: error.response.status.toString(),
+        message: error.message,
+      });
+    }
   }
 
   async function logout() {
-    await authService.logout();
-    console.log(logout);
+    try {
+      await authService.logout();
+      console.log("logout");
 
-    accessTokenService.remove();
-    setUser(null);
+      accessTokenService.remove();
+      setUser(null);
+    } catch (error) {
+      console.log("error client", error);
+      // checkResponseCode({
+      //   code: error.response.status.toString(),
+      //   message: error.message,
+      // });
+    }
   }
 
   return (

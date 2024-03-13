@@ -1,22 +1,29 @@
 import { FC, useEffect, useState } from "react";
-import { Box, List, ListItem, Typography } from "@mui/material";
+import { List, ListItem, Typography } from "@mui/material";
 import MainLayout from "../layout/MainLayout";
 import { userService } from "../services/userService";
 import Loader from "../components/Loader";
+import useCheckResponseCode from "../hooks/useCheckResponseCode";
 
 const Users: FC = () => {
   // fix types later
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<any>([]);
 
+  const checkResponseCode = useCheckResponseCode();
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await userService.getAll();
       setUsers(response);
+    } catch (error: any) {
+      checkResponseCode({
+        code: error.response.status.toString(),
+        message: error.message,
+      });
+    } finally {
       setLoading(false);
-    } catch (error) {
-      console.log("Error fetching users:", error);
     }
   };
 

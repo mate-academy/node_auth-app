@@ -11,17 +11,7 @@ import AvatarWithText from "../components/AvatarWithText";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import CustomTextField from "../components/CustomTextField";
-
-const textFields = [
-  {
-    type: "email",
-    name: "Email Address",
-  },
-  {
-    type: "password",
-    name: "Password",
-  },
-];
+import PasswordField from "../components/PasswordField";
 
 const SignIn: FC = () => {
   const { login } = useAuthContext();
@@ -36,7 +26,7 @@ const SignIn: FC = () => {
         .email("Invalid email address")
         .required("Email is required"),
       password: Yup.string()
-        // .min(8, 'Password must be at least 8 characters')
+        // .min(8, "Password must be at least 8 characters")
         // .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
         // .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
         // .matches(/[0-9]/, 'Password must contain at least one number')
@@ -48,19 +38,26 @@ const SignIn: FC = () => {
     },
   });
 
+  const isButtonActive =
+    Object.keys(formik.values).every(
+      (key) => !!formik.values[key as keyof typeof formik.values]
+    ) &&
+    !Object.keys(formik.errors).some(
+      (key) => !!formik.errors[key as keyof typeof formik.errors]
+    );
+
   return (
     <LoginLayout>
       <>
         <AvatarWithText text="Sign in" />
         <Box component="form" onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
-          {textFields.map(({ name, type }, index) => (
-            <CustomTextField
-              key={`${type}_${index}`}
-              label={name}
-              field={type}
-              formik={formik}
-            />
-          ))}
+          <CustomTextField
+            label="Email"
+            field="email"
+            type="email"
+            formik={formik}
+          />
+          <PasswordField formik={formik} sx={{ mt: 1 }} />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
@@ -70,6 +67,7 @@ const SignIn: FC = () => {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            disabled={!isButtonActive}
           >
             Sign In
           </Button>

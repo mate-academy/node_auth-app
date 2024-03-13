@@ -16,15 +16,17 @@ const register = async (req, res) => {
 
   try {
     const newUser = await authService.create({ email, password });
+    console.log("newUser", newUser);
     res.send(newUser);
   } catch (error) {
+    console.log(error);
     console.log(`Internal server found: ${error}`);
     res.send(500);
   }
 };
 
 const login = async (req, res) => {
-  console.log("it works, login");
+  console.log("it works on server, login");
   const { email, password } = req.body;
 
   try {
@@ -48,4 +50,14 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { getAll, register, login };
+async function logout(req, res, next) {
+  const data = req;
+  // add here code
+  // res.sendStatus(204);
+
+  console.log("logout server");
+  res.end("logout server");
+  console.log("data", data, data.cookies);
+}
+
+module.exports = { getAll, register, login, logout };

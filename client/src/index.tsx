@@ -5,6 +5,7 @@ import { router } from "./router/router";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { getTheme } from "./theme/theme";
 import { AuthProvider } from "./context/AuthProvider";
+import CustomSnackbarProvider from "./context/CustomSnackbarProvider";
 
 const theme = getTheme();
 
@@ -13,11 +14,13 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <RouterProvider router={router} />
-      </ThemeProvider>
-    </AuthProvider>
+    <CustomSnackbarProvider>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </AuthProvider>
+    </CustomSnackbarProvider>
   </React.StrictMode>
 );
