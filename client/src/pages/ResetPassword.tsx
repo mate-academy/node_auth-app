@@ -45,7 +45,7 @@ const ResetPassword: FC = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => navigate(routes.login.signIn)}
+              onClick={() => navigate(routes.signIn)}
             >
               Wait! I remember
             </Button>

@@ -1,13 +1,13 @@
-const client = require('./src/utils/db');
-const User = require('./src/modules/user');
+const client = require("./src/utils/db");
+const User = require("./src/models/user");
 
 client
   .authenticate()
   .then(() => {
-    console.log('Connection has been established successfully.');
+    console.log("Connection has been established successfully.");
   })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
+  .catch((err) => {
+    console.error("Unable to connect to the database:", err);
   });
 
 User.sync();

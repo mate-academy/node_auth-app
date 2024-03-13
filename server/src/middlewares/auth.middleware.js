@@ -2,6 +2,7 @@
 /* eslint-disable object-curly-newline */
 
 const { checkIsReqBodyValid } = require("../utils/checkIsReqBodyValid");
+const authServices = require("../services/auth.services");
 
 function checkIsEmailValid(email) {
   const emailRegex = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
@@ -34,7 +35,7 @@ function validateEmailAndPasswordReqParams(req, res, next) {
   const isEmailValid = checkIsEmailValid(email);
   const isPasswordValid = checkIsPasswordValid(password);
 
-  if (!isEmailValid) {
+  if (!isEmailValid || !isPasswordValid) {
     res.sendStatus(400);
     return;
   }
@@ -42,4 +43,19 @@ function validateEmailAndPasswordReqParams(req, res, next) {
   next();
 }
 
-module.exports = { validateEmailAndPasswordReqParams };
+async function checkIsEmailAlreadyExistInDB(req, res, next) {
+  const { email } = req.body;
+  const user = await authServices.getByEmail(email);
+
+  if (user) {
+    res.sendStatus(409);
+    return;
+  }
+
+  next();
+}
+
+module.exports = {
+  validateEmailAndPasswordReqParams,
+  checkIsEmailAlreadyExistInDB,
+};

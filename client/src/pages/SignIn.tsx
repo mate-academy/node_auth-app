@@ -33,7 +33,6 @@ const SignIn: FC = () => {
         .required("Password is required"),
     }),
     onSubmit: (values) => {
-      console.log(values);
       login(values);
     },
   });
@@ -73,12 +72,12 @@ const SignIn: FC = () => {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href={routes.login.resetPassword} variant="body2">
+              <Link href={routes.resetPassword} variant="body2">
                 Forgot password?
               </Link>
             </Grid>
             <Grid item>
-              <Link href={routes.login.signUp} variant="body2">
+              <Link href={routes.signUp} variant="body2">
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

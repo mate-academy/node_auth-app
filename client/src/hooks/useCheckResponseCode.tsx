@@ -19,6 +19,13 @@ const useCheckResponseCode = () => {
         });
         break;
 
+      case apiResponseCodes.BAD_REQUEST:
+        enqueueSnackbar({
+          variant: "error",
+          message: "The sent data is not valid",
+        });
+        break;
+
       case apiResponseCodes.BAD_TOKEN:
         enqueueSnackbar({
           variant: "error",
@@ -30,6 +37,13 @@ const useCheckResponseCode = () => {
         enqueueSnackbar({
           variant: "error",
           message: "Resource not found due to a bad request.",
+        });
+        break;
+
+      case apiResponseCodes.DATA_CONFLICT:
+        enqueueSnackbar({
+          variant: "error",
+          message: "User with this email is already exist",
         });
         break;
 

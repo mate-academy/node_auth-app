@@ -8,12 +8,13 @@ authRouter.get("/", authControler.getAll);
 authRouter.post(
   "/registration",
   // authMiddleware.validateEmailAndPasswordReqParams,
+  authMiddleware.checkIsEmailAlreadyExistInDB,
   authControler.register
 );
-authRouter.post("/activation", (req, res) => res.send("activation"));
+authRouter.get("/activation/:activationToken", authControler.activate);
 authRouter.post(
   "/login",
-  authMiddleware.validateEmailAndPasswordReqParams,
+  // authMiddleware.validateEmailAndPasswordReqParams,
   authControler.login
 );
 authRouter.post("/logout", authControler.logout);

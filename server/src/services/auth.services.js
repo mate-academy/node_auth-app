@@ -1,12 +1,14 @@
-const User = require("../modules/user");
+const User = require("../models/user");
 
 const getAll = () => User.findAll();
 
 const getByEmail = (email) => User.findOne({ where: { email } });
 
-const create = ({ email, password }) => {
-  console.log("create");
-  return User.create({ email, password });
+const getByActivationToken = (activationToken) =>
+  User.findOne({ where: { activationToken } });
+
+const create = ({ email, password, activationToken }) => {
+  return User.create({ email, password, activationToken });
 };
 
 const normalize = ({ id, email }) => {
@@ -16,6 +18,7 @@ const normalize = ({ id, email }) => {
 module.exports = {
   getAll,
   getByEmail,
+  getByActivationToken,
   create,
   normalize,
 };

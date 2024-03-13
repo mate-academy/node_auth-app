@@ -1,5 +1,7 @@
 const authService = require("../services/auth.services");
 const jwtService = require("../services/jwt.services");
+const emailService = require("../services/email.services");
+const { v4 } = require("uuid");
 
 const getAll = async (req, res) => {
   try {
@@ -13,20 +15,47 @@ const getAll = async (req, res) => {
 
 const register = async (req, res) => {
   const { email, password } = req.body;
+  const activationToken = v4();
 
   try {
-    const newUser = await authService.create({ email, password });
-    console.log("newUser", newUser);
+    const newUser = await authService.create({
+      email,
+      password,
+      activationToken,
+    });
+
+    emailService.sendActivationEmail(email, activationToken);
     res.send(newUser);
   } catch (error) {
-    console.log(error);
+    console.log(`Internal server found: ${error}`);
+    res.send(500);
+  }
+};
+
+const activate = async (req, res) => {
+  const { activationToken } = req.params;
+
+  try {
+    const user = await authService.getByActivationToken(activationToken);
+
+    console.log("user ", user);
+
+    if (!user) {
+      res.sendStatus(404);
+      return;
+    }
+
+    user.activationToken = null;
+    user.save();
+
+    res.send(user);
+  } catch (error) {
     console.log(`Internal server found: ${error}`);
     res.send(500);
   }
 };
 
 const login = async (req, res) => {
-  console.log("it works on server, login");
   const { email, password } = req.body;
 
   try {
@@ -60,4 +89,4 @@ async function logout(req, res, next) {
   console.log("data", data, data.cookies);
 }
 
-module.exports = { getAll, register, login, logout };
+module.exports = { getAll, register, activate, login, logout };

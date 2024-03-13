@@ -37,7 +37,7 @@ const Users: FC = () => {
         <Loader />
       ) : users.length > 0 ? (
         <>
-          <Typography>Users List</Typography>
+          <Typography variant="subtitle1">Users List</Typography>
           <List>
             {users.map((user: User) => (
               <ListItem key={user.id}>{user.email}</ListItem>

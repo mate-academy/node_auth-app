@@ -8,6 +8,7 @@ import Home from "../pages/Home";
 import SignUp from "../pages/SignUp";
 import ResetPassword from "../pages/ResetPassword";
 import Users from "../pages/Users";
+import UserActivationPage from "../pages/UserActivationPage";
 
 function createRoute(
   path: string,
@@ -21,10 +22,11 @@ function createRoute(
 }
 
 export const routeStack: RouteObject[] = [
-  createRoute("*", <Navigate to={routes.login.signIn} />),
-  createRoute(routes.login.signIn, <SignIn />, "public"),
-  createRoute(routes.login.signUp, <SignUp />, "public"),
-  createRoute(routes.login.resetPassword, <ResetPassword />, "public"),
+  createRoute("*", <Navigate to={routes.signIn} />),
+  createRoute(routes.signIn, <SignIn />, "public"),
+  createRoute(routes.signUp, <SignUp />, "public"),
+  createRoute(routes.resetPassword, <ResetPassword />, "public"),
   createRoute(routes.home, <Home />),
+  createRoute(routes.activate.rootTabs, <UserActivationPage />, "public"),
   createRoute(routes.users, <Users />),
 ];

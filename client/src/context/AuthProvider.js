@@ -17,6 +17,8 @@ export const useAuthContext = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState();
+  const [isError, setIsError] = useState(null);
+
   const checkResponseCode = useCheckResponseCode();
 
   async function registration({ email, password }) {
@@ -28,6 +30,19 @@ export const AuthProvider = ({ children }) => {
         message: error.message,
       });
     }
+  }
+
+  async function activateUser(activationToken) {
+    setIsError(false);
+    try {
+      await authService.activate(activationToken);
+    } catch (error) {
+      checkResponseCode({
+        code: error.response.status.toString(),
+        message: error.message,
+      });
+    }
+    setIsError(true);
   }
 
   async function login({ email, password }) {
@@ -66,7 +81,9 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, registration, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, registration, activateUser, login, logout, isError }}
+    >
       {children}
     </AuthContext.Provider>
   );

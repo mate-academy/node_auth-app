@@ -8,9 +8,10 @@ import * as Yup from "yup";
 import CustomTextField from "../components/CustomTextField";
 import { useAuthContext } from "../context/AuthProvider";
 import PasswordField from "../components/PasswordField";
+import Loader from "../components/Loader";
 
 const SignUp: FC = () => {
-  const { registration } = useAuthContext();
+  const { registration, isError } = useAuthContext();
   const [isRegistered, setIsRegistered] = useState(false);
 
   const formik = useFormik({
@@ -30,15 +31,8 @@ const SignUp: FC = () => {
         .required("Password is required"),
     }),
     onSubmit: async (values) => {
-      try {
-        const data = await registration(values);
-
-        if (data) {
-          setIsRegistered(true);
-        }
-      } catch (error) {
-        console.log("Error during registration:", error);
-      }
+      await registration(values);
+      setIsRegistered(true);
     },
   });
 
@@ -60,11 +54,13 @@ const SignUp: FC = () => {
             alignItems: "center",
           }}
         >
-          <Typography sx={{ fontWeight: 600 }}>Check your email</Typography>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+            Check your email
+          </Typography>
           <Typography mt={1}>
             We have sent you an email with the activation link
           </Typography>
-          <Link href={routes.login.signIn} mt={4}>
+          <Link href={routes.signIn} mt={4}>
             Sign in
           </Link>
         </Stack>
@@ -90,10 +86,13 @@ const SignUp: FC = () => {
               Sign Up
             </Button>
             <Stack>
-              <Link href={routes.login.signIn} variant="body2">
+              <Link href={routes.signIn} variant="body2">
                 Already have an account? Sign in
               </Link>
             </Stack>
+
+            {/* // remove it later */}
+            {formik.isSubmitting && <Loader />}
           </Box>
         </>
       )}

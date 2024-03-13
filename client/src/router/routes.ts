@@ -1,9 +1,11 @@
 export const routes = {
   home: "/home",
-  login: {
-    signIn: "/sign-in",
-    signUp: "/sign-up",
-    resetPassword: "/password-reset",
-  },
+  signIn: "/sign-in",
+  signUp: "/sign-up",
+  resetPassword: "/password-reset",
   users: "/users",
+  activate: {
+    root: "/activate/*",
+    rootTabs: "/activate/:activationToken",
+  },
 };

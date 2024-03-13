@@ -16,7 +16,7 @@ const AuthWrapper: React.FC<Props> = ({ children, type }) => {
       return user ? <Navigate to={routes.home} /> : children;
 
     case "private":
-      return user ? children : <Navigate to={routes.login.signIn} />;
+      return user ? children : <Navigate to={routes.signIn} />;
 
     default:
       return children;
