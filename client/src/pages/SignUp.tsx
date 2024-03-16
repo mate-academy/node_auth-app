@@ -8,10 +8,10 @@ import * as Yup from "yup";
 import CustomTextField from "../components/CustomTextField";
 import { useAuthContext } from "../context/AuthProvider";
 import PasswordField from "../components/PasswordField";
-import Loader from "../components/Loader";
+import { LoadingButton } from "@mui/lab";
 
 const SignUp: FC = () => {
-  const { registration, isError } = useAuthContext();
+  const { registration, isLoading } = useAuthContext();
   const [isRegistered, setIsRegistered] = useState(false);
 
   const formik = useFormik({
@@ -24,15 +24,18 @@ const SignUp: FC = () => {
         .email("Invalid email address")
         .required("Email is required"),
       password: Yup.string()
-        // .min(8, 'Password must be at least 8 characters')
+        // .min(6, "Password must be at least 6 characters")
         // .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
         // .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
         // .matches(/[0-9]/, 'Password must contain at least one number')
         .required("Password is required"),
     }),
     onSubmit: async (values) => {
-      await registration(values);
-      setIsRegistered(true);
+      const isSuccess = await registration(values);
+
+      if (isSuccess) {
+        setIsRegistered(true);
+      }
     },
   });
 
@@ -75,24 +78,21 @@ const SignUp: FC = () => {
               formik={formik}
             />
             <PasswordField formik={formik} sx={{ mt: 1 }} />
-
-            <Button
+            <LoadingButton
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
               disabled={!isButtonActive}
+              loading={isLoading}
             >
               Sign Up
-            </Button>
+            </LoadingButton>
             <Stack>
               <Link href={routes.signIn} variant="body2">
                 Already have an account? Sign in
               </Link>
             </Stack>
-
-            {/* // remove it later */}
-            {formik.isSubmitting && <Loader />}
           </Box>
         </>
       )}

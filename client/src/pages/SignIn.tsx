@@ -12,9 +12,10 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import CustomTextField from "../components/CustomTextField";
 import PasswordField from "../components/PasswordField";
+import { LoadingButton } from "@mui/lab";
 
 const SignIn: FC = () => {
-  const { login } = useAuthContext();
+  const { login, isLoading } = useAuthContext();
 
   const formik = useFormik({
     initialValues: {
@@ -61,15 +62,16 @@ const SignIn: FC = () => {
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
           />
-          <Button
+          <LoadingButton
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
             disabled={!isButtonActive}
+            loading={isLoading}
           >
             Sign In
-          </Button>
+          </LoadingButton>
           <Grid container>
             <Grid item xs>
               <Link href={routes.resetPassword} variant="body2">

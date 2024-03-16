@@ -17,72 +17,84 @@ export const useAuthContext = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState();
-  const [isError, setIsError] = useState(null);
+  const [isLoading, setIsLoading] = useState(null);
 
   const checkResponseCode = useCheckResponseCode();
 
+  const showError = (error) =>
+    checkResponseCode({
+      // code: error.response.status.toString(),
+      message: error.message,
+    });
+
   async function registration({ email, password }) {
+    setIsLoading(true);
+
     try {
       await authService.register({ email, password });
+      return true;
     } catch (error) {
-      checkResponseCode({
-        code: error.response.status.toString(),
-        message: error.message,
-      });
+      showError(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function activateUser(activationToken) {
-    setIsError(false);
+    setIsLoading(true);
+
     try {
       await authService.activate(activationToken);
+      return true;
     } catch (error) {
-      checkResponseCode({
-        code: error.response.status.toString(),
-        message: error.message,
-      });
+      showError(error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsError(true);
   }
 
   async function login({ email, password }) {
+    setIsLoading(true);
+
     try {
       const { accessToken, user } = await authService.login({
         email,
         password,
       });
-      // console.log("accessToken", accessToken);
-      // console.log("user", user);
 
       accessTokenService.save(accessToken);
       setUser(user);
     } catch (error) {
-      checkResponseCode({
-        code: error.response.status.toString(),
-        message: error.message,
-      });
+      showError(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   async function logout() {
+    setIsLoading(true);
+
     try {
       await authService.logout();
-      console.log("logout");
-
       accessTokenService.remove();
       setUser(null);
     } catch (error) {
-      console.log("error client", error);
-      // checkResponseCode({
-      //   code: error.response.status.toString(),
-      //   message: error.message,
-      // });
+      showError(error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <AuthContext.Provider
-      value={{ user, registration, activateUser, login, logout, isError }}
+      value={{
+        user,
+        registration,
+        activateUser,
+        login,
+        logout,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

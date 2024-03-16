@@ -8,21 +8,20 @@ import Loader from "../components/Loader";
 
 const UserActivationPage: FC = () => {
   const { activationToken } = useParams<{ activationToken: string }>();
-  const { activateUser, isError } = useAuthContext();
-
-  const [loading, setLoading] = useState(false);
-
-  const userActivation = async () => {
-    try {
-      setLoading(true);
-      await activateUser(activationToken);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { activateUser, isLoading } = useAuthContext();
+  const [isActivated, setIsActivated] = useState(false);
 
   useEffect(() => {
+    const userActivation = async () => {
+      const isSuccess = await activateUser(activationToken);
+
+      if (isSuccess) {
+        setIsActivated(true);
+      }
+    };
+
     userActivation();
+    console.log("how many times");
   }, []);
 
   return (
@@ -34,26 +33,28 @@ const UserActivationPage: FC = () => {
           Activation Page
         </Typography>
 
-        {loading && <Loader />}
+        {isLoading && <Loader />}
 
-        {!loading && (
+        {!isLoading && (
           <Stack sx={{ alignItems: "center" }}>
             <Typography
               sx={{
-                color: (theme) =>
-                  !isError
+                color: (theme: any) =>
+                  isActivated
                     ? theme.palette.success.main
                     : theme.palette.error.main,
                 p: 2,
               }}
             >
-              {!isError
+              {isActivated
                 ? "Your account now is activated"
                 : "Wrong activation link"}
             </Typography>
-            <Link href={routes.signIn} mt={1}>
-              Sign in
-            </Link>
+            {isActivated && (
+              <Link href={routes.signIn} mt={1}>
+                Sign in
+              </Link>
+            )}
           </Stack>
         )}
       </Stack>

@@ -20,7 +20,7 @@ async function send({ email, html }) {
   console.log("Message sent: %s", info.messageId);
 }
 
-function sendActivationEmail(email, token) {
+async function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_URL}/activate/${token}`;
 
   const html = `
@@ -28,7 +28,7 @@ function sendActivationEmail(email, token) {
   <a href="${href}">${href}</a>
   `;
 
-  return send({ email, html }).catch(console.error);
+  return await send({ email, html }).catch(console.error);
 }
 
 // sendActivationEmail("mokal65869@dovesilo.com", "111");

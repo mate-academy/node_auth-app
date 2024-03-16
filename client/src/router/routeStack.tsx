@@ -21,6 +21,13 @@ function createRoute(
   };
 }
 
+// на клиенте ошибки черти как вылазят
+// приложение при перезагрузке постоянно ведет на логин - НЕ ок
+// страница активации пользователя и users рендериться два раза
+// на сервере в токинах храняться старые айдишки пользователей (я обновила базу в sql)
+
+// реализовать смену пароля для юзера
+
 export const routeStack: RouteObject[] = [
   createRoute("*", <Navigate to={routes.signIn} />),
   createRoute(routes.signIn, <SignIn />, "public"),

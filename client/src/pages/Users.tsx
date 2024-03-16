@@ -12,22 +12,22 @@ const Users: FC = () => {
 
   const checkResponseCode = useCheckResponseCode();
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await userService.getAll();
-      setUsers(response);
-    } catch (error: any) {
-      checkResponseCode({
-        code: error.response.status.toString(),
-        message: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        setLoading(true);
+        const response = await userService.getAll();
+        setUsers(response);
+      } catch (error: any) {
+        checkResponseCode({
+          code: error.response.status.toString(),
+          message: error.message,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchUsers();
   }, []);
 

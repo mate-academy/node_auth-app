@@ -2,19 +2,29 @@
 /* eslint-disable object-curly-newline */
 
 const { checkIsReqBodyValid } = require("../utils/checkIsReqBodyValid");
-const authServices = require("../services/auth.services");
+const ApiError = require("../exceptions/ApiError");
 
-function checkIsEmailValid(email) {
+function validateEmail(value) {
+  if (!value) {
+    return "Email is required";
+  }
+
   const emailRegex = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-  return emailRegex.test(email);
+  if (!emailRegex.test(value)) {
+    return "Email is not valid";
+  }
 }
 
-function checkIsPasswordValid(password) {
-  const hasMinLength = password.length >= 8;
-  const hasUpperCase = /[A-Z]/.test(password);
-  const hasNoSpecialChars = /^[a-zA-Z0-9]+$/.test(password);
+function validatePassword(value) {
+  if (!value) {
+    return "Password is required";
+  }
 
-  return hasMinLength && hasUpperCase && hasNoSpecialChars;
+  if (value.length < 6) {
+    return "At least 6 characters";
+  }
+  // const hasUpperCase = /[A-Z]/.test(password);
+  // const hasNoSpecialChars = /^[a-zA-Z0-9]+$/.test(password);
 }
 
 function validateEmailAndPasswordReqParams(req, res, next) {
@@ -26,30 +36,19 @@ function validateEmailAndPasswordReqParams(req, res, next) {
   const isReqBodyValid = checkIsReqBodyValid(req.body, listOfExpectedParams);
 
   if (!isReqBodyValid) {
-    res.sendStatus(400);
-    return;
+    // change after
+    throw ApiError.BadRequest("Validation error", (errors = {}));
   }
 
   const { email, password } = req.body;
 
-  const isEmailValid = checkIsEmailValid(email);
-  const isPasswordValid = checkIsPasswordValid(password);
+  const errors = {
+    email: validateEmail(email),
+    password: validatePassword(password),
+  };
 
-  if (!isEmailValid || !isPasswordValid) {
-    res.sendStatus(400);
-    return;
-  }
-
-  next();
-}
-
-async function checkIsEmailAlreadyExistInDB(req, res, next) {
-  const { email } = req.body;
-  const user = await authServices.getByEmail(email);
-
-  if (user) {
-    res.sendStatus(409);
-    return;
+  if (errors.email || errors.password) {
+    throw ApiError.BadRequest("Validation error", errors);
   }
 
   next();
@@ -57,5 +56,4 @@ async function checkIsEmailAlreadyExistInDB(req, res, next) {
 
 module.exports = {
   validateEmailAndPasswordReqParams,
-  checkIsEmailAlreadyExistInDB,
 };
