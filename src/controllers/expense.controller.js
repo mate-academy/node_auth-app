@@ -8,28 +8,24 @@ const {
 } = require('../utils/validation');
 
 const getAll = async(req, res) => {
-  const { userId } = req.params;
-
-  if (!userId) {
-    throw ApiError.BadRequest('Invalid request parameters');
-  }
-
+  const userId = req.session.userId || req.user.id;
   const expenses = await expenseService.getByUser({ userId });
 
   res.send(expenses.map(expense => expenseService.normalize(expense)));
 };
 
 const addOne = async(req, res) => {
-  const { userId, spentAt, title, amount, category, note } = req.body;
+  const { spentAt, title, amount, category, note } = req.body;
 
   const isRequestValid = validateExpensePostRequestBody({
-    userId, spentAt, title, amount, category, note,
+    spentAt, title, amount, category, note,
   });
 
   if (!isRequestValid) {
     throw ApiError.BadRequest('Invalid request');
   }
 
+  const userId = req.session.userId || req.user.id;
   const newExpense = await expenseService.add({
     userId, spentAt, title, amount, category, note,
   });

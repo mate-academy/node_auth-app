@@ -7,18 +7,16 @@ const { catchError } = require('../middlewares/catchError');
 
 const expenseRouter = express.Router();
 
-expenseRouter.get('/:userId', authMiddleware,
-  catchError(expenseController.getAll)
-);
+expenseRouter.get('/', authMiddleware,
+  catchError(expenseController.getAll));
 
-expenseRouter.post('/', authMiddleware, catchError(expenseController.addOne));
+expenseRouter.post('/', authMiddleware,
+  catchError(expenseController.addOne));
 
 expenseRouter.delete('/:id', authMiddleware,
-  catchError(expenseController.deleteOne)
-);
+  catchError(expenseController.deleteOne));
 
 expenseRouter.patch('/:id', authMiddleware,
-  catchError(expenseController.updateOne)
-);
+  catchError(expenseController.updateOne));
 
 module.exports = expenseRouter;

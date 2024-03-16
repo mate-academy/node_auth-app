@@ -5,30 +5,20 @@ const categoryService = require('../services/category.service');
 const expenseService = require('../services/expense.service');
 
 const getAllByUser = async(req, res) => {
-  const { userId } = req.params;
-
-  if (!userId) {
-    throw ApiError.BadRequest('Invalid request parameters');
-  }
-
+  const userId = req.session.userId || req.user.id;
   const categories = await categoryService.getAllByUser(userId);
 
   res.send(categories.map(category => categoryService.normalize(category)));
 };
 
 const addOne = async(req, res) => {
-  const { userId } = req.params;
-
-  if (!userId) {
-    throw ApiError.BadRequest('Invalid request parameters');
-  }
-
   const { name } = req.body;
 
   if (typeof name !== 'string') {
     throw ApiError.BadRequest('Invalid request');
   }
 
+  const userId = req.session.userId || req.user.id;
   const newCategory = await categoryService.add(name, userId);
 
   res.status(201).send(categoryService.normalize(newCategory));

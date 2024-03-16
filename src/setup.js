@@ -6,6 +6,7 @@ const { User } = require('./models/User');
 const { Token } = require('./models/Token');
 const { Expense } = require('./models/Expense');
 const { Category } = require('./models/Category');
+const { Account } = require('./models/Account');
 
 require('dotenv').config();
 

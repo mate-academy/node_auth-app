@@ -9,22 +9,27 @@ const userRouter = express.Router();
 
 userRouter.patch(
   '/change-username', authMiddleware,
-  catchError(userController.changeUsername)
-);
+  catchError(userController.changeUsername));
 
 userRouter.patch(
   '/change-password', authMiddleware,
-  catchError(userController.changePassword)
-);
+  catchError(userController.changePassword));
 
 userRouter.post(
   '/request-email-change', authMiddleware,
-  catchError(userController.requestEmailChange)
-);
+  catchError(userController.requestEmailChange));
 
 userRouter.patch(
   '/change-email', authMiddleware,
-  catchError(userController.changeEmail)
-);
+  catchError(userController.changeEmail));
+
+userRouter.get('/get-user', authMiddleware,
+  catchError(userController.getUserInfo));
+
+userRouter.delete('/', authMiddleware,
+  catchError(userController.deleteUser));
+
+userRouter.delete('/account/:accountType', authMiddleware,
+  catchError(userController.deleteSocialAccount));
 
 module.exports = { userRouter };

@@ -34,6 +34,12 @@ const getAllByUser = async(userId) => {
   });
 };
 
+const removeAllByUser = async(userId) => {
+  await Category.destroy({
+    where: { userId },
+  });
+};
+
 const add = async(name, userId) => {
   if (!(await userService.getById(userId))) {
     throw ApiError.NotFound('User not found');
@@ -67,6 +73,7 @@ const remove = async(id) => {
 module.exports = {
   normalize,
   getAllByUser,
+  removeAllByUser,
   getByName,
   getById,
   add,

@@ -7,11 +7,11 @@ const { catchError } = require('../middlewares/catchError');
 
 const categoryRouter = express.Router();
 
-categoryRouter.get('/:userId', authMiddleware,
+categoryRouter.get('/', authMiddleware,
   catchError(categoryController.getAllByUser)
 );
 
-categoryRouter.post('/:userId', authMiddleware,
+categoryRouter.post('/', authMiddleware,
   catchError(categoryController.addOne)
 );
 

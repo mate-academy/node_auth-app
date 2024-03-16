@@ -3,6 +3,7 @@
 const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
+const accountService = require('../services/account.service');
 const { ApiError } = require('../exceptions/ApiError');
 const {
   validateUsername,
@@ -13,7 +14,7 @@ const {
 require('dotenv').config();
 
 const sendAuthData = async(res, user) => {
-  const normalizedUser = userService.normalize(user);
+  const normalizedUser = await userService.normalize(user);
   const accessToken = jwtService.sign(normalizedUser);
   const refreshToken = jwtService.signRefresh(normalizedUser);
 
@@ -87,6 +88,7 @@ const activate = async(req, res) => {
 
   const user = await userService.getById(id);
 
+  req.session.userId = user.id;
   await sendAuthData(res, user);
 };
 
@@ -105,6 +107,7 @@ const login = async(req, res) => {
 
   const user = await userService.getByEmail(email);
 
+  req.session.userId = user.id;
   await sendAuthData(res, user);
 };
 
@@ -170,16 +173,39 @@ const confirmEmailChange = async(req, res) => {
 };
 
 const logout = async(req, res) => {
-  const { refreshToken } = req.cookies;
-  const userData = jwtService.verifyRefresh(refreshToken);
+  if (req.isAuthenticated()) {
+    req.logout((error) => {
+      if (error) {
+        throw error;
+      }
+    });
+  } else {
+    const { refreshToken } = req.cookies;
+    const userData = jwtService.verifyRefresh(refreshToken);
 
-  res.clearCookie('refreshToken');
+    res.clearCookie('refreshToken');
 
-  if (userData) {
-    await tokenService.removeAll({ userId: userData.id });
+    if (userData) {
+      await tokenService.removeAll({ userId: userData.id });
+    }
+
+    delete req.session.userId;
   }
 
   res.sendStatus(204);
+};
+
+const addSocialAccount = async(req, res) => {
+  const userId = req.session.userId || req.user.id;
+
+  await accountService.add({
+    userId,
+    id: req.account.id,
+    name: req.account.name,
+    type: req.account.type,
+  });
+
+  res.redirect(`${process.env.CLIENT_HOST}/auth-callback`);
 };
 
 module.exports = {
@@ -193,4 +219,5 @@ module.exports = {
   confirmEmailChange,
   refresh,
   logout,
+  addSocialAccount,
 };

@@ -32,10 +32,9 @@ const validateExpensePatchRequestBody = (
 };
 
 const validateExpensePostRequestBody = (
-  { userId, spentAt, title, amount, category, note }
+  { spentAt, title, amount, category, note }
 ) => {
-  return typeof userId === 'string'
-    && (typeof spentAt === 'string' && !isNaN(new Date(spentAt)))
+  return (typeof spentAt === 'string' && !isNaN(new Date(spentAt)))
     && typeof title === 'string'
     && Number.isInteger(amount)
     && typeof category === 'string'

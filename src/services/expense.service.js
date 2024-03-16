@@ -19,6 +19,10 @@ const getByUser = async({ userId }) => {
   return Expense.findAll({ where: { userId } });
 };
 
+const removeByUser = async(userId) => {
+  await Expense.destroy({ where: { userId } });
+};
+
 const getById = async(id) => {
   return Expense.findByPk(id);
 };
@@ -92,6 +96,7 @@ const update = async(id, dataToUpdate) => {
 module.exports = {
   normalize,
   getByUser,
+  removeByUser,
   getById,
   add,
   remove,

@@ -5,12 +5,26 @@ const bcrypt = require('bcrypt');
 const { User } = require('../models/User');
 const mailService = require('./mail.service');
 const tokenService = require('./token.service');
+const accountService = require('./account.service');
 const { ApiError } = require('../exceptions/ApiError');
 
-const normalize = ({ id, username, email }) => {
-  return {
-    id, username, email,
+const normalize = async({ id, username, email, authType }) => {
+  const accounts = await accountService.getAllByUser(id);
+
+  const normalizedUser = {
+    id, username, email, authType,
   };
+
+  if (accounts) {
+    accounts.forEach(account => {
+      normalizedUser[account.type] = {
+        id: account.id,
+        name: account.name,
+      };
+    });
+  }
+
+  return normalizedUser;
 };
 
 const getByEmail = (email) => {
@@ -196,10 +210,12 @@ const requestEmailChange = async(password, oldEmail, newEmail) => {
     throw ApiError.NotFound('User not found');
   }
 
-  const isPassValid = await bcrypt.compare(password, user.password);
+  if (password !== null) {
+    const isPassValid = await bcrypt.compare(password, user.password);
 
-  if (!isPassValid) {
-    throw ApiError.BadRequest('Invalid credentials');
+    if (!isPassValid) {
+      throw ApiError.BadRequest('Invalid credentials');
+    }
   }
 
   const newEmailToken = crypto.randomBytes(32).toString('hex');
@@ -258,6 +274,12 @@ const changeEmail = async({ userId, newEmail }) => {
   await mailService.sendEmailChangedEmail({ oldEmail });
 };
 
+const deleteUser = async(userId) => {
+  await User.destroy({
+    where: { id: userId },
+  });
+};
+
 module.exports = {
   normalize,
   getByEmail,
@@ -273,4 +295,5 @@ module.exports = {
   requestEmailChange,
   confirmEmailChange,
   changeEmail,
+  deleteUser,
 };
