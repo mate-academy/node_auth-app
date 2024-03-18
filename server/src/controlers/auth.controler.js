@@ -4,6 +4,7 @@ const ApiError = require("../exceptions/ApiError");
 const tokenService = require("../services/token.services");
 const emailService = require("../services/email.services");
 const { v4 } = require("uuid");
+const bcrypt = require("bcrypt");
 
 const getAll = async (req, res) => {
   const users = await authService.getAll();
@@ -13,7 +14,9 @@ const getAll = async (req, res) => {
 const register = async (req, res) => {
   const { email, password } = req.body;
 
-  await authService.register(email, password);
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await authService.register(email, hashedPassword);
 
   res.send({ message: "OK" });
 };
@@ -46,7 +49,9 @@ const login = async (req, res) => {
     throw ApiError.FORBIDDEN();
   }
 
-  if (user.password !== password) {
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
     throw ApiError.BadRequest("Wrong password", {
       password: "Wrong password",
     });
@@ -107,8 +112,6 @@ const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
 
   const userData = jwtService.verifyRefreshToken(refreshToken);
-
-  console.log(userData, refreshToken);
 
   if (!userData || !refreshToken) {
     throw ApiError.Unauthorized();

@@ -56,8 +56,6 @@ function validateEmailAndPasswordReqParams(req, res, next) {
 function validateEmailReqParams(req, res, next) {
   const listOfExpectedParams = [{ key: "email", type: "string" }];
 
-  console.log("req.body", req.body);
-
   const isReqBodyValid = checkIsReqBodyValid(req.body, listOfExpectedParams);
 
   if (!isReqBodyValid) {

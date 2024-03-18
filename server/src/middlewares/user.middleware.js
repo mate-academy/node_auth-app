@@ -11,7 +11,6 @@ function checkIsAuthorized(req, res, next) {
     throw ApiError.Unauthorized();
   }
   const userData = jwtService.verifyToken(token);
-  console.log("userData", userData);
 
   if (!userData) {
     throw ApiError.Unauthorized();
