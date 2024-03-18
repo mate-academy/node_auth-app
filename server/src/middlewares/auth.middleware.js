@@ -36,8 +36,7 @@ function validateEmailAndPasswordReqParams(req, res, next) {
   const isReqBodyValid = checkIsReqBodyValid(req.body, listOfExpectedParams);
 
   if (!isReqBodyValid) {
-    // change after
-    throw ApiError.BadRequest("Validation error", (errors = {}));
+    throw ApiError.BadRequest("Validation error");
   }
 
   const { email, password } = req.body;
@@ -54,6 +53,54 @@ function validateEmailAndPasswordReqParams(req, res, next) {
   next();
 }
 
+function validateEmailReqParams(req, res, next) {
+  const listOfExpectedParams = [{ key: "email", type: "string" }];
+
+  console.log("req.body", req.body);
+
+  const isReqBodyValid = checkIsReqBodyValid(req.body, listOfExpectedParams);
+
+  if (!isReqBodyValid) {
+    throw ApiError.BadRequest("Validation error");
+  }
+
+  const { email } = req.body;
+
+  const errors = {
+    email: validateEmail(email),
+  };
+
+  if (errors.email) {
+    throw ApiError.BadRequest("Validation error", errors);
+  }
+
+  next();
+}
+
+function validatePasswordReqParams(req, res, next) {
+  const listOfExpectedParams = [{ key: "password", type: "string" }];
+
+  const isReqBodyValid = checkIsReqBodyValid(req.body, listOfExpectedParams);
+
+  if (!isReqBodyValid) {
+    throw ApiError.BadRequest("Validation error");
+  }
+
+  const { password } = req.body;
+
+  const errors = {
+    password: validatePassword(password),
+  };
+
+  if (errors.password) {
+    throw ApiError.BadRequest("Validation error", errors);
+  }
+
+  next();
+}
+
 module.exports = {
   validateEmailAndPasswordReqParams,
+  validatePasswordReqParams,
+  validateEmailReqParams,
 };

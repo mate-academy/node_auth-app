@@ -10,10 +10,10 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function send({ email, html }) {
+async function send({ email, html, subject }) {
   const info = await transporter.sendMail({
     to: email,
-    subject: "Activation email",
+    subject,
     html,
   });
 
@@ -28,9 +28,22 @@ async function sendActivationEmail(email, token) {
   <a href="${href}">${href}</a>
   `;
 
-  return await send({ email, html }).catch(console.error);
+  const subject = "Activation email";
+
+  return await send({ email, html, subject }).catch(console.error);
 }
 
-// sendActivationEmail("mokal65869@dovesilo.com", "111");
+async function sendPasswordResetEmail(email, token) {
+  const href = `${process.env.CLIENT_URL}/reset-password/${token}`;
 
-module.exports = { sendActivationEmail, send };
+  const html = `
+  <h1>Change password by link below</h1>
+  <a href="${href}">${href}</a>
+  `;
+
+  const subject = "Password recovering";
+
+  return await send({ email, html, subject }).catch(console.error);
+}
+
+module.exports = { sendActivationEmail, sendPasswordResetEmail, send };

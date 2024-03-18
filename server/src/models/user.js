@@ -14,6 +14,9 @@ const User = client.define("auths", {
   activationToken: {
     type: DataTypes.STRING,
   },
+  resetPasswordToken: {
+    type: DataTypes.STRING,
+  },
 });
 
 module.exports = User;

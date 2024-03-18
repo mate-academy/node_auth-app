@@ -20,6 +20,20 @@ authRouter.post(
   authMiddleware.validateEmailAndPasswordReqParams,
   catchError(authControler.login)
 );
+authRouter.post(
+  "/reset-password",
+  authMiddleware.validateEmailReqParams,
+  catchError(authControler.sendEmailForPasswordReset)
+);
+authRouter.get(
+  "/reset-password/:resetPasswordToken",
+  catchError(authControler.checkResetPasswordToken)
+);
+authRouter.post(
+  "/reset-password/:resetPasswordToken",
+  authMiddleware.validatePasswordReqParams,
+  catchError(authControler.resetPassword)
+);
 authRouter.get("/refresh", catchError(authControler.refresh));
 authRouter.post("/logout", catchError(authControler.logout));
 

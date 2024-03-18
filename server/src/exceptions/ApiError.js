@@ -23,7 +23,9 @@ class ApiError extends Error {
   }
 
   static Conflict() {
-    return new ApiError(409, "User with this email is already exist");
+    return new ApiError(409, "Conflict in data", {
+      email: "User with this email is already exist",
+    });
   }
 }
 
