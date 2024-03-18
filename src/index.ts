@@ -1,10 +1,8 @@
-'use strict';
-require('dotenv').config();
-
-const createServer = require('./app');
+import 'dotenv/config';
+import { createServer } from './app.js';
 
 const app = createServer();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT ?? 3000;
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
