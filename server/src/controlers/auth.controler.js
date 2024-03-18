@@ -95,14 +95,17 @@ const resetPassword = async (req, res) => {
     resetPasswordToken
   );
 
-  if (password === user.password) {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const isPasswordAlreadyUsed = await bcrypt.compare(password, user.password);
+
+  if (isPasswordAlreadyUsed) {
     throw ApiError.BadRequest(
       "This password is already in use. Please choose a different one."
     );
   }
 
   user.resetPasswordToken = null;
-  user.password = password;
+  user.password = hashedPassword;
   await user.save();
 
   res.send({ message: "OK" });

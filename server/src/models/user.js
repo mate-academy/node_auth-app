@@ -17,7 +17,6 @@ const User = client.define("auths", {
   resetPasswordToken: {
     type: DataTypes.STRING,
   },
-  // timestamps: true,
 });
 
 module.exports = User;

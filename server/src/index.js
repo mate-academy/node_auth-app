@@ -24,6 +24,11 @@ app.use(authRouter);
 app.use(userRouter);
 app.use(errorMiddleware);
 
+// for all other pages
+app.use((req, res, next) => {
+  next(ApiError.NotFound());
+});
+
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {

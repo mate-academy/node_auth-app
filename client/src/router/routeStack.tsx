@@ -25,12 +25,11 @@ function createRoute(
 // приложение при перезагрузке постоянно ведет на логин - НЕ ок
 // EmailFormForpassword... постоянно перезагружается после отправки формы
 // страница активации пользователя (из-за этого текст не правильный) и users рендериться два раза
-// reset password page - сначала показывает что не прав страница, а потом ок
-// reset password page - в нетворке беда в запросах
 
-// вроде все гуд
-// на сервере в токинах храняться старые айдишки пользователей (я обновила базу в sql)
-// странно, что в базе данных не обновляется апдейтид после когда удаляю какой-то токен
+// ## (Optional) Advanced tasks
+// - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
+// - Profile page should allow to add/remove any social account
+// - Add authentication to your Accounting App
 
 export const routeStack: RouteObject[] = [
   createRoute("*", <Navigate to={routes.signIn} />),

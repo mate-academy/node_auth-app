@@ -24,7 +24,8 @@ const EmailFormForPasswordReset: FC = () => {
         .required("Email is required"),
     }),
     onSubmit: async (values) => {
-      const isSuccess = await sendRecoveringPasswordLink(values.email);
+      const { isSuccess } = await sendRecoveringPasswordLink(values.email);
+
       if (isSuccess) {
         setIsSent(true);
       }

@@ -8,11 +8,14 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import PasswordField from "../components/PasswordField";
 import { LoadingButton } from "@mui/lab";
+import Loader from "../components/Loader";
 
 const ResetPassword: FC = () => {
   const { resetPasswordToken } = useParams<{ resetPasswordToken: string }>();
+
   const { verifyResetPasswordToken, resetPassword, isLoading } =
     useAuthContext();
+
   const [isLinkValid, setIsLinkValid] = useState(false);
   const [isDone, setIsDone] = useState(false);
 
@@ -52,6 +55,7 @@ const ResetPassword: FC = () => {
       <Stack
         sx={{ height: "350px", justifyContent: "center", alignItems: "center" }}
       >
+        {isLoading && !isLinkValid && !isDone && <Loader />}
         {isLinkValid && !isDone && (
           <>
             <Typography variant="subtitle1" sx={{ fontWeight: "600" }}>
@@ -64,14 +68,14 @@ const ResetPassword: FC = () => {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
               disabled={!isButtonActive}
-              // loading={!isLoading}
+              loading={isLoading}
               onClick={() => formik.handleSubmit()}
             >
               Change password
             </LoadingButton>
           </>
         )}
-        {!isLinkValid && (
+        {!isLinkValid && !isLoading && (
           <Stack sx={{ alignItems: "center" }}>
             <Typography
               variant="subtitle1"
@@ -87,6 +91,7 @@ const ResetPassword: FC = () => {
         {isLinkValid && isDone && (
           <Stack sx={{ alignItems: "center" }}>
             <Typography
+              variant="subtitle1"
               sx={{ color: (theme: any) => theme.palette.success.main, p: 2 }}
             >
               Your password was successfully changed

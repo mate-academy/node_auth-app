@@ -2,6 +2,7 @@ const express = require("express");
 const authControler = require("../controlers/auth.controler");
 const authMiddleware = require("../middlewares/auth.middleware");
 const { catchError } = require("../middlewares/catchError");
+const ApiError = require("../exceptions/ApiError");
 
 const authRouter = new express.Router();
 
