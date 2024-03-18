@@ -1,9 +1,6 @@
-import { FC } from "react";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import { Box, Grid } from "@mui/material";
+import { FC, useEffect, useState } from "react";
+import { Box, Grid, Typography, Link } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { routes } from "../router/routes";
 import LoginLayout from "../layout/LoginLayout";
 import { useAuthContext } from "../context/AuthProvider";
@@ -12,12 +9,19 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import CustomTextField from "../components/CustomTextField";
 import PasswordField from "../components/PasswordField";
-import { LoadingButton } from "@mui/lab";
+
+interface FormValues {
+  email: string;
+  password: string;
+}
 
 const SignIn: FC = () => {
   const { login, isLoading } = useAuthContext();
+  const [serverErrors, setServerErrors] = useState<CustomServerErrors | null>(
+    null
+  );
 
-  const formik = useFormik({
+  const formik = useFormik<FormValues>({
     initialValues: {
       email: "",
       password: "",
@@ -27,23 +31,28 @@ const SignIn: FC = () => {
         .email("Invalid email address")
         .required("Email is required"),
       password: Yup.string()
-        // .min(8, "Password must be at least 8 characters")
-        // .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
-        // .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
-        // .matches(/[0-9]/, 'Password must contain at least one number')
+        .min(6, "Password must be at least 6 characters")
         .required("Password is required"),
     }),
-    onSubmit: (values) => {
-      login(values);
+    onSubmit: async (values) => {
+      const { errors } = await login(values);
+
+      if (errors) {
+        setServerErrors(errors);
+      }
     },
   });
 
+  useEffect(() => {
+    setServerErrors(null);
+  }, [formik.values]);
+
   const isButtonActive =
     Object.keys(formik.values).every(
-      (key) => !!formik.values[key as keyof typeof formik.values]
+      (key) => !!formik.values[key as keyof FormValues]
     ) &&
     !Object.keys(formik.errors).some(
-      (key) => !!formik.errors[key as keyof typeof formik.errors]
+      (key) => !!formik.errors[key as keyof FormValues]
     );
 
   return (
@@ -57,11 +66,17 @@ const SignIn: FC = () => {
             type="email"
             formik={formik}
           />
+          {serverErrors?.email && (
+            <Typography color="error" variant="caption">
+              {serverErrors.email}
+            </Typography>
+          )}
           <PasswordField formik={formik} sx={{ mt: 1 }} />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
+          {serverErrors?.password && (
+            <Typography color="error" variant="caption">
+              {serverErrors.password}
+            </Typography>
+          )}
           <LoadingButton
             type="submit"
             fullWidth
@@ -74,7 +89,7 @@ const SignIn: FC = () => {
           </LoadingButton>
           <Grid container>
             <Grid item xs>
-              <Link href={routes.resetPassword} variant="body2">
+              <Link href={routes.resetPassword.main} variant="body2">
                 Forgot password?
               </Link>
             </Grid>

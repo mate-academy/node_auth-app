@@ -12,7 +12,7 @@ const UserActivationPage: FC = () => {
   const [isActivated, setIsActivated] = useState(false);
 
   useEffect(() => {
-    const userActivation = async () => {
+    const userActivation = async (activationToken: string) => {
       const isSuccess = await activateUser(activationToken);
 
       if (isSuccess) {
@@ -20,8 +20,7 @@ const UserActivationPage: FC = () => {
       }
     };
 
-    userActivation();
-    console.log("how many times");
+    activationToken && userActivation(activationToken);
   }, []);
 
   return (

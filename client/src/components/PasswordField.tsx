@@ -55,7 +55,7 @@ const PasswordField: React.FC<PasswordFieldWithLabelProps> = ({
         onChange={(event) =>
           formik.setFieldValue("password", event.target.value)
         }
-        onBlur={formik.handleBlur("password")} //need this, otherwise formik.touched will be always empty
+        onBlur={formik.handleBlur("password")}
         error={isTouched && isError}
       />
       {isTouched && error && (

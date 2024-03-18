@@ -2,7 +2,11 @@ export const routes = {
   home: "/home",
   signIn: "/sign-in",
   signUp: "/sign-up",
-  resetPassword: "/password-reset",
+  resetPassword: {
+    main: "/reset-password",
+    root: "/reset-password/*",
+    rootTabs: "/reset-password/:resetPasswordToken",
+  },
   users: "/users",
   activate: {
     root: "/activate/*",

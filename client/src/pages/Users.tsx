@@ -3,49 +3,38 @@ import { List, ListItem, Typography } from "@mui/material";
 import MainLayout from "../layout/MainLayout";
 import { userService } from "../services/userService";
 import Loader from "../components/Loader";
-import useCheckResponseCode from "../hooks/useCheckResponseCode";
+import useHandleRequest from "../hooks/useHandleRequest";
 
 const Users: FC = () => {
-  // fix types later
-  const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState<any>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const { handleRequest, isLoading } = useHandleRequest();
 
-  const checkResponseCode = useCheckResponseCode();
+  const fetchUsers = () =>
+    handleRequest(userService.getAll(), (response) => {
+      setUsers(response);
+    });
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const response = await userService.getAll();
-        setUsers(response);
-      } catch (error: any) {
-        checkResponseCode({
-          code: error.response.status.toString(),
-          message: error.message,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUsers();
   }, []);
 
   return (
     <MainLayout>
-      {loading ? (
+      {isLoading ? (
         <Loader />
-      ) : users.length > 0 ? (
+      ) : (
         <>
           <Typography variant="subtitle1">Users List</Typography>
-          <List>
-            {users.map((user: User) => (
-              <ListItem key={user.id}>{user.email}</ListItem>
-            ))}
-          </List>
+          {users.length > 0 ? (
+            <List>
+              {users.map((user: User) => (
+                <ListItem key={user.id}>{user.email}</ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography>No active users</Typography>
+          )}
         </>
-      ) : (
-        <Typography>No active users</Typography>
       )}
     </MainLayout>
   );

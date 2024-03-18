@@ -1,5 +1,5 @@
-import { FC, useState } from "react";
-import { Box, Stack, Link, Button, Typography } from "@mui/material";
+import { FC, useEffect, useState } from "react";
+import { Box, Stack, Link, Typography } from "@mui/material";
 import { routes } from "../router/routes";
 import LoginLayout from "../layout/LoginLayout";
 import AvatarWithText from "../components/AvatarWithText";
@@ -10,11 +10,19 @@ import { useAuthContext } from "../context/AuthProvider";
 import PasswordField from "../components/PasswordField";
 import { LoadingButton } from "@mui/lab";
 
+interface FormValues {
+  email: string;
+  password: string;
+}
+
 const SignUp: FC = () => {
   const { registration, isLoading } = useAuthContext();
   const [isRegistered, setIsRegistered] = useState(false);
+  const [serverErrors, setServerErrors] = useState<CustomServerErrors | null>(
+    null
+  );
 
-  const formik = useFormik({
+  const formik = useFormik<FormValues>({
     initialValues: {
       email: "",
       password: "",
@@ -24,24 +32,32 @@ const SignUp: FC = () => {
         .email("Invalid email address")
         .required("Email is required"),
       password: Yup.string()
-        // .min(6, "Password must be at least 6 characters")
+        .min(6, "Password must be at least 6 characters")
         // .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
         // .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
         // .matches(/[0-9]/, 'Password must contain at least one number')
         .required("Password is required"),
     }),
     onSubmit: async (values) => {
-      const isSuccess = await registration(values);
+      const { isSuccess, errors } = await registration(values);
 
       if (isSuccess) {
         setIsRegistered(true);
       }
+
+      if (errors) {
+        setServerErrors(errors);
+      }
     },
   });
 
+  useEffect(() => {
+    setServerErrors(null);
+  }, [formik.values]);
+
   const isButtonActive =
     Object.keys(formik.values).every(
-      (key) => !!formik.values[key as keyof typeof formik.values]
+      (key) => !!formik.values[key as keyof FormValues]
     ) &&
     !Object.keys(formik.errors).some(
       (key) => !!formik.errors[key as keyof typeof formik.errors]
@@ -77,7 +93,17 @@ const SignUp: FC = () => {
               type="email"
               formik={formik}
             />
+            {serverErrors?.email && (
+              <Typography color="error" variant="caption">
+                {serverErrors.email}
+              </Typography>
+            )}
             <PasswordField formik={formik} sx={{ mt: 1 }} />
+            {serverErrors?.password && (
+              <Typography color="error" variant="caption">
+                {serverErrors.password}
+              </Typography>
+            )}
             <LoadingButton
               type="submit"
               fullWidth
