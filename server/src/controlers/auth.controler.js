@@ -42,14 +42,14 @@ const login = async (req, res) => {
     throw ApiError.BadRequest("No such user");
   }
 
+  if (user.activationToken) {
+    throw ApiError.FORBIDDEN();
+  }
+
   if (user.password !== password) {
     throw ApiError.BadRequest("Wrong password", {
       password: "Wrong password",
     });
-  }
-
-  if (user.activationToken) {
-    throw ApiError.FORBIDDEN();
   }
 
   generateTokens(res, user);
