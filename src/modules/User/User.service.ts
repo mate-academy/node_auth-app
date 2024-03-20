@@ -12,8 +12,8 @@ export default class UserService {
     return user;
   }
 
-  async activate(email: string) {
-    await this.UserModel.update({ activationToken: null }, { where: { email } });
+  activate(token: string) {
+    return this.UserModel.update({ activationToken: null }, { where: { activationToken: token } });
   }
 
   async add({ email, name, password }: UserDTO) {

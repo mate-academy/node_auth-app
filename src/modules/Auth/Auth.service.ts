@@ -20,7 +20,7 @@ class AuthService {
     this.emailService = emailService;
   }
 
-  async register(userDTO: UserDTO) {
+  async register(userDTO: UserDTO, redirect?: string) {
     const { email, password } = userDTO;
     const user = await this.userService.getByEmail(email);
 
@@ -42,12 +42,24 @@ class AuthService {
       throw new Error('Activation token is not set. Error');
     }
 
-    this.emailService.sendActivationEmail(email, activationToken).catch((err) => {
+    this.emailService.sendActivationEmail(email, activationToken, redirect).catch((err) => {
       // eslint-disable-next-line no-console
       console.log("Activation email wasn't send, error: ", err);
     });
 
     return newUser;
+  }
+
+  async activate(token: string) {
+    const [activatedCount] = await this.userService.activate(token);
+
+    if (activatedCount === 0) {
+      throw new Error('Token is not valid');
+    }
+
+    if (activatedCount > 1) {
+      throw new Error('Token is not unique');
+    }
   }
 }
 

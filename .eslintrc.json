@@ -16,6 +16,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "@typescript-eslint/strict-boolean-expressions": "off",
     "@typescript-eslint/unbound-method": "warn",
     "arrow-body-style": "off",
     "no-unused-vars": "off",
