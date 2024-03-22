@@ -2,4 +2,6 @@
 export const enum AuthRoutes {
   REGISTER = '/signUp',
   ACTIVATE = '/activate',
+  LOGIN = '/login',
+  REFRESH = '/refresh',
 }

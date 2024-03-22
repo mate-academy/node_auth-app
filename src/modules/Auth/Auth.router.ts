@@ -1,5 +1,5 @@
 import { json } from 'express';
-import Router from '../../core/Router/Router.js';
+import Router from '../../core/modules/Router/Router.js';
 import type AuthController from './Auth.controller.js';
 import { AuthRoutes } from './Auth.routes.js';
 
@@ -15,9 +15,19 @@ export default class AuthRouter extends Router<AuthController> {
           handler: authController.register,
         },
         {
+          method: 'post',
+          path: AuthRoutes.LOGIN,
+          handler: authController.login,
+        },
+        {
           method: 'get',
           path: AuthRoutes.ACTIVATE,
           handler: authController.activate,
+        },
+        {
+          method: 'get',
+          path: AuthRoutes.REFRESH,
+          handler: authController.refresh,
         },
       ],
     });

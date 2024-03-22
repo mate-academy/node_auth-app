@@ -1,13 +1,13 @@
-/* eslint-disable no-console */
-import sequelize from '../services/database.js';
-import transporter from '../services/mailer.js';
+import sequelize from '../../services/database.js';
+import transporter from '../../services/mailer.js';
+import ApiError from '../modules/exceptions/ApiError.js';
 
 export default class RootService {
   private checkConnection<T>(verifyPromise: Promise<T>, serviceName: string) {
     return verifyPromise.catch((error: Error) => {
       const errorMessage = `Unable to connect to the ${serviceName}: ${error.message}`;
 
-      throw new Error(errorMessage);
+      throw ApiError.ServerError(errorMessage, { cause: error });
     });
   }
 

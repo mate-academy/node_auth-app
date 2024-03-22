@@ -1,15 +1,14 @@
-import type { Provider } from '../../core/Provider/Provider.js';
-import type EmailService from '../Email/Email.service.js';
-import type UserService from '../User/User.service.js';
+import type { Provider } from '../../core/modules/Provider/Provider.js';
 import AuthController from './Auth.controller.js';
 import AuthService from './Auth.service.js';
+import type { AuthConstructorServices } from './Auth.types.js';
 
 export default class AuthProvider implements Provider<AuthService, AuthController> {
   public service;
   public controller;
 
-  constructor(userService: UserService, emailService: EmailService) {
-    this.service = new AuthService({ userService, emailService });
+  constructor(authServices: AuthConstructorServices) {
+    this.service = new AuthService(authServices);
     this.controller = new AuthController(this.service);
   }
 }

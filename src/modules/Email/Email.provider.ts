@@ -1,4 +1,4 @@
-import type { Provider } from '../../core/Provider/Provider.js';
+import type { Provider } from '../../core/modules/Provider/Provider.js';
 import transporter from '../../services/mailer.js';
 import EmailService from './Email.service.js';
 

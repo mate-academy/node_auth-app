@@ -17,7 +17,10 @@
   ],
   "rules": {
     "@typescript-eslint/strict-boolean-expressions": "off",
-    "@typescript-eslint/unbound-method": "warn",
+    "@typescript-eslint/unbound-method": "off",
+    "@typescript-eslint/return-await": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-confusing-void-expression": "off",
     "arrow-body-style": "off",
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": [
