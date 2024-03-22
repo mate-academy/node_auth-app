@@ -112,6 +112,25 @@ export default class AuthController {
     response.send({ message: 'AccessToken updated successfully' });
   }
 
+  async logout(request: Request, response: Response) {
+    const { refreshToken, accessToken } = request.cookies;
+
+    if (!Validator.isNotEmptyString(refreshToken)) {
+      throw ApiError.Unauthorized('Refresh token is invalid');
+    }
+
+    if (!Validator.isNotEmptyString(accessToken)) {
+      throw ApiError.Unauthorized('Access token is invalid');
+    }
+
+    await this.authService.logout(refreshToken);
+
+    response.clearCookie('refreshToken');
+    response.clearCookie('accessToken');
+
+    response.send({ message: 'You have been logged out successfully' });
+  }
+
   withAuth(): Middleware {
     return (request, response, next) => {
       const { accessToken } = request.cookies;

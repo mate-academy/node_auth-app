@@ -4,4 +4,5 @@ export const enum AuthRoutes {
   ACTIVATE = '/activate',
   LOGIN = '/login',
   REFRESH = '/refresh',
+  LOGOUT = '/logout',
 }

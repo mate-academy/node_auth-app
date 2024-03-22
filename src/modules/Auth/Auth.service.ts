@@ -142,6 +142,14 @@ class AuthService {
 
     return this.generateTokensAndWriteToDB({ id: user.id, email: user.email });
   }
+
+  async logout(refreshToken: string) {
+    const deletedCount = await this.tokenService.removeRefreshToken(refreshToken);
+
+    if (deletedCount === 0) {
+      throw ApiError.BadRequest('Refresh token not found');
+    }
+  }
 }
 
 export default AuthService;

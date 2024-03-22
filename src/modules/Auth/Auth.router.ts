@@ -29,6 +29,11 @@ export default class AuthRouter extends Router<AuthController> {
           path: AuthRoutes.REFRESH,
           handler: authController.refresh,
         },
+        {
+          method: 'post',
+          path: AuthRoutes.LOGOUT,
+          handler: authController.logout,
+        },
       ],
     });
   }
