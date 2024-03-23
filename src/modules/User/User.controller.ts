@@ -23,7 +23,7 @@ export default class UserController {
       throw ApiError.BadRequest('Name must be a string');
     }
 
-    const updatedUser = await this.userService.update(id, { name });
+    const updatedUser = await this.userService.updateById(id, { name });
     const normalizedUser = this.userService.normalize(updatedUser);
 
     return res.send({

@@ -38,8 +38,22 @@ export default class UserService {
     return user;
   }
 
-  async update(userId: User['id'], dataToUpdate: Partial<UserDTO>) {
+  async updateById(userId: User['id'], dataToUpdate: Partial<UserDTO>) {
     const user = await this.UserModel.findByPk(userId);
+
+    if (!user) {
+      throw ApiError.NotFound('User not found');
+    }
+
+    await user.update(dataToUpdate);
+
+    return user;
+  }
+
+  async updateByEmail(email: string, dataToUpdate: Partial<UserDTO>) {
+    const user = await this.UserModel.findOne({
+      where: { email },
+    });
 
     if (!user) {
       throw ApiError.NotFound('User not found');

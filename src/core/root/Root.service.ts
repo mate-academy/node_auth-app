@@ -1,3 +1,4 @@
+import { redisClient } from '../../services/cache.js';
 import sequelize from '../../services/database.js';
 import transporter from '../../services/mailer.js';
 import ApiError from '../modules/exceptions/ApiError.js';
@@ -12,6 +13,7 @@ export default class RootService {
   }
 
   public async start() {
+    await this.checkConnection(redisClient.connect(), 'cache');
     await this.checkConnection(sequelize.authenticate(), 'database');
     await this.checkConnection(transporter.verify(), 'mailer');
   }

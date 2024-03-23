@@ -34,6 +34,16 @@ export default class AuthRouter extends Router<AuthController> {
           path: AuthRoutes.LOGOUT,
           handler: authController.logout,
         },
+        {
+          method: 'post',
+          path: AuthRoutes.REQUEST_PASSWORD_RESET,
+          handler: authController.requestPasswordReset,
+        },
+        {
+          method: 'post',
+          path: AuthRoutes.CONFIRM_PASSWORD_RESET,
+          handler: authController.confirmPasswordReset,
+        },
       ],
     });
   }

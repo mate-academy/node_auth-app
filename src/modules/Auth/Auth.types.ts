@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable max-len */
+import type CacheService from '../Cache/Cache.service.js';
 import type EmailService from '../Email/Email.service.js';
 import type TokenService from '../Token/Token.service.js';
 import type User from '../User/User.model.js';
@@ -9,6 +8,7 @@ export interface AuthConstructorServices {
   userService: UserService;
   emailService: EmailService;
   tokenService: TokenService;
+  cacheService: CacheService;
 }
 
 export type UserValidateDTO = Record<keyof Pick<User, 'email' | 'password'>, unknown>;

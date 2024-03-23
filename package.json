@@ -45,8 +45,10 @@
     "p-retry": "^6.2.0",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
+    "redis": "^4.6.13",
     "reflect-metadata": "^0.2.1",
     "sequelize": "^6.37.1",
-    "sequelize-typescript": "^2.1.6"
+    "sequelize-typescript": "^2.1.6",
+    "uuid": "^9.0.1"
   }
 }

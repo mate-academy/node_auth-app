@@ -14,7 +14,7 @@ export default class Validator {
     return emailRegex.test(String(value));
   }
 
-  static isStrongPassword(value: unknown) {
+  static isStrongPassword(value: unknown): value is string {
     return Validator.isNotEmptyString(value) && value.length >= 8;
   }
 
@@ -22,5 +22,11 @@ export default class Validator {
     const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
     return urlRegex.test(String(value));
+  }
+
+  static isUUID(value: unknown): value is string {
+    const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    return regex.test(String(value));
   }
 }

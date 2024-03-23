@@ -1,35 +1,57 @@
 import type Mail from 'nodemailer/lib/mailer/index.js';
 import type { TransporterType } from '../../services/mailer.js';
 import { AuthRoutes } from '../Auth/Auth.routes.js';
-import { getActivationEmail } from './Email.helpers.js';
-import retry from 'p-retry';
+import { getActivationEmail, getPasswordResetEmail } from './Email.helpers.js';
+import retry, { type Options as RetryOptions } from 'p-retry';
+import { isServerRedirect, type ConfirmationEmailOptions } from './Email.types.js';
+import ApiError from '../../core/modules/exceptions/ApiError.js';
 
 export default class EmailService {
+  private readonly baseUrl = `http://${process.env.HOST ?? 'localhost'}:${process.env.PORT ?? 3000}`;
+
   constructor(private readonly transporter: TransporterType) {}
 
-  private getActivationLink(token: string, redirectFromUser?: string) {
-    const { HOST, PORT, ACTIVATION_REDIRECT_URL } = process.env;
-    const host = HOST ?? 'localhost';
-    const port = PORT ?? 3000;
-    const redirect = redirectFromUser ?? ACTIVATION_REDIRECT_URL ?? '';
+  private sendConfirmationEmail(options: ConfirmationEmailOptions) {
+    const { email, token, getHTML } = options;
+    const confirmationLink = isServerRedirect(options)
+      ? `${this.baseUrl}${options.route}?token=${token}&redirect=${options.redirect}`
+      : `${options.baseUrl}?token=${token}`;
 
-    return `http://${host}:${port}${AuthRoutes.ACTIVATE}?token=${token}&redirect=${redirect}`;
+    const html = getHTML(confirmationLink);
+
+    return this.send({ to: email, html }).catch((err) => {
+      throw ApiError.ServerError(`Unable to send email confirmation to ${email}`, {
+        cause: err,
+        payload: { email, confirmationLink, options },
+      });
+    });
   }
 
-  public send(options: Mail.Options) {
-    return this.transporter.sendMail(options);
-  }
-
-  async sendActivationEmail(email: string, token: string, redirect?: string) {
-    const html = getActivationEmail(this.getActivationLink(token, redirect));
-    const sendMail = () => this.transporter.sendMail({ to: email, html });
-
-    const messageInfo = await retry(sendMail, {
+  public send(options: Mail.Options, retryOptions?: RetryOptions) {
+    return retry(() => this.transporter.sendMail(options), {
       retries: 4,
       factor: 1.5,
       minTimeout: 10000,
+      ...retryOptions,
     });
+  }
 
-    return messageInfo;
+  async sendActivationEmail(email: string, token: string, redirectFromClient?: string) {
+    return this.sendConfirmationEmail({
+      email,
+      token,
+      route: AuthRoutes.ACTIVATE,
+      getHTML: getActivationEmail,
+      redirect: redirectFromClient ?? process.env.ACTIVATION_REDIRECT_URL,
+    });
+  }
+
+  async sendResetPasswordEmail(email: string, token: string, baseUrl: string) {
+    return this.sendConfirmationEmail({
+      email,
+      token,
+      baseUrl,
+      getHTML: getPasswordResetEmail,
+    });
   }
 }

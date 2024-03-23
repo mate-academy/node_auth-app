@@ -23,14 +23,14 @@ export default class AuthController {
   private setRefreshTokenInCookie(response: Response, token: string) {
     response.cookie('refreshToken', token, {
       httpOnly: true,
-      maxAge: +(process.env.REFRESH_TOKEN_COOKIE_EXPIRES_IN ?? -1),
+      maxAge: +(process.env.REFRESH_TOKEN_COOKIE_EXPIRES_IN ?? -1) * 1000 * 60 * 60,
     });
   }
 
   private setAccessTokenInCookie(response: Response, token: string) {
     response.cookie('accessToken', token, {
       httpOnly: true,
-      maxAge: +(process.env.ACCESS_TOKEN_COOKIE_EXPIRES_IN ?? -1),
+      maxAge: +(process.env.ACCESS_TOKEN_COOKIE_EXPIRES_IN ?? -1) * 1000,
     });
   }
 
@@ -57,8 +57,8 @@ export default class AuthController {
   async activate(request: Request, response: Response) {
     const { token, redirect } = request.query;
 
-    if (!Validator.isNotEmptyString(token)) {
-      throw ApiError.BadRequest('Token is required');
+    if (!Validator.isUUID(token)) {
+      throw ApiError.BadRequest('Token is missing or invalid');
     }
 
     await this.authService.activate(token);
@@ -129,6 +129,40 @@ export default class AuthController {
     response.clearCookie('accessToken');
 
     response.send({ message: 'You have been logged out successfully' });
+  }
+
+  async requestPasswordReset(request: Request, response: Response) {
+    const { email, redirect } = request.body;
+
+    if (!Validator.isEmail(email)) {
+      throw ApiError.BadRequest('Email is not valid');
+    }
+
+    if (!Validator.isURL(redirect)) {
+      throw ApiError.BadRequest('Redirect is must be a valid URL');
+    }
+
+    await this.authService.initPasswordReset(email, redirect);
+
+    response.send({
+      message: 'A password reset link has been sent to your email address',
+    });
+  }
+
+  async confirmPasswordReset(request: Request, response: Response) {
+    const { token, password } = request.body;
+
+    if (!Validator.isUUID(token)) {
+      throw ApiError.BadRequest('Token is not valid');
+    }
+
+    if (!Validator.isStrongPassword(password)) {
+      throw ApiError.BadRequest('Password must be at least 8 characters long');
+    }
+
+    const user = await this.authService.confirmPasswordReset(token, password);
+
+    return response.send({ message: 'Password reset successful', user });
   }
 
   withAuth(): Middleware {

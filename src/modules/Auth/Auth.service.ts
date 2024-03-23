@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { v4 as uuid } from 'uuid';
 import bcrypt from 'bcrypt';
 import type { UserDTO } from './../User/User.types.js';
 import ApiError from '../../core/modules/exceptions/ApiError.js';
@@ -7,6 +8,7 @@ import type TokenService from '../Token/Token.service.js';
 import type UserService from '../User/User.service.js';
 import type { AuthConstructorServices, UserTokenPayload } from './Auth.types.js';
 import type User from '../User/User.model.js';
+import type CacheService from '../Cache/Cache.service.js';
 
 const { BCRYPT_SALT_ROUNDS } = process.env;
 
@@ -14,11 +16,19 @@ class AuthService {
   private readonly userService: UserService;
   private readonly emailService: EmailService;
   private readonly tokenService: TokenService;
+  private readonly cacheService: CacheService;
 
-  constructor({ userService, emailService, tokenService }: AuthConstructorServices) {
+  constructor({ userService, emailService, tokenService, cacheService }: AuthConstructorServices) {
     this.userService = userService;
     this.emailService = emailService;
     this.tokenService = tokenService;
+    this.cacheService = cacheService;
+  }
+
+  private getEncryptedPassword(password: string) {
+    const saltRounds = +(BCRYPT_SALT_ROUNDS ?? 10);
+
+    return bcrypt.hash(password, saltRounds);
   }
 
   private async generateTokensAndWriteToDB(userPayload: UserTokenPayload) {
@@ -48,9 +58,7 @@ class AuthService {
       throw ApiError.Conflict('User already exist');
     }
 
-    const saltRounds = +(BCRYPT_SALT_ROUNDS ?? 10);
-    const encryptedPassword = await bcrypt.hash(password, saltRounds);
-
+    const encryptedPassword = await this.getEncryptedPassword(password);
     const newUser = await this.userService.add({
       ...userDTO,
       password: encryptedPassword,
@@ -62,9 +70,8 @@ class AuthService {
       throw ApiError.ServerError('Activation token is null after creating. Error');
     }
 
-    this.emailService.sendActivationEmail(email, activationToken, redirect).catch((err) => {
-      throw ApiError.ServerError("Activation email wasn't send", { cause: err });
-    });
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.emailService.sendActivationEmail(email, activationToken, redirect);
 
     return newUser;
   }
@@ -149,6 +156,46 @@ class AuthService {
     if (deletedCount === 0) {
       throw ApiError.BadRequest('Refresh token not found');
     }
+  }
+
+  async initPasswordReset(email: User['email'], redirectClientUrl: string) {
+    const user = await this.userService.getByEmail(email);
+
+    if (!user) {
+      throw ApiError.NotFound('User not found. Check your email and try again.');
+    }
+
+    const resetToken = uuid();
+
+    await this.cacheService.setResetPasswordToken(resetToken, user.id);
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.emailService.sendResetPasswordEmail(email, resetToken, redirectClientUrl);
+  }
+
+  async confirmPasswordReset(token: string, newPassword: string) {
+    const userId = await this.cacheService.getUserIdByResetPasswordToken(token);
+
+    if (!userId) {
+      throw ApiError.Unauthorized(
+        'Reset token is not valid or expired. You need to request a new one.',
+      );
+    }
+
+    const user = await this.userService.getById(userId);
+
+    if (!user) {
+      throw ApiError.NotFound('User not found by reset token. Maybe user was deleted.');
+    }
+
+    const encryptedPassword = await this.getEncryptedPassword(newPassword);
+
+    await this.userService.updateById(user.id, { password: encryptedPassword });
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    this.cacheService.deleteResetPasswordToken(token);
+
+    return this.userService.normalize(user);
   }
 }
 
