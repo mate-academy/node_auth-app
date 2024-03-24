@@ -16,7 +16,7 @@ export default class UserRouter extends Router<UserController> {
       routes: [
         {
           method: 'patch',
-          path: '/:id',
+          path: '/',
           handler: userController.update,
         },
       ],
