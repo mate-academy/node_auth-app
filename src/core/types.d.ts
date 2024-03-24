@@ -4,7 +4,7 @@
 declare namespace Express {
   export interface Request {
     readonly payload: {
-      auth?: { accessToken: string; userId: string };
+      auth?: { accessToken: string; userId: number };
     };
   }
 }

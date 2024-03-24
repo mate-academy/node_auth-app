@@ -185,15 +185,15 @@ export default class AuthController {
         );
       }
 
-      const [tokenIsValid, user] = this.authService.accessTokenIsValid(accessToken);
+      const userTokenData = this.authService.verifyAccessToken(accessToken);
 
-      if (!tokenIsValid) {
+      if (!userTokenData) {
         throw ApiError.Unauthorized('Access token is invalid');
       }
 
       request.payload.auth = {
         accessToken,
-        userId: user!.id,
+        userId: userTokenData.id,
       };
 
       next();

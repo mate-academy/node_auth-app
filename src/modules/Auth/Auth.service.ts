@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { v4 as uuid } from 'uuid';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 import type { UserDTO } from './../User/User.types.js';
 import ApiError from '../../core/modules/exceptions/ApiError.js';
 import type EmailService from '../Email/Email.service.js';
@@ -9,9 +9,7 @@ import type UserService from '../User/User.service.js';
 import type { AuthConstructorServices, UserTokenPayload } from './Auth.types.js';
 import type User from '../User/User.model.js';
 import type CacheService from '../Cache/Cache.service.js';
-import type { JwtPayload } from 'jsonwebtoken';
-
-const { BCRYPT_SALT_ROUNDS } = process.env;
+import Validator from '../../core/modules/validation/Validator.js';
 
 class AuthService {
   private readonly userService: UserService;
@@ -26,10 +24,15 @@ class AuthService {
     this.cacheService = cacheService;
   }
 
-  private getEncryptedPassword(password: string) {
-    const saltRounds = +(BCRYPT_SALT_ROUNDS ?? 10);
+  private isUserTokenPayload(payload: unknown): payload is UserTokenPayload {
+    if (typeof payload !== 'object' || payload === null) {
+      return false;
+    }
 
-    return bcrypt.hash(password, saltRounds);
+    return (
+      Validator.isCorrectNumber((payload as UserTokenPayload).id) &&
+      Validator.isEmail((payload as UserTokenPayload).email)
+    );
   }
 
   private async generateTokensAndWriteToDB(userPayload: UserTokenPayload) {
@@ -41,10 +44,16 @@ class AuthService {
     return [accessToken, refreshToken];
   }
 
-  accessTokenIsValid(token: string) {
+  verifyAccessToken(token: string) {
     const tokenData = this.tokenService.verifyAccessToken(token);
 
-    return [!!tokenData, tokenData as JwtPayload | null] as const;
+    if (tokenData !== null && !this.isUserTokenPayload(tokenData)) {
+      throw ApiError.ServerError('User access token must to have be a object', {
+        payload: { tokenData, token },
+      });
+    }
+
+    return tokenData;
   }
 
   accessTokenExpired(token: string) {
@@ -59,10 +68,9 @@ class AuthService {
       throw ApiError.Conflict('User already exist');
     }
 
-    const encryptedPassword = await this.getEncryptedPassword(password);
     const newUser = await this.userService.add({
       ...userDTO,
-      password: encryptedPassword,
+      password,
     });
 
     const { activationToken } = newUser;
@@ -104,7 +112,7 @@ class AuthService {
       throw ApiError.Forbidden('Email is not activated. Check your email for activation link.');
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, userPassword);
+    const isPasswordCorrect = await this.userService.passwordEqual(password, userPassword);
 
     if (!isPasswordCorrect) {
       throw ApiError.Unauthorized('Password is not correct. Try again.');
@@ -189,9 +197,7 @@ class AuthService {
       throw ApiError.NotFound('User not found by reset token. Maybe user was deleted.');
     }
 
-    const encryptedPassword = await this.getEncryptedPassword(newPassword);
-
-    await this.userService.updateById(user.id, { password: encryptedPassword });
+    await this.userService.updateById(user.id, { password: newPassword });
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.cacheService.deleteResetPasswordToken(token);

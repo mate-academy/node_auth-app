@@ -51,6 +51,10 @@ export default class ApiError extends Error {
     return new ApiError(500, message, { ...details, date });
   }
 
+  static MissingAuthMiddleware() {
+    return new ApiError(500, 'Auth middleware have to be called before this middleware');
+  }
+
   static catch(fn: Middleware): Middleware {
     return (req: Request, res: Response, next: NextFunction) => {
       try {
