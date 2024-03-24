@@ -9,6 +9,7 @@ import type UserService from '../User/User.service.js';
 import type { AuthConstructorServices, UserTokenPayload } from './Auth.types.js';
 import type User from '../User/User.model.js';
 import type CacheService from '../Cache/Cache.service.js';
+import type { JwtPayload } from 'jsonwebtoken';
 
 const { BCRYPT_SALT_ROUNDS } = process.env;
 
@@ -43,7 +44,7 @@ class AuthService {
   accessTokenIsValid(token: string) {
     const tokenData = this.tokenService.verifyAccessToken(token);
 
-    return !!tokenData;
+    return [!!tokenData, tokenData as JwtPayload | null] as const;
   }
 
   accessTokenExpired(token: string) {
