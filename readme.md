@@ -43,7 +43,7 @@ This documentation provides in-depth details of the Authentication and User Mana
     - `redirect` (string, optional): Redirect URL.
   - **Response**: 
     - `message` (string): Token update confirmation or redirection to the specified URL.
-  **Note**: Mostly, if the accessToken is outdated, the api automatically redirects to refresh.
+**Note**: Mostly, if the accessToken is outdated, the api automatically redirects to refresh.
 
 ### Logout
 - **POST** `/auth/logout`
