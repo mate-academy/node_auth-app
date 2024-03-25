@@ -1,7 +1,7 @@
 # Auth API Documentation
 
 ## Introduction
-This documentation provides in-depth details of the Authentication and User Management endpoints in our API. It includes the request methods, URL paths, required parameters, and detailed response structures for each endpoint.
+This documentation provides in-depth details of the Authentication and User Management endpoints in my API. It includes the request methods, URL paths, required parameters, and detailed response structures for each endpoint.
 
 ---
 
@@ -35,7 +35,7 @@ This documentation provides in-depth details of the Authentication and User Mana
     - `user` (object): The user's profile information.
     - Sets `refreshToken` and `accessToken` in cookies.
 
-### Token Refresh
+### Tokens Refresh
 - **GET** `/auth/refresh`
   - **Cookies**:
     - `refreshToken` (string): Refresh token.
@@ -43,7 +43,7 @@ This documentation provides in-depth details of the Authentication and User Mana
     - `redirect` (string, optional): Redirect URL.
   - **Response**: 
     - `message` (string): Token update confirmation or redirection to the specified URL.
-  - **Note**: Mostly, if the accessToken is outdated, the api automatically redirects to refresh.
+  **Note**: Mostly, if the accessToken is outdated, the api automatically redirects to refresh.
 
 ### Logout
 - **POST** `/auth/logout`
