@@ -16,8 +16,13 @@ export default class UserRouter extends Router<UserController> {
       routes: [
         {
           method: 'patch',
-          path: '/',
+          path: '/me',
           handler: userController.update,
+        },
+        {
+          method: 'post',
+          path: '/me/confirm-email',
+          handler: userController.confirmEmailUpdate,
         },
       ],
     });

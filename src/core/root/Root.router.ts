@@ -18,8 +18,8 @@ export default class RootRouter {
 
     this.router.use(requestPayload());
     this.router.use(cookieParser());
-    this.router.use('/', authRouter.router);
-    this.router.use('/user', userRouter.router);
+    this.router.use('/auth', authRouter.router);
+    this.router.use('/users', userRouter.router);
     this.router.use(ApiError.handleRouteNotFoundError);
     this.router.use(ApiError.handle);
   }

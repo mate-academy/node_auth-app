@@ -16,6 +16,8 @@ class AuthService {
   private readonly emailService: EmailService;
   private readonly tokenService: TokenService;
   private readonly cacheService: CacheService;
+  private readonly resetTokenExpires = +(process.env.RESET_PASSWORD_TOKEN_EXPIRES_IN ?? 900);
+  private readonly cachePrefix = { RESET_PASSWORD: 'reset-password' };
 
   constructor({ userService, emailService, tokenService, cacheService }: AuthConstructorServices) {
     this.userService = userService;
@@ -112,7 +114,7 @@ class AuthService {
       throw ApiError.Forbidden('Email is not activated. Check your email for activation link.');
     }
 
-    const isPasswordCorrect = await this.userService.passwordEqual(password, userPassword);
+    const isPasswordCorrect = await this.userService.passwordAreEqual(password, userPassword);
 
     if (!isPasswordCorrect) {
       throw ApiError.Unauthorized('Password is not correct. Try again.');
@@ -174,16 +176,18 @@ class AuthService {
       throw ApiError.NotFound('User not found. Check your email and try again.');
     }
 
+    const resetPrefix = this.cachePrefix.RESET_PASSWORD;
     const resetToken = uuid();
 
-    await this.cacheService.setResetPasswordToken(resetToken, user.id);
+    await this.cacheService.set(resetPrefix, resetToken, user.id, this.resetTokenExpires);
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.emailService.sendResetPasswordEmail(email, resetToken, redirectClientUrl);
   }
 
   async confirmPasswordReset(token: string, newPassword: string) {
-    const userId = await this.cacheService.getUserIdByResetPasswordToken(token);
+    const resetPrefix = this.cachePrefix.RESET_PASSWORD;
+    const userId = await this.cacheService.get<number>(resetPrefix, token);
 
     if (!userId) {
       throw ApiError.Unauthorized(
@@ -200,7 +204,7 @@ class AuthService {
     await this.userService.updateById(user.id, { password: newPassword });
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.cacheService.deleteResetPasswordToken(token);
+    this.cacheService.delete(resetPrefix, token);
 
     return this.userService.normalize(user);
   }

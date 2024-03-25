@@ -1,29 +1,29 @@
 import type { RedisClient } from '../../services/cache.js';
-import type User from '../User/User.model.js';
 
 export default class CacheService {
   private readonly redisClient: RedisClient;
   private readonly prefix = {
     RESET_PASSWORD: 'reset-password',
+    EMAIL_CHANGE: 'email-change',
   };
 
   constructor(redisClient: RedisClient) {
     this.redisClient = redisClient;
   }
 
-  public async setResetPasswordToken(token: string, userId: User['id']) {
-    await this.redisClient.set(`${this.prefix.RESET_PASSWORD}:${token}`, userId, {
-      EX: +(process.env.RESET_PASSWORD_TOKEN_EXPIRES_IN ?? 900),
-    });
+  public async set(prefix: string, key: string, value: unknown, expiresInSeconds?: number) {
+    const cacheValue = JSON.stringify(value);
+
+    await this.redisClient.set(`${prefix}:${key}`, cacheValue, { EX: expiresInSeconds });
   }
 
-  public async getUserIdByResetPasswordToken(token: string) {
-    const userId = await this.redisClient.get(`${this.prefix.RESET_PASSWORD}:${token}`);
+  public async get<T>(prefix: string, key: string) {
+    const value = await this.redisClient.get(`${prefix}:${key}`);
 
-    return Number(userId);
+    return value !== null ? (JSON.parse(value) as T) : null;
   }
 
-  public async deleteResetPasswordToken(token: string) {
-    await this.redisClient.del(`${this.prefix.RESET_PASSWORD}:${token}`);
+  public async delete(prefix: string, key: string) {
+    await this.redisClient.del(`${prefix}:${key}`);
   }
 }

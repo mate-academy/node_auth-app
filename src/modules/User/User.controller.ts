@@ -4,6 +4,7 @@ import type UserService from './User.service.js';
 import Validator from '../../core/modules/validation/Validator.js';
 import ApiError from '../../core/modules/exceptions/ApiError.js';
 import type { UserDTO } from './User.types.js';
+import { allowedKeysToUpdate } from './User.helper.js';
 
 export default class UserController {
   private readonly userService: UserService;
@@ -12,71 +13,70 @@ export default class UserController {
     this.userService = userService;
   }
 
-  private async checkNewPasswordBeforeUpdate(
-    realPassword: string,
-    newPassword: string | undefined,
-    currentPassword: unknown,
-  ) {
-    if (newPassword) {
-      if (!Validator.isNotEmptyString(currentPassword)) {
-        throw ApiError.BadRequest(
-          'Current password is required for changing password. And must be a string',
-        );
-      }
-
-      const currentPasswordCorrect = await this.userService.passwordEqual(
-        currentPassword,
-        realPassword,
-      );
-
-      if (!currentPasswordCorrect) {
-        throw ApiError.BadRequest('Current password is incorrect');
-      }
-
-      if (!Validator.isStrongPassword(newPassword)) {
-        throw ApiError.BadRequest('Password length must be greater than 8');
-      }
-    }
-  }
-
   async update(req: Request, res: Response) {
-    const { auth } = req.payload;
-
-    if (!auth) {
+    if (!req.payload.auth) {
       throw ApiError.MissingAuthMiddleware();
     }
 
-    const { userId: id } = auth;
-    const dataToUpdate = Validator.filterKeys<UserDTO>(req.body as UserDTO, [
-      { key: 'name', errMessage: 'Name must be a string', isValid: Validator.isNotEmptyString },
-      { key: 'email', errMessage: 'Email is not valid', isValid: Validator.isEmail },
-      {
-        key: 'password',
-        errMessage: 'Password length must be greater than 8',
-        isValid: Validator.isStrongPassword,
-      },
-    ]);
-
+    const { userId: id } = req.payload.auth;
+    const { currentPassword } = req.body;
     const user = await this.userService.getById(id);
+    const dataToUpdate = Validator.filterKeys<UserDTO>(req.body as UserDTO, allowedKeysToUpdate);
+    const { password: newPassword, email: newEmail } = dataToUpdate;
+    const messages = ['User updated successfully'];
 
     if (!user) {
       throw ApiError.ServerError('User not found. Id is incorrect', {
-        payload: { id, auth },
+        payload: { id, auth: req.payload.auth },
       });
     }
 
-    await this.checkNewPasswordBeforeUpdate(
-      user.password,
-      dataToUpdate.password,
-      req.body.currentPassword,
-    );
+    if (newPassword !== undefined) {
+      if (!Validator.isNotEmptyString(currentPassword)) {
+        throw ApiError.BadRequest('Current password is required for changing password');
+      }
+
+      if (!(await this.userService.passwordAreEqual(currentPassword, user.password))) {
+        throw ApiError.BadRequest('Provided password is incorrect');
+      }
+
+      messages.push('Password changed successfully.');
+    }
+
+    if (newEmail !== undefined) {
+      if (user.email === newEmail) {
+        throw ApiError.BadRequest('You already use this email');
+      }
+
+      if (await this.userService.getByEmail(newEmail)) {
+        throw ApiError.Conflict('Email is already in use by another user');
+      }
+
+      messages.push('Email change confirmation codes have been sent to your new and old emails.');
+    }
 
     const updatedUser = await this.userService.updateById(id, dataToUpdate);
-    const normalizedUser = this.userService.normalize(updatedUser);
+
+    return res.send({ messages, user: this.userService.normalize(updatedUser) });
+  }
+
+  async confirmEmailUpdate(req: Request, res: Response) {
+    if (!req.payload.auth) {
+      throw ApiError.MissingAuthMiddleware();
+    }
+
+    const { userId } = req.payload.auth;
+    const { newCode, oldCode } = req.body;
+
+    if (!Validator.isNotEmptyString(newCode) || !Validator.isNotEmptyString(oldCode)) {
+      throw ApiError.BadRequest('Old code and new code are required');
+    }
+
+    const updatedUser = await this.userService.confirmEmailUpdate(userId, oldCode, newCode);
 
     return res.send({
-      message: `User updated successfully`,
-      user: normalizedUser,
+      message: 'Email updated successfully',
+      user: this.userService.normalize(updatedUser),
     });
   }
 }

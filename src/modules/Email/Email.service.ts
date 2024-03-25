@@ -1,8 +1,12 @@
 import type Mail from 'nodemailer/lib/mailer/index.js';
+import retry, { type Options as RetryOptions } from 'p-retry';
 import type { TransporterType } from '../../services/mailer.js';
 import { AuthRoutes } from '../Auth/Auth.routes.js';
-import { getActivationEmail, getPasswordResetEmail } from './Email.helpers.js';
-import retry, { type Options as RetryOptions } from 'p-retry';
+import {
+  getActivationEmail,
+  getPasswordChangedEmail,
+  getPasswordResetEmail,
+} from './Email.helpers.js';
 import { isServerRedirect, type ConfirmationEmailOptions } from './Email.types.js';
 import ApiError from '../../core/modules/exceptions/ApiError.js';
 
@@ -11,7 +15,7 @@ export default class EmailService {
 
   constructor(private readonly transporter: TransporterType) {}
 
-  private sendConfirmationEmail(options: ConfirmationEmailOptions) {
+  public sendConfirmationEmail(options: ConfirmationEmailOptions) {
     const { email, token, getHTML } = options;
     const confirmationLink = isServerRedirect(options)
       ? `${this.baseUrl}${options.route}?token=${token}&redirect=${options.redirect}`
@@ -52,6 +56,13 @@ export default class EmailService {
       token,
       baseUrl,
       getHTML: getPasswordResetEmail,
+    });
+  }
+
+  async sendPasswordChangedEmail(email: string) {
+    return this.send({
+      to: email,
+      html: getPasswordChangedEmail(),
     });
   }
 }

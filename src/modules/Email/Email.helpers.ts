@@ -103,3 +103,143 @@ export function getPasswordResetEmail(resetLink: string) {
 </html>
 `;
 }
+
+export function getPasswordChangedEmail() {
+  return `
+  <!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 0.8em;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Password Change Notification</h2>
+        <p>Dear User,</p>
+        <p>Your account password has been successfully changed. If you did not initiate this change, please contact our support team immediately.</p>
+        <a href="${process.env.SUPPORT_URL ?? ''}" class="button">Contact Support</a>
+        <p>For your security, please do not share your password with others.</p>
+        <p>Thank you,<br>Your Website Team</p>
+        <div class="footer">
+            &copy; 2024 Your Website. All rights reserved.
+        </div>
+    </div>
+</body>
+</html>
+`;
+}
+
+export function getUpdateEmailLetterForOldEmail(code: string, newEmail: string) {
+  return `<!DOCTYPE html>
+  <html>
+  <head>
+      <style>
+          .email-container {
+              font-family: Arial, sans-serif;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              border: 1px solid #ddd;
+              text-align: center;
+          }
+          .header {
+              font-size: 20px;
+              color: #333;
+              margin-bottom: 20px;
+          }
+          .content {
+              font-size: 16px;
+              color: #666;
+              margin-bottom: 20px;
+          }
+          .code {
+              font-size: 24px;
+              color: #000;
+              font-weight: bold;
+              margin-bottom: 20px;
+          }
+      </style>
+  </head>
+  <body>
+      <div class="email-container">
+          <div class="header">Email Change Request</div>
+          <div class="content">A request has been made to change the email associated with your account to <strong>${newEmail}</strong>.</div>
+          <div class="content">Please use the following verification code to confirm the change:</div>
+          <div class="code">${code}</div>
+          <div class="content">If you did not request this change, please ignore this email or contact support.</div>
+      </div>
+  </body>
+  </html>
+  `;
+}
+
+export function getUpdateEmailLetterForNewEmail(code: string) {
+  return `<!DOCTYPE html>
+  <html>
+  <head>
+      <style>
+          .email-container {
+              font-family: Arial, sans-serif;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              border: 1px solid #ddd;
+              text-align: center;
+          }
+          .header {
+              font-size: 20px;
+              color: #333;
+              margin-bottom: 20px;
+          }
+          .content {
+              font-size: 16px;
+              color: #666;
+              margin-bottom: 20px;
+          }
+          .code {
+              font-size: 24px;
+              color: #000;
+              font-weight: bold;
+              margin-bottom: 20px;
+          }
+      </style>
+  </head>
+  <body>
+      <div class="email-container">
+          <div class="header">Email Verification Required</div>
+          <div class="content">Welcome to your new email setup. Please use the following verification code to complete the email change process:</div>
+          <div class="code">${code}</div>
+          <div class="content">Thank you for updating your account. If you have any issues, please contact support.</div>
+      </div>
+  </body>
+  </html>
+  `;
+}

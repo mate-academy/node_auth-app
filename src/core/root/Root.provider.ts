@@ -14,8 +14,12 @@ export default class RootProvider {
   constructor() {
     this.Cache = new CacheProvider();
     this.Token = new TokenProvider();
-    this.User = new UserProvider();
     this.Email = new EmailProvider();
+
+    this.User = new UserProvider({
+      cacheService: this.Cache.service,
+      emailService: this.Email.service,
+    });
 
     this.Auth = new AuthProvider({
       cacheService: this.Cache.service,
