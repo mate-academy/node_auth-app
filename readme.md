@@ -13,14 +13,14 @@ This documentation provides in-depth details of the Authentication and User Mana
     - `name` (string): User's name.
     - `email` (string): Valid email address.
     - `password` (string): Password (at least 8 characters).
-    - `redirect` (string, optional): Redirect URL after successful registration.
+    - `redirect` (string, optional): Redirect URL after successful email activation.
   - **Response**: 
     - `message` (string): Confirmation of successful registration and instructions to check email for activation.
 
 ### Activation
 - **GET** `/auth/activate`
   - **Query Parameters**:
-    - `token` (string): Activation token.
+    - `token` (string): The activation token that was sent in the activated mail link.
     - `redirect` (string, optional): Redirect URL.
   - **Response**: 
     - `message` (string): Account activation status message or redirection to the specified URL.
@@ -43,6 +43,7 @@ This documentation provides in-depth details of the Authentication and User Mana
     - `redirect` (string, optional): Redirect URL.
   - **Response**: 
     - `message` (string): Token update confirmation or redirection to the specified URL.
+  - **Note**: Mostly, if the accessToken is outdated, the api automatically redirects to refresh.
 
 ### Logout
 - **POST** `/auth/logout`
@@ -58,7 +59,7 @@ This documentation provides in-depth details of the Authentication and User Mana
     - `email` (string): User's email.
     - `redirect` (string, optional): Redirect URL.
   - **Response**: 
-    - `message` (string): Confirmation that a password reset link has been sent.
+    - `message` (string): Confirmation that a password reset link has been sent on email.
 
 ### Confirm Password Reset
 - **POST** `/auth/password-reset/confirm`
@@ -77,8 +78,9 @@ This documentation provides in-depth details of the Authentication and User Mana
 - **PATCH** `/users/me`
   - **Request Body**: 
     - `currentPassword` (string, required for password changes): Current password.
-    - `newPassword` (string, optional): New password.
-    - `newEmail` (string, optional): New email address.
+    - `password` (string, optional): New password.
+    - `email` (string, optional): New email address. Don't update immediately, but send letters with confirmations to two emails.
+    - `name` (string, optional): New user name.
   - **Response**: 
     - `messages` (array of strings): Update status messages for password and/or email.
     - `user` (object): The user's updated profile information.
@@ -92,34 +94,9 @@ This documentation provides in-depth details of the Authentication and User Mana
     - `message` (string): Email update success message.
     - `user` (object): The user's updated profile information.
 
+**Note**: Access to User Management Endpoints requires an `accessToken` provided in the cookie.
+
 ---
-
-## Contributing
-Contributions to this documentation are welcome. Please create an issue or submit a pull request for any suggestions or error reports.
-
-# Auth application
-Implement an application that allows user to:
-- Register using name, email and password (only non authenticated)
-  - Inform the users about the rules for a password and check them
-  - send and activation email
-- Activation page (only non authenticated)
-  - the user should be activated only after email confirmation
-  - redirect to Profile after the activation
-- Login with valid credentials (email and password) (only non authenticated)
-  - If user is not active ask them to activate their email
-  - Redirect to profile after login
-- Logout (only authenticated)
-  - Redirect to login after logging out
-- Password reset (only non authenticated)
-  - Ask for an email
-  - Show email sent page
-  - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
-  - Show Success page with a link to login
-- Profile page (only authenticated)
-  - You can change a name
-  - It allows to change a password (require an old one, `new password` and `confirmation`)
-  - To change an email you should type the password, confirm the new email and notify the old email about the change
-- 404 for all the other pages
 
 ## (Optional) Advanced tasks
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
