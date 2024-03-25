@@ -3,13 +3,23 @@ import { emailService } from './email.service.js';
 import { User } from '../models/user.js';
 
 async function getAllUsers() {
-  return User.findAll();
+  return User.findAll({
+    order: [['id', 'ASC']],
+  });
 }
 
 function getByEmail(email) {
   return User.findOne({
     where: {
       email,
+    },
+  });
+}
+
+function getById(id) {
+  return User.findOne({
+    where: {
+      id,
     },
   });
 }
@@ -31,9 +41,15 @@ function normalize({ id, email }) {
   return { id, email };
 }
 
+async function updateUsername(id, name) {
+  await User.update({ name }, { where: { id } });
+}
+
 export const userService = {
   getAllUsers,
   register,
   getByEmail,
+  getById,
   normalize,
+  updateUsername,
 };

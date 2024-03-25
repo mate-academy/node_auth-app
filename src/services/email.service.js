@@ -31,6 +31,15 @@ async function sendActivationEmail(email, token) {
   await send(email, 'Activate', html);
 }
 
+async function sendNotification(oldEmail, newEmail) {
+  const html = `
+    <p>Your email has been changed to ${newEmail}</p>
+  `;
+
+  await send(oldEmail, 'Email update', html);
+}
+
 export const emailService = {
   sendActivationEmail,
+  sendNotification,
 };

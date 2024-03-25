@@ -15,9 +15,7 @@ const register = async (req, res, next) => {
   );
 
   if (registerInvalid) {
-    res.send(registerInvalid);
-
-    return;
+    return res.send(registerInvalid);
   }
 
   await userService.register(name, email, password);
@@ -31,9 +29,7 @@ const activate = async (req, res) => {
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
   user.activationToken = null;
@@ -42,15 +38,21 @@ const activate = async (req, res) => {
   await sendAuthentication(res, user);
 };
 
-const login = async (req, res) => {
+const loginGet = async (req, res) => {
+  const html = `
+    <h1>Login page</h1>
+  `;
+
+  res.send(html);
+};
+
+const loginPost = async (req, res) => {
   const { email, password } = req.body;
   const user = await userService.getByEmail(email);
   const loginInvalid = validationService.login(email, password, user);
 
   if (loginInvalid) {
-    res.send(loginInvalid);
-
-    return;
+    return res.send(loginInvalid);
   }
 
   await sendAuthentication(res, user);
@@ -59,8 +61,14 @@ const login = async (req, res) => {
 const logout = async (req, res) => {
   const { id } = req.body;
 
+  const token = await tokenService.getByUserId(id);
+
+  if (!token) {
+    return res.send('You are not authorized');
+  }
   await tokenService.destroy(+id);
-  res.redirect(`http://localhost:${process.env.PORT}/login`);
+
+  res.redirect(`http://localhost:${process.env.PORT}/authorization/login`);
 };
 
 async function sendAuthentication(res, user) {
@@ -70,20 +78,17 @@ async function sendAuthentication(res, user) {
   const userToken = await tokenService.getByUserId(user.id);
 
   if (userToken) {
-    res.send('User already authorized');
-
-    return;
+    return res.send('User already authorized');
   }
 
-  res.cookie('authToken', authToken);
-
   await tokenService.createToken(user.id, authToken);
-  res.redirect(`http://localhost:${process.env.PORT}/users/profile`);
+  res.redirect(`http://localhost:${process.env.PORT}/profile/${user.id}`);
 }
 
 export const authController = {
   register,
   activate,
-  login,
+  loginGet,
+  loginPost,
   logout,
 };
