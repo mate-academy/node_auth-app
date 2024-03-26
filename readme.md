@@ -1,102 +1,16 @@
-# Auth API Documentation
+# Node Authentication App
 
-## Introduction
-This documentation provides in-depth details of the Authentication and User Management endpoints in my API. It includes the request methods, URL paths, required parameters, and detailed response structures for each endpoint.
+Welcome to the documentation for the Authentication app. This document is a central resource for all information related to the authentication system I've developed, providing essential guidance through API documentation and a comprehensive getting started guide.
 
----
+## Documentation Links
 
-## Authentication Endpoints
+### API Documentation
+For a detailed understanding of the API, including endpoint information, authentication methods, and request/response details, please refer to the API Documentation.
+- [API Documentation](#link-to-api-docs)
 
-### Registration
-- **POST** `/auth/sign-up`
-  - **Request Body**: 
-    - `name` (string): User's name.
-    - `email` (string): Valid email address.
-    - `password` (string): Password (at least 8 characters).
-    - `redirect` (string, optional): Redirect URL after successful email activation.
-  - **Response**: 
-    - `message` (string): Confirmation of successful registration and instructions to check email for activation.
-
-### Activation
-- **GET** `/auth/activate`
-  - **Query Parameters**:
-    - `token` (string): The activation token that was sent in the activated mail link.
-    - `redirect` (string, optional): Redirect URL.
-  - **Response**: 
-    - `message` (string): Account activation status message or redirection to the specified URL.
-
-### Login
-- **POST** `/auth/login`
-  - **Request Body**:
-    - `email` (string): User's email.
-    - `password` (string): User's password.
-  - **Response**: 
-    - `message` (string): Login success message.
-    - `user` (object): The user's profile information.
-    - Sets `refreshToken` and `accessToken` in cookies.
-
-### Tokens Refresh
-- **GET** `/auth/refresh`
-  - **Cookies**:
-    - `refreshToken` (string): Refresh token.
-  - **Query Parameters**:
-    - `redirect` (string, optional): Redirect URL.
-  - **Response**: 
-    - `message` (string): Token update confirmation or redirection to the specified URL.
-**Note**: Mostly, if the accessToken is outdated, the api automatically redirects to refresh.
-
-### Logout
-- **POST** `/auth/logout`
-  - **Cookies**:
-    - `refreshToken` (string): Refresh token.
-    - `accessToken` (string): Access token.
-  - **Response**: 
-    - `message` (string): Logout success message.
-
-### Password Reset Request
-- **POST** `/auth/password-reset/request`
-  - **Request Body**:
-    - `email` (string): User's email.
-    - `redirect` (string, optional): Redirect URL.
-  - **Response**: 
-    - `message` (string): Confirmation that a password reset link has been sent on email.
-
-### Confirm Password Reset
-- **POST** `/auth/password-reset/confirm`
-  - **Request Body**:
-    - `token` (string): Password reset token.
-    - `password` (string): New password.
-  - **Response**: 
-    - `message` (string): Password reset success message.
-    - `user` (object): The user's updated profile information.
-
----
-
-## User Management Endpoints
-
-### Update User Information
-- **PATCH** `/users/me`
-  - **Request Body**: 
-    - `currentPassword` (string, required for password changes): Current password.
-    - `password` (string, optional): New password.
-    - `email` (string, optional): New email address. Don't update immediately, but send letters with confirmations to two emails.
-    - `name` (string, optional): New user name.
-  - **Response**: 
-    - `messages` (array of strings): Update status messages for password and/or email.
-    - `user` (object): The user's updated profile information.
-
-### Confirm Email Update
-- **POST** `/users/me/confirm-email`
-  - **Request Body**:
-    - `newCode` (string): Confirmation code sent to new email.
-    - `oldCode` (string): Confirmation code sent to old email.
-  - **Response**: 
-    - `message` (string): Email update success message.
-    - `user` (object): The user's updated profile information.
-
-**Note**: Access to User Management Endpoints requires an `accessToken` provided in the cookie.
-
----
+### Getting Started Guide
+If you're new to this project, the Getting Started Guide offers step-by-step instructions for setting up and using the authentication system.
+- [Getting Started Guide](#link-to-getting-started-docs)
 
 ## (Optional) Advanced tasks
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
