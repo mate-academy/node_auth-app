@@ -6,6 +6,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "node build/index.js",
+    "setup": "tsc --project tsconfig.json && node build/setup.js",
     "dev": "tsc-watch --onSuccess \"npm start\"",
     "build": "tsc",
     "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
