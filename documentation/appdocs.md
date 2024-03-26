@@ -20,39 +20,34 @@ Install Docker from [Docker's official website](https://www.docker.com/get-start
 Run the following Docker commands:
 
 - **PostgreSQL Container:**
-
   `docker run -d --name postgres-auth-app -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=1111 -e POSTGRES_DB=auth_app -p 5432:5432 postgres`
 
 - **Redis Container:**
-
   `docker run -d --name redis-auth-app -p 6379:6379 redis`
 
 ## Project Setup
 
 - **Install Node Modules:**
-
   `npm install`
 
 - **Setup PostgreSQL and Redis Clients:**
-
   (Warning: This command clears all data from tables and cache)
-
   `npm setup`
+
+## Configuring the .env File
+
+Before starting the application, create and configure the `.env` file at the root of the project according to your environment and service credentials.
 
 ## Running the Application
 
 - **Build the Application:**
-
   `npm run build`
 
 - **Start the Application:**
-
   `npm start`
 
 - **Development Mode with Watch:**
-
   (For development with live reloading)
-
   `npm run dev`
 
 ## Notes
