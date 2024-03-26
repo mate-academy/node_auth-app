@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import type RootProvider from './Root.provider.js';
 import AuthRouter from '../../modules/Auth/Auth.router.js';
@@ -16,6 +17,12 @@ export default class RootRouter {
       authController: rootProvider.Auth.controller,
     });
 
+    this.router.use(
+      cors({
+        origin: process.env.CLIENT_URL,
+        credentials: true,
+      }),
+    );
     this.router.use(requestPayload());
     this.router.use(cookieParser());
     this.router.use('/auth', authRouter.router);
