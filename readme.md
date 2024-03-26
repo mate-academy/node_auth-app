@@ -6,11 +6,11 @@ Welcome to the documentation for the Authentication app. This document is a cent
 
 ### API Documentation
 For a detailed understanding of the API, including endpoint information, authentication methods, and request/response details, please refer to the API Documentation.
-- [API Documentation](#link-to-api-docs)
+- [API Documentation](documentation/apidocs.md)
 
 ### Getting Started Guide
 If you're new to this project, the Getting Started Guide offers step-by-step instructions for setting up and using the authentication system.
-- [Getting Started Guide](#link-to-getting-started-docs)
+- [Getting Started Guide](documentation/appdocs.md)
 
 ## (Optional) Advanced tasks
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
