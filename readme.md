@@ -1,26 +1,16 @@
-# Auth application
-Implement an application that allows user to:
-- Register using name, email and password (only non authenticated)
-  - Inform the users about the rules for a password and check them
-  - send and activation email
-- Actvation page (only non authenticated)
-  - the user should be activated only after email confirmation
-  - redirect to Profile after the activation
-- Login with valid credentials (email and password) (only non authenticated)
-  - If user is not active ask them to activate their email
-  - Redirect to profile after login
-- Logout (only authenticated)
-  - Redirect to login after logging out
-- Password reset (only non authenticated)
-  - Ask for an email
-  - Show email sent page
-  - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
-  - Show Success page with a link to login
-- Profile page (only authenticated)
-  - You can change a name
-  - It allows to change a password (require an old one, `new password` and `confirmation`)
-  - To change an email you should type the password, confirm the new email and notify the old email about the change
-- 404 for all the other pages
+# Node Authentication App
+
+Welcome to the documentation for the Authentication app. This document is a central resource for all information related to the authentication system I've developed, providing essential guidance through API documentation and a comprehensive getting started guide.
+
+## Documentation Links
+
+### API Documentation
+For a detailed understanding of the API, including endpoint information, authentication methods, and request/response details, please refer to the API Documentation.
+- [API Documentation](documentation/apidocs.md)
+
+### Getting Started Guide
+If you're new to this project, the Getting Started Guide offers step-by-step instructions for setting up and using the authentication system.
+- [Getting Started Guide](documentation/appdocs.md)
 
 ## (Optional) Advanced tasks
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
