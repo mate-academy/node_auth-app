@@ -9,7 +9,7 @@ const sequelize = new Sequelize({
   host: DB_HOST ?? 'localhost',
   port: parseInt(DB_PORT ?? '5432', 10),
   username: DB_USER ?? 'postgres',
-  password: DB_PASSWORD ?? '4485',
+  password: DB_PASSWORD ?? '1111',
   database: DB_NAME ?? 'postgres',
   logging: false,
 });
