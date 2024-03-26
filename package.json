@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "description": "Auth app",
   "main": "src/index.ts",
+  "engines": {
+    "node": ">=21.6.2"
+  },
   "scripts": {
     "start": "node build/index.js",
     "setup": "tsc --project tsconfig.json && node build/setup.js",
