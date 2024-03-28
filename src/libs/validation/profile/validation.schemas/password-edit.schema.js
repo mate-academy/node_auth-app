@@ -1,0 +1,22 @@
+'use strict';
+
+const joi = require('joi');
+
+const { userFields } = require('../../fields/user-fields.js');
+
+const { password } = userFields;
+
+const passwordEditSchema = joi
+  .object({
+    password,
+    oldPassword: password,
+  })
+  .required()
+  .options({
+    abortEarly: false,
+    allowUnknown: false,
+  });
+
+module.exports = {
+  passwordEditSchema,
+};
