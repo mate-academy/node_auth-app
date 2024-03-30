@@ -1,7 +1,9 @@
+require('dotenv/config');
+
 const bcrypt = require('bcrypt');
 
 function createHash(password) {
-  return bcrypt.hash(password, 10);
+  return bcrypt.hash(password, process.env.BCRYPT_SALT);
 }
 
 async function compare(password, hash) {
