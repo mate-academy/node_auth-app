@@ -1,18 +1,22 @@
 /* eslint-disable no-console */
+require('dotenv/config');
+
 const express = require('express');
 const cors = require('cors');
-
-require('dotenv/config');
+const cookieParser = require('cookie-parser');
+const { authRouter } = require('./routes/auth.route.js');
+const { errorMiddleware } = require('./middlewars/errorMiddleware.js');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-app.use(cors());
-app.use(express.json({ origin: process.env.CLIENT_URL }));
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(authRouter);
 
-app.get('/', (req, res) => {
-  res.send('hello');
-});
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`Server run on http://localhost:${PORT}`);
