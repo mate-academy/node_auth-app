@@ -6,10 +6,9 @@ export const Loader = () => {
   const [text, setText] = useLoading(interval, '');
 
   useEffect(() => {
-    const i = interval.current;
     setText('...');
 
-    return () => clearInterval(i);
+    return () => clearInterval(interval.current);
   }, [setText]);
 
   return (

@@ -49,14 +49,8 @@ export const App = () => {
     
         switch (i) {
           case 1:
-            setAreBordersVisible(false);
-            break;
           case 2:
-            setAreBordersVisible(false);
-            break;
           case 5:
-            setAreBordersVisible(false);
-            break;
           case 6:
             setAreBordersVisible(false);
             break;

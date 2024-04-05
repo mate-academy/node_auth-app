@@ -12,5 +12,4 @@ export function errorMiddleware(error, req, res, next) {
     message: 'Server error',
   });
 }
-
   

@@ -123,7 +123,7 @@ export const resetPassword = async (req, res) => {
     throw ApiError.Conflict('You already use this password');
   }
 
-  const hashPassword = await bcrypt.hash(password, 10);
+  const hashPassword = await bcrypt.hash(newPassword, 10);
 
   user.password = hashPassword;
   await user.save();

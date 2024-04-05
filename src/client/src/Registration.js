@@ -88,7 +88,7 @@ export const Registration = () => {
       }, (i * 10))
     }
 
-    return () => clearTimeout(timer1.current, timer2.current)
+    return () => clearTimeout(timer1.current, timer2.current);
   }, []);
 
   useEffect(() => {

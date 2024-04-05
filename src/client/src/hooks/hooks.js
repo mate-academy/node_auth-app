@@ -5,7 +5,6 @@ export const useLoading = (interval, text = '') => {
 
   const setMessage = useCallback((str) => {
     if (str === '...') {
-      let loadingText = '...';
       let count = 1;
       
       set('.');
@@ -15,7 +14,7 @@ export const useLoading = (interval, text = '') => {
     
         count > 3 && (count = 1);
 
-        set(loadingText.slice(0, count));
+        set(str.slice(0, count));
       }, 500);
     } else {
       set(str);
