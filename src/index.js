@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { authRouter } = require('./routes/auth.route.js');
+const { userRoute } = require('./routes/user.route.js');
 const { errorMiddleware } = require('./middlewars/errorMiddleware.js');
 
 const PORT = process.env.PORT || 5000;
@@ -14,7 +15,9 @@ app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use(authRouter);
+app.use('/user', userRoute);
 
 app.use(errorMiddleware);
 

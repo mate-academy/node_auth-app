@@ -1,18 +1,15 @@
+const bcrypt = require('bcrypt');
 const { User } = require('../models/user.model.js');
 const { ApiError } = require('../exeptions/apiError.js');
+const { sendResetPasswordLink } = require('../services/email.service.js');
 const userService = require('../services/user.service.js');
-const validators = require('../helpers/validators.js');
 const jwtService = require('../services/jwt.service.js');
 const resetTokenService = require('../services/resetToken.service.js');
-const bcrypt = require('bcrypt');
-const { sendResetPasswordLink } = require('../services/email.service.js');
-
-const normalizeBody = ({ name, email, password }) => {
-  return { name: name.trim(), email: email.trim(), password: password.trim() };
-};
+const tokenService = require('../services/token.service.js');
+const validators = require('../helpers/validators.js');
 
 const register = async (req, res) => {
-  const { name, email, password } = normalizeBody(req.body);
+  const { name, email, password } = req.body;
 
   const error = {
     name: validators.validateName(name),
@@ -66,17 +63,8 @@ const login = async (req, res) => {
   }
 
   const normalizedUser = userService.normalize(user);
-  const accessToken = jwtService.createAccessToken(normalizedUser);
-  const refreshToken = jwtService.createRefreshToken(normalizedUser);
 
-  await tokenService.save({ refreshToken, userId: user.id });
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    maxAge: 3600 * 24,
-    secure: true,
-  });
-  res.send({ user: normalizedUser, accessToken });
+  generateTokens(res, normalizedUser);
 };
 
 const logout = async (req, res) => {
@@ -89,6 +77,18 @@ const logout = async (req, res) => {
 
   await tokenService.remove(user.id);
   res.sendStatus(204);
+};
+
+const refresh = async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const userData = jwtService.verifyRefreshToken(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!userData || !token) {
+    throw ApiError.unauthorized();
+  }
+
+  generateTokens(res, userService.normalize(userData));
 };
 
 const resetPassword = async (req, res) => {
@@ -140,11 +140,26 @@ const changePassword = async (req, res) => {
   res.sendStatus(204);
 };
 
+const generateTokens = async (res, user) => {
+  const accessToken = jwtService.createAccessToken(user);
+  const refreshToken = jwtService.createRefreshToken(user);
+
+  await tokenService.save({ refreshToken, userId: user.id });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    maxAge: 3600 * 24,
+    secure: true,
+  });
+  res.send({ user, accessToken });
+};
+
 module.exports = {
   register,
   activate,
   login,
   logout,
+  refresh,
   resetPassword,
   changePassword,
 };

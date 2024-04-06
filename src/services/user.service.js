@@ -38,6 +38,30 @@ const create = async ({ name, email, password }) => {
   return normalize(newUser);
 };
 
+const update = async ({ id, name, email, password }) => {
+  const updateData = {};
+
+  if (name) {
+    updateData.name = name;
+  }
+
+  if (email) {
+    updateData.email = email;
+  }
+
+  if (password) {
+    const hash = await bcrypt.hash(password, 7);
+
+    updateData.password = hash;
+  }
+
+  const result = await User.update(updateData, {
+    where: { id },
+  });
+
+  return result[0];
+};
+
 const changePassword = async ({ password, userId }) => {
   const user = await User.findByPk(userId);
 
@@ -56,4 +80,5 @@ module.exports = {
   findByEmail,
   normalize,
   changePassword,
+  update,
 };

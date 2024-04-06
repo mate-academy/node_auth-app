@@ -1,5 +1,5 @@
 const emailValidator = require('email-validator');
-const passwordValidator = require('password-validator');
+const PasswordValidator = require('password-validator');
 
 const validateEmail = (email) => {
   if (!email) {
@@ -18,7 +18,7 @@ const validatePassword = (password) => {
     return 'Password is required';
   }
 
-  const schema = new passwordValidator();
+  const schema = new PasswordValidator();
 
   schema.is().min(4);
 

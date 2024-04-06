@@ -13,11 +13,20 @@ const save = async ({ refreshToken, userId }) => {
   await Token.create({ refresh_token: refreshToken, userId });
 };
 
-const remove = async (userId) => {
-  await Token.destroy({ where: { userId } });
+const remove = (userId) => {
+  return Token.destroy({ where: { userId } });
+};
+
+const getByToken = (token) => {
+  if (!token) {
+    return null;
+  }
+
+  return Token.findOne({ where: { refresh_token: token } });
 };
 
 module.exports = {
   save,
   remove,
+  getByToken,
 };
