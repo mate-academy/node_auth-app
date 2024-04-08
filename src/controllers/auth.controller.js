@@ -7,6 +7,7 @@ const jwtService = require('../services/jwt.service.js');
 const resetTokenService = require('../services/resetToken.service.js');
 const tokenService = require('../services/token.service.js');
 const validators = require('../helpers/validators.js');
+// const passport = require('passport');
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -67,7 +68,9 @@ const login = async (req, res) => {
   generateTokens(res, normalizedUser);
 };
 
-const google = async (req, res) => {};
+const googleRedirect = (req, res) => {
+  res.send('you reached the redirect URI');
+};
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
@@ -154,8 +157,9 @@ module.exports = {
   activate,
   login,
   logout,
-  google,
+  // google,
   refresh,
   resetPassword,
+  googleRedirect,
   restorePassword,
 };
