@@ -14,6 +14,12 @@ const createRefreshToken = (userData) => {
   });
 };
 
+const createEmailActivationToken = (userData) => {
+  return jwt.sign(userData, process.env.JWT_EMAIL_SECRET, {
+    expiresIn: '24h',
+  });
+};
+
 const verifyAccessToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
@@ -30,9 +36,19 @@ const verifyRefreshToken = (token) => {
   }
 };
 
+const verifyEmailActivationToken = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_EMAIL_SECRET);
+  } catch (err) {
+    return null;
+  }
+};
+
 module.exports = {
   createAccessToken,
   createRefreshToken,
+  createEmailActivationToken,
   verifyAccessToken,
   verifyRefreshToken,
+  verifyEmailActivationToken,
 };

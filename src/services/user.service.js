@@ -8,6 +8,16 @@ const normalize = ({ id, name, email }) => {
   return { id, name, email };
 };
 
+const findById = async (id) => {
+  try {
+    const user = await User.findByPk(id);
+
+    return user.dataValues;
+  } catch (err) {
+    return null;
+  }
+};
+
 const findByEmail = async (email) => {
   const user = await User.findOne({ where: { email } });
 
@@ -38,31 +48,15 @@ const create = async ({ name, email, password }) => {
   return normalize(newUser);
 };
 
-const update = async ({ id, name, email, password }) => {
-  const updateData = {};
-
-  if (name) {
-    updateData.name = name;
-  }
-
-  if (email) {
-    updateData.email = email;
-  }
-
-  if (password) {
-    const hash = await bcrypt.hash(password, 7);
-
-    updateData.password = hash;
-  }
-
-  const result = await User.update(updateData, {
-    where: { id },
-  });
-
-  return result[0];
+const updateName = ({ id, name }) => {
+  return User.update({ name }, { where: { id } });
 };
 
-const changePassword = async ({ password, userId }) => {
+const updateEmail = ({ id, email }) => {
+  return User.update({ email }, { where: { id } });
+};
+
+const restorePassword = async ({ password, userId }) => {
   const user = await User.findByPk(userId);
 
   if (!user) {
@@ -77,8 +71,10 @@ const changePassword = async ({ password, userId }) => {
 
 module.exports = {
   create,
-  findByEmail,
+  findById,
   normalize,
-  changePassword,
-  update,
+  updateName,
+  updateEmail,
+  findByEmail,
+  restorePassword,
 };

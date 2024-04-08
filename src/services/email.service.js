@@ -51,8 +51,24 @@ async function sendResetPasswordLink(email, token) {
   });
 }
 
+async function sendNewEmailActivation(email, token) {
+  const link = `http://localhost:5173/user/confirm-emali/${token}`;
+
+  sendEmail({
+    subject: 'Email confirmation',
+    email,
+    text: 'Click link below to confirm email',
+    html: `
+    <h1>Email  confirmation</h1>
+    <p>Click link below to confirm email</p>
+    <a href="${link}">${link}</a>
+    `,
+  });
+}
+
 module.exports = {
-  sendActivationLink,
   sendEmail,
+  sendActivationLink,
   sendResetPasswordLink,
+  sendNewEmailActivation,
 };

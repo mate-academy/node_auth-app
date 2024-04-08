@@ -1,5 +1,6 @@
 const emailValidator = require('email-validator');
 const PasswordValidator = require('password-validator');
+const { ApiError } = require('../exeptions/apiError');
 
 const validateEmail = (email) => {
   if (!email) {
@@ -14,6 +15,8 @@ const validateEmail = (email) => {
 };
 
 const validatePassword = (password) => {
+  console.log(password);
+
   if (!password) {
     return 'Password is required';
   }
@@ -41,8 +44,21 @@ const validateName = (name) => {
   }
 };
 
+const comparePassword = (password1, password2) => {
+  const error = {
+    newPassword: validatePassword(password1),
+    newPasswordCopy: validatePassword(password2),
+    isEqual: password1 === password2 ? null : 'Passwords do not match.',
+  };
+
+  if (error.password1 || error.password2 || error.isEqual) {
+    throw ApiError.badRequest('Wrong passwods', error);
+  }
+};
+
 module.exports = {
-  validateEmail,
-  validatePassword,
   validateName,
+  validateEmail,
+  comparePassword,
+  validatePassword,
 };

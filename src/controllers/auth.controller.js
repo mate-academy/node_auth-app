@@ -116,17 +116,10 @@ const resetPassword = async (req, res) => {
   res.sendStatus(204);
 };
 
-const changePassword = async (req, res) => {
+const restorePassword = async (req, res) => {
   const { password, password2, resetToken } = req.body;
 
-  const error = {
-    password: validators.validatePassword(password),
-    password2: validators.validatePassword(password2),
-  };
-
-  if (error.password || error.password2) {
-    throw ApiError.badRequest('Error password', error);
-  }
+  validators.comparePassword(password, password2);
 
   const user = jwtService.verifyRefreshToken(resetToken);
 
@@ -135,7 +128,7 @@ const changePassword = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  await userService.changePassword({ password, userId: user.id });
+  await userService.restorePassword({ password, userId: user.id });
   await resetTokenService.remove(user.id);
   res.sendStatus(204);
 };
@@ -161,5 +154,5 @@ module.exports = {
   logout,
   refresh,
   resetPassword,
-  changePassword,
+  restorePassword,
 };
