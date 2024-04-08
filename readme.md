@@ -1,28 +1,26 @@
 # Auth application
-Implement an application that allows user to:
-- Register using name, email and password (only non authenticated)
-  - Inform the users about the rules for a password and check them
-  - send and activation email
-- Actvation page (only non authenticated)
-  - the user should be activated only after email confirmation
-  - redirect to Profile after the activation
-- Login with valid credentials (email and password) (only non authenticated)
-  - If user is not active ask them to activate their email
-  - Redirect to profile after login
-- Logout (only authenticated)
-  - Redirect to login after logging out
-- Password reset (only non authenticated)
-  - Ask for an email
-  - Show email sent page
-  - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
-  - Show Success page with a link to login
-- Profile page (only authenticated)
-  - You can change a name
-  - It allows to change a password (require an old one, `new password` and `confirmation`)
-  - To change an email you should type the password, confirm the new email and notify the old email about the change
-- 404 for all the other pages
 
-## (Optional) Advanced tasks
-- Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
-- Profile page should allow to add/remove any social account
-- Add authentication to your Accounting App
+## Description:
+This is the Node.js server side for authentication where the user has the option to register, login (also reset password and login), and log out of their account. All user data and their tokens are stored in the PostgreSQL database.
+
+Registration takes place in two stages: first, the user sends his name, email, and password (which is checked for validation) and then confirms his email by clicking on the link.
+It is not possible to register more than one user per e-mail. Logging in through a Google account is also implemented.
+
+When logging in, an access token and a refresh token are sent to the user for further confirmation of the user's authorization (the first is accepted in the body, the second in cookies).
+
+When the user is authorized, he has access to his account, where he can change his name, e-mail (after confirmation by e-mail), password (after confirmation of the old password), and can also log out of the account.
+
+## Extra technologies:
+1) Express.js
+2) Sequelize
+3) jsonwebtoken
+4) bcrypt
+5) passport
+6) nodemailer
+7) eslint
+8) uuid
+9) dotenv
+10) nodemon
+
+## Frontend repo:
+https://github.com/Soi4An/auth-app--frontend

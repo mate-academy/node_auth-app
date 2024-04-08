@@ -6,6 +6,7 @@ const nodemailer = require('nodemailer');
 const {
   DEF_MAIL_KEY_OPTIONS, DEF_MAIL_LINK_OPTIONS,
 } = require('../defaultConfig.js');
+const { createClientUrl } = require('../exceptions/createClientUrl.js');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -30,7 +31,7 @@ function sendActivationLink(
   email, token, options = DEF_MAIL_LINK_OPTIONS,
 ) {
   const { way, subject, htmlTitle } = options;
-  const link = `${process.env.CLIENT_URL}/#/${way}/${token}`;
+  const link = createClientUrl(`/${way}/${token}`);
 
   return send({
     email,
@@ -63,29 +64,6 @@ function sendActivationKey(
   });
 }
 
-function sendActivationEmailLink(
-  email, token, options = DEF_MAIL_LINK_OPTIONS,
-) {
-  const { way, subject, htmlTitle } = options;
-
-  const paramToken = `activationToken=${token}`;
-  const paramEmail = `newEmail=${email}`;
-
-  const link = `
-${process.env.CLIENT_URL}/#/${way}?${paramEmail}&${paramToken}`;
-
-  return send({
-    email,
-    subject,
-    html: `
-      <h1>${htmlTitle}</h1>
-      <p>Follow the link to confirm:</p>
-      <br/>
-      <a href="${link}">${link}</a>
-    `,
-  });
-}
-
 function sendChangeEmailNotification(oldEmail, newEmail) {
   return send({
     email: oldEmail,
@@ -101,7 +79,6 @@ const mail = {
   send,
   sendActivationLink,
   sendActivationKey,
-  sendActivationEmailLink,
   sendChangeEmailNotification,
 };
 

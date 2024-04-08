@@ -5,7 +5,7 @@ function name(value) {
     return 'Name is required';
   }
 
-  const namePattern = /^[a-zA-Z ]{2,20}$/;
+  const namePattern = /^[a-zA-Z](?:[a-zA-Z ]{0,18}[a-zA-Z])?$/;
 
   if (!namePattern.test(value)) {
     return 'Name is invalid (only letters, the length from 2 to 20)';
