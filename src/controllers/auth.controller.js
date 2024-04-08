@@ -67,6 +67,8 @@ const login = async (req, res) => {
   generateTokens(res, normalizedUser);
 };
 
+const google = async (req, res) => {};
+
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
   const user = jwtService.verifyRefreshToken(refreshToken);
@@ -152,6 +154,7 @@ module.exports = {
   activate,
   login,
   logout,
+  google,
   refresh,
   resetPassword,
   restorePassword,

@@ -15,8 +15,6 @@ const validateEmail = (email) => {
 };
 
 const validatePassword = (password) => {
-  console.log(password);
-
   if (!password) {
     return 'Password is required';
   }

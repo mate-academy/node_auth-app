@@ -1,6 +1,7 @@
 # IDE
 .idea
-.vscode
+.vscode.
+.env
 
 # Node
 node_modules

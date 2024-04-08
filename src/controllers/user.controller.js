@@ -105,9 +105,6 @@ const updateEmailRequest = async (req, res) => {
 
 const updateEmail = async (req, res) => {
   const { token } = req.params;
-
-  console.log('======');
-
   const user = jwtService.verifyEmailActivationToken(token);
 
   if (!user) {
