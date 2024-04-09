@@ -13,7 +13,7 @@ const errorMiddleware = (err, req, res, next) => {
   }
 
   res.statusCode = 500;
-  res.send({ message: 'Server error' });
+  res.send({ message: 'Server error', error: err.message });
 };
 
 module.exports = {

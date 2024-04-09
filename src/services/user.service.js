@@ -1,7 +1,8 @@
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
+
 const { ApiError } = require('../exeptions/apiError');
 const { User } = require('../models/user.model');
-const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcrypt');
 const emailService = require('../services/email.service.js');
 
 const normalize = ({ id, name, email }) => {
@@ -48,6 +49,22 @@ const create = async ({ name, email, password }) => {
   return normalize(newUser);
 };
 
+const findOrCreate = async (profile, field) => {
+  try {
+    const [user] = await User.findOrCreate({
+      where: { [field]: profile.id },
+      defaults: {
+        name: profile.displayName,
+        [field]: profile.id,
+      },
+    });
+
+    return user;
+  } catch (err) {
+    throw ApiError.badRequest('Data base error');
+  }
+};
+
 const updateName = ({ id, name }) => {
   return User.update({ name }, { where: { id } });
 };
@@ -76,5 +93,6 @@ module.exports = {
   updateName,
   updateEmail,
   findByEmail,
+  findOrCreate,
   restorePassword,
 };

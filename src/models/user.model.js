@@ -8,15 +8,23 @@ const User = sequelize.define('user', {
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: false,
     unique: true,
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
   },
   activation_token: {
     type: DataTypes.TEXT,
+  },
+  googleId: {
+    type: DataTypes.NUMBER,
+    allowNull: true,
+    unique: true,
+  },
+  gitHubId: {
+    type: DataTypes.NUMBER,
+    allowNull: true,
+    unique: true,
   },
 });
 

@@ -1,3 +1,5 @@
+require('dotenv/config');
+
 const bcrypt = require('bcrypt');
 const { User } = require('../models/user.model.js');
 const { ApiError } = require('../exeptions/apiError.js');
@@ -7,7 +9,6 @@ const jwtService = require('../services/jwt.service.js');
 const resetTokenService = require('../services/resetToken.service.js');
 const tokenService = require('../services/token.service.js');
 const validators = require('../helpers/validators.js');
-// const passport = require('passport');
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -68,11 +69,21 @@ const login = async (req, res) => {
   generateTokens(res, normalizedUser);
 };
 
-const googleRedirect = (req, res) => {
-  res.send('you reached the redirect URI');
+const loginFailed = (req, res) => {
+  throw ApiError.unauthorized();
+};
+
+const loginSussess = (req, res) => {
+  generateTokens(res, req.user);
 };
 
 const logout = async (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to log out' });
+    }
+  });
+
   const { refreshToken } = req.cookies;
   const user = jwtService.verifyRefreshToken(refreshToken);
 
@@ -153,13 +164,13 @@ const generateTokens = async (res, user) => {
 };
 
 module.exports = {
-  register,
-  activate,
   login,
   logout,
-  // google,
   refresh,
+  register,
+  activate,
+  loginFailed,
+  loginSussess,
   resetPassword,
-  googleRedirect,
   restorePassword,
 };
