@@ -64,6 +64,28 @@ function sendActivationKey(
   });
 }
 
+// function sendActivationEmailLink(
+//   email, token, options = DEF_MAIL_LINK_OPTIONS,
+// ) {
+//   const { way, subject, htmlTitle } = options;
+
+//   const paramToken = `activationToken=${token}`;
+//   const paramEmail = `newEmail=${email}`;
+
+//   const link = createClientUrl(`/${way}?${paramEmail}&${paramToken}`);
+
+//   return send({
+//     email,
+//     subject,
+//     html: `
+//       <h1>${htmlTitle}</h1>
+//       <p>Follow the link to confirm:</p>
+//       <br/>
+//       <a href="${link}">${link}</a>
+//     `,
+//   });
+// }
+
 function sendChangeEmailNotification(oldEmail, newEmail) {
   return send({
     email: oldEmail,
@@ -79,6 +101,7 @@ const mail = {
   send,
   sendActivationLink,
   sendActivationKey,
+  // sendActivationEmailLink,
   sendChangeEmailNotification,
 };
 
