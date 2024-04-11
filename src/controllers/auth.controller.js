@@ -12,11 +12,12 @@ const validators = require('../helpers/validators.js');
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
+  const { validateName, validateEmail, validatePassword } = validators;
 
   const error = {
-    name: validators.validateName(name),
-    email: validators.validateEmail(email),
-    password: validators.validatePassword(password),
+    name: validateName(name),
+    email: validateEmail(email),
+    password: validatePassword(password),
   };
 
   if (error.email || error.password || error.name) {
@@ -43,10 +44,11 @@ const activate = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
+  const { validateEmail, validatePassword } = validators;
 
   const error = {
-    email: validators.validateEmail(email),
-    password: validators.validatePassword(password),
+    email: validateEmail(email),
+    password: validatePassword(password),
   };
 
   if (error.email || error.password) {
@@ -66,15 +68,7 @@ const login = async (req, res) => {
 
   const normalizedUser = userService.normalize(user);
 
-  generateTokens(res, normalizedUser);
-};
-
-const loginFailed = (req, res) => {
-  throw ApiError.unauthorized();
-};
-
-const loginSussess = (req, res) => {
-  generateTokens(res, req.user);
+  jwtService.generateTokens(res, normalizedUser);
 };
 
 const logout = async (req, res) => {
@@ -104,7 +98,7 @@ const refresh = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  generateTokens(res, userService.normalize(userData));
+  jwtService.generateTokens(res, userService.normalize(userData));
 };
 
 const resetPassword = async (req, res) => {
@@ -149,28 +143,12 @@ const restorePassword = async (req, res) => {
   res.sendStatus(204);
 };
 
-const generateTokens = async (res, user) => {
-  const accessToken = jwtService.createAccessToken(user);
-  const refreshToken = jwtService.createRefreshToken(user);
-
-  await tokenService.save({ refreshToken, userId: user.id });
-
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    maxAge: 3600 * 24,
-    secure: true,
-  });
-  res.send({ user, accessToken });
-};
-
 module.exports = {
   login,
   logout,
   refresh,
   register,
   activate,
-  loginFailed,
-  loginSussess,
   resetPassword,
   restorePassword,
 };

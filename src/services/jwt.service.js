@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const tokenService = require('../services/token.service.js');
 
 require('dotenv/config');
 
@@ -44,6 +45,20 @@ const verifyEmailActivationToken = (token) => {
   }
 };
 
+const generateTokens = async (res, user) => {
+  const accessToken = createAccessToken(user);
+  const refreshToken = createRefreshToken(user);
+
+  await tokenService.save({ refreshToken, userId: user.id });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    maxAge: 3600 * 24,
+    secure: true,
+  });
+  res.send({ user, accessToken });
+};
+
 module.exports = {
   createAccessToken,
   createRefreshToken,
@@ -51,4 +66,5 @@ module.exports = {
   verifyAccessToken,
   verifyRefreshToken,
   verifyEmailActivationToken,
+  generateTokens,
 };

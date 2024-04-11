@@ -9,8 +9,6 @@ const authRouter = express.Router();
 authRouter.post('/registration', catchError(authController.register));
 authRouter.get('/activation/:token', catchError(authController.activate));
 authRouter.post('/login', catchError(authController.login));
-authRouter.get('/login/failed', authController.loginFailed);
-authRouter.get('/login/success', authController.loginSussess);
 authRouter.post('/logout', catchError(authController.logout));
 authRouter.get('/refresh', catchError(authController.refresh));
 authRouter.post('/reset-password', catchError(authController.resetPassword));
@@ -26,7 +24,7 @@ authRouter.get(
   '/auth/google/callback',
   passport.authenticate('google', {
     successRedirect: process.env.CLIENT_URL,
-    failureRedirect: '/login/failed',
+    failureRedirect: process.env.CLIENT_URL + '/login',
   }),
 );
 

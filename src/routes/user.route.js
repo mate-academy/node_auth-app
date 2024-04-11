@@ -4,27 +4,28 @@ const userController = require('../controllers/user.controller.js');
 const { authMiddleware } = require('../middlewars/authMiddleware.js');
 
 const userRoute = Router();
+const ROOT = '/user';
 
 userRoute.patch(
-  '/update-name',
+  ROOT + '/update-name',
   authMiddleware,
   catchError(userController.updateName),
 );
 
 userRoute.patch(
-  '/update-password',
+  ROOT + '/update-password',
   authMiddleware,
   catchError(userController.updatePassword),
 );
 
 userRoute.patch(
-  '/update-email-request',
+  ROOT + '/update-email-request',
   authMiddleware,
   catchError(userController.updateEmailRequest),
 );
 
 userRoute.patch(
-  '/update-email/:token',
+  ROOT + '/update-email/:token',
   authMiddleware,
   catchError(userController.updateEmail),
 );

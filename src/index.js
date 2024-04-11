@@ -40,7 +40,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(authRouter);
-app.use('/user', userRoute);
+app.use(userRoute);
 app.use(defaultRoute);
 app.use(errorMiddleware);
 
