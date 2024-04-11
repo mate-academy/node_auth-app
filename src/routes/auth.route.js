@@ -28,9 +28,6 @@ authRouter.get(
     successRedirect: process.env.CLIENT_URL,
     failureRedirect: '/login/failed',
   }),
-  // (req, res) => {
-  //   res.redirect('http://localhost:5173/profile');
-  // },
 );
 
 authRouter.get(
