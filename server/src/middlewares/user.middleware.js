@@ -8,11 +8,13 @@ function checkIsAuthorized(req, res, next) {
   const [, token] = authorization.split(" ");
 
   if (!token || !authorization) {
+    // #swagger.responses[401] = { description: 'Unauthorized'}
     throw ApiError.Unauthorized();
   }
   const userData = jwtService.verifyToken(token);
 
   if (!userData) {
+    // #swagger.responses[401] = { description: 'Unauthorized'}
     throw ApiError.Unauthorized();
   }
 

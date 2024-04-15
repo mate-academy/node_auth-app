@@ -14,7 +14,7 @@ class ApiError extends Error {
     return new ApiError(401, "User is not authorized");
   }
 
-  static FORBIDDEN() {
+  static Forbidden() {
     return new ApiError(403, "User is not activated yet");
   }
 

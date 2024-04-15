@@ -11,7 +11,8 @@
     "test:only": "mate-scripts test",
     "update": "mate-scripts update",
     "postinstall": "npm run update",
-    "test": "npm run lint && npm run test:only"
+    "test": "npm run lint && npm run test:only",
+    "swagger-autogen": "node swagger.js"
   },
   "author": "Mate academy",
   "license": "GPL-3.0",
@@ -28,6 +29,7 @@
     "projectType": "javascript"
   },
   "dependencies": {
+    "and": "^0.0.3",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -38,6 +40,8 @@
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.36.0",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.0",
     "uuid": "^9.0.1"
   }
 }

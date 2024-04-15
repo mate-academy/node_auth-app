@@ -8,7 +8,10 @@ const userRouter = new express.Router();
 userRouter.get(
   "/users",
   userMiddleware.checkIsAuthorized,
-  catchError(userControler.getAllActivated)
+  catchError(
+    userControler.getAllActivated
+    // #swagger.description = 'Return all activated users.'
+  )
 );
 
 module.exports = userRouter;

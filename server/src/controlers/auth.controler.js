@@ -6,11 +6,6 @@ const emailService = require("../services/email.services");
 const { v4 } = require("uuid");
 const bcrypt = require("bcrypt");
 
-const getAll = async (req, res) => {
-  const users = await authService.getAll();
-  res.send(users);
-};
-
 const register = async (req, res) => {
   const { email, password } = req.body;
 
@@ -18,6 +13,7 @@ const register = async (req, res) => {
 
   await authService.register(email, hashedPassword);
 
+  // #swagger.responses[200] = { description: 'Success' }
   res.send({ message: "OK" });
 };
 
@@ -27,12 +23,14 @@ const activate = async (req, res) => {
   const user = await authService.getByActivationToken(activationToken);
 
   if (!user) {
+    // #swagger.responses[404] = { description: 'NotFound' }
     throw ApiError.NotFound();
   }
 
   user.activationToken = null;
   await user.save();
 
+  // #swagger.responses[200] = { description: 'Success' }
   res.send({ message: "OK" });
 };
 
@@ -42,21 +40,25 @@ const login = async (req, res) => {
   const user = await authService.getByEmail(email);
 
   if (!user) {
+    // #swagger.responses[400] = { description: 'BadRequest' }
     throw ApiError.BadRequest("No such user");
   }
 
   if (user.activationToken) {
-    throw ApiError.FORBIDDEN();
+    // #swagger.responses[403] = { description: 'Forbidden' }
+    throw ApiError.Forbidden();
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
+    // #swagger.responses[400] = { description: 'BadRequest' }
     throw ApiError.BadRequest("Wrong password", {
       password: "Wrong password",
     });
   }
 
+  // #swagger.responses[200] = { description: 'Success' }
   generateTokens(res, user);
 };
 
@@ -66,6 +68,7 @@ const sendEmailForPasswordReset = async (req, res) => {
   const existUser = await authService.getByEmail(email);
 
   if (!existUser) {
+    // #swagger.responses[400] = { description: 'BadRequest' }
     throw ApiError.BadRequest("User with this email is not exist");
   }
 
@@ -77,6 +80,7 @@ const sendEmailForPasswordReset = async (req, res) => {
   await existUser.save();
 
   res.send({ message: "link to reset password was sent" });
+  // #swagger.responses[200] = { description: 'Success' }
 };
 
 const checkResetPasswordToken = async (req, res) => {
@@ -85,6 +89,7 @@ const checkResetPasswordToken = async (req, res) => {
   await authService.verifyResetPasswordTokenInDB(resetPasswordToken);
 
   res.send({ message: "OK" });
+  // #swagger.responses[200] = { description: 'Success' }
 };
 
 const resetPassword = async (req, res) => {
@@ -99,6 +104,7 @@ const resetPassword = async (req, res) => {
   const isPasswordAlreadyUsed = await bcrypt.compare(password, user.password);
 
   if (isPasswordAlreadyUsed) {
+    // #swagger.responses[400] = { description: 'BadRequest' }
     throw ApiError.BadRequest(
       "This password is already in use. Please choose a different one."
     );
@@ -109,6 +115,7 @@ const resetPassword = async (req, res) => {
   await user.save();
 
   res.send({ message: "OK" });
+  // #swagger.responses[200] = { description: 'Success' }
 };
 
 const logout = async (req, res) => {
@@ -117,12 +124,14 @@ const logout = async (req, res) => {
   const userData = jwtService.verifyRefreshToken(refreshToken);
 
   if (!userData || !refreshToken) {
+    // #swagger.responses[401] = { description: 'Unauthorized' }
     throw ApiError.Unauthorized();
   }
 
   await tokenService.remove(userData.id);
 
   res.cookie("refreshToken", "", { maxAge: 0 });
+  // #swagger.responses[204] = { description: 'Success' }
   res.sendStatus(204);
 };
 
@@ -133,12 +142,14 @@ const refresh = async (req, res) => {
   const token = tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
+    // #swagger.responses[401] = { description: 'Unauthorized' }
     throw ApiError.Unauthorized();
   }
 
   const user = await authService.getByEmail(userData.email);
 
   generateTokens(res, user);
+  // #swagger.responses[200] = { description: 'Success' }
 };
 
 const generateTokens = async (res, user) => {
@@ -163,7 +174,6 @@ const generateTokens = async (res, user) => {
 };
 
 module.exports = {
-  getAll,
   register,
   activate,
   login,
