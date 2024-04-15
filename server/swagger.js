@@ -1,32 +1,38 @@
-const swaggerAutogen = require("swagger-autogen")();
+const swaggerAutogen = require("swagger-autogen")({ openapi: "3.0.0" });
 
 const doc = {
   info: {
-    title: "Users Rest API",
+    title: "Auth/Users Rest API",
   },
   host: "localhost:5000",
-  //   responses: {
-  //     200: {
-  //       description: "Success",
-  //       content: {
-  //         "application/json": {
-  //           schema: {
-  //             // описание схемы успешного ответа, если необходимо
-  //           },
-  //         },
-  //       },
-  //     },
-  //     default: {
-  //       description: "Default response",
-  //       content: {
-  //         "application/json": {
-  //           schema: {
-  //             // описание схемы ответа по умолчанию, если необходимо
-  //           },
-  //         },
-  //       },
-  //     },
-  //   },
+  components: {
+    schemas: {
+      User: {
+        type: "object",
+        properties: {
+          id: {
+            type: "integer",
+            format: "int32",
+          },
+          email: {
+            type: "string",
+            format: "email",
+          },
+        },
+      },
+      UserWithAccessToken: {
+        type: "object",
+        properties: {
+          user: {
+            $ref: "#/components/schemas/User",
+          },
+          accessToken: {
+            type: "string",
+          },
+        },
+      },
+    },
+  },
 };
 
 const outputFile = "./swagger_output.json";

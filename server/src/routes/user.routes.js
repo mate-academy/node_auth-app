@@ -11,6 +11,24 @@ userRouter.get(
   catchError(
     userControler.getAllActivated
     // #swagger.description = 'Return all activated users.'
+
+    /* #swagger.responses[200] = {
+        description: "Success",
+        content: {
+          "application/json": {
+            schema:{
+              $ref: "#/components/schemas/User"
+            },
+            example: {
+              id: 1,
+              email: "test@test.com",
+            },
+          }           
+        }
+      }   
+    */
+
+    // #swagger.responses[401] = { description: 'Unauthorized'}
   )
 );
 
