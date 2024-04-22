@@ -57,7 +57,7 @@ const forgotPassword = async (user) => {
   await EmailService.sendResetPasswordLink(user.email, activationToken);
 };
 
-async function resetPassword(activationToken, password) {
+const resetPassword = async (activationToken, password) => {
   const user = await getByQuery({ activationToken });
 
   if (!user) {
@@ -69,9 +69,14 @@ async function resetPassword(activationToken, password) {
   user.activationToken = null;
   user.password = hashedPassword;
   await user.save();
-}
+};
 
-async function changePassword(email, oldPassword, newPassword, confirmation) {
+const changePassword = async (
+  email,
+  oldPassword,
+  newPassword,
+  confirmation,
+) => {
   const user = await getByQuery({ email });
 
   if (!user) {
@@ -94,9 +99,9 @@ async function changePassword(email, oldPassword, newPassword, confirmation) {
   user.password = await createHash(newPassword);
 
   await user.save();
-}
+};
 
-async function updateEmailRequest(user, newEmail) {
+const updateEmailRequest = async (user, newEmail) => {
   const activationToken = v4();
 
   user.activationToken = activationToken;
@@ -104,9 +109,9 @@ async function updateEmailRequest(user, newEmail) {
 
   await user.save();
   await EmailService.sendNewEmailActivation(newEmail, activationToken);
-}
+};
 
-async function updateEmailService(activationToken) {
+const updateEmailService = async (activationToken) => {
   const user = await getByQuery({ activationToken });
 
   if (!user) {
@@ -115,7 +120,7 @@ async function updateEmailService(activationToken) {
 
   user.activationToken = null;
   await user.save();
-}
+};
 
 const normalize = ({ id, email, name }) => {
   return {

@@ -82,7 +82,7 @@ const updateEmail = async (req, res) => {
   res.sendStatus(200);
 };
 
-async function updateEmailConfirm(req, res) {
+const updateEmailConfirm = async (req, res) => {
   const { activationToken } = req.params;
 
   const user = await UsersService.getByQuery({ activationToken });
@@ -94,7 +94,7 @@ async function updateEmailConfirm(req, res) {
   await UsersService.updateEmailService(activationToken);
 
   res.status(204);
-}
+};
 
 module.exports = {
   UsersController: {

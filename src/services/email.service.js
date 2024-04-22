@@ -22,7 +22,7 @@ const send = async ({ email, subject, html }) => {
   });
 };
 
-async function sendActivationEmail(email, token) {
+const sendActivationEmail = async (email, token) => {
   const href = `${CLIENT_HOST}/activation/${token}`;
 
   await send({
@@ -31,9 +31,9 @@ async function sendActivationEmail(email, token) {
     html: `<h1>Activate account</h1>
     <a href=${href}>${href}</a>`,
   });
-}
+};
 
-async function sendResetPasswordLink(email, token) {
+const sendResetPasswordLink = async (email, token) => {
   const href = `${CLIENT_HOST}/change-password/${token}`;
 
   await send({
@@ -42,18 +42,18 @@ async function sendResetPasswordLink(email, token) {
     html: `<h1>Change password</h1>
     <a href="${href}">${href}</a>`,
   });
-}
+};
 
-async function sendNewEmailActivation(email, token) {
+const sendNewEmailActivation = async (email, token) => {
   const href = `${CLIENT_HOST}/change-email/${token}`;
 
-  send({
+  await send({
     subject: 'Email confirmation',
     email,
     html: `<h1>Email confirmation</h1>
     <a href="${href}">${href}</a>`,
   });
-}
+};
 
 module.exports = {
   EmailService: {

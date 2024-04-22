@@ -1,34 +1,34 @@
 const jwt = require('jsonwebtoken');
 
-function sign(user) {
+const sign = (user) => {
   const token = jwt.sign(user, process.env.JWT_KEY, {
     expiresIn: 60 * 60,
   });
 
   return token;
-}
+};
 
-function verify(token) {
+const verify = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_KEY);
   } catch (error) {
     return null;
   }
-}
+};
 
-function signRefresh(user) {
+const signRefresh = (user) => {
   const token = jwt.sign(user, process.env.JWT_REFRESH_KEY);
 
   return token;
-}
+};
 
-function verifyRefresh(token) {
+const verifyRefresh = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_KEY);
   } catch (error) {
     return null;
   }
-}
+};
 
 module.exports = {
   JwtService: {

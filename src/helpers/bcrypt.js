@@ -1,10 +1,10 @@
 const bcrypt = require('bcrypt');
 
-function createHash(password) {
+const createHash = (password) => {
   return bcrypt.hash(password, Number(process.env.SALT));
-}
+};
 
-async function compare(password, hashedPassword) {
+const compare = async (password, hashedPassword) => {
   const isValid = await bcrypt.compare(password, hashedPassword);
 
   if (!isValid) {
@@ -12,7 +12,7 @@ async function compare(password, hashedPassword) {
   }
 
   return isValid;
-}
+};
 
 module.exports = {
   createHash,

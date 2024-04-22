@@ -134,7 +134,7 @@ const forgotPassword = async (req, res) => {
   res.sendStatus(200);
 };
 
-async function resetPassword(req, res) {
+const resetPassword = async (req, res) => {
   const { activationToken } = req.params;
 
   const { password, confirmation } = req.body;
@@ -154,7 +154,7 @@ async function resetPassword(req, res) {
   await UsersService.resetPassword(activationToken, password);
 
   res.sendStatus(200);
-}
+};
 
 module.exports = {
   AuthController: {
