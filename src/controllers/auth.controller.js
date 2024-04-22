@@ -4,7 +4,7 @@ const { JwtService } = require('../services/jwt.service');
 const { ValidatorHelper } = require('../helpers/validator');
 const { ApiError } = require('../exceptions/api.error');
 const { TokenService } = require('../services/token.service');
-const { compare, createHash } = require('../helpers/bcrypt');
+const { bcryptHelper } = require('../helpers/bcrypt');
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -19,7 +19,7 @@ const register = async (req, res) => {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const hashedPassword = await createHash(password);
+  const hashedPassword = await bcryptHelper.createHash(password);
 
   const newUser = await UsersService.create(email, hashedPassword, name);
 
@@ -65,7 +65,7 @@ const login = async (req, res) => {
     throw ApiError.badRequest(ERRORS.UNACTIVATED_ACCOUNT);
   }
 
-  const isPasswordValid = await compare(password, user.password);
+  const isPasswordValid = await bcryptHelper.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.badRequest(ERRORS.INCORRECT_EMAIL_PASSWORD);

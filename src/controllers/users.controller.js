@@ -1,5 +1,6 @@
 const { ERRORS } = require('../const/errors');
 const { ApiError } = require('../exceptions/api.error');
+const { bcryptHelper } = require('../helpers/bcrypt');
 const { ValidatorHelper } = require('../helpers/validator');
 const { UsersService } = require('../services/users.service');
 
@@ -53,6 +54,21 @@ const updateUser = async (req, res) => {
 const updatePassword = async (req, res) => {
   const { id } = req.params;
   const { oldPassword, newPassword, confirmation } = req.body;
+
+  const user = getUserById(id);
+
+  const isValid = await bcryptHelper.compare(oldPassword, user.password);
+
+  const errors = {
+    oldPassword: isValid,
+    newPassword: ValidatorHelper.validatePassword(newPassword),
+    confirmation:
+      newPassword !== confirmation ? ERRORS.PASSWORDS_DO_NOT_MATCH : null,
+  };
+
+  if (errors.oldPassword || errors.newPassword || errors.confirmation) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
 
   await UsersService.changePassword(id, oldPassword, newPassword, confirmation);
 

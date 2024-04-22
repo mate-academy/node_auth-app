@@ -15,6 +15,8 @@ const compare = async (password, hashedPassword) => {
 };
 
 module.exports = {
-  createHash,
-  compare,
+  bcryptHelper: {
+    createHash,
+    compare,
+  },
 };

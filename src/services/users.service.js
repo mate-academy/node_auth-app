@@ -4,8 +4,7 @@ const { ApiError } = require('../exceptions/api.error');
 const { User } = require('../models/User.model');
 const { EmailService } = require('./email.service');
 const { ERRORS } = require('../const/errors');
-const { ValidatorHelper } = require('../helpers/validator');
-const { createHash, compare } = require('../helpers/bcrypt');
+const { bcryptHelper } = require('../helpers/bcrypt');
 
 const getAll = () => {
   return User.findAll({
@@ -64,39 +63,21 @@ const resetPassword = async (activationToken, password) => {
     throw ApiError.NotFound(ERRORS.USER_NOT_FOUND);
   }
 
-  const hashedPassword = await createHash(password);
+  const hashedPassword = await bcryptHelper.createHash(password);
 
   user.activationToken = null;
   user.password = hashedPassword;
   await user.save();
 };
 
-const changePassword = async (
-  email,
-  oldPassword,
-  newPassword,
-  confirmation,
-) => {
+const changePassword = async (email, newPassword) => {
   const user = await getByQuery({ email });
 
   if (!user) {
     throw ApiError.NotFound('user');
   }
 
-  const isValid = await compare(oldPassword, user.password);
-
-  const errors = {
-    oldPassword: isValid,
-    newPassword: ValidatorHelper.validatePassword(newPassword),
-    confirmation:
-      newPassword !== confirmation ? ERRORS.PASSWORDS_DO_NOT_MATCH : null,
-  };
-
-  if (errors.oldPassword || errors.newPassword || errors.confirmation) {
-    throw ApiError.BadRequest('Validation error', errors);
-  }
-
-  user.password = await createHash(newPassword);
+  user.password = await bcryptHelper.createHash(newPassword);
 
   await user.save();
 };
