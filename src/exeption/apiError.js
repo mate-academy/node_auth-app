@@ -31,6 +31,14 @@ class ApiError extends Error {
       status: 404,
     });
   }
+
+  static serverError(errors) {
+    return new ApiError({
+      massage: 'server error',
+      errors,
+      status: 500,
+    });
+  }
 };
 
 module.exports = {

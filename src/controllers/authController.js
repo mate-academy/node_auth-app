@@ -11,17 +11,11 @@ const validate = require('../utils/validate.js');
 const register = async(req, res) => {
   const { name, email, password } = req.body;
 
-  const errors = {
-    email: validate.email(email),
-    password: validate.password(password),
-    name: validate.username(name),
-  };
-
-  if (!errors.email || !errors.password || !errors.name) {
-    throw ApiError.badRequest('Bad requst', errors);
+  try {
+    await userSevices.register(name, email, password);
+  } catch (error) {
+    throw ApiError.serverError(error);
   }
-
-  await userSevices.register(name, email, password);
 
   res.send({ message: 'OK' });
 };

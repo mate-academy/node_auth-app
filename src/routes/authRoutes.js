@@ -3,10 +3,15 @@
 const express = require('express');
 const authController = require('../controllers/authController.js');
 const { catchError } = require('../utils/catchError.js');
+const { validRegMiddlewere } = require('../middlewares/authMiddleware.js');
 
 const authRouter = new express.Router();
 
-authRouter.post('/registration', catchError(authController.register));
+authRouter.post(
+  '/registration',
+  validRegMiddlewere,
+  catchError(authController.register)
+);
 
 authRouter.get(
   '/activation/:activationToken',
