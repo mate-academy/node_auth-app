@@ -22,18 +22,23 @@ const register = async(req, res) => {
 
 const activate = async(req, res) => {
   const { activationToken } = req.params;
-  const user = await User.findOne({ where: { activationToken } });
 
-  if (!user) {
-    res.sendStatus(404);
+  try {
+    const user = await User.findOne({ where: { activationToken } });
 
-    return;
+    if (!user) {
+      res.sendStatus(404);
+
+      return;
+    }
+
+    user.activationToken = null;
+    user.save();
+
+    res.send(user);
+  } catch (error) {
+    throw ApiError.serverError(error);
   }
-
-  user.activationToken = null;
-  user.save();
-
-  res.send(user);
 };
 
 const generateToken = async(res, user) => {
@@ -41,7 +46,11 @@ const generateToken = async(res, user) => {
   const accessToken = jwtServices.sign(normalizedUser);
   const refrashToken = jwtServices.signRefresh(normalizedUser);
 
-  await tokenSevices.save(normalizedUser.id, refrashToken);
+  try {
+    await tokenSevices.save(normalizedUser.id, refrashToken);
+  } catch (error) {
+    throw ApiError.serverError(error);
+  }
 
   res.cookie('refrashToken', refrashToken, {
     maxAge: 30 * 24 * 60 * 60 * 100,
@@ -57,34 +66,42 @@ const generateToken = async(res, user) => {
 const login = async(req, res) => {
   const { email, password } = req.body;
 
-  const user = await userSevices.findByEmail(email);
+  try {
+    const user = await userSevices.findByEmail(email);
 
-  if (!user) {
-    throw ApiError.badRequest('No such user');
+    if (!user) {
+      throw ApiError.badRequest('No such user');
+    }
+
+    const isPasswordValid = bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw ApiError.badRequest('Wrong password');
+    };
+
+    await generateToken(res, user);
+  } catch (error) {
+    throw ApiError.serverError(error);
   }
-
-  const isPasswordValid = bcrypt.compare(password, user.password);
-
-  if (!isPasswordValid) {
-    throw ApiError.badRequest('Wrong password');
-  };
-
-  await generateToken(res, user);
 };
 
 const refresh = async(req, res) => {
   const { refreshToken } = req.cookies;
 
-  const userData = await jwtServices.verifyRefresh(refreshToken);
-  const token = await tokenSevices.getByToken(refreshToken);
+  try {
+    const userData = await jwtServices.verifyRefresh(refreshToken);
+    const token = await tokenSevices.getByToken(refreshToken);
 
-  if (!userData || !token) {
-    throw ApiError.unauthorization();
+    if (!userData || !token) {
+      throw ApiError.unauthorization();
+    }
+
+    const user = await userSevices.findByEmail(userData.email);
+
+    await generateToken(res, user);
+  } catch (error) {
+    throw ApiError.serverError(error);
   }
-
-  const user = await userSevices.findByEmail(userData.email);
-
-  await generateToken(res, user);
 };
 
 const logout = async(req, res) => {
@@ -103,7 +120,11 @@ const logout = async(req, res) => {
 const resetPass = async(req, res) => {
   const { email } = req.body;
 
-  await userSevices.resetPassword(email);
+  try {
+    await userSevices.resetPassword(email);
+  } catch (error) {
+    throw ApiError.serverError(error);
+  }
 
   res.send({ message: 'OK' });
 };
@@ -112,31 +133,35 @@ const setPassword = async(req, res) => {
   const { resetToken } = req.params;
   const { newPassword, confirmation } = req.body;
 
-  const user = await User.findOne({ where: { resetToken } });
+  try {
+    const user = await User.findOne({ where: { resetToken } });
 
-  if (!user) {
-    res.sendStatus(404);
+    if (!user) {
+      res.sendStatus(404);
 
-    return;
+      return;
+    }
+
+    const isValidNewPassword = validate.newPassword(
+      user.password,
+      newPassword,
+      confirmation
+    );
+
+    if (isValidNewPassword) {
+      throw ApiError.badRequest('Validation error', { isValidNewPassword });
+    }
+
+    const hashedNewPas = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedNewPas;
+    user.resetToken = null;
+    user.save();
+
+    res.send(userSevices.normalize(user));
+  } catch (error) {
+    throw ApiError.serverError(error);
   }
-
-  const isValidNewPassword = validate.newPassword(
-    user.password,
-    newPassword,
-    confirmation
-  );
-
-  if (isValidNewPassword) {
-    throw ApiError.badRequest('Validation error', { isValidNewPassword });
-  }
-
-  const hashedNewPas = await bcrypt.hash(newPassword, 10);
-
-  user.password = hashedNewPas;
-  user.resetToken = null;
-  user.save();
-
-  res.send(userSevices.normalize(user));
 };
 
 module.exports = {
