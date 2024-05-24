@@ -52,10 +52,18 @@ const updateName = async (id, name) => {
   return user;
 };
 
+const updatePassword = async (id, password) => {
+  const user = await getById(id);
+
+  user.password = await bcrypt.hash(password, 10);
+  await user.save();
+};
+
 export default {
   register,
   getByEmail,
   getById,
   normalize,
   updateName,
+  updatePassword,
 };

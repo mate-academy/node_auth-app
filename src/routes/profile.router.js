@@ -6,3 +6,4 @@ export const profileRouter = express.Router();
 
 profileRouter.get('/', catchError(profileController.get));
 profileRouter.put('/name', catchError(profileController.updateName));
+profileRouter.put('/password', catchError(profileController.updatePassword));

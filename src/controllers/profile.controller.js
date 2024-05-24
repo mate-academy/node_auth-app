@@ -1,6 +1,11 @@
 import { ApiError } from '../exeptions/apiError.js';
 import userService from '../services/user.service.js';
-import { validateName } from '../utils/validation.js';
+import {
+  validateName,
+  validatePassword,
+  validateConfirmPassword,
+} from '../utils/validation.js';
+import bcrypt from 'bcrypt';
 
 const get = async (req, res) => {
   const user = await userService.getById(req.userId);
@@ -28,7 +33,34 @@ const updateName = async (req, res) => {
   res.status(200).send(userService.normalize(user));
 };
 
+const updatePassword = async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  const errors = {
+    oldPassword: validatePassword(oldPassword),
+    newPassword: validatePassword(newPassword),
+    confirmPassword: validateConfirmPassword(newPassword, confirmPassword),
+  };
+
+  if (errors.oldPassword || errors.newPassword || errors.confirmPassword) {
+    throw ApiError.BadRequest('validation error', errors);
+  }
+
+  const user = await userService.getById(req.userId);
+  const isValidOldPassword = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isValidOldPassword) {
+    throw ApiError.BadRequest('Validation error', {
+      oldPassword: 'Password is wrong',
+    });
+  }
+
+  await userService.updatePassword(req.userId, newPassword);
+  res.status(200).send('Password changed successfully');
+};
+
 export default {
   get,
   updateName,
+  updatePassword,
 };

@@ -25,3 +25,17 @@ export const validatePassword = (value) => {
     return 'At least 6 characters';
   }
 };
+
+export const validateConfirmPassword = (value, confirmation) => {
+  if (!confirmation) {
+    return 'Confirmation is required';
+  }
+
+  if (value.length < 6) {
+    return 'At least 6 characters';
+  }
+
+  if (value !== confirmation) {
+    return 'Do not match';
+  }
+};
