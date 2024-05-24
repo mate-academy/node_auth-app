@@ -5,7 +5,9 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 import { authRouter } from './routes/auth.router.js';
+import { profileRouter } from './routes/profile.router.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
+import { authMiddleware } from './middlewares/authMiddleware.js';
 
 const app = express();
 
@@ -20,6 +22,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 app.use(authRouter);
+app.use('/profile', authMiddleware, profileRouter);
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {

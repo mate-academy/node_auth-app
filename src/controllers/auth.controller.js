@@ -4,34 +4,11 @@ import jwtService from '../services/jwt.service.js';
 import tokenService from '../services/token.service.js';
 import userService from '../services/user.service.js';
 import bcrypt from 'bcrypt';
-
-const validateEmail = (value) => {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-};
-
-const validateName = (value) => {
-  if (!value) {
-    return 'Name is required';
-  }
-};
-
-const validatePassword = (value) => {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-};
+import {
+  validateEmail,
+  validateName,
+  validatePassword,
+} from '../utils/validation.js';
 
 const register = async (req, res) => {
   const { email, name, password } = req.body;
@@ -104,6 +81,7 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
+
   res.clearCookie('refreshToken');
 
   const userData = jwtService.verifyRefreshToken(refreshToken);

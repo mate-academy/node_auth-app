@@ -5,6 +5,7 @@ const save = async (userId, refreshToken) => {
 
   if (token) {
     token.refreshToken = refreshToken;
+
     return token.save();
   }
 

@@ -8,6 +8,10 @@ const getByEmail = (email) => {
   return User.findOne({ where: { email } });
 };
 
+const getById = (id) => {
+  return User.findOne({ where: { id } });
+};
+
 const normalize = ({ name, email, id }) => {
   return {
     name,
@@ -38,8 +42,20 @@ const register = async ({ email, name, password }) => {
   await emailService.sendActivationLink(email, activationToken);
 };
 
+const updateName = async (id, name) => {
+  const user = await getById(id);
+
+  user.name = name;
+
+  await user.save();
+
+  return user;
+};
+
 export default {
   register,
   getByEmail,
+  getById,
   normalize,
+  updateName,
 };
