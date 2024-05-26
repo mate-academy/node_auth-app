@@ -42,9 +42,34 @@ function getPrivatekey(type) {
   }
 }
 
+function verifyActivationToken(token) {
+  return verifyToken(token, 'activate');
+}
+
+function verifyAccssesRefreshTokens(accessToken, refreshToken) {
+  const resultOfAccessToken = verifyToken(accessToken, 'access');
+  const resultOfrefreshToken = verifyToken(refreshToken, 'refresh');
+
+  if (!resultOfAccessToken && !resultOfrefreshToken) {
+    throw ApiError.unauthorized({ message: 'user not logged in' });
+  }
+
+  return [resultOfAccessToken, resultOfrefreshToken];
+}
+
+function generateTokens() {
+  const accessToken = getToken({}, 'access', { expiresIn: '360s' });
+  const refreshToken = getToken({}, 'refresh', { expiresIn: '3600s' });
+
+  return [accessToken, refreshToken];
+}
+
 module.exports = {
   token: {
     getToken,
     verifyToken,
+    verifyActivationToken,
+    verifyAccssesRefreshTokens,
   },
+  generateTokens,
 };

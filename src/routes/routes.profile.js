@@ -3,16 +3,16 @@
 const express = require('express');
 const { authController } = require('../controllers/auth.controller');
 const { profileController } = require('../controllers/profile.controller');
-const { errorWrapperAsync } = require('../middleware/errorWrapperAsync');
+const { errorWrapper } = require('../middleware/errorWrapper');
 
-const routeProfile = new express.Router();
+const profileRoutes = new express.Router();
 
-routeProfile.get(
+profileRoutes.get(
   '/:userId',
-  errorWrapperAsync(authController.authenticateToken),
-  errorWrapperAsync(profileController.getProfile),
+  errorWrapper(authController.authenticateToken),
+  errorWrapper(profileController.getProfile),
 );
 
 module.exports = {
-  routeProfile,
+  profileRoutes,
 };

@@ -1,22 +1,23 @@
 'use strict';
 
 const { ApiError } = require('../exeptions/api.error');
-const { User } = require('../models/user.model');
 const { isValidatedEmail } = require('../utils/isValidatedEmail.js');
 const { isValidatedPassword } = require('../utils/isValidatedPassword.js');
-const { sendMail } = require('../services/sendMail.js');
-const { token } = require('../services/token.js');
-const bcrypt = require('bcrypt');
+const {
+  findUserById,
+  getHashPassword,
+  comparePassword,
+} = require('../services/user.service');
+const {
+  sendActivationEmail,
+  sendNotificationEmail,
+} = require('../services/mail.service.js');
 
 async function postName(req, res) {
   const { userId } = req.params;
   const { newName } = req.body;
 
-  const user = await User.findByPk(userId);
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
+  const user = await findUserById(userId);
 
   if (!newName || newName.trim() === '') {
     throw ApiError.badRequest({ message: 'Name is invalid' });
@@ -32,28 +33,14 @@ async function postEmail(req, res) {
   const { userId } = req.params;
   const { newEmail } = req.body;
 
-  const user = await User.findByPk(userId);
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
+  const user = await findUserById(userId);
 
   if (!newEmail || !isValidatedEmail(newEmail)) {
     throw ApiError.badRequest({ message: 'Email is invalid' });
   }
 
-  const payload = { name: user.name, email: newEmail };
-  const activateToken = token.getToken(payload, 'activate');
-
-  const url = `http://localhost:3005/activation/${activateToken}`;
-
-  await sendMail(newEmail, url);
-
-  await sendMail(newEmail, url, {
-    message: `Your email has been changed successfully on ${newEmail}`,
-    subject: 'notification',
-    status: true,
-  });
+  await sendActivationEmail(newEmail, user.name);
+  await sendNotificationEmail(user.email);
 
   user.email = newEmail;
   user.isActive = false;
@@ -66,11 +53,7 @@ async function postPassword(req, res) {
   const { userId } = req.params;
   const { oldPassword, newPassword, confirmPassword } = req.body;
 
-  const user = await User.findByPk(userId);
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
+  const user = await findUserById(userId);
 
   if (
     !newPassword ||
@@ -84,13 +67,13 @@ async function postPassword(req, res) {
     throw ApiError.badRequest({ message: 'password is equal to old password' });
   }
 
-  const result = await bcrypt.compare(oldPassword, user.password);
+  const result = await comparePassword(oldPassword, user.password);
 
   if (!result) {
     throw ApiError.badRequest({ message: 'incorect password' });
   }
 
-  const hashPassword = await bcrypt.hash(newPassword, 3);
+  const hashPassword = await getHashPassword(newPassword);
 
   user.password = hashPassword;
   await user.save();

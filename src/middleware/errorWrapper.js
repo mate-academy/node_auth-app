@@ -1,4 +1,4 @@
-function errorWrapperAsync(controller) {
+function errorWrapper(controller) {
   return async (req, res, next) => {
     try {
       await controller(req, res, next);
@@ -9,5 +9,5 @@ function errorWrapperAsync(controller) {
 }
 
 module.exports = {
-  errorWrapperAsync,
+  errorWrapper,
 };

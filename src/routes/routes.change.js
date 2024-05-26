@@ -2,29 +2,30 @@
 
 const express = require('express');
 const { changeController } = require('../controllers/change.controller');
-const { errorWrapperAsync } = require('../middleware/errorWrapperAsync');
+const { errorWrapper } = require('../middleware/errorWrapper');
 const { authController } = require('../controllers/auth.controller.js');
 
-const routeChange = new express.Router();
+const profileUpdateRoutes = new express.Router();
+const authenticate = errorWrapper(authController.authenticateToken);
 
-routeChange.post(
+profileUpdateRoutes.post(
   '/name/:userId',
-  errorWrapperAsync(authController.authenticateToken),
-  errorWrapperAsync(changeController.postName),
+  authenticate,
+  errorWrapper(changeController.postName),
 );
 
-routeChange.post(
+profileUpdateRoutes.post(
   '/email/:userId',
-  errorWrapperAsync(authController.authenticateToken),
-  errorWrapperAsync(changeController.postEmail),
+  authenticate,
+  errorWrapper(changeController.postEmail),
 );
 
-routeChange.post(
+profileUpdateRoutes.post(
   '/password/:userId',
-  errorWrapperAsync(authController.authenticateToken),
-  errorWrapperAsync(changeController.postPassword),
+  authenticate,
+  errorWrapper(changeController.postPassword),
 );
 
 module.exports = {
-  routeChange,
+  profileUpdateRoutes,
 };

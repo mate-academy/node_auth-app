@@ -2,7 +2,7 @@
 
 const { ApiError } = require('../exeptions/api.error.js');
 
-async function errorHandlerMiddleware(error, req, res, next) {
+async function errorHandler(error, req, res, next) {
   if (error instanceof ApiError) {
     res.status(error.status).json(error.message);
 
@@ -13,5 +13,5 @@ async function errorHandlerMiddleware(error, req, res, next) {
 }
 
 module.exports = {
-  errorHandlerMiddleware,
+  errorHandler,
 };

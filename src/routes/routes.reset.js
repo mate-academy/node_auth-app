@@ -2,22 +2,22 @@
 
 const express = require('express');
 const { resetController } = require('../controllers/reset.controller');
-const { errorWrapperAsync } = require('../middleware/errorWrapperAsync');
+const { errorWrapper } = require('../middleware/errorWrapper');
 
-const routeReset = new express.Router();
+const resetRoutes = new express.Router();
 
-routeReset.post('/password', errorWrapperAsync(resetController.resetPassword));
+resetRoutes.post('/password', errorWrapper(resetController.resetPassword));
 
-routeReset.get(
+resetRoutes.get(
   '/password/:resetToken',
-  errorWrapperAsync(resetController.resetPasswordWithToken),
+  errorWrapper(resetController.resetPasswordWithToken),
 );
 
-routeReset.post(
-  '/password/:resetToken',
-  errorWrapperAsync(resetController.resetPasswordData),
+resetRoutes.post(
+  '/password/:userId',
+  errorWrapper(resetController.resetPasswordData),
 );
 
 module.exports = {
-  routeReset,
+  resetRoutes,
 };

@@ -1,11 +1,18 @@
 'use strict';
 
-const { User } = require('../models/user.model.js');
 const { normalizeUser } = require('../utils/normalizeUser.js');
-const { sendMail } = require('../services/sendMail.js');
 const { ApiError } = require('../exeptions/api.error.js');
-const { token } = require('../services/token.js');
-const bcrypt = require('bcrypt');
+const { token, generateTokens } = require('../services/token.js');
+const {
+  createUser,
+  findUserByEmail,
+  activateUser,
+  verifyPassword,
+  updateUserTokens,
+  findUserById,
+  updateAccessTokenOnly,
+} = require('../services/user.service.js');
+const { sendActivationEmail } = require('../services/mail.service.js');
 
 function getRegistrationForm(req, res) {
   res.send(`
@@ -21,20 +28,9 @@ function getRegistrationForm(req, res) {
 async function registration(req, res) {
   const { name, email, password } = req.body;
 
-  const hashPassword = await bcrypt.hash(password, 3);
+  const user = await createUser(name, email, password);
 
-  const user = await User.create({ name, email, password: hashPassword });
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'user already exists' });
-  }
-
-  const payload = { name, email };
-  const activateToken = token.getToken(payload, 'activate');
-
-  const url = `http://localhost:3005/activation/${activateToken}`;
-
-  await sendMail(email, url);
+  await sendActivationEmail(email, name);
 
   res.status(201).json(normalizeUser(user));
 }
@@ -42,9 +38,9 @@ async function registration(req, res) {
 async function activation(req, res) {
   const { activationToken } = req.params;
 
-  const { email } = token.verifyToken(activationToken, 'activate');
+  const { email } = token.verifyActivationToken(activationToken);
 
-  const user = await User.findOne({ email });
+  const user = await findUserByEmail(email);
 
   if (!user) {
     throw ApiError.badRequest({ message: 'activation token invalid' });
@@ -54,8 +50,7 @@ async function activation(req, res) {
     throw ApiError.badRequest({ message: 'user already active' });
   }
 
-  user.isActive = true;
-  user.save();
+  await activateUser(user);
 
   res.status(300).redirect(`http://localhost:3005/profile/${user.id}`);
 }
@@ -72,29 +67,17 @@ async function getloginPage(req, res) {
 
 async function login(req, res) {
   const { email, password } = req.body;
-  const user = await User.findOne({ where: { email } });
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'user not found' });
-  }
+  const user = await findUserByEmail(email);
 
   if (!user.isActive) {
     throw ApiError.badRequest({ message: 'user not activated' });
   }
 
-  const result = await bcrypt.compare(password, user.password);
+  await verifyPassword(password, user.password);
 
-  if (!result) {
-    throw ApiError.badRequest({ message: 'incorect password' });
-  }
+  const [accessToken, refreshToken] = generateTokens();
 
-  const accessToken = token.getToken({}, 'access', { expiresIn: '360s' });
-  const refreshToken = token.getToken({}, 'refresh', { expiresIn: '3600s' });
-
-  user.accsessToken = accessToken;
-  user.refreshToken = refreshToken;
-
-  await user.save();
+  await updateUserTokens(user, accessToken, refreshToken);
 
   res.cookie('accessToken', accessToken, { httpOnly: true, secure: false });
   res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false });
@@ -106,24 +89,19 @@ async function authenticateToken(req, res, next) {
   const { accessToken, refreshToken } = req.cookies;
   const { userId } = req.params;
 
-  const user = await User.findByPk(userId);
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
+  const user = await findUserById(userId);
 
   if (!accessToken || !refreshToken) {
     throw ApiError.unauthorized({ message: 'user not logged in' });
   }
 
-  const resultOfAccessToken = token.verifyToken(accessToken, 'access');
-  const resultOfrefreshToken = token.verifyToken(refreshToken, 'refresh');
+  const [resultOfAccessToken, resultOfrefreshToken] =
+    token.verifyAccssesRefreshTokens(accessToken, refreshToken);
 
   if (!resultOfAccessToken && resultOfrefreshToken) {
-    const newAccessToken = token.getToken({}, 'access', { expiresIn: '360s' });
+    const [newAccessToken] = generateTokens();
 
-    user.accsessToken = newAccessToken;
-    await user.save();
+    await updateAccessTokenOnly(user, newAccessToken);
 
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
@@ -135,25 +113,15 @@ async function authenticateToken(req, res, next) {
     return;
   }
 
-  if (!resultOfAccessToken && !resultOfrefreshToken) {
-    throw ApiError.unauthorized({ message: 'user not logged in' });
-  }
-
   next();
 }
 
 async function logout(req, res) {
   const { userId } = req.params;
 
-  const user = await User.findByPk(userId);
+  const user = await findUserById(userId);
 
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
-
-  user.accsessToken = null;
-  user.refreshToken = null;
-  await user.save();
+  await updateUserTokens(user, null, null);
 
   res.status(300).redirect('/login');
 }

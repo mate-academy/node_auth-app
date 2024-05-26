@@ -5,32 +5,32 @@ const { authController } = require('../controllers/auth.controller');
 const {
   middlewareCheckSignInDataRes,
 } = require('../middleware/middlewareCheckSignInDataRes.js');
-const { errorWrapperAsync } = require('../middleware/errorWrapperAsync.js');
+const { errorWrapper } = require('../middleware/errorWrapper.js');
 
-const routeAuth = new express.Router();
+const authRoutes = new express.Router();
 
-routeAuth.get(
+authRoutes.get(
   '/registration',
-  errorWrapperAsync(authController.getRegistrationForm),
+  errorWrapper(authController.getRegistrationForm),
 );
 
-routeAuth.post(
+authRoutes.post(
   '/registration',
   middlewareCheckSignInDataRes,
-  errorWrapperAsync(authController.registration),
+  errorWrapper(authController.registration),
 );
 
-routeAuth.get(
+authRoutes.get(
   '/activation/:activationToken',
-  errorWrapperAsync(authController.activation),
+  errorWrapper(authController.activation),
 );
 
-routeAuth.get('/login', errorWrapperAsync(authController.getloginPage));
+authRoutes.get('/login', errorWrapper(authController.getloginPage));
 
-routeAuth.post('/login', errorWrapperAsync(authController.login));
+authRoutes.post('/login', errorWrapper(authController.login));
 
-routeAuth.post('/logout/:userId', errorWrapperAsync(authController.logout));
+authRoutes.post('/logout/:userId', errorWrapper(authController.logout));
 
 module.exports = {
-  routeAuth,
+  authRoutes,
 };

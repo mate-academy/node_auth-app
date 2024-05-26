@@ -1,11 +1,11 @@
 'use strict';
 
 const { ApiError } = require('../exeptions/api.error');
-const { User } = require('../models/user.model');
 const { sendMail } = require('../services/sendMail');
 const { token } = require('../services/token');
 const bcrypt = require('bcrypt');
 const { isValidatedPassword } = require('../utils/isValidatedPassword.js');
+const { findUserByEmail, findUserById } = require('../services/user.service');
 
 async function resetPassword(req, res) {
   const { email } = req.body;
@@ -14,17 +14,12 @@ async function resetPassword(req, res) {
     throw ApiError.badRequest({ message: 'Invalid email' });
   }
 
-  const user = await User.findOne({ where: { email } });
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
+  const user = await findUserByEmail(email);
 
   const resetToken = token.getToken(
     { password: user.password },
     'resetPassword',
   );
-
   const url = `http://localhost:3005/reset/password/${resetToken}`;
 
   await sendMail(email, url);
@@ -38,16 +33,10 @@ async function resetPassword(req, res) {
 async function resetPasswordWithToken(req, res) {
   const { resetToken } = req.params;
 
-  const user = await User.findOne({
-    where: { resetPasswordToken: resetToken },
-  });
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
+  const user = await findUserByEmail({ resetPasswordToken: resetToken });
 
   res.send(`
-    <form action="/reset/password/${resetToken}" method="POST">
+    <form action="/reset/password/${user.id}" method="POST">
       <input type="password" name="password" placeholder="New password" required />
       <input type="password" name="confirmPassword" placeholder="Confirm new password" required />
       <button type="submit">Reset Password</button>
@@ -57,15 +46,9 @@ async function resetPasswordWithToken(req, res) {
 
 async function resetPasswordData(req, res) {
   const { password, confirmPassword } = req.body;
-  const { resetToken } = req.params;
+  const { userId } = req.params;
 
-  const user = await User.findOne({
-    where: { resetPasswordToken: resetToken },
-  });
-
-  if (!user) {
-    throw ApiError.badRequest({ message: 'User not found' });
-  }
+  const user = await findUserById(userId);
 
   if (password !== confirmPassword) {
     throw ApiError.badRequest({ message: 'password is not equal' });
