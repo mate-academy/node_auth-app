@@ -45,8 +45,22 @@ const sendConfirmation = (email, token) => {
   });
 };
 
+const sendResetPassword = (email, token) => {
+  const link = `${process.env.CLIENT_URL}/reset-password/${token}`;
+
+  return send({
+    email,
+    subject: 'Password reset',
+    html: `
+      <h1>Reset link</h1>
+      <a href="${link}" target="_blank">${link}</a>
+    `,
+  });
+};
+
 export default {
   send,
   sendActivationLink,
   sendConfirmation,
+  sendResetPassword,
 };

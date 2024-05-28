@@ -5,6 +5,7 @@ import tokenService from '../services/token.service.js';
 import userService from '../services/user.service.js';
 import bcrypt from 'bcrypt';
 import {
+  validateConfirmPassword,
   validateEmail,
   validateName,
   validatePassword,
@@ -125,10 +126,52 @@ const sendAuthentication = async (res, user) => {
   });
 };
 
+const requestResetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const errors = {
+    email: validateEmail(email),
+  };
+
+  if (errors.email) {
+    throw ApiError.BadRequest('validation error', errors);
+  }
+
+  const user = await userService.getByEmail(email);
+
+  if (!user) {
+    throw ApiError.BadRequest('No such user', {
+      email: 'Email not found',
+    });
+  }
+
+  await userService.requestResetPassword(user);
+  res.sendStatus(200);
+};
+
+const resetPassword = async (req, res) => {
+  const { password, confirmation } = req.body;
+  const { token } = req.params;
+
+  const errors = {
+    password: validatePassword(password),
+    confirmation: validateConfirmPassword(password, confirmation),
+  };
+
+  if (errors.password || errors.confirmation) {
+    throw ApiError.BadRequest('validation error', errors);
+  }
+
+  await userService.resetPassword({ token, password });
+  res.sendStatus(200);
+};
+
 export default {
   register,
   activate,
   login,
   logout,
   refresh,
+  requestResetPassword,
+  resetPassword,
 };

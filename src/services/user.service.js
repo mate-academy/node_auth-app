@@ -82,6 +82,25 @@ const updateEmail = async ({ id, password, newEmail }) => {
   await emailService.sendConfirmation(newEmail, user.activationToken);
 };
 
+const requestResetPassword = async (user) => {
+  user.resetPasswordToken = uuidv4();
+  await user.save();
+
+  await emailService.sendResetPassword(user.email, user.resetPasswordToken);
+};
+
+const resetPassword = async ({ token: resetPasswordToken, password }) => {
+  const user = await User.findOne({ where: { resetPasswordToken } });
+
+  if (!user) {
+    throw ApiError.NotFound();
+  }
+
+  user.resetPasswordToken = null;
+  user.password = await bcrypt.hash(password, 10);
+  await user.save();
+};
+
 export default {
   register,
   getByEmail,
@@ -90,4 +109,6 @@ export default {
   updateName,
   updatePassword,
   updateEmail,
+  requestResetPassword,
+  resetPassword,
 };
