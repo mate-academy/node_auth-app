@@ -1,9 +1,11 @@
 import { ApiError } from '../exeptions/apiError.js';
+import { User } from '../models/User.js';
 import userService from '../services/user.service.js';
 import {
   validateName,
   validatePassword,
   validateConfirmPassword,
+  validateEmail,
 } from '../utils/validation.js';
 import bcrypt from 'bcrypt';
 
@@ -59,8 +61,41 @@ const updatePassword = async (req, res) => {
   res.status(200).send('Password changed successfully');
 };
 
+const updateEmail = async (req, res) => {
+  const { password, newEmail } = req.body;
+
+  const errors = {
+    password: validatePassword(password),
+    newEmail: validateEmail(newEmail),
+  };
+
+  if (errors.password || errors.newEmail) {
+    throw ApiError.BadRequest('validation errors', errors);
+  }
+
+  await userService.updateEmail({ id: req.userId, password, newEmail });
+  res.send({ message: 'OK' });
+};
+
+const confirmEmail = async (req, res) => {
+  const { token: activationToken } = req.params;
+
+  const user = await User.findOne({ where: { activationToken } });
+
+  if (!user) {
+    throw ApiError.NotFound();
+  }
+
+  user.activationToken = null;
+  await user.save();
+
+  res.send({ message: 'OK' });
+};
+
 export default {
   get,
   updateName,
   updatePassword,
+  updateEmail,
+  confirmEmail,
 };

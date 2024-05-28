@@ -59,6 +59,29 @@ const updatePassword = async (id, password) => {
   await user.save();
 };
 
+const updateEmail = async ({ id, password, newEmail }) => {
+  const user = await getById(id);
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
+    throw ApiError.BadRequest('validation errors', {
+      password: 'Password is wrong',
+    });
+  }
+
+  if (newEmail === user.email) {
+    throw ApiError.BadRequest('validation errors', {
+      newEmail: 'Don`t use previous email',
+    });
+  }
+
+  user.email = newEmail;
+  user.activationToken = uuidv4();
+  await user.save();
+  await emailService.sendConfirmation(newEmail, user.activationToken);
+};
+
 export default {
   register,
   getByEmail,
@@ -66,4 +89,5 @@ export default {
   normalize,
   updateName,
   updatePassword,
+  updateEmail,
 };

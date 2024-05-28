@@ -32,7 +32,21 @@ const sendActivationLink = (email, token) => {
   });
 };
 
+const sendConfirmation = (email, token) => {
+  const link = `${process.env.CLIENT_URL}/profile/confirm-email/${token}`;
+
+  return send({
+    email,
+    subject: 'Confirmation of email',
+    html: `
+      <h1>Confirmation's link</h1>
+      <a href="${link}" target="_blank">${link}</a>
+    `,
+  });
+};
+
 export default {
   send,
   sendActivationLink,
+  sendConfirmation,
 };
