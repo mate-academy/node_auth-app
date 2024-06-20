@@ -11,11 +11,12 @@ const {
   httpChangePassword,
   passport,
 } = require('../controllers/users.controller');
+const { userRoute } = require('../constants/routes');
 
 const usersRoute = express.Router();
 
 usersRoute.get(
-  '/login/google',
+  userRoute.googleLogin,
   passport.authenticate('google', {
     scope: ['email', 'profile'],
     accessType: 'offline',
@@ -24,7 +25,7 @@ usersRoute.get(
 );
 
 usersRoute.get(
-  '/login/google/callback',
+  userRoute.googleLoginCB,
   passport.authenticate('google', {
     failureRedirect: '/login',
     successRedirect: '/profile',
@@ -32,22 +33,22 @@ usersRoute.get(
 );
 
 usersRoute.post(
-  '/login',
+  userRoute.login,
   passport.authenticate('custom', { failureRedirect: '/login' }),
   httpLoginUser,
 );
-usersRoute.post('/logout', httpLogoutUser);
+usersRoute.post(userRoute.logout, httpLogoutUser);
 
 usersRoute.post(
-  '/signUp',
+  userRoute.signup,
   passport.authenticate('custom', { failureRedirect: '/signUp' }),
   httpSignupUser,
 );
-usersRoute.get('/activate/:activationToken', httpActivateUser);
-usersRoute.get('/refresh', httpRefreshUserToken);
-usersRoute.get('/auth/status', httpCheckAuthStatus);
-usersRoute.put('/restore', httpUserValidation);
-usersRoute.get('/restore/:activationToken', httpRestorePassword);
-usersRoute.put('/restore/newpassword', httpChangePassword);
+usersRoute.get(userRoute.activate, httpActivateUser);
+usersRoute.get(userRoute.refresh, httpRefreshUserToken);
+usersRoute.get(userRoute.authStatus, httpCheckAuthStatus);
+usersRoute.put(userRoute.restore, httpUserValidation);
+usersRoute.get(userRoute.restoreActivationToken, httpRestorePassword);
+usersRoute.put(userRoute.restoreNewPassword, httpChangePassword);
 
 module.exports = { usersRoute };

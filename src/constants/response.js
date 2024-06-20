@@ -39,6 +39,12 @@ const response = {
       noUser: 'No user was found.',
     },
   },
+  503: {
+    statusCode: 503,
+    messages: {
+      serverError: 'Server error.',
+    },
+  },
 };
 
 module.exports = { response };
