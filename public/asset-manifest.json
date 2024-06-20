@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.js": "/static/js/main.75dca926.js",
+    "static/media/loginScreen.png": "/static/media/loginScreen.ea7dd368c1d678d92440.png",
+    "static/media/background.png": "/static/media/background.645c707b7e2ebd0f9b56.png",
+    "static/media/error.gif": "/static/media/error.2099abec8f7b637f8c5b.gif",
+    "index.html": "/index.html",
+    "main.75dca926.js.map": "/static/js/main.75dca926.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.75dca926.js"
+  ]
+}
