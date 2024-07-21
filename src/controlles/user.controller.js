@@ -1,29 +1,137 @@
-// import { userService } from "../services/user.service.js"
+import uuid4 from 'uuid4';
+import { ApiError } from '../exeptions/api.error.js';
+import { emailService } from '../services/email.service.js';
+import { userService } from '../services/user.service.js';
+import { validateEmail, validatePassword } from './auth.controller.js';
+import bcrypt from 'bcrypt';
 
-import { jwtService } from "../services/jwt.service.js";
+export const verifyRefreshToken = async (userId, refreshToken) => {
+  if (!refreshToken) {
+    return res
+      .status(401)
+      .send('No refresh token provided');
+  }
 
-// const allUserActivated = async (req, res) => {
-//   try {
-//     const users = await userService.getAllActivated();
+  const tokenRecord = await userService.getUserToken(userId);
 
-//     res.send(users.map(userService.normalize))
-//   } catch (err) {
-//     res.status(500).send(err)
-//   }
-// }
+  if (!tokenRecord) {
+    throw ApiError.unauthorized();
+  }
 
-// export const userController = {
-//   allUserActivated
-// }
+  if (tokenRecord.dataValues.refreshToken !== refreshToken) {
+    throw ApiError.unauthorized();
+  }
+};
 
-const user = async (req, res) => {
+const userProfile = async (req, res) => {
   const { id } = req.params;
-  const user = userService.getUser(id)
+  const { refreshToken } = req.cookies;
 
-  res.send(`Hello ${user.name}`)
-}
+  await verifyRefreshToken(id, refreshToken);
+
+  const user = await userService.getUser(id);
+  const name = user.name;
+
+  res.send(`Hello ${name}`);
+};
+
+const changeName = async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const { refreshToken } = req.cookies;
+
+  await verifyRefreshToken(id, refreshToken);
+
+  const user = await userService.getUser(id);
+
+  user.name = name;
+  await user.save();
+
+  res.send({ ...userService.normalize(user), name });
+};
+
+const changePassword = async (req, res) => {
+  const { id } = req.params;
+  const { password, newPassword, confirmation } = req.body;
+  const { refreshToken } = req.cookies;
+
+  await verifyRefreshToken(id, refreshToken);
+
+  const user = await userService.getUser(id);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Incorrect password.');
+  }
+
+  if (newPassword !== confirmation) {
+    throw ApiError.badRequest(
+      `Passwords do not match.
+      Please make sure both password fields are the same.`,
+    );
+  }
+
+  if (!validatePassword(password)) {
+    throw ApiError.badRequest(
+      `Incorrect password.
+      The length of the fault must be at least 6 characters`,
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  await user.save();
+
+  res.send('Password has been reset successfully');
+};
+
+const changeEmail = async (req, res) => {
+  const { id } = req.params;
+  const { newEmail, password } = req.body;
+  const { refreshToken } = req.cookies;
+
+  await verifyRefreshToken(id, refreshToken);
+
+  if (!validateEmail(newEmail)) {
+    throw ApiError.badRequest(
+      `Invalid email address.
+      Please enter a valid email address in the format "example@example.com".`,
+      errors,
+    );
+  }
+
+  const user = await userService.getUser(id);
+  const email = user.email;
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  }
+
+  const existUser = await userService.findByEmail(newEmail);
+
+  if (existUser) {
+    throw ApiError.badRequest('User Already exist', {
+      email: 'User already exist',
+    });
+  }
+
+  const activationToken = uuid4();
+
+  user.email = newEmail;
+  user.activationToken = activationToken;
+  user.save();
+
+  await emailService.sendActivationEmail(newEmail, activationToken);
+  await emailService.changeEmail(email, newEmail);
+
+  res.send(user);
+};
 
 export const userController = {
-  user,
-}
-
+  user: userProfile,
+  changeName,
+  changePassword,
+  changeEmail,
+};

@@ -1,5 +1,4 @@
 import 'dotenv/config';
-
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -17,20 +16,45 @@ export function send({ email, subject, html }) {
     to: email,
     subject,
     html,
-  })
+  });
 }
 
 function sendActivationEmail(email, token) {
-  const href = `${process.env.CLIENT_HOST}/activation/${token}`
+  const href = `${process.env.CLIENT_HOST}/activation/${token}`;
   const html = `
-    <h1>Activate account</h1>
-    <a href="${href}">${href}</a>
+  <h1>Activate account</h1>
+  <a target="_blank" href="${href}">${href}</a>
   `;
 
-  return send({ email, html, subject: 'Activate' })
+  return send({ email, html, subject: 'Activate' });
+}
+
+function passwordReset(email, passwordResetToken) {
+  const href = `${process.env.CLIENT_HOST}/password-reset/${passwordResetToken}`;
+
+  const html = `
+  <h1>Password reset</h1>
+  <a target="_blank" href="${href}">${href}</a>
+  `;
+
+  return send({ email, html, subject: 'Password reset' });
+}
+
+function changeEmail(email, newEmail) {
+  const html = `
+  <h1>Change email</h1>
+  <p>
+    Ви успішно змінили свою електронну адресу.
+    Перевірте свою нову електронну пошту ${newEmail} для підтвердження зміни.
+  </p>
+  `;
+
+  return send({ email, html, subject: 'Change email' });
 }
 
 export const emailService = {
   sendActivationEmail,
-  send
-}
+  send,
+  passwordReset,
+  changeEmail,
+};

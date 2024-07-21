@@ -3,29 +3,30 @@ export class ApiError extends Error {
     super(message);
 
     this.status = status;
-    this.errors = errors
+    this.errors = errors;
   }
 
-  static bedRequest(message, errors) {
+  static badRequest(message, errors) {
     return new ApiError({
       message,
       errors,
-      status: 400
-    })
+      status: 400,
+    });
   }
 
   static unauthorized(errors) {
     return new ApiError({
       message: 'unauthorized user',
       errors,
-      status: 401
-    })
+      status: 401,
+    });
   }
+
   static notFound(errors) {
     return new ApiError({
       message: 'notFound',
       errors,
-      status: 404
-    })
+      status: 404,
+    });
   }
 }
