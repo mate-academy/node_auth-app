@@ -18,11 +18,11 @@ import { tokenService } from '../services/token-service.js';
 
 export const authController = {
   async register(req, res, next) {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    const validationErrors = validateRegistrationData(email, password);
+    const validationErrors = validateRegistrationData(name, email, password);
 
-    if (validationErrors) {
+    if (!!validationErrors) {
       throw ApiError.BadRequest('Incorrect data', validationErrors);
     }
 
@@ -34,7 +34,7 @@ export const authController = {
       });
     }
 
-    const newUser = await createUser(email, password);
+    const newUser = await createUser(name, email, password);
 
     if (!newUser) {
       next(new ApiError(400, 'Could not create the user'));

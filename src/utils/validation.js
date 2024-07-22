@@ -20,13 +20,24 @@ export const validatePassword = (password) => {
   }
 };
 
-export const validateRegistrationData = (email, password) => {
+export const validateName = (name) => {
+  if (!name.length) {
+    return 'Name is required';
+  }
+};
+
+export const validateRegistrationData = (name, email, password) => {
+  const nameError = validateName(name);
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
 
-  // Validate email and password
-  if (emailError || passwordError) {
+  // Validate data
+  if (nameError || emailError || passwordError) {
     const errors = {};
+
+    if (nameError) {
+      errors.name = nameError;
+    }
 
     if (emailError) {
       errors.email = emailError;

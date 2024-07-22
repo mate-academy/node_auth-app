@@ -36,7 +36,7 @@ export const readRefreshToken = (refreshToken) => {
   try {
     return jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return null;
   }
 };

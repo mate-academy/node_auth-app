@@ -3,7 +3,7 @@ import { ApiError } from '../exceptions/API-error.js';
 import { User } from '../models/user.model.js';
 import { generateActivationToken } from './users-service.js';
 
-export const createUser = async (email, password) => {
+export const createUser = async (name, email, password) => {
   const existingUser = await User.findOne({
     where: {
       email,
@@ -19,12 +19,19 @@ export const createUser = async (email, password) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({
+    name,
     email,
     password: hashedPassword,
     activationToken,
   });
 
-  return { id: newUser.id, email: newUser.email, activationToken };
+  const newUserPublicData = {
+    id: newUser.id,
+    name: newUser.name,
+    email: newUser.email,
+  };
+
+  return newUserPublicData;
 };
 
 export const findUserByActivationToken = async (activationToken) => {
