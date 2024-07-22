@@ -5,15 +5,13 @@ export const authMiddleware = (req, res, next) => {
   const auth = req.headers.authorization;
 
   if (!auth) {
-    res.sendStatus(401);
-    return;
+    throw ApiError.Unauthorized();
   }
 
   const [, accessToken] = auth.split(' ');
 
   if (!accessToken) {
-    res.sendStatus(401);
-    return;
+    throw ApiError.Unauthorized();
   }
 
   const result = readAccessToken(accessToken);
