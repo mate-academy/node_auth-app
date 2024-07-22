@@ -103,7 +103,8 @@ export const authController = {
       secure: true,
     });
 
-    res.sendStatus(204);
+    res.status(204);
+    res.redirect('/login');
   },
 
   async sendAuth(res, publicUserData) {
