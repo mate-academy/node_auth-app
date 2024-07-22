@@ -13,6 +13,7 @@ authRouter.post(
 
 authRouter.get(
   '/activation/:activationToken',
+  catchError(guestMiddleware),
   catchError(authController.activate),
 );
 
