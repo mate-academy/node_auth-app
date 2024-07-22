@@ -26,5 +26,5 @@ userRouter.post(
 );
 
 module.exports = {
-  userRouter
+  userRouter,
 };

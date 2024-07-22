@@ -6,12 +6,6 @@ const { validateEmail, validatePassword } = require('./auth.controller.js');
 const bcrypt = require('bcrypt');
 
 const verifyRefreshToken = async (userId, refreshToken) => {
-  if (!refreshToken) {
-    return res
-      .status(401)
-      .send('No refresh token provided');
-  }
-
   const tokenRecord = await userService.getUserToken(userId);
 
   if (!tokenRecord) {
@@ -96,8 +90,7 @@ const changeEmail = async (req, res) => {
   if (!validateEmail(newEmail)) {
     throw ApiError.badRequest(
       `Invalid email address.
-      Please enter a valid email address in the format "example@example.com".`,
-      errors,
+      Please enter a valid email address in the format "example@example.com".`
     );
   }
 
@@ -138,5 +131,5 @@ const userController = {
 
 module.exports = {
   userController,
-  verifyRefreshToken
+  verifyRefreshToken,
 };

@@ -218,5 +218,5 @@ const authController = {
 module.exports = {
   authController,
   validateEmail,
-  validatePassword
+  validatePassword,
 };

@@ -1,4 +1,5 @@
 require('dotenv/config');
+
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
@@ -11,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
- function send({ email, subject, html }) {
+function send({ email, subject, html }) {
   return transporter.sendMail({
     to: email,
     subject,
@@ -52,7 +53,7 @@ function changeEmail(email, newEmail) {
   return send({ email, html, subject: 'Change email' });
 }
 
- const emailService = {
+const emailService = {
   sendActivationEmail,
   send,
   passwordReset,
@@ -60,6 +61,5 @@ function changeEmail(email, newEmail) {
 };
 
 module.exports = {
-   emailService,
-
+  emailService,
 };

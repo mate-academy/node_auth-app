@@ -25,5 +25,4 @@ const User = client.define('user', {
 
 module.exports = {
   User,
-
 };

@@ -2,7 +2,7 @@ const express = require('express');
 const { authController } = require('../controlles/auth.controller.js');
 const { catchError } = require('../utils/catchError.js');
 
- const authRouter = new express.Router();
+const authRouter = new express.Router();
 
 authRouter.post('/registration', catchError(authController.register));
 
@@ -24,8 +24,6 @@ authRouter.post(
   catchError(authController.passwordReset),
 );
 
-
 module.exports = {
   authRouter,
-
 };

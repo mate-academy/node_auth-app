@@ -1,4 +1,4 @@
-const { jwtService } = require("../services/jwt.service.js");
+const { jwtService } = require('../services/jwt.service.js');
 
 const authMiddleware = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';
@@ -6,6 +6,7 @@ const authMiddleware = (req, res, next) => {
 
   if (!authorization || !token) {
     res.sendStatus(401);
+
     return;
   }
 
@@ -13,13 +14,13 @@ const authMiddleware = (req, res, next) => {
 
   if (!userData) {
     res.sendStatus(401);
+
     return;
   }
 
-  next()
-}
+  next();
+};
 
 module.exports = {
   authMiddleware,
-
 };

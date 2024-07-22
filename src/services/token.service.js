@@ -13,7 +13,6 @@ async function save(userId, newToken) {
     token.refreshToken = newToken;
     await token.save();
   } catch (err) {
-    console.error('Error saving token:', err);
     throw err;
   }
 }
@@ -26,12 +25,12 @@ function remove(userId) {
   return Token.distroy({ where: { userId } });
 }
 
- const tokenService = {
+const tokenService = {
   save,
   getByToken,
   remove,
 };
 
 module.exports = {
-  tokenService
+  tokenService,
 };

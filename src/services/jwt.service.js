@@ -1,4 +1,5 @@
 require('dotenv/config');
+
 const jwt = require('jsonwebtoken');
 
 function sign(user) {
@@ -11,7 +12,7 @@ function verify(token) {
   try {
     return jwt.verify(token, process.env.JWT_KEY);
   } catch (err) {
-    return null
+    return null;
   }
 }
 
@@ -25,7 +26,7 @@ function verifyRefresh(token) {
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_KEY);
   } catch (err) {
-    return null
+    return null;
   }
 }
 
@@ -33,9 +34,9 @@ const jwtService = {
   sign,
   verify,
   signRefresh,
-  verifyRefresh
-}
+  verifyRefresh,
+};
 
 module.exports = {
-  jwtService
+  jwtService,
 };
