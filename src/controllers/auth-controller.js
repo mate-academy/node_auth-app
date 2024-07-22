@@ -94,8 +94,14 @@ export const authController = {
 
     if (userData) {
       // Delete the Refresh Token from DB
-      await tokenService.deleteTokenByUserId(userData.id);
+      await tokenService.deleteTokenByUserId(userData.UserId);
     }
+
+    res.cookie('refreshToken', null, {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
 
     res.sendStatus(204);
   },
