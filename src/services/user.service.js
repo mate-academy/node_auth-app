@@ -1,5 +1,5 @@
-import { Token } from '../models/token.js';
-import { User } from '../models/user.js';
+const { Token } = require('../models/token.js');
+const { User } = require('../models/user.js');
 
 async function getUser(id) {
   return User.findOne({ where: { id } });
@@ -17,9 +17,13 @@ const getUserToken = async (userId) => {
   return Token.findOne({ where: { userId } });
 };
 
-export const userService = {
+const userService = {
   normalize,
   findByEmail,
   getUser,
   getUserToken,
+};
+
+module.exports = {
+  userService
 };

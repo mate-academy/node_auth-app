@@ -1,5 +1,5 @@
-import 'dotenv/config';
-import jwt from 'jsonwebtoken';
+require('dotenv/config');
+const jwt = require('jsonwebtoken');
 
 function sign(user) {
   const token = jwt.sign(user, process.env.JWT_KEY, { expiresIn: '999s' });
@@ -29,9 +29,13 @@ function verifyRefresh(token) {
   }
 }
 
-export const jwtService = {
+const jwtService = {
   sign,
   verify,
   signRefresh,
   verifyRefresh
 }
+
+module.exports = {
+  jwtService
+};

@@ -1,11 +1,11 @@
-import uuid4 from 'uuid4';
-import { ApiError } from '../exeptions/api.error.js';
-import { emailService } from '../services/email.service.js';
-import { userService } from '../services/user.service.js';
-import { validateEmail, validatePassword } from './auth.controller.js';
-import bcrypt from 'bcrypt';
+const uuid4 = require('uuid4');
+const { ApiError } = require('../exeptions/api.error.js');
+const { emailService } = require('../services/email.service.js');
+const { userService } = require('../services/user.service.js');
+const { validateEmail, validatePassword } = require('./auth.controller.js');
+const bcrypt = require('bcrypt');
 
-export const verifyRefreshToken = async (userId, refreshToken) => {
+const verifyRefreshToken = async (userId, refreshToken) => {
   if (!refreshToken) {
     return res
       .status(401)
@@ -129,9 +129,14 @@ const changeEmail = async (req, res) => {
   res.send(user);
 };
 
-export const userController = {
+const userController = {
   user: userProfile,
   changeName,
   changePassword,
   changeEmail,
+};
+
+module.exports = {
+  userController,
+  verifyRefreshToken
 };

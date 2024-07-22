@@ -1,19 +1,19 @@
-import uuid4 from 'uuid4';
-import { User } from '../models/user.js';
-import { emailService } from '../services/email.service.js';
-import { userService } from '../services/user.service.js';
-import { jwtService } from '../services/jwt.service.js';
-import { ApiError } from '../exeptions/api.error.js';
-import bcrypt from 'bcrypt';
-import { tokenService } from '../services/token.service.js';
+const uuid4 = require('uuid4');
+const { User } = require('../models/user.js');
+const { emailService } = require('../services/email.service.js');
+const { userService } = require('../services/user.service.js');
+const { jwtService } = require('../services/jwt.service.js');
+const { ApiError } = require('../exeptions/api.error.js');
+const bcrypt = require('bcrypt');
+const { tokenService } = require('../services/token.service.js');
 
-export function validateEmail(email) {
+function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   return emailRegex.test(email);
 }
 
-export function validatePassword(password) {
+function validatePassword(password) {
   return password.length >= 6;
 }
 
@@ -205,7 +205,7 @@ const requestPasswordReset = async (req, res) => {
   res.send('Password reset link has been sent to your email');
 };
 
-export const authController = {
+const authController = {
   register: register,
   activate,
   login,
@@ -213,4 +213,10 @@ export const authController = {
   logout,
   passwordReset,
   requestPasswordReset,
+};
+
+module.exports = {
+  authController,
+  validateEmail,
+  validatePassword
 };

@@ -1,9 +1,9 @@
-import express from 'express';
-import { userController } from '../controlles/user.controller.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
-import { catchError } from '../utils/catchError.js';
+const express = require('express');
+const { userController } = require('../controlles/user.controller.js');
+const { authMiddleware } = require('../middlewares/authMiddleware.js');
+const { catchError } = require('../utils/catchError.js');
 
-export const userRouter = new express.Router();
+const userRouter = new express.Router();
 
 userRouter.get('/:id', authMiddleware, catchError(userController.user));
 
@@ -24,3 +24,7 @@ userRouter.post(
   authMiddleware,
   catchError(userController.changeEmail),
 );
+
+module.exports = {
+  userRouter
+};

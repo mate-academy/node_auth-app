@@ -1,4 +1,4 @@
-import { Token } from '../models/token.js';
+const { Token } = require('../models/token.js');
 
 async function save(userId, newToken) {
   try {
@@ -26,8 +26,12 @@ function remove(userId) {
   return Token.distroy({ where: { userId } });
 }
 
-export const tokenService = {
+ const tokenService = {
   save,
   getByToken,
   remove,
+};
+
+module.exports = {
+  tokenService
 };
