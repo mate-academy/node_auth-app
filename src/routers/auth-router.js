@@ -2,6 +2,7 @@ import express from 'express';
 import { authController } from '../controllers/auth-controller.js';
 import { catchError } from '../utils/catch-error.js';
 import { guestMiddleware } from '../middlewares/guest-middleware.js';
+import { authMiddleware } from '../middlewares/auth-middleware.js';
 
 export const authRouter = new express.Router();
 
@@ -19,5 +20,9 @@ authRouter.get(
 
 authRouter.get('/refresh', catchError(authController.refresh));
 
-authRouter.post('/login', catchError(authController.login));
+authRouter.post(
+  '/login',
+  catchError(guestMiddleware),
+  catchError(authController.login),
+);
 authRouter.post('/logout', catchError(authController.logout));
