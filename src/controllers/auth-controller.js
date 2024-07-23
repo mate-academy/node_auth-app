@@ -119,7 +119,7 @@ export const authController = {
     });
 
     res.status(204);
-    res.redirect('/login');
+    res.redirect('/');
   },
 
   async sendAuth(res, publicUserData) {
