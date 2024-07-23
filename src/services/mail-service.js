@@ -62,3 +62,13 @@ export const sendResetMailConfirmation = (email) => {
     `,
   });
 };
+
+export const sendEmailChangeConfirmation = (oldEmail) => {
+  return sendMail({
+    to: oldEmail,
+    subject: 'Email change confirmation',
+    html: `
+      <h1>This email address previously assigned to your account has been changed successfully</h1>
+    `,
+  });
+};

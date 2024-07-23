@@ -67,6 +67,15 @@ export const findActivatedUserByEmail = (email) => {
   });
 };
 
+export const findActivatedUserById = (userId) => {
+  return User.findOne({
+    where: {
+      id: userId,
+      activationToken: null,
+    },
+  });
+};
+
 const hashPassword = (plainPassword) => {
   return bcrypt.hash(plainPassword, 10);
 };

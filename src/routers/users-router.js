@@ -16,3 +16,20 @@ usersRouter.get(
   catchError(authMiddleware),
   catchError(usersController.getProfile),
 );
+
+usersRouter.patch(
+  '/name',
+  catchError(authMiddleware),
+  catchError(usersController.updateName),
+);
+
+usersRouter.patch(
+  '/password',
+  catchError(authMiddleware),
+  catchError(usersController.updatePassword),
+);
+usersRouter.patch(
+  '/email',
+  catchError(authMiddleware),
+  catchError(usersController.updateEmail),
+);
