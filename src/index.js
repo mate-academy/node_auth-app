@@ -22,10 +22,11 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(authRouter);
 app.use(usersRouter);
-app.use(errorMiddleware);
 
-app.get('/', express.json(), (req, res) => {
-  res.send('Helo');
+app.use((req, res) => {
+  res.sendStatus(404);
 });
+
+app.use(errorMiddleware);
 
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

@@ -52,3 +52,13 @@ export const sendResetMail = (email, resetToken) => {
     `,
   });
 };
+
+export const sendResetMailConfirmation = (email) => {
+  return sendMail({
+    to: email,
+    subject: 'Password reset confirmation',
+    html: `
+      <h1>Your password has been changed successfully</h1>
+    `,
+  });
+};

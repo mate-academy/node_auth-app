@@ -1,4 +1,8 @@
-import { sendActivationMail, sendResetMail } from '../services/mail-service.js';
+import {
+  sendActivationMail,
+  sendResetMail,
+  sendResetMailConfirmation,
+} from '../services/mail-service.js';
 import {
   consumeActivationToken,
   createUser,
@@ -175,9 +179,7 @@ export const authController = {
     const user = await findActivatedUserByEmail(email);
 
     if (!user) {
-      throw ApiError.BadRequest(
-        `Account with that email address doesn't exist or the account has not yet been activated`,
-      );
+      throw ApiError.BadRequest('Invalid email', { email: 'Incorrect email' });
     }
 
     // Create a ResetToken
@@ -264,6 +266,9 @@ export const authController = {
 
     // Remove the resetToken from the User's record
     await resetService.deleteResetTokenByUserId(user.id);
+
+    // Send an email about the password change
+    await sendResetMailConfirmation(email);
 
     // Send a success message
     res.sendStatus(200);
