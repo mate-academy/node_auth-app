@@ -59,8 +59,7 @@ export const createResetToken = (user) => {
 export const verifyResetToken = (resetToken) => {
   try {
     return jwt.verify(resetToken, process.env.JWT_SECRET_RESET);
-  } catch (error) {
-    console.log(error);
+  } catch {
     return null;
   }
 };

@@ -28,6 +28,7 @@ usersRouter.patch(
   catchError(authMiddleware),
   catchError(usersController.updatePassword),
 );
+
 usersRouter.patch(
   '/email',
   catchError(authMiddleware),

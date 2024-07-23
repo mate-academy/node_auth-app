@@ -8,5 +8,4 @@ export const guestMiddleware = (req, res, next) => {
   }
 
   next();
-  return;
 };

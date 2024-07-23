@@ -6,7 +6,6 @@ import { authRouter } from './routers/auth-router.js';
 import { usersRouter } from './routers/users-router.js';
 import { errorMiddleware } from './middlewares/error-middleware.js';
 import cookieParser from 'cookie-parser';
-import { sequelize } from './utils/db.js';
 
 const PORT = process.env.PORT || 5500;
 
@@ -29,4 +28,4 @@ app.use((req, res) => {
 
 app.use(errorMiddleware);
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+app.listen(PORT, () => {});
