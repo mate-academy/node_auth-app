@@ -10,3 +10,9 @@ usersRouter.get(
   catchError(authMiddleware),
   catchError(usersController.getAll),
 );
+
+usersRouter.get(
+  '/profile',
+  catchError(authMiddleware),
+  catchError(usersController.getProfile),
+);

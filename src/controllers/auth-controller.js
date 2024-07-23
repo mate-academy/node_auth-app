@@ -116,18 +116,12 @@ export const authController = {
       await tokenService.deleteTokenByUserId(userData.UserId);
     }
 
-    res.cookie('refreshToken', null, {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true,
-    });
+    res.clearCookie('refreshToken');
 
-    res.status(204);
-    res.redirect('/');
+    res.sendStatus(204);
   },
 
   async sendAuth(res, publicUserData) {
-    // generate access token
     const accessToken = createAccessToken(publicUserData);
     const refreshToken = createRefreshToken(publicUserData);
 
@@ -139,7 +133,6 @@ export const authController = {
       secure: true,
     });
 
-    // Save the refresh token in the DB
     await tokenService.saveToken(publicUserData.id, refreshToken);
 
     res.send({
@@ -154,7 +147,6 @@ export const authController = {
   async refresh(req, res, next) {
     const { refreshToken } = req.cookies;
 
-    // Check whether the token has ever been valid
     const publicUserData = verifyRefreshToken(refreshToken);
 
     if (publicUserData === null) {
@@ -171,7 +163,6 @@ export const authController = {
     await authController.sendAuth(res, publicUserData);
   },
 
-  // Password reset
   async resetRequest(req, res, next) {
     const { email } = req.body;
 
@@ -182,21 +173,17 @@ export const authController = {
       throw ApiError.BadRequest('Invalid email', { email: 'Incorrect email' });
     }
 
-    // Create a ResetToken
     const ResetToken = createResetToken(user);
 
     // Store a ResetToken in the DB (on User's record)
     await resetService.saveToken(user, ResetToken);
 
-    // Send the password reset email with the reset link (include the token)
     await sendResetMail(email, ResetToken);
 
-    // Send the status (with info that "Reset email has been set")
     res.status(200).send({ message: 'Reset email has been set' });
   },
 
   async resetPassword(req, res, next) {
-    // Get the reset token
     const { resetToken } = req.params;
     const { email, password, confirmation } = req.body;
 
@@ -261,16 +248,12 @@ export const authController = {
       throw ApiError.Unauthorized();
     }
 
-    // Change the password
     await updatePassword(user.id, password);
 
-    // Remove the resetToken from the User's record
     await resetService.deleteResetTokenByUserId(user.id);
 
-    // Send an email about the password change
     await sendResetMailConfirmation(email);
 
-    // Send a success message
     res.sendStatus(200);
   },
 };

@@ -26,13 +26,18 @@ authRouter.post(
   catchError(authController.login),
 );
 
-authRouter.post('/logout', catchError(authController.logout));
+authRouter.post(
+  '/logout',
+  catchError(authMiddleware),
+  catchError(authController.logout),
+);
 
 authRouter.post(
   '/reset',
   catchError(guestMiddleware),
   catchError(authController.resetRequest),
 );
+
 authRouter.post(
   '/reset/:resetToken',
   catchError(guestMiddleware),
