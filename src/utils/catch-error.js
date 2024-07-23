@@ -1,4 +1,4 @@
-export const catchError = (middleware) => {
+const catchError = (middleware) => {
   return async (req, res, next) => {
     try {
       await middleware(req, res, next);
@@ -7,3 +7,5 @@ export const catchError = (middleware) => {
     }
   };
 };
+
+module.exports = { catchError };

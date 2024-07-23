@@ -1,24 +1,24 @@
-import bcrypt from 'bcrypt';
-import {
+const bcrypt = require('bcrypt');
+const {
   getAllActiveUsers,
   updateUserEmail,
   updateUserName,
-} from '../services/users-service.js';
-import {
+} = require('../services/users-service.js');
+const {
   verifyAccessToken,
   verifyRefreshToken,
-} from '../services/jwt-service.js';
-import { ApiError } from '../exceptions/API-error.js';
-import { parseAccessToken } from '../utils/parseAccessToken.js';
-import { tokenService } from '../services/token-service.js';
-import { validateEmail, validatePassword } from '../utils/validation.js';
-import {
+} = require('../services/jwt-service.js');
+const { ApiError } = require('../exceptions/API-error.js');
+const { parseAccessToken } = require('../utils/parseAccessToken.js');
+const { tokenService } = require('../services/token-service.js');
+const { validateEmail, validatePassword } = require('../utils/validation.js');
+const {
   findActivatedUserById,
   updatePassword,
-} from '../services/auth-service.js';
-import { sendEmailChangeConfirmation } from '../services/mail-service.js';
+} = require('../services/auth-service.js');
+const { sendEmailChangeConfirmation } = require('../services/mail-service.js');
 
-export const usersController = {
+const usersController = {
   async getAll(req, res) {
     const activeUsers = await getAllActiveUsers();
 
@@ -144,6 +144,11 @@ export const usersController = {
   },
 };
 
-export const compareUserPasswords = (user, plainPassword) => {
+const compareUserPasswords = (user, plainPassword) => {
   return bcrypt.compare(plainPassword, user.password);
+};
+
+module.exports = {
+  usersController,
+  compareUserPasswords,
 };

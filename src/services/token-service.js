@@ -1,8 +1,8 @@
-import { ApiError } from '../exceptions/API-error.js';
-import { Token } from '../models/token.model.js';
-import { User } from '../models/user.model.js';
+const { ApiError } = require('../exceptions/API-error.js');
+const { Token } = require('../models/token.model.js');
+const { User } = require('../models/user.model.js');
 
-export const tokenService = {
+const tokenService = {
   // Writing Tokens
   async saveToken(userId, refreshToken) {
     const token = await tokenService.getByToken(refreshToken);
@@ -35,4 +35,8 @@ export const tokenService = {
   deleteTokenByUserId(userId) {
     return Token.destroy({ where: { UserId: userId } });
   },
+};
+
+module.exports = {
+  tokenService,
 };

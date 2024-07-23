@@ -1,33 +1,33 @@
-import {
+const {
   sendActivationMail,
   sendResetMail,
   sendResetMailConfirmation,
-} from '../services/mail-service.js';
-import {
+} = require('../services/mail-service.js');
+const {
   consumeActivationToken,
   createUser,
   findActivatedUserByEmail,
   findUserByActivationToken,
   findUserByEmail,
   updatePassword,
-} from '../services/auth-service.js';
-import { ApiError } from '../exceptions/API-error.js';
-import {
+} = require('../services/auth-service.js');
+const { ApiError } = require('../exceptions/API-error.js');
+const {
   validatePassword,
   validateRegistrationData,
-} from '../utils/validation.js';
-import { compareUserPasswords } from './users-controller.js';
-import {
+} = require('../utils/validation.js');
+const { compareUserPasswords } = require('./users-controller.js');
+const {
   createAccessToken,
   createResetToken,
   createRefreshToken,
   verifyResetToken,
   verifyRefreshToken,
-} from '../services/jwt-service.js';
-import { tokenService } from '../services/token-service.js';
-import { resetService } from '../services/reset-service.js';
+} = require('../services/jwt-service.js');
+const { tokenService } = require('../services/token-service.js');
+const { resetService } = require('../services/reset-service.js');
 
-export const authController = {
+const authController = {
   async register(req, res, next) {
     const { name, email, password } = req.body;
 
@@ -249,4 +249,8 @@ export const authController = {
 
     res.sendStatus(200);
   },
+};
+
+module.exports = {
+  authController,
 };

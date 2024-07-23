@@ -1,4 +1,4 @@
-export const validateEmail = (email) => {
+const validateEmail = (email) => {
   if (!email) {
     return 'Email is required';
   }
@@ -10,7 +10,7 @@ export const validateEmail = (email) => {
   }
 };
 
-export const validatePassword = (password) => {
+const validatePassword = (password) => {
   if (!password) {
     return 'Password is required';
   }
@@ -20,13 +20,13 @@ export const validatePassword = (password) => {
   }
 };
 
-export const validateName = (name) => {
+const validateName = (name) => {
   if (!name.length) {
     return 'Name is required';
   }
 };
 
-export const validateRegistrationData = (name, email, password) => {
+const validateRegistrationData = (name, email, password) => {
   const nameError = validateName(name);
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
@@ -50,4 +50,11 @@ export const validateRegistrationData = (name, email, password) => {
   }
 
   return undefined;
+};
+
+module.exports = {
+  validateEmail,
+  validatePassword,
+  validateName,
+  validateRegistrationData,
 };

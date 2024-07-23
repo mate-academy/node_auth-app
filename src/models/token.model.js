@@ -1,10 +1,10 @@
-import { DataTypes } from 'sequelize';
-import { sequelize } from '../utils/db.js';
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../utils/db.js');
 
 // eslint-disable-next-line no-unused-vars
-import { User } from './user.model.js';
+const User = require('./user.model.js');
 
-export const Token = sequelize.define(
+const Token = sequelize.define(
   'Token',
   {
     refreshToken: {
@@ -16,3 +16,7 @@ export const Token = sequelize.define(
     tableName: 'tokens',
   },
 );
+
+module.exports = {
+  Token,
+};

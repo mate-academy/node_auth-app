@@ -1,9 +1,9 @@
-import bcrypt from 'bcrypt';
-import { ApiError } from '../exceptions/API-error.js';
-import { User } from '../models/user.model.js';
-import { generateActivationToken } from './users-service.js';
+const bcrypt = require('bcrypt');
+const { ApiError } = require('../exceptions/API-error.js');
+const { User } = require('../models/user.model.js');
+const { generateActivationToken } = require('./users-service.js');
 
-export const createUser = async (name, email, password) => {
+const createUser = async (name, email, password) => {
   const existingUser = await User.findOne({
     where: {
       email,
@@ -35,7 +35,7 @@ export const createUser = async (name, email, password) => {
   return newUserPublicData;
 };
 
-export const findUserByActivationToken = async (activationToken) => {
+const findUserByActivationToken = async (activationToken) => {
   return User.findOne({
     where: {
       activationToken,
@@ -44,7 +44,7 @@ export const findUserByActivationToken = async (activationToken) => {
   });
 };
 
-export const findUserByEmail = async (email) => {
+const findUserByEmail = async (email) => {
   return User.findOne({
     where: {
       email,
@@ -53,12 +53,12 @@ export const findUserByEmail = async (email) => {
   });
 };
 
-export const consumeActivationToken = async (user) => {
+const consumeActivationToken = async (user) => {
   user.activationToken = null;
   await user.save();
 };
 
-export const findActivatedUserByEmail = (email) => {
+const findActivatedUserByEmail = (email) => {
   return User.findOne({
     where: {
       email,
@@ -67,7 +67,7 @@ export const findActivatedUserByEmail = (email) => {
   });
 };
 
-export const findActivatedUserById = (userId) => {
+const findActivatedUserById = (userId) => {
   return User.findOne({
     where: {
       id: userId,
@@ -76,11 +76,11 @@ export const findActivatedUserById = (userId) => {
   });
 };
 
-const hashPassword = (plainPassword) => {
+function hashPassword(plainPassword) {
   return bcrypt.hash(plainPassword, 10);
-};
+}
 
-export const updatePassword = async (userId, newPassword) => {
+const updatePassword = async (userId, newPassword) => {
   const user = await User.findByPk(userId);
 
   if (!user) {
@@ -91,4 +91,14 @@ export const updatePassword = async (userId, newPassword) => {
 
   user.password = hashedPassword;
   await user.save();
+};
+
+module.exports = {
+  createUser,
+  findUserByActivationToken,
+  findUserByEmail,
+  consumeActivationToken,
+  findActivatedUserByEmail,
+  findActivatedUserById,
+  updatePassword,
 };

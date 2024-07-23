@@ -1,7 +1,7 @@
-import { ApiError } from '../exceptions/API-error.js';
-import { User } from '../models/user.model.js';
+const { ApiError } = require('../exceptions/API-error.js');
+const { User } = require('../models/user.model.js');
 
-export const resetService = {
+const resetService = {
   async saveToken(user, resetToken) {
     const currentResetToken = user.resetToken;
 
@@ -23,4 +23,8 @@ export const resetService = {
     user.resetToken = null;
     await user.save();
   },
+};
+
+module.exports = {
+  resetService,
 };

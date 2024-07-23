@@ -1,6 +1,6 @@
-import { ApiError } from '../exceptions/API-error.js';
+const { ApiError } = require('../exceptions/API-error.js');
 
-export const guestMiddleware = (req, res, next) => {
+const guestMiddleware = (req, res, next) => {
   const auth = req.headers?.authorization;
 
   if (auth) {
@@ -9,3 +9,5 @@ export const guestMiddleware = (req, res, next) => {
 
   next();
 };
+
+module.exports = { guestMiddleware };

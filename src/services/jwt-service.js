@@ -1,8 +1,7 @@
-import 'dotenv';
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
 // Access Token
-export const createAccessToken = (user) => {
+const createAccessToken = (user) => {
   const publicUserData = {
     id: user.id,
     name: user.name,
@@ -14,7 +13,7 @@ export const createAccessToken = (user) => {
   });
 };
 
-export const verifyAccessToken = (accessToken) => {
+const verifyAccessToken = (accessToken) => {
   try {
     return jwt.verify(accessToken, process.env.JWT_SECRET);
   } catch {
@@ -23,7 +22,7 @@ export const verifyAccessToken = (accessToken) => {
 };
 
 // Refresh Token
-export const createRefreshToken = (user) => {
+const createRefreshToken = (user) => {
   const publicUserData = {
     id: user.id,
     name: user.name,
@@ -35,7 +34,7 @@ export const createRefreshToken = (user) => {
   });
 };
 
-export const verifyRefreshToken = (refreshToken) => {
+const verifyRefreshToken = (refreshToken) => {
   try {
     return jwt.verify(refreshToken, process.env.JWT_SECRET_REFRESH);
   } catch (error) {
@@ -44,7 +43,7 @@ export const verifyRefreshToken = (refreshToken) => {
 };
 
 // Password Reset Token
-export const createResetToken = (user) => {
+const createResetToken = (user) => {
   const publicUserData = {
     id: user.id,
     name: user.name,
@@ -56,10 +55,19 @@ export const createResetToken = (user) => {
   });
 };
 
-export const verifyResetToken = (resetToken) => {
+const verifyResetToken = (resetToken) => {
   try {
     return jwt.verify(resetToken, process.env.JWT_SECRET_RESET);
   } catch {
     return null;
   }
+};
+
+module.exports = {
+  createAccessToken,
+  verifyAccessToken,
+  createRefreshToken,
+  verifyRefreshToken,
+  createResetToken,
+  verifyResetToken,
 };

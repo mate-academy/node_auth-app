@@ -1,11 +1,11 @@
 'use strict';
 
-import express from 'express';
-import cors from 'cors';
-import { authRouter } from './routers/auth-router.js';
-import { usersRouter } from './routers/users-router.js';
-import { errorMiddleware } from './middlewares/error-middleware.js';
-import cookieParser from 'cookie-parser';
+const express = require('express');
+const cors = require('cors');
+const { authRouter } = require('./routers/auth-router.js');
+const { usersRouter } = require('./routers/users-router.js');
+const { errorMiddleware } = require('./middlewares/error-middleware.js');
+const cookieParser = require('cookie-parser');
 
 const PORT = process.env.PORT || 5500;
 

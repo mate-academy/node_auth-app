@@ -1,3 +1,3 @@
-import { sequelize } from './utils/db.js';
+const { sequelize } = require('./utils/db.js');
 
 await sequelize.sync({ force: true });

@@ -1,10 +1,10 @@
-import express from 'express';
-import { authController } from '../controllers/auth-controller.js';
-import { catchError } from '../utils/catch-error.js';
-import { guestMiddleware } from '../middlewares/guest-middleware.js';
-import { authMiddleware } from '../middlewares/auth-middleware.js';
+const express = require('express');
+const { authController } = require('../controllers/auth-controller.js');
+const { catchError } = require('../utils/catch-error.js');
+const { guestMiddleware } = require('../middlewares/guest-middleware.js');
+const { authMiddleware } = require('../middlewares/auth-middleware.js');
 
-export const authRouter = new express.Router();
+const authRouter = new express.Router();
 
 authRouter.post(
   '/registration',
@@ -43,3 +43,7 @@ authRouter.post(
   catchError(guestMiddleware),
   catchError(authController.resetPassword),
 );
+
+module.exports = {
+  authRouter,
+};

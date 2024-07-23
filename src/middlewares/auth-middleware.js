@@ -1,8 +1,8 @@
-import { ApiError } from '../exceptions/API-error.js';
-import { verifyAccessToken } from '../services/jwt-service.js';
-import { parseAccessToken } from '../utils/parseAccessToken.js';
+const { ApiError } = require('../exceptions/API-error.js');
+const { verifyAccessToken } = require('../services/jwt-service.js');
+const { parseAccessToken } = require('../utils/parseAccessToken.js');
 
-export const authMiddleware = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   const auth = req.headers.authorization;
 
   if (!auth) {
@@ -23,3 +23,5 @@ export const authMiddleware = (req, res, next) => {
 
   next();
 };
+
+module.exports = { authMiddleware };

@@ -1,5 +1,6 @@
-import nodemailer from 'nodemailer';
-import 'dotenv/config';
+const nodemailer = require('nodemailer');
+
+require('dotenv/config');
 
 const transporter = nodemailer.createTransport({
   host: process.env.NODEMAILER_HOST,
@@ -11,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendMail = async ({ to, subject, text, html }) => {
+const sendMail = async ({ to, subject, text, html }) => {
   const result = await transporter.sendMail({
     from: 'Auth API <olaf4402@gmail.com>',
     to,
@@ -27,7 +28,7 @@ export const sendMail = async ({ to, subject, text, html }) => {
   return result.accepted;
 };
 
-export const sendActivationMail = (email, token) => {
+const sendActivationMail = (email, token) => {
   const activationLink = `${process.env.REACT_APP_ORIGIN}/activate/${token}`;
 
   return sendMail({
@@ -40,7 +41,7 @@ export const sendActivationMail = (email, token) => {
   });
 };
 
-export const sendResetMail = (email, resetToken) => {
+const sendResetMail = (email, resetToken) => {
   const resetLink = `${process.env.REACT_APP_ORIGIN}/reset/${resetToken}`;
 
   return sendMail({
@@ -53,7 +54,7 @@ export const sendResetMail = (email, resetToken) => {
   });
 };
 
-export const sendResetMailConfirmation = (email) => {
+const sendResetMailConfirmation = (email) => {
   return sendMail({
     to: email,
     subject: 'Password reset confirmation',
@@ -63,7 +64,7 @@ export const sendResetMailConfirmation = (email) => {
   });
 };
 
-export const sendEmailChangeConfirmation = (oldEmail) => {
+const sendEmailChangeConfirmation = (oldEmail) => {
   return sendMail({
     to: oldEmail,
     subject: 'Email change confirmation',
@@ -71,4 +72,12 @@ export const sendEmailChangeConfirmation = (oldEmail) => {
       <h1>This email address previously assigned to your account has been changed successfully</h1>
     `,
   });
+};
+
+module.exports = {
+  sendMail,
+  sendActivationMail,
+  sendResetMail,
+  sendResetMailConfirmation,
+  sendEmailChangeConfirmation,
 };
