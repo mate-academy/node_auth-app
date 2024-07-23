@@ -66,14 +66,12 @@ export const authController = {
   async activate(req, res, next) {
     const { activationToken } = req.params;
 
-    // User stripped of password attribute, so we don't send it in the response
     const publicUserData = await findUserByActivationToken(activationToken);
 
     if (!publicUserData) {
       next(ApiError.BadRequest('Wrong activation link'));
     }
 
-    // Found the user, change the field to null
     consumeActivationToken(publicUserData);
 
     res.send(publicUserData);
@@ -82,7 +80,6 @@ export const authController = {
   async login(req, res) {
     const { email, password } = req.body;
 
-    // find the user in db
     const activeUser = await findActivatedUserByEmail(email);
 
     if (!activeUser) {
@@ -94,8 +91,6 @@ export const authController = {
     if (!arePasswordsEqual) {
       throw ApiError.BadRequest('User does not exist or password is incorrect');
     }
-
-    // Log in was successful
 
     const publicUserData = {
       id: activeUser.id,

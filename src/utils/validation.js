@@ -31,7 +31,6 @@ export const validateRegistrationData = (name, email, password) => {
   const emailError = validateEmail(email);
   const passwordError = validatePassword(password);
 
-  // Validate data
   if (nameError || emailError || passwordError) {
     const errors = {};
 

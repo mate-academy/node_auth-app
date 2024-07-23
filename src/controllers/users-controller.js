@@ -90,7 +90,6 @@ export const usersController = {
       });
     }
 
-    // Check refresh token
     const tokenData = verifyRefreshToken(refreshToken);
 
     if (!tokenData) {
@@ -122,14 +121,12 @@ export const usersController = {
       });
     }
 
-    // Check refresh token
     const tokenData = verifyRefreshToken(refreshToken);
 
     if (!tokenData) {
       throw ApiError.Unauthorized();
     }
 
-    // Get old email to notify it about the email change
     const user = await findActivatedUserById(tokenData.userId);
     const oldEmail = user.email;
 

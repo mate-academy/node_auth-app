@@ -3,10 +3,9 @@ import { User } from '../models/user.model.js';
 
 export const resetService = {
   async saveToken(user, resetToken) {
-    // If user already has a resetToken -> Don't change it
     const currentResetToken = user.resetToken;
 
-    if (!!currentResetToken) {
+    if (currentResetToken) {
       throw ApiError.BadRequest('User already has a password reset token.');
     }
 
