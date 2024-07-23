@@ -16,7 +16,7 @@ export const createUser = async (name, email, password) => {
 
   const activationToken = generateActivationToken();
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
 
   const newUser = await User.create({
     name,
@@ -64,4 +64,8 @@ export const findActivatedUserByEmail = (email) => {
       activationToken: null,
     },
   });
+};
+
+const hashPassword = (plainPassword) => {
+  return bcrypt.hash(plainPassword, 10);
 };

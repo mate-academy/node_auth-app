@@ -26,3 +26,5 @@ authRouter.post(
   catchError(authController.login),
 );
 authRouter.post('/logout', catchError(authController.logout));
+
+authRouter.post('/reset', catchError(authController.reset));

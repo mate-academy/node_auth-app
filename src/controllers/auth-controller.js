@@ -7,7 +7,10 @@ import {
   findUserByEmail,
 } from '../services/auth-service.js';
 import { ApiError } from '../exceptions/API-error.js';
-import { validateRegistrationData } from '../utils/validation.js';
+import {
+  validatePassword,
+  validateRegistrationData,
+} from '../utils/validation.js';
 import { compareUserPasswords } from './users-controller.js';
 import {
   createAccessToken,
