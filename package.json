@@ -1,7 +1,6 @@
 {
   "name": "node_auth-app",
   "version": "1.0.0",
-  "type": "module",
   "description": "Auth app",
   "main": "src/index.js",
   "scripts": {
