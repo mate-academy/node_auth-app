@@ -148,7 +148,6 @@ export const authController = {
       throw ApiError.Unauthorized();
     }
 
-    // Check in DB whether the refresh token is still valid
     const token = await tokenService.getByToken(refreshToken);
 
     if (token === null) {
@@ -161,7 +160,6 @@ export const authController = {
   async resetRequest(req, res, next) {
     const { email } = req.body;
 
-    // Check whether user with that email exists
     const user = await findActivatedUserByEmail(email);
 
     if (!user) {
