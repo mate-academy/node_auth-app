@@ -28,6 +28,10 @@ export const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    resetToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: 'users',

@@ -1,5 +1,5 @@
 import { ApiError } from '../exceptions/API-error.js';
-import { readAccessToken } from '../services/jwt-service.js';
+import { verifyAccessToken } from '../services/jwt-service.js';
 
 export const authMiddleware = (req, res, next) => {
   const auth = req.headers.authorization;
@@ -14,7 +14,7 @@ export const authMiddleware = (req, res, next) => {
     throw ApiError.Unauthorized();
   }
 
-  const result = readAccessToken(accessToken);
+  const result = verifyAccessToken(accessToken);
 
   if (result === null) {
     throw ApiError.Unauthorized();

@@ -29,6 +29,7 @@ export const createUser = async (name, email, password) => {
     id: newUser.id,
     name: newUser.name,
     email: newUser.email,
+    activationToken: newUser.activationToken,
   };
 
   return newUserPublicData;
@@ -68,4 +69,17 @@ export const findActivatedUserByEmail = (email) => {
 
 const hashPassword = (plainPassword) => {
   return bcrypt.hash(plainPassword, 10);
+};
+
+export const updatePassword = async (userId, newPassword) => {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    throw ApiError.NotFound();
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  user.password = hashedPassword;
+  await user.save();
 };

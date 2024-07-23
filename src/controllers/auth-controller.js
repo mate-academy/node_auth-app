@@ -1,10 +1,11 @@
-import { sendActivationMail } from '../services/mail-service.js';
+import { sendActivationMail, sendResetMail } from '../services/mail-service.js';
 import {
   consumeActivationToken,
   createUser,
   findActivatedUserByEmail,
   findUserByActivationToken,
   findUserByEmail,
+  updatePassword,
 } from '../services/auth-service.js';
 import { ApiError } from '../exceptions/API-error.js';
 import {
@@ -14,10 +15,13 @@ import {
 import { compareUserPasswords } from './users-controller.js';
 import {
   createAccessToken,
+  createResetToken,
   createRefreshToken,
-  readRefreshToken,
+  verifyResetToken,
+  verifyRefreshToken,
 } from '../services/jwt-service.js';
 import { tokenService } from '../services/token-service.js';
+import { resetService } from '../services/reset-service.js';
 
 export const authController = {
   async register(req, res, next) {
@@ -25,7 +29,7 @@ export const authController = {
 
     const validationErrors = validateRegistrationData(name, email, password);
 
-    if (!!validationErrors) {
+    if (validationErrors) {
       throw ApiError.BadRequest('Incorrect data', validationErrors);
     }
 
@@ -136,7 +140,7 @@ export const authController = {
     const { refreshToken } = req.cookies;
 
     // Check whether the token has ever been valid
-    const publicUserData = readRefreshToken(refreshToken);
+    const publicUserData = verifyRefreshToken(refreshToken);
 
     if (publicUserData === null) {
       throw ApiError.Unauthorized();
@@ -150,5 +154,107 @@ export const authController = {
     }
 
     await authController.sendAuth(res, publicUserData);
+  },
+
+  // Password reset
+  async resetRequest(req, res, next) {
+    const { email } = req.body;
+
+    // Check whether user with that email exists
+    const user = await findActivatedUserByEmail(email);
+
+    if (!user) {
+      throw ApiError.BadRequest(
+        `Account with that email address doesn't exist or the account has not yet been activated`,
+      );
+    }
+
+    // Create a ResetToken
+    const ResetToken = createResetToken(user);
+
+    // Store a ResetToken in the DB (on User's record)
+    await resetService.saveToken(user, ResetToken);
+
+    // Send the password reset email with the reset link (include the token)
+    await sendResetMail(email, ResetToken);
+
+    // Send the status (with info that "Reset email has been set")
+    res.status(200).send({ message: 'Reset email has been set' });
+  },
+
+  async resetPassword(req, res, next) {
+    // Get the reset token
+    const { resetToken } = req.params;
+    const { email, password, confirmation } = req.body;
+
+    if (!resetToken) {
+      throw ApiError.BadRequest('Incorrect token', {
+        resetToken: 'No reset token provided',
+      });
+    }
+
+    if (!password) {
+      throw ApiError.BadRequest('Incorrect data', {
+        password: 'No password provided',
+      });
+    }
+
+    const passwordErrors = validatePassword(password);
+
+    if (passwordErrors) {
+      throw ApiError.BadRequest('Incorrect password', {
+        password: 'passwordErrors',
+      });
+    }
+
+    if (!confirmation) {
+      throw ApiError.BadRequest('Incorrect data', {
+        confirmation: 'No confirmation provided',
+      });
+    }
+
+    if (password !== confirmation) {
+      throw ApiError.BadRequest('Incorrect data', {
+        confirmation: `Passwords don't match`,
+      });
+    }
+
+    if (!email) {
+      throw ApiError.BadRequest('Incorrect data', {
+        email: 'No email provided',
+      });
+    }
+
+    // Check whether reset token is valid (with jwt)
+    const publicUserData = verifyResetToken(resetToken);
+
+    if (!publicUserData) {
+      throw ApiError.BadRequest('Incorrect token', {
+        resetToken: 'Incorrect or expired reset token.',
+      });
+    }
+
+    // Check who does the token belong to (which user)
+    const user = await findActivatedUserByEmail(email);
+
+    if (!user) {
+      throw ApiError.BadRequest('Incorrect data', {
+        email: 'Incorrect email address',
+      });
+    }
+
+    // Check whether the token belongs to the user of that email
+    if (publicUserData.id !== user.id) {
+      throw ApiError.Unauthorized();
+    }
+
+    // Change the password
+    await updatePassword(user.id, password);
+
+    // Remove the resetToken from the User's record
+    await resetService.deleteResetTokenByUserId(user.id);
+
+    // Send a success message
+    res.sendStatus(200);
   },
 };

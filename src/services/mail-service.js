@@ -39,3 +39,16 @@ export const sendActivationMail = (email, token) => {
     `,
   });
 };
+
+export const sendResetMail = (email, resetToken) => {
+  const resetLink = `${process.env.REACT_APP_ORIGIN}/reset/${resetToken}`;
+
+  return sendMail({
+    to: email,
+    subject: 'Password Reset',
+    html: `
+      <h1>Visit the link below to reset your password</h1>
+      <a target="_blank" href=${resetLink}>${resetLink}</a>
+    `,
+  });
+};
