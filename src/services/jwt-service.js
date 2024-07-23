@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 export const createAccessToken = (user) => {
   const publicUserData = {
     id: user.id,
+    name: user.name,
     email: user.email,
   };
 
@@ -25,6 +26,7 @@ export const verifyAccessToken = (accessToken) => {
 export const createRefreshToken = (user) => {
   const publicUserData = {
     id: user.id,
+    name: user.name,
     email: user.email,
   };
 
@@ -45,6 +47,7 @@ export const verifyRefreshToken = (refreshToken) => {
 export const createResetToken = (user) => {
   const publicUserData = {
     id: user.id,
+    name: user.name,
     email: user.email,
   };
 

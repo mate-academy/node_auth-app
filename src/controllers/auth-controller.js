@@ -49,7 +49,14 @@ export const authController = {
 
     await sendActivationMail(email, newUser.activationToken);
 
-    res.send(newUser);
+    const newUserPublicData = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      activationToken: newUser.activationToken,
+    };
+
+    res.send(newUserPublicData);
   },
 
   async activate(req, res, next) {
@@ -88,6 +95,7 @@ export const authController = {
 
     const publicUserData = {
       id: activeUser.id,
+      name: activeUser.name,
       email: activeUser.email,
     };
 
@@ -132,7 +140,10 @@ export const authController = {
 
     res.send({
       accessToken: accessToken,
-      user: { email: publicUserData.email },
+      user: {
+        name: publicUserData.name,
+        email: publicUserData.email,
+      },
     });
   },
 

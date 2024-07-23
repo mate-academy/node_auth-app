@@ -40,7 +40,7 @@ export const findUserByActivationToken = async (activationToken) => {
     where: {
       activationToken,
     },
-    attributes: ['id', 'email'],
+    attributes: ['id', 'name', 'email'],
   });
 };
 
