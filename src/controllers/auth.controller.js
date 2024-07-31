@@ -1,15 +1,25 @@
 const { User } = require('../models/user');
 const bcrypt = require('bcrypt');
+const moment = require('moment');
 
 const {
   findByEmail,
   normalize,
   registerUser,
+  findUserById,
+  findByEmailAndId,
+  changeAuthEmail,
 } = require('../services/user.service');
 
 const { sign, verifyRefresh, signRefresh } = require('../services/jwt.service');
 const { ApiError } = require('../exceptions/api.error');
 const { save, getByToken, remove } = require('../services/token.service');
+const {
+  resetPasswordUser,
+  findUserByResetToken,
+  removeResetToken,
+} = require('../services/resetToken.service');
+const { sendGoodbyeEmail } = require('../services/email.service');
 
 function validateEmail(value) {
   if (!value) {
@@ -33,6 +43,12 @@ function validatePassword(value) {
   }
 }
 
+function validateName(value) {
+  if (value.length < 3) {
+    return 'At least 3 characters';
+  }
+}
+
 const generateTokens = async (res, user) => {
   const normalizedUser = normalize(user);
   const accessToken = sign(normalizedUser);
@@ -52,19 +68,51 @@ const generateTokens = async (res, user) => {
 };
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
+
   const errors = {
+    name: validateName(name),
     email: validateEmail(email),
     password: validatePassword(password),
   };
 
-  if (errors.email || errors.password) {
+  if (errors.email || errors.password || errors.name) {
     throw ApiError('Bad request', errors);
   }
 
   const hashPass = await bcrypt.hash(password, 10);
-  await registerUser(email, hashPass);
+
+  await registerUser(name, email, hashPass);
+
   res.send({ message: 'OK' });
+};
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await findByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('No such users');
+  }
+
+  const { activationToken } = user;
+  if (activationToken) {
+    throw ApiError.badRequest(
+      'Please check your inbox and activate your email',
+    );
+  }
+
+  if (!user) {
+    throw ApiError.badRequest('No such users');
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  }
+
+  await generateTokens(res, user);
 };
 
 const activate = async (req, res) => {
@@ -79,34 +127,11 @@ const activate = async (req, res) => {
 
   user.activationToken = null;
 
-  user.save();
+  await user.save();
+
+  await generateTokens(res, user);
 
   res.send(user);
-};
-
-const login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await findByEmail(email);
-
-  if (!user) {
-    throw ApiError.badRequest('No such users');
-  }
-
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-
-  if (!isPasswordValid) {
-    throw ApiError.badRequest('Wrong password');
-  }
-
-  generateTokens(res, user);
-
-  // const normalizeDUser = normalize(user);
-  // const accessToken = sign(normalizeDUser);
-
-  // res.send({
-  //   user: normalizeDUser,
-  //   accessToken,
-  // });
 };
 
 const refresh = async (req, res) => {
@@ -114,9 +139,13 @@ const refresh = async (req, res) => {
 
   const userData = await verifyRefresh(refreshToken);
 
+  if (!userData) {
+    throw ApiError.unauthorized();
+  }
+
   const token = await getByToken(refreshToken);
 
-  if (!userData || !token) {
+  if (!token) {
     throw ApiError.unauthorized();
   }
 
@@ -139,10 +168,150 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
+const reset = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    throw ApiError.unauthorized();
+  }
+
+  await resetPasswordUser(email);
+  res.sendStatus(200);
+};
+
+const resetPassword = async (req, res) => {
+  const { newPassword, newPasswordConfirmation, resetToken } = req.body;
+
+  if (!newPassword || !newPasswordConfirmation || !resetToken) {
+    throw ApiError.badRequest('All fields are required.');
+  }
+
+  if (newPassword.trim() !== newPasswordConfirmation.trim()) {
+    throw ApiError.badRequest('Passwords are not equal');
+  }
+
+  const token = await findUserByResetToken(resetToken);
+
+  if (!token || !token.userId) {
+    throw ApiError.badRequest('Invalid or expired reset token');
+  }
+
+  const user = await findUserById(token.userId);
+
+  if (!user) {
+    throw ApiError.badRequest('No such user!');
+  }
+
+  const hashPass = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashPass;
+  await removeResetToken(token.resetToken);
+
+  await user.save();
+
+  res.send('Password reset successfully');
+};
+
+const resetChecker = async (req, res) => {
+  const { resetToken } = req.params;
+  const userToken = await findUserByResetToken(resetToken);
+  if (!userToken) {
+    throw ApiError.notFound();
+  }
+  const currentTime = moment();
+
+  if (currentTime.isAfter(userToken.expirationTime)) {
+    throw ApiError.badRequest('Expired reset token, please request new token');
+  }
+
+  res.send(userToken);
+};
+
+const updateUserName = async (req, res) => {
+  const { name, email } = req.body;
+
+  try {
+    const user = await findByEmail(email);
+    if (!user) {
+      return res.status(404).send({ message: 'User not found' });
+    }
+
+    user.name = name;
+    await user.save();
+
+    res.send(normalize(user));
+  } catch (err) {
+    console.error('Error updating user name:', err);
+    res.status(500).send({ message: 'Internal server error' });
+  }
+};
+
+const changeAuthPass = async (req, res) => {
+  const { id, email, oldPassword, newPassword, newPasswordConfirmation } =
+    req.body;
+  const user = await findByEmailAndId(id, email);
+  if (!user) {
+    throw ApiError.badRequest('User is not found');
+  }
+
+  if (newPassword !== newPasswordConfirmation) {
+    throw ApiError.badRequest('Password is not the same');
+  }
+
+  const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Your current password wrong');
+  }
+
+  const hashPass = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashPass;
+
+  await user.save();
+
+  await generateTokens(res, user);
+};
+
+const changeEmail = async (req, res) => {
+  const { user } = req.body;
+
+  const currentUser = await findUserById(user.id);
+
+  if (!currentUser) {
+    throw ApiError.badRequest('User is not found');
+  }
+
+  if (currentUser.email === user.email) {
+    throw ApiError.badRequest('Email is the same');
+  }
+  const isPasswordValid = await bcrypt.compare(
+    user.password,
+    currentUser.password,
+  );
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Your password is wrong');
+  }
+
+  await sendGoodbyeEmail(currentUser.name, user.email, currentUser.email);
+
+  currentUser.email = user.email;
+
+  currentUser.save();
+
+  await generateTokens(res, currentUser);
+};
+
 module.exports = {
   register,
   activate,
   login,
   refresh,
   logout,
+  reset,
+  resetPassword,
+  resetChecker,
+  updateUserName,
+  changeAuthPass,
+  changeEmail,
 };

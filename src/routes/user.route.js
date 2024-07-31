@@ -5,7 +5,7 @@ const { catchError } = require('../utils/catchError');
 
 const userRouter = new express.Router();
 
-userRouter.get('/', authMiddleware, catchError(getAllActivated));
+userRouter.get('/', catchError(authMiddleware), catchError(getAllActivated));
 
 module.exports = {
   userRouter,

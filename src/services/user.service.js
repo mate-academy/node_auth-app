@@ -12,15 +12,23 @@ const getAllActivatedUsers = () => {
   });
 };
 
-const normalize = ({ id, email }) => {
-  return { id, email };
+const normalize = ({ id, email, name }) => {
+  return { id, email, name };
 };
 
 const findByEmail = (email) => {
   return User.findOne({ where: { email } });
 };
 
-const registerUser = async (email, password) => {
+const findByEmailAndId = (userId, email) => {
+  return User.findOne({ where: { id: userId, email } });
+};
+
+const findUserById = (userId) => {
+  return User.findOne({ where: { id: userId } });
+};
+
+const registerUser = async (name, email, password) => {
   const activationToken = uuidv4();
 
   const existUser = await findByEmail(email);
@@ -31,9 +39,9 @@ const registerUser = async (email, password) => {
     });
   }
 
-  User.create({ email, password, activationToken });
+  await User.create({ name, email, password, activationToken });
 
-  await sendActivationEmail(email, activationToken);
+  await sendActivationEmail(name, email, activationToken);
 };
 
 module.exports = {
@@ -41,4 +49,6 @@ module.exports = {
   normalize,
   findByEmail,
   registerUser,
+  findUserById,
+  findByEmailAndId,
 };

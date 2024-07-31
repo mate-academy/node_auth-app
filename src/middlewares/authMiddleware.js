@@ -1,26 +1,18 @@
-const { verify } = require('../services/jwt.service');
+const { ApiError } = require('./../exceptions/api.error');
 
-const authMiddleware = (req, res, next) => {
-  const authorization = req.headers['authorization'] || '';
-  const [, token] = authorization.split(' ');
+const { verifyRefresh } = require('../services/jwt.service');
 
-  if (!authorization || !token) {
-    res.sendStatus(401);
+async function authMiddleware(req, res, next) {
+  const { refreshToken } = req.cookies;
 
-    return;
-  }
-
-  const userData = verify(token);
-
-  console.log(userData);
+  const userData = await verifyRefresh(refreshToken);
 
   if (!userData) {
-    res.sendStatus(401);
-    return;
+    throw ApiError.unauthorized();
   }
 
   next();
-};
+}
 
 module.exports = {
   authMiddleware,

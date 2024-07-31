@@ -31,6 +31,10 @@ app.use(cookieParser());
 app.use(authRouter);
 app.use('/users', userRouter);
 
+app.use((req, res) => {
+  res.status(404).send('The page is not found');
+});
+
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
