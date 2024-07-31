@@ -53,7 +53,7 @@ const sendActivation = async (req, res) => {
 const activate = async (req, res) => {
   const { activationToken } = req.params;
 
-  const user = await userService.getUserByActivationToken({ activationToken });
+  const user = await userService.getUserByActivationToken(activationToken);
 
   if (!user) {
     res.sendStatus(404);
@@ -78,7 +78,8 @@ const login = async (req, res) => {
 
   if (user.activationToken) {
     throw ApiError.badRequest(
-      'The account is not activated. Please check your mail. You should have received an email with an activation link',
+      `The account is not activated. Please check your mail.
+      You should have received an email with an activation link`,
     );
   }
 
@@ -112,20 +113,20 @@ const resetPassword = async (req, res) => {
 
 const saveNewPassword = async (req, res) => {
   const { resetToken } = req.params;
-  const { password } = req.body;
+  const { password, confirmPassword } = req.body;
 
   const token = await resetTokenService.getByResetToken(resetToken);
 
   if (!token) {
     throw ApiError.badRequest(
-      'You may have missed some steps when changing your password. Please start from the beginning',
+      `You may have missed some steps when changing your password.
+      Please start from the beginning`,
     );
   }
 
   const now = new Date();
 
   if (now > token.expiresAt) {
-    // add remove resetToken
     await resetTokenService.remove(token.userId);
 
     throw ApiError.badRequest('Token has expired');
@@ -133,10 +134,15 @@ const saveNewPassword = async (req, res) => {
 
   const errors = {
     password: validatePassword(password),
+    confirmPassword: validatePassword(confirmPassword),
   };
 
-  if (errors.password) {
+  if (errors.password || errors.confirmPassword) {
     throw ApiError.badRequest('Bad request', errors);
+  }
+
+  if (password !== confirmPassword) {
+    throw ApiError.badRequest('Passwords must match');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -146,57 +152,9 @@ const saveNewPassword = async (req, res) => {
   user.password = hashedPassword;
   user.save();
 
-  // add remove resetToken
   await resetTokenService.remove(token.userId);
 
-  res.send({ message: 'works', user });
-};
-
-const changeEmail = async (req, res) => {
-  const { confirmNewEmailToken } = req.params;
-
-  const changeEmail =
-    await emailChangesService.getByConfirmNewEmailToken(confirmNewEmailToken);
-
-  if (!changeEmail) {
-    throw ApiError.badRequest('Wrong token to confirm the change of mail');
-  }
-
-  const now = new Date();
-
-  if (now > changeEmail.expiresAt) {
-    throw ApiError.badRequest('Token has expired');
-  }
-
-  const user = await userService.getUserById(changeEmail.userId);
-
-  if (!user) {
-    throw ApiError.badRequest('No such user');
-  }
-
-  user.email = changeEmail.newEmail;
-  user.save();
-
-  await generateTokens(res, user);
-};
-
-const logout = async (req, res) => {
-  const { refreshToken } = req.cookies;
-
-  if (!refreshToken) {
-    throw ApiError.unauthorized();
-  }
-
-  const userData = jwtService.verifyRefresh(refreshToken);
-
-  if (!userData) {
-    throw ApiError.unauthorized();
-  }
-
-  await tokenService.remove(userData.id);
-
-  res.clearCookie('refreshToken');
-  res.sendStatus(204);
+  res.send({ message: 'Password successfully changed' });
 };
 
 const refresh = async (req, res) => {
@@ -219,6 +177,185 @@ const refresh = async (req, res) => {
   await generateTokens(res, user);
 };
 
+const changeName = async (req, res) => {
+  const { id, newName } = req.body;
+
+  const user = await userService.getUserById(id);
+
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  if (user.name === newName) {
+    throw ApiError.badRequest('The same names');
+  }
+
+  const error = validateName(newName);
+
+  if (error) {
+    throw ApiError.badRequest('Bad request', error);
+  }
+
+  user.name = newName;
+  await user.save();
+
+  const normalizedUser = userService.normalize(user);
+
+  res.status(200);
+  res.send({ user: normalizedUser });
+};
+
+const changeEmail = async (req, res) => {
+  const { id, email, password, newEmail } = req.body;
+
+  const user = await userService.getUserById(id);
+
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  const errors = {
+    password: validatePassword(password),
+    email: validateEmail(email),
+    newEmail: validateEmail(newEmail),
+  };
+
+  if (errors.password || errors.email || errors.newEmail) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  }
+
+  if (newEmail === email) {
+    throw ApiError.badRequest('Emails cannot be the same');
+  }
+
+  const userByEmail = await userService.getUserByEmail(email);
+
+  if (!userByEmail) {
+    throw ApiError.badRequest('There is no user with this email');
+  }
+
+  if (userByEmail.email !== user.email) {
+    throw ApiError.badRequest('This is not your email address');
+  }
+
+  const userByNewEmail = await userService.getUserByEmail(newEmail);
+
+  if (userByNewEmail) {
+    throw ApiError.badRequest('This email is already being used');
+  }
+
+  const confirmNewEmailToken = uuidv4();
+
+  await emailChangesService.create({
+    userId: user.id,
+    oldEmail: email,
+    newEmail,
+    confirmNewEmailToken,
+  });
+
+  await emailService.sendConfirmNewEmail({
+    email,
+    newEmail,
+    confirmNewEmailToken,
+  });
+
+  await emailService.sendNotificationToOldEmail({ email, newEmail });
+
+  res.statusCode = 200;
+  res.send({ message: 'OK' });
+};
+
+const saveNewEmail = async (req, res) => {
+  const { confirmNewEmailToken } = req.params;
+
+  const changeEmailData =
+    await emailChangesService.getByConfirmNewEmailToken(confirmNewEmailToken);
+
+  if (!changeEmailData) {
+    throw ApiError.badRequest('Wrong token to confirm the change of mail');
+  }
+
+  const now = new Date();
+
+  if (now > changeEmailData.expiresAt) {
+    throw ApiError.badRequest('Token has expired');
+  }
+
+  const user = await userService.getUserById(changeEmailData.userId);
+
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  user.email = changeEmailData.newEmail;
+  user.save();
+
+  await generateTokens(res, user);
+};
+
+const changePassword = async (req, res) => {
+  const { id, password, newPassword, confirmNewPassword } = req.body;
+
+  const user = await userService.getUserById(id);
+
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  const errors = {
+    password: validatePassword(password),
+    newPassword: validatePassword(newPassword),
+    confirmNewPassword: validatePassword(confirmNewPassword),
+  };
+
+  if (errors.password || errors.newPassword || errors.confirmNewPassword) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    throw ApiError.badRequest('Passwords must match');
+  }
+
+  const hashedNewPass = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedNewPass;
+  await user.save();
+
+  res.status(200);
+  res.send({ message: 'Password has been successfully updated' });
+};
+
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    throw ApiError.unauthorized();
+  }
+
+  const userData = jwtService.verifyRefresh(refreshToken);
+
+  if (!userData) {
+    throw ApiError.unauthorized();
+  }
+
+  await tokenService.remove(userData.id);
+
+  res.clearCookie('refreshToken');
+  res.sendStatus(204);
+};
+
 const generateTokens = async (res, user) => {
   const normalizedUser = userService.normalize(user);
   const accessToken = jwtService.sign(normalizedUser);
@@ -228,7 +365,7 @@ const generateTokens = async (res, user) => {
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
-    HttpOnly: true,
+    httpOnly: true,
   });
 
   res.send({
@@ -244,7 +381,10 @@ export const authController = {
   login,
   resetPassword,
   saveNewPassword,
+  changeName,
   changeEmail,
+  saveNewEmail,
+  changePassword,
   logout,
   refresh,
 };

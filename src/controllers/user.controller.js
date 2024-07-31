@@ -1,12 +1,12 @@
-import { ApiError } from '../exceptions/api.error.js';
-import { emailService } from '../services/email.service.js';
-import { emailChangesService } from '../services/emailChanges.service.js';
+// import { ApiError } from '../exceptions/api.error.js';
+// import { emailService } from '../services/email.service.js';
+// import { emailChangesService } from '../services/emailChanges.service.js';
 import { userService } from '../services/user.service.js';
-import { validateEmail } from '../validators/emailValidator.js';
-import { validateName } from '../validators/nameValidator.js';
-import { validatePassword } from '../validators/passwordValidator.js';
-import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
+// import { validateEmail } from '../validators/emailValidator.js';
+// import { validateName } from '../validators/nameValidator.js';
+// import { validatePassword } from '../validators/passwordValidator.js';
+// import bcrypt from 'bcrypt';
+// import { v4 as uuidv4 } from 'uuid';
 
 const getAllActivated = async (req, res) => {
   const users = await userService.getAllActivated();
@@ -14,112 +14,103 @@ const getAllActivated = async (req, res) => {
   res.send(users.map(userService.normalize));
 };
 
-const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { name, password, newPassword, email, newEmail } = req.body;
+// const updateUser = async (req, res) => {
+//   const { id } = req.params;
+//   const { password, newPassword, email, newEmail } = req.body;
 
-  const user = await userService.getUserById(id);
+//   const user = await userService.getUserById(id);
 
-  if (!user) {
-    throw ApiError.badRequest('No such user');
-  }
+//   if (!user) {
+//     throw ApiError.badRequest('No such user');
+//   }
 
-  const errors = {
-    name: validateName(name),
-    password: validatePassword(password),
-    newPassword: validatePassword(newPassword),
-    email: validateEmail(email),
-    newEmail: validateEmail(newEmail),
-  };
+//   const errors = {
+//     password: validatePassword(password),
+//     newPassword: validatePassword(newPassword),
+//     email: validateEmail(email),
+//     newEmail: validateEmail(newEmail),
+//   };
 
-  if (name) {
-    if (errors.name) {
-      throw ApiError.badRequest('Bad request', errors);
-    }
+//   if (password) {
+//     if (errors.password) {
+//       throw ApiError.badRequest('Bad request', errors);
+//     }
 
-    user.name = name;
-  }
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
 
-  if (password) {
-    if (errors.password) {
-      throw ApiError.badRequest('Bad request', errors);
-    }
+//     if (!isPasswordValid) {
+//       throw ApiError.badRequest('Wrong password');
+//     }
+//   }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+//   if (newPassword) {
+//     if (errors.newPassword) {
+//       throw ApiError.badRequest('Bad request', errors);
+//     }
 
-    if (!isPasswordValid) {
-      throw ApiError.badRequest('Wrong password');
-    }
-  }
+//     const hashedNewPass = await bcrypt.hash(newPassword, 10);
 
-  if (newPassword) {
-    if (errors.newPassword) {
-      throw ApiError.badRequest('Bad request', errors);
-    }
+//     user.password = hashedNewPass;
+//   }
 
-    const hashedNewPass = await bcrypt.hash(newPassword, 10);
+//   if (email) {
+//     if (errors.email) {
+//       throw ApiError.badRequest('Bad request', errors);
+//     }
 
-    user.password = hashedNewPass;
-  }
+//     const userByEmail = await userService.getUserByEmail(email);
 
-  if (email) {
-    if (errors.email) {
-      throw ApiError.badRequest('Bad request', errors);
-    }
+//     if (!userByEmail) {
+//       throw ApiError.badRequest('There is no user with this email');
+//     }
 
-    const userByEmail = await userService.getUserByEmail(email);
+//     if (userByEmail.email !== user.email) {
+//       throw ApiError.badRequest('This is not your email address');
+//     }
+//   }
 
-    if (!userByEmail) {
-      throw ApiError.badRequest('There is no user with this email');
-    }
+//   if (newEmail) {
+//     if (errors.newEmail) {
+//       throw ApiError.badRequest('Bad request', errors);
+//     }
 
-    if (userByEmail.email !== user.email) {
-      throw ApiError.badRequest('This is not your email address');
-    }
-  }
+//     const userByNewEmail = await userService.getUserByEmail(newEmail);
 
-  if (newEmail) {
-    if (errors.newEmail) {
-      throw ApiError.badRequest('Bad request', errors);
-    }
+//     if (userByNewEmail) {
+//       throw ApiError.badRequest('This email is already being used');
+//     }
 
-    const userByNewEmail = await userService.getUserByEmail(newEmail);
+//     if (newEmail === email) {
+//       throw ApiError.badRequest('Emails cannot be the same');
+//     }
 
-    if (userByNewEmail) {
-      throw ApiError.badRequest('This email is already being used');
-    }
+//     const confirmNewEmailToken = uuidv4();
 
-    if (newEmail === email) {
-      throw ApiError.badRequest('Emails cannot be the same');
-    }
+//     await emailChangesService.create({
+//       userId: user.id,
+//       oldEmail: email,
+//       newEmail,
+//       confirmNewEmailToken,
+//     });
 
-    const confirmNewEmailToken = uuidv4();
+//     await emailService.sendConfirmNewEmail({
+//       email,
+//       newEmail,
+//       confirmNewEmailToken,
+//     });
 
-    await emailChangesService.create({
-      userId: user.id,
-      oldEmail: email,
-      newEmail,
-      confirmNewEmailToken,
-    });
+//     await emailService.sendNotificationToOldEmail({ email, newEmail });
+//   }
 
-    await emailService.sendConfirmNewEmail({
-      email,
-      newEmail,
-      confirmNewEmailToken,
-    });
+//   await user.save();
 
-    await emailService.sendNotificationToOldEmail({ email, newEmail });
-  }
+//   const normalizedUser = userService.normalize(user);
 
-  await user.save();
-
-  const normalizedUser = userService.normalize(user);
-
-  res.status(200);
-  res.send(normalizedUser);
-};
+//   res.status(200);
+//   res.send(normalizedUser);
+// };
 
 export const userController = {
   getAllActivated,
-  updateUser,
+  // updateUser,
 };

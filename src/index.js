@@ -23,11 +23,13 @@ app.use(
 );
 app.use(authRouter);
 app.use('/users', userRouter);
-app.use((req, res, next) => {
+
+app.use((req, res) => {
   res.status(404).send('Page Not Found');
 });
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line
   console.log(`Server is running on ${PORT}`);
 });

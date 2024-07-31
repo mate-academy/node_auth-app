@@ -6,12 +6,13 @@ export const errorMiddleware = (error, req, res, next) => {
       message: error.message,
       errors: error.errors,
     });
-  }
+  } else {
+    res.statusCode = 500;
 
-  res.status = 500;
-  res.send({
-    message: 'Server error 1',
-  });
+    res.send({
+      message: 'Server error 1',
+    });
+  }
 
   next();
 };

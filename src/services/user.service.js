@@ -18,12 +18,17 @@ const createUser = async ({ name, email, password }) => {
 
   const activationToken = uuidv4();
 
-  await User.create({ name, email, password, activationToken });
+  await User.create({
+    name,
+    email,
+    password,
+    activationToken,
+  });
 
   await emailService.sendActivationEmail({ email, activationToken });
 };
 
-const getUserByActivationToken = ({ activationToken }) => {
+const getUserByActivationToken = (activationToken) => {
   return User.findOne({ where: { activationToken } });
 };
 
