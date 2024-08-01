@@ -59,6 +59,8 @@ const generateTokens = async (res, user) => {
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     HttpOnly: true,
+    secure: true,
+    sameSite: 'none',
   });
 
   res.send({
@@ -139,11 +141,15 @@ const refresh = async (req, res) => {
 
   const userData = await verifyRefresh(refreshToken);
 
+  console.log('userData ->', userData);
+
   if (!userData) {
     throw ApiError.unauthorized();
   }
 
   const token = await getByToken(refreshToken);
+
+  console.log('token ->', token);
 
   if (!token) {
     throw ApiError.unauthorized();
@@ -276,6 +282,12 @@ const changeEmail = async (req, res) => {
   const { user } = req.body;
 
   const currentUser = await findUserById(user.id);
+
+  const findAnotherUserByEmail = await findByEmail(user.email);
+
+  if (findAnotherUserByEmail) {
+    throw ApiError.badRequest('This email is already exist');
+  }
 
   if (!currentUser) {
     throw ApiError.badRequest('User is not found');

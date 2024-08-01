@@ -35,7 +35,7 @@ const sendResetEmail = (name, email, token) => {
   <h1>Reset your password</h1>
   <p>Hi ${name}, you are trying to reset your password. Please follow this link to complete this action:</p>
   <a href="${href}">${href}</a>
-  <p> <b>Please note that token is alive in 60 minutes</b> </p>`;
+  <p><b>Please note that the token is valid for 60 minutes</b></p>`;
 
   return send({ email, html, subject: 'Reset password' });
 };
