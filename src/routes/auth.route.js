@@ -10,11 +10,9 @@ const {
   resetChecker,
   updateUserName,
   changeAuthPass,
-  generateEmailChangeToken,
   changeEmail,
 } = require('../controllers/auth.controller');
 const { catchError } = require('../utils/catchError');
-const { authMiddleware } = require('../middlewares/authMiddleware');
 
 const authRouter = new express.Router();
 
