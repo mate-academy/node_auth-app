@@ -242,7 +242,6 @@ const updateUserName = async (req, res) => {
 
     res.send(normalize(user));
   } catch (err) {
-    console.error('Error updating user name:', err);
     res.status(500).send({ message: 'Internal server error' });
   }
 };
