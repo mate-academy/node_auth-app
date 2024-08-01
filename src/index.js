@@ -1,12 +1,13 @@
 'use strict';
 
-import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import { authRouter } from './routes/auth.route.js';
-import { userRouter } from './routes/user.route.js';
-import { errorMiddleware } from './middlewares/errorMiddleware.js';
-import cookieParser from 'cookie-parser';
+require('dotenv/config');
+
+const express = require('express');
+const cors = require('cors');
+const { authRouter } = require('./routes/auth.route.js');
+const { userRouter } = require('./routes/user.route.js');
+const { errorMiddleware } = require('./middlewares/errorMiddleware.js');
+const cookieParser = require('cookie-parser');
 
 const PORT = process.env.PORT || 3005;
 

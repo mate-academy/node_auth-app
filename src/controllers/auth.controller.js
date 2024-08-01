@@ -1,15 +1,15 @@
-import { userService } from '../services/user.service.js';
-import { jwtService } from '../services/jwt.service.js';
-import { ApiError } from '../exceptions/api.error.js';
-import bcrypt from 'bcrypt';
-import { tokenService } from '../services/token.service.js';
-import { emailService } from '../services/email.service.js';
-import { v4 as uuidv4 } from 'uuid';
-import { resetTokenService } from '../services/resetToken.service.js';
-import { validatePassword } from '../validators/passwordValidator.js';
-import { validateName } from '../validators/nameValidator.js';
-import { validateEmail } from '../validators/emailValidator.js';
-import { emailChangesService } from '../services/emailChanges.service.js';
+const { userService } = require('../services/user.service');
+const { jwtService } = require('../services/jwt.service');
+const { ApiError } = require('../exceptions/api.error');
+const bcrypt = require('bcrypt');
+const { tokenService } = require('../services/token.service');
+const { emailService } = require('../services/email.service');
+const { v4: uuidv4 } = require('uuid');
+const { resetTokenService } = require('../services/resetToken.service');
+const { validatePassword } = require('../validators/passwordValidator');
+const { validateName } = require('../validators/nameValidator');
+const { validateEmail } = require('../validators/emailValidator');
+const { emailChangesService } = require('../services/emailChanges.service');
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -374,7 +374,7 @@ const generateTokens = async (res, user) => {
   });
 };
 
-export const authController = {
+const authController = {
   register,
   sendActivation,
   activate,
@@ -388,3 +388,5 @@ export const authController = {
   logout,
   refresh,
 };
+
+module.exports = { authController };

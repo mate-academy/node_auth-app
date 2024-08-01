@@ -1,4 +1,4 @@
-export function validatePassword(value) {
+function validatePassword(value) {
   if (!value) {
     return 'Password is required';
   }
@@ -11,3 +11,5 @@ export function validatePassword(value) {
     return 'At least 6 characters';
   }
 }
+
+module.exports = { validatePassword };

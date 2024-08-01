@@ -1,8 +1,8 @@
-import { DataTypes } from 'sequelize';
-import { client } from '../utils/db.js';
-import { User } from './user.model.js';
+const { DataTypes } = require('sequelize');
+const { client } = require('../utils/db.js');
+const { User } = require('./user.model.js');
 
-export const EmailChanges = client.define('email_changes', {
+const EmailChanges = client.define('email_changes', {
   oldEmail: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -24,3 +24,5 @@ export const EmailChanges = client.define('email_changes', {
 
 EmailChanges.belongsTo(User);
 User.hasOne(EmailChanges);
+
+module.exports = { EmailChanges };

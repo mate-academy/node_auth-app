@@ -1,7 +1,7 @@
-import { ApiError } from '../exceptions/api.error.js';
-import { User } from '../models/user.model.js';
-import { v4 as uuidv4 } from 'uuid';
-import { emailService } from './email.service.js';
+const { ApiError } = require('../exceptions/api.error.js');
+const { User } = require('../models/user.model.js');
+const { v4: uuidv4 } = require('uuid');
+const { emailService } = require('./email.service.js');
 
 const normalize = ({ id, name, email }) => {
   return { id, name, email };
@@ -48,7 +48,7 @@ const getUserById = (id) => {
   return User.findOne({ where: { id } });
 };
 
-export const userService = {
+const userService = {
   normalize,
   createUser,
   getUserByActivationToken,
@@ -56,3 +56,5 @@ export const userService = {
   getAllActivated,
   getUserById,
 };
+
+module.exports = { userService };

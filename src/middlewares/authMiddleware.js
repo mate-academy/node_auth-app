@@ -1,7 +1,7 @@
-import { ApiError } from '../exceptions/api.error.js';
-import { jwtService } from '../services/jwt.service.js';
+const { ApiError } = require('../exceptions/api.error.js');
+const { jwtService } = require('../services/jwt.service.js');
 
-export const authMiddleware = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';
   const [, token] = authorization.split(' ');
 
@@ -15,8 +15,11 @@ export const authMiddleware = (req, res, next) => {
 
   if (!userData) {
     res.sendStatus(401);
+
     return;
   }
 
   next();
 };
+
+module.exports = { authMiddleware };

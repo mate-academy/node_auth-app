@@ -1,6 +1,6 @@
-import 'dotenv/config';
+require('dotenv/config');
 
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -65,10 +65,12 @@ function sendNotificationToOldEmail({ email, newEmail }) {
   return send({ email, subject: 'Auth app / Email will be changed', html });
 }
 
-export const emailService = {
+const emailService = {
   send,
   sendActivationEmail,
   sendResetPasswordEmail,
   sendNotificationToOldEmail,
   sendConfirmNewEmail,
 };
+
+module.exports = { emailService };

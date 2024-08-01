@@ -1,4 +1,4 @@
-export function validateEmail(value) {
+function validateEmail(value) {
   if (!value) {
     return 'Email is required';
   }
@@ -9,3 +9,5 @@ export function validateEmail(value) {
     return 'Email is not valid';
   }
 }
+
+module.exports = { validateEmail };

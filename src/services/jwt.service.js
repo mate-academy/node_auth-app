@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
 const sign = (user) => {
   const token = jwt.sign(user, process.env.JWT_KEY, {
@@ -30,9 +30,11 @@ const verifyRefresh = (token) => {
   }
 };
 
-export const jwtService = {
+const jwtService = {
   sign,
   verify,
   signRefresh,
   verifyRefresh,
 };
+
+module.exports = { jwtService };

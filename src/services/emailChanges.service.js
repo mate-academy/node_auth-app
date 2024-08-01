@@ -1,4 +1,4 @@
-import { EmailChanges } from '../models/emailChanges.model.js';
+const { EmailChanges } = require('../models/emailChanges.model.js');
 
 const create = async ({ userId, oldEmail, newEmail, confirmNewEmailToken }) => {
   const now = new Date();
@@ -17,7 +17,9 @@ const getByConfirmNewEmailToken = (confirmNewEmailToken) => {
   return EmailChanges.findOne({ where: { confirmNewEmailToken } });
 };
 
-export const emailChangesService = {
+const emailChangesService = {
   create,
   getByConfirmNewEmailToken,
 };
+
+module.exports = { emailChangesService };

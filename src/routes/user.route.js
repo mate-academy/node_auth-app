@@ -1,8 +1,10 @@
-import express from 'express';
-import { userController } from '../controllers/user.controller.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
-import { catchError } from '../utils/catchError.js';
+const express = require('express');
+const { userController } = require('../controllers/user.controller');
+const { authMiddleware } = require('../middlewares/authMiddleware');
+const { catchError } = require('../utils/catchError');
 
-export const userRouter = new express.Router();
+const userRouter = new express.Router();
 
 userRouter.get('/', authMiddleware, catchError(userController.getAllActivated));
+
+module.exports = { userRouter };

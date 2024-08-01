@@ -1,4 +1,4 @@
-import { ResetToken } from '../models/resetToken.model.js';
+const { ResetToken } = require('../models/resetToken.model.js');
 
 const create = async (userId, resetToken) => {
   const now = new Date();
@@ -12,11 +12,13 @@ const getByResetToken = (resetToken) => {
 };
 
 const remove = async (userId) => {
-  return await ResetToken.destroy({ where: { userId } });
+  return ResetToken.destroy({ where: { userId } });
 };
 
-export const resetTokenService = {
+const resetTokenService = {
   create,
   getByResetToken,
   remove,
 };
+
+module.exports = { resetTokenService };
