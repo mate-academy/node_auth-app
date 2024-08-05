@@ -100,20 +100,20 @@ const refresh = async (req, res) => {
     throw ApiError.Unauthorized('No refresh token found');
   }
 
-  const userData = await jwtService.verifyRefresh(refreshToken);
-  const token = await tokenService.getByToken(refreshToken);
-
-  if (!userData || !token) {
-    throw ApiError.Unauthorized();
+  const userData = jwtService.verifyRefresh(refreshToken);
+  if (!userData) {
+    throw ApiError.Unauthorized('Invalid refresh token');
   }
 
   const user = await userService.findByEmail(userData.email);
-  await generateTokens(res, user);
+  const newAccessToken = jwtService.sign(user);
+
+  res.send({ accessToken: newAccessToken });
 };
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
-  const userData = await jwtService.verifyRefresh(refreshToken);
+  const userData = jwtService.verifyRefresh(refreshToken);
 
   if (!userData || !refreshToken) {
     throw ApiError.Unauthorized();
@@ -149,14 +149,15 @@ const sendResetEmail = async (req, res) => {
     throw ApiError.BadRequest('No such user');
   }
 
-  const resetToken = jwtService.sign({ id: user.id }, '1h');
+  const resetToken = jwtService.signResetToken({ id: user.id });
   await emailService.sendResetEmail(email, resetToken);
 
   res.send({ message: 'Password reset email sent' });
 };
 
 const resetPassword = async (req, res) => {
-  const { resetToken, password, confirmation } = req.body;
+  const { resetToken } = req.params;
+  const { password, confirmation } = req.body;
 
   if (password !== confirmation) {
     throw ApiError.BadRequest('Passwords do not match');
