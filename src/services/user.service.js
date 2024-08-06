@@ -1,7 +1,8 @@
-import { ApiError } from '../exeptions/api.error.js';
 import { User } from '../models/user.js';
+import bcrypt from 'bcrypt';
 import { emailService } from './email.service.js';
 import { v4 as uuidv4 } from 'uuid';
+import { ApiError } from '../exeptions/api.error.js';
 
 function getAllActivated() {
   return User.findAll({
@@ -34,31 +35,20 @@ async function register(name, email, password) {
   await emailService.sendActivationEmail(email, activationToken);
 }
 
-async function updateProfile(userId, data) {
+async function updateName(userId, newName) {
   const user = await User.findByPk(userId);
 
   if (!user) {
     throw ApiError.NotFound();
   }
 
-  Object.assign(user, data);
+  user.name = newName;
   await user.save();
 
-  return userService.normalize(user);
+  return normalize(user);
 }
 
-async function updatePassword(userId, newPassword) {
-  const user = await User.findByPk(userId);
-
-  if (!user) {
-    throw ApiError.NotFound();
-  }
-
-  user.password = newPassword;
-  await user.save();
-}
-
-async function changeEmail(userId, newEmail, password) {
+async function updateEmail(userId, newEmail, password) {
   const user = await User.findByPk(userId);
 
   if (!user) {
@@ -78,7 +68,21 @@ async function changeEmail(userId, newEmail, password) {
   }
 
   await emailService.sendEmailChangeNotification(user.email, newEmail);
+
   user.email = newEmail;
+  await user.save();
+}
+
+async function updatePassword(userId, currentPassword, newPassword) {
+  const user = await User.findByPk(userId);
+  if (!user) {
+    throw ApiError.NotFound();
+  }
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw ApiError.BadRequest('Current password is incorrect');
+  }
+  user.password = await bcrypt.hash(newPassword, 10);
   await user.save();
 }
 
@@ -87,7 +91,7 @@ export const userService = {
   normalize,
   findByEmail,
   register,
-  updateProfile,
+  updateName,
+  updateEmail,
   updatePassword,
-  changeEmail,
 };

@@ -6,6 +6,6 @@ import { catchError } from '../utils/catchError.js';
 export const userRouter = new express.Router();
 
 userRouter.get('/', authMiddleware, catchError(userController.getAllActivated));
-userRouter.put('/profile', authMiddleware, catchError(userController.updateProfile));
-userRouter.post('/change-password', authMiddleware, catchError(userController.changePassword));
-userRouter.post('/change-email', authMiddleware, catchError(userController.changeEmail));
+userRouter.patch('/profile/name', authMiddleware, catchError(userController.updateName));
+userRouter.patch('/profile/email', authMiddleware, catchError(userController.updateEmail));
+userRouter.patch('/profile/password', authMiddleware, catchError(userController.updatePassword));

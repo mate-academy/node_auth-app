@@ -35,10 +35,19 @@ function sendResetEmail(email, token) {
   return send({ email, html, subject: 'Reset Password' });
   }
 
+  async function sendEmailChangeNotification(oldEmail, newEmail) {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: oldEmail,
+      subject: 'Email Change Notification',
+      text: `Your email has been changed to ${newEmail}. If this was not you, please contact support immediately.`,
+    });
+  }
 
 
 export const emailService = {
   sendActivationEmail,
   send,
-  sendResetEmail
+  sendResetEmail,
+  sendEmailChangeNotification
 }

@@ -6,38 +6,49 @@ const getAllActivated = async (req, res) => {
   res.send(users.map(user => userService.normalize(user)));
 };
 
-const updateProfile = async (req, res) => {
+const updateName = async (req, res) => {
   const userId = req.user.id;
-  const updatedUser = await userService.updateProfile(userId, req.body);
+  const { name } = req.body;
 
+  if (!name) {
+    throw ApiError.BadRequest('Name is required');
+  }
+
+  const updatedUser = await userService.updateName(userId, name);
   res.send(updatedUser);
 };
 
-const changePassword = async (req, res) => {
+const updateEmail = async (req, res) => {
   const userId = req.user.id;
-  const { oldPassword, newPassword, confirmation } = req.body;
+  const { newEmail, password } = req.body;
+
+  if (!newEmail || !password) {
+    throw ApiError.BadRequest('Email and password are required');
+  }
+
+  const updatedUser = await userService.updateEmail(userId, newEmail, password);
+  res.send(updatedUser);
+};
+
+const updatePassword = async (req, res) => {
+  const userId = req.user.id;
+  const { currentPassword, newPassword, confirmation } = req.body;
+
+  if (!currentPassword || !newPassword || !confirmation) {
+    return res.status(400).send({ message: 'All password fields are required' });
+  }
 
   if (newPassword !== confirmation) {
     throw ApiError.BadRequest('Passwords do not match');
   }
 
-  await userService.changePassword(userId, oldPassword, newPassword);
-
+  await userService.updatePassword(userId, currentPassword, newPassword);
   res.send({ message: 'Password changed successfully' });
-};
-
-const changeEmail = async (req, res) => {
-  const userId = req.user.id;
-  const { password, newEmail } = req.body;
-
-  await userService.changeEmail(userId, newEmail, password);
-
-  res.send({ message: 'Email changed successfully' });
 };
 
 export const userController = {
   getAllActivated,
-  updateProfile,
-  changePassword,
-  changeEmail,
+  updateName,
+  updateEmail,
+  updatePassword,
 };
