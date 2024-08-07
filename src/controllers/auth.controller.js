@@ -4,7 +4,7 @@ const { ApiError } = require('../exceptions/api.error');
 const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
-// const emailService = require('../services/email.service');
+const emailService = require('../services/email.service');
 
 const sendAuthentication = async (res, user) => {
   const userData = userService.normalize(user);
@@ -111,150 +111,69 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
-// const reset = async (req, res) => {
-//   const { email } = req.body;
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
 
-//   if (!email) {
-//     throw ApiError.Unauthorized();
-//   }
+  const user = await userService.findByEmail(email);
 
-//   await resetPasswordUser(email);
-//   res.sendStatus(200);
-// };
+  if (!user) {
+    throw ApiError.BadRequest('Invalid email', {
+      email: 'Incorrect email or user does not exist',
+    });
+  }
 
-// const resetPassword = async (req, res) => {
-//   const { newPassword, newPasswordConfirmation, resetToken } = req.body;
+  const userData = userService.normalize(user);
+  const resetToken = jwtService.generateResetToken(userData);
 
-//   if (!newPassword || !newPasswordConfirmation || !resetToken) {
-//     throw ApiError.badRequest('All fields are required.');
-//   }
+  await emailService.sendResetLink(user.name, user.email, resetToken);
 
-//   if (newPassword.trim() !== newPasswordConfirmation.trim()) {
-//     throw ApiError.badRequest('Passwords are not equal');
-//   }
+  res.status(200).send({
+    message: 'Instructions on password reset were sent to your email',
+  });
+};
 
-//   const token = await findUserByResetToken(resetToken);
+const resetPassword = async (req, res) => {
+  const { resetToken } = req.params;
+  const { password, passwordConfirm } = req.body;
 
-//   if (!token || !token.userId) {
-//     throw ApiError.badRequest('Invalid or expired reset token');
-//   }
+  if (!password || !passwordConfirm) {
+    throw ApiError.BadRequest('All fields are required.');
+  }
 
-//   const user = await findUserById(token.userId);
+  const validationError = userService.validatePassword(password);
 
-//   if (!user) {
-//     throw ApiError.badRequest('No such user!');
-//   }
+  if (validationError) {
+    throw ApiError.BadRequest(validationError);
+  }
 
-//   const hashPass = await bcrypt.hash(newPassword, 10);
+  if (password !== passwordConfirm) {
+    throw ApiError.BadRequest('Incorrect data', {
+      confirmation: `Passwords do not match`,
+    });
+  }
 
-//   user.password = hashPass;
-//   await removeResetToken(token.resetToken);
+  const userData = await jwtService.validateResetToken(resetToken);
 
-//   await user.save();
+  if (!userData) {
+    throw ApiError.BadRequest('Invalid token', {
+      resetToken: 'Invalid or expired reset token.',
+    });
+  }
 
-//   res.send('Password reset successfully');
-// };
+  const user = await userService.findByEmail(userData.email);
 
-// const resetChecker = async (req, res) => {
-//   const { resetToken } = req.params;
-//   const userToken = await findUserByResetToken(resetToken);
+  if (!user) {
+    throw ApiError.NotFound;
+  }
 
-//   if (!userToken) {
-//     throw ApiError.notFound();
-//   }
+  if (userData.id !== user.id) {
+    throw ApiError.Unauthorized();
+  }
 
-//   const currentTime = moment();
+  await userService.updatePassword(user.id, password);
 
-//   if (currentTime.isAfter(userToken.expirationTime)) {
-//     throw ApiError.badRequest('Expired reset token');
-//   }
-
-//   res.send(userToken);
-// };
-
-// const updateUserName = async (req, res) => {
-//   const { name, email } = req.body;
-
-//   try {
-//     const user = await findByEmail(email);
-
-//     if (!user) {
-//       return res.status(404).send({ message: 'User not found' });
-//     }
-
-//     user.name = name;
-//     await user.save();
-
-//     res.send(normalize(user));
-//   } catch (err) {
-//     res.status(500).send({ message: 'Internal server error' });
-//   }
-// };
-
-// const changeAuthPass = async (req, res) => {
-//   const { id, email, oldPassword, newPassword, newPasswordConfirmation } =
-//     req.body;
-//   const user = await findByEmailAndId(id, email);
-
-//   if (!user) {
-//     throw ApiError.badRequest('User is not found');
-//   }
-
-//   if (newPassword !== newPasswordConfirmation) {
-//     throw ApiError.badRequest('Password is not the same');
-//   }
-
-//   const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
-
-//   if (!isPasswordValid) {
-//     throw ApiError.badRequest('Your current password wrong');
-//   }
-
-//   const hashPass = await bcrypt.hash(newPassword, 10);
-
-//   user.password = hashPass;
-
-//   await user.save();
-
-//   await generateTokens(res, user);
-// };
-
-// const changeEmail = async (req, res) => {
-//   const { user } = req.body;
-
-//   const currentUser = await findUserById(user.id);
-
-//   const findAnotherUserByEmail = await findByEmail(user.email);
-
-//   if (findAnotherUserByEmail) {
-//     throw ApiError.badRequest('This email is already exist');
-//   }
-
-//   if (!currentUser) {
-//     throw ApiError.badRequest('User is not found');
-//   }
-
-//   if (currentUser.email === user.email) {
-//     throw ApiError.badRequest('Email is the same');
-//   }
-
-//   const isPasswordValid = await bcrypt.compare(
-//     user.password,
-//     currentUser.password,
-//   );
-
-//   if (!isPasswordValid) {
-//     throw ApiError.badRequest('Your password is wrong');
-//   }
-
-//   await sendGoodbyeEmail(currentUser.name, user.email, currentUser.email);
-
-//   currentUser.email = user.email;
-
-//   currentUser.save();
-
-//   await generateTokens(res, currentUser);
-// };
+  res.status(200).send({ message: 'password reset successfully' });
+};
 
 module.exports = {
   register,
@@ -262,10 +181,6 @@ module.exports = {
   login,
   refresh,
   logout,
-  // reset,
-  // resetPassword,
-  // resetChecker,
-  // updateUserName,
-  // changeAuthPass,
-  // changeEmail,
+  forgotPassword,
+  resetPassword,
 };

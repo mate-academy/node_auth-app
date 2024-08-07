@@ -32,6 +32,14 @@ function validateName(value) {
   }
 }
 
+function hashPassword(password, saltRounds = 10) {
+  return bcrypt.hash(password, saltRounds);
+}
+
+const comparePasswords = (userPasswordHash, incomingPassword) => {
+  return bcrypt.compare(incomingPassword, userPasswordHash);
+};
+
 const normalize = ({ id, name, email }) => {
   return { id, name, email };
 };
@@ -47,12 +55,9 @@ const getAllActive = () => {
 const findByEmail = (email) => {
   return User.findOne({ where: { email } });
 };
+
 const findByToken = (activationToken) => {
   return User.findOne({ where: { activationToken } });
-};
-
-const findByEmailAndId = (userId, email) => {
-  return User.findOne({ where: { id: userId, email } });
 };
 
 const findById = (userId) => {
@@ -68,7 +73,7 @@ const register = async (name, email, password) => {
     });
   }
 
-  const hash = await bcrypt.hash(password, 10);
+  const hash = await hashPassword(password);
   const activationToken = bcrypt.genSaltSync(1);
 
   await User.create({
@@ -81,6 +86,35 @@ const register = async (name, email, password) => {
   await emailService.sendActivationLink(name, email, activationToken);
 };
 
+const updatePassword = async (userId, newPassword) => {
+  const user = await User.findByPk(userId);
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  user.password = hashedPassword;
+  await user.save();
+};
+
+const updateName = async (newName, userId) => {
+  const user = await findById(userId);
+
+  if (!user) {
+    throw ApiError.Unauthorized();
+  }
+
+  await user.update('name', newName);
+};
+
+const updateEmail = async (newEmail, userId) => {
+  const user = await findById(userId);
+
+  if (!user) {
+    throw ApiError.Unauthorized();
+  }
+
+  await user.update('email', newEmail);
+};
+
 module.exports = {
   validateName,
   validateEmail,
@@ -90,6 +124,9 @@ module.exports = {
   findByEmail,
   findById,
   findByToken,
-  findByEmailAndId,
   register,
+  updatePassword,
+  comparePasswords,
+  updateName,
+  updateEmail,
 };

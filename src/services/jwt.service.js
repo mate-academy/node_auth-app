@@ -7,7 +7,11 @@ function generateAccessToken(user) {
 }
 
 function generateRefreshToken(user) {
-  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: '30s' });
+  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' });
+}
+
+function generateResetToken(user) {
+  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '1h' });
 }
 
 function validateAccessToken(token) {
@@ -26,9 +30,19 @@ function validateRefreshToken(token) {
   }
 }
 
+function validateResetToken(token) {
+  try {
+    return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+  } catch (error) {
+    return null;
+  }
+}
+
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
+  generateResetToken,
   validateAccessToken,
   validateRefreshToken,
+  validateResetToken,
 };

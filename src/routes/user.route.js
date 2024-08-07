@@ -1,16 +1,13 @@
 const express = require('express');
 const userController = require('../controllers/user.controller');
-const { authMiddleware } = require('../middlewares/auth.middleware');
 const { catchError } = require('../utils/catchError');
 
-const userRouter = new express.Router();
+const router = new express.Router();
 
-userRouter.get(
-  '/',
-  catchError(authMiddleware),
-  catchError(userController.getAllActive),
-);
+router.get('/', catchError(userController.getAllActive));
+router.get('/profile', catchError(userController.getProfile));
+router.patch('/name', catchError(userController.updateName));
+router.patch('/password', catchError(userController.updatePassword));
+router.patch('/email', catchError(userController.updateEmail));
 
-module.exports = {
-  userRouter,
-};
+module.exports = router;
