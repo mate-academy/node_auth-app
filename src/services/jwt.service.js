@@ -1,9 +1,23 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { ApiError } from '../exeptions/api.error.js';
+
+function isPlainObject(obj) {
+  return obj && typeof obj === 'object' && !Array.isArray(obj);
+}
 
 function sign(user) {
-  const token = jwt.sign(user, process.env.JWT_KEY, {
-    expiresIn: '1h'
+  if (!isPlainObject(user)) {
+    throw ApiError.BadRequest('Payload for JWT must be a plain object');
+  }
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_KEY, {
+    expiresIn: '1h',
   });
   return token;
 }
@@ -12,14 +26,22 @@ function verify(token) {
   try {
     return jwt.verify(token, process.env.JWT_KEY);
   } catch (error) {
-    console.error('Access token verification failed:', error.message);
-    return null;
+    throw ApiError.Unauthorized('Access token verification failed: ' + error.message);
   }
 }
 
 function signRefresh(user) {
-  const token = jwt.sign(user, process.env.JWT_REFRESH_KEY, {
-    expiresIn: '7d'
+  if (!isPlainObject(user)) {
+    throw ApiError.BadRequest('Payload for JWT must be a plain object');
+  }
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
+    expiresIn: '7d',
   });
   return token;
 }
@@ -28,14 +50,22 @@ function verifyRefresh(token) {
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_KEY);
   } catch (error) {
-    console.error('Refresh token verification failed:', error.message);
-    return null;
+    throw ApiError.Unauthorized('Refresh token verification failed: ' + error.message);
   }
 }
 
 function signResetToken(user) {
-  const token = jwt.sign(user, process.env.JWT_KEY, {
-    expiresIn: '1h'
+  if (!isPlainObject(user)) {
+    throw ApiError.BadRequest('Payload for JWT must be a plain object');
+  }
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+  };
+
+  const token = jwt.sign(payload, process.env.JWT_KEY, {
+    expiresIn: '1h',
   });
   return token;
 }

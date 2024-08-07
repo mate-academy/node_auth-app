@@ -86,6 +86,15 @@ async function updatePassword(userId, currentPassword, newPassword) {
   await user.save();
 }
 
+async function resetPassword(userId, newPassword) {
+  const user = await User.findByPk(userId);
+  if (!user) {
+    throw ApiError.NotFound();
+  }
+  user.password = newPassword;
+  await user.save();
+}
+
 export const userService = {
   getAllActivated,
   normalize,
@@ -94,4 +103,5 @@ export const userService = {
   updateName,
   updateEmail,
   updatePassword,
+  resetPassword,
 };
