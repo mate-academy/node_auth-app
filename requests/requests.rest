@@ -1,0 +1,65 @@
+# --------------------------------------------------------AUTH
+
+GET http://localhost:3000/auth/activation/$2b$04$3tEtHkHyH3xjRu5pX3JQ9e
+content-type: application/json
+###
+
+POST http://localhost:3000/auth/registration
+content-type: application/json
+
+{
+  "name": "vlad",
+  "email": "vladbuldenko@gmail.com",
+  "password": "rfrfirf"
+}
+###
+
+# --------------------------------------------------------USERS
+GET http://localhost:3001/api/users/
+###
+
+GET http://localhost:3001/api/users/66a56be3dff5f46c6fb33d24/
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQyMzdlZTYwMzkwMGJjM2MzZmExYjEiLCJpYXQiOjE3MjIwOTQ3MzF9.v9TbnC7Es3oQhF_7_IUCjY5DwinglmUOsUOyM22Dt1g
+###
+
+POST http://localhost:3001/api/users/
+content-type: application/json
+
+{
+    "username": "anzhela",
+    "name": "Anzhelika",
+    "surname": "Buldenko",
+    "email": "anzhela@gmail.com",
+    "phone": "0979910022",
+    "password": "rfrfirf",
+    "role": "client"
+}
+###
+
+PUT http://localhost:3001/api/users/66a56dd9bec5d2391c844822
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmE1NmRkOWJlYzVkMjM5MWM4NDQ4MjIiLCJpYXQiOjE3MjIxMTc1OTQsImV4cCI6MTcyMjIwMzk5NH0.5oMXVqyVPOpWJOBwcpp6H7Lg45ixmNUbXSNbx0aZfPU
+
+{
+    "settings": {
+    "fontSize": 19
+  },
+  "phone": "0978612333"
+}
+###
+
+DELETE http://localhost:3001/api/users/66a52ef287263d9e2ea9b3e0/
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmE1MmVmMjg3MjYzZDllMmVhOWIzZTAiLCJpYXQiOjE3MjIxMDE1MTR9.yFj2Qr2GU19P1rSScCLdxAS_ppKsc9jwBccENQDpO6Y
+###
+
+PATCH  http://localhost:3001/api/users?action=delete
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTQyMzdlZTYwMzkwMGJjM2MzZmExYjEiLCJpYXQiOjE3MjIwOTc2Mjd9.Nd6DZ0Z4g1Ik7FAQu-CMyY4Kn4M_fOuiwDbX08CqJCA
+
+{
+    "ids": ["66a56be3dff5f46c6fb33d24"]
+}
+###
+
