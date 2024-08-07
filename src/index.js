@@ -14,7 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
-
+app.use('/auth', userRouter);
 app.use('/users', userRouter);
 app.use(unknownEndpoint);
 app.use(errorMiddleware);

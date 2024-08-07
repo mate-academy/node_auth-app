@@ -1,137 +1,121 @@
-// const { User } = require('../models/User');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
-// const { ApiError } = require('../exceptions/api.error');
-// const userService = require('../services/user.service');
-// // const jwtService = require('../services/jwt.service');
-// // const tokenService = require('../services/token.service');
-// // const emailService = require('../services/email.service');
+const { ApiError } = require('../exceptions/api.error');
+const userService = require('../services/user.service');
+const jwtService = require('../services/jwt.service');
+const tokenService = require('../services/token.service');
+// const emailService = require('../services/email.service');
 
-// // const sendAuthentication = async (res, user) => {
-// //   const userData = userService.normalize(user);
-// //   const accessToken = jwtService.generateAccessToken(userData);
-// //   const refreshToken = jwtService.generateRefreshToken(userData);
+const sendAuthentication = async (res, user) => {
+  const userData = userService.normalize(user);
+  const accessToken = jwtService.generateAccessToken(userData);
+  const refreshToken = jwtService.generateRefreshToken(userData);
 
-// //   await tokenService.save(user.id, refreshToken);
+  await tokenService.save(user.id, refreshToken);
 
-// //   res.cookie('refreshToken', refreshToken, {
-// //     maxAge: 30 * 24 * 60 * 60 * 1000,
-// //     httpOnly: true,
-// //     sameSite: 'none',
-// //     secure: true,
-// //   });
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
 
-// //   res.send({
-// //     user: userData,
-// //     accessToken,
-// //   });
-// // };
+  res.send({
+    user: userData,
+    accessToken,
+  });
+};
 
-// const register = async (req, res) => {
-//   const { name, email, password } = req.body;
+const register = async (req, res) => {
+  const { name, email, password } = req.body;
 
-//   const errors = {
-//     name: userService.validateName(name),
-//     email: userService.validateEmail(email),
-//     password: userService.validatePassword(password),
-//   };
+  const errors = {
+    name: userService.validateName(name),
+    email: userService.validateEmail(email),
+    password: userService.validatePassword(password),
+  };
 
-//   if (Object.values(errors).some((error) => error)) {
-//     throw ApiError.BadRequest('Validation error', errors);
-//   }
+  if (Object.values(errors).some((error) => error)) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
 
-//   await userService.register(name, email, password);
+  await userService.register(name, email, password);
 
-//   res.send({ message: 'OK' });
-// };
+  res.sendStatus(200);
+};
 
-// const login = async (req, res) => {
-//   const { email, password } = req.body;
-//   const user = await findByEmail(email);
+const activate = async (req, res) => {
+  const { activationToken } = req.params;
+  const user = await userService.findByToken(activationToken);
 
-//   if (!user) {
-//     throw ApiError.badRequest('No such users');
-//   }
+  if (!user) {
+    throw ApiError.NotFound();
+  }
 
-//   const { activationToken } = user;
+  user.activationToken = null;
 
-//   if (activationToken) {
-//     throw ApiError.badRequest(
-//       'Please check your inbox and activate your email',
-//     );
-//   }
+  await user.save();
 
-//   if (!user) {
-//     throw ApiError.badRequest('No such users');
-//   }
+  await sendAuthentication(res, user);
+};
 
-//   const isPasswordValid = await bcrypt.compare(password, user.password);
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await userService.findByEmail(email);
 
-//   if (!isPasswordValid) {
-//     throw ApiError.badRequest('Wrong password');
-//   }
+  if (!user) {
+    throw ApiError.NotFound();
+  }
 
-//   await generateTokens(res, user);
-// };
+  if (user.activationToken) {
+    throw ApiError.BadRequest('User not activated', {
+      user: 'User not activated. Please check your email',
+    });
+  }
 
-// const activate = async (req, res) => {
-//   const { activationToken } = req.params;
-//   const user = await User.findOne({ where: { activationToken } });
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
-//   if (!user) {
-//     res.sendStatus(404);
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Invalid credentials');
+  }
 
-//     return;
-//   }
+  await sendAuthentication(res, user);
+};
 
-//   user.activationToken = null;
+const refresh = async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken || '';
 
-//   await user.save();
+  const userData = await jwtService.validateRefreshToken(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
+  const user = await userService.findByEmail(userData.email);
 
-//   await generateTokens(res, user);
+  if (!userData || !token || !user || token.userId !== user.id) {
+    res.clearCookie('refreshToken');
+    throw ApiError.Unauthorized();
+  }
 
-//   res.send(user);
-// };
+  await sendAuthentication(res, user);
+};
 
-// const refresh = async (req, res) => {
-//   const { refreshToken } = req.cookies;
+const logout = async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken || '';
+  const userData = jwtService.validateRefreshToken(refreshToken);
 
-//   const userData = await verifyRefresh(refreshToken);
+  if (!userData || !refreshToken) {
+    throw ApiError.Unauthorized();
+  }
 
-//   if (!userData) {
-//     throw ApiError.unauthorized();
-//   }
+  tokenService.remove(userData.id);
 
-//   const token = await getByToken(refreshToken);
-
-//   if (!token) {
-//     throw ApiError.unauthorized();
-//   }
-
-//   const user = await findByEmail(userData.email);
-
-//   await generateTokens(res, user);
-// };
-
-// const logout = async (req, res) => {
-//   const { refreshToken } = req.cookies;
-
-//   const userData = await verifyRefresh(refreshToken);
-
-//   if (!userData || !refreshToken) {
-//     throw ApiError.unauthorized();
-//   }
-
-//   await remove(userData.id);
-
-//   res.sendStatus(204);
-// };
+  res.clearCookie('refreshToken');
+  res.sendStatus(204);
+};
 
 // const reset = async (req, res) => {
 //   const { email } = req.body;
 
 //   if (!email) {
-//     throw ApiError.unauthorized();
+//     throw ApiError.Unauthorized();
 //   }
 
 //   await resetPasswordUser(email);
@@ -272,16 +256,16 @@
 //   await generateTokens(res, currentUser);
 // };
 
-// module.exports = {
-//   register,
-//   activate,
-//   login,
-//   refresh,
-//   logout,
-//   reset,
-//   resetPassword,
-//   resetChecker,
-//   updateUserName,
-//   changeAuthPass,
-//   changeEmail,
-// };
+module.exports = {
+  register,
+  activate,
+  login,
+  refresh,
+  logout,
+  // reset,
+  // resetPassword,
+  // resetChecker,
+  // updateUserName,
+  // changeAuthPass,
+  // changeEmail,
+};

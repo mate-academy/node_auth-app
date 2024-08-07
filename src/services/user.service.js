@@ -2,9 +2,7 @@ const bcrypt = require('bcrypt');
 
 const { ApiError } = require('../exceptions/api.error');
 const { User } = require('../models/User');
-
 const emailService = require('../services/email.service');
-const { v4: uuidv4 } = require('uuid');
 
 function validateEmail(email) {
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
@@ -49,6 +47,9 @@ const getAllActive = () => {
 const findByEmail = (email) => {
   return User.findOne({ where: { email } });
 };
+const findByToken = (activationToken) => {
+  return User.findOne({ where: { activationToken } });
+};
 
 const findByEmailAndId = (userId, email) => {
   return User.findOne({ where: { id: userId, email } });
@@ -59,17 +60,16 @@ const findById = (userId) => {
 };
 
 const register = async (name, email, password) => {
-  const activationToken = uuidv4();
-
   const existingUser = await findByEmail(email);
 
   if (existingUser) {
-    throw ApiError.badRequest('User already exist', {
+    throw ApiError.BadRequest('User already exist', {
       email: 'User already exist',
     });
   }
 
   const hash = await bcrypt.hash(password, 10);
+  const activationToken = bcrypt.genSaltSync(1);
 
   await User.create({
     name,
@@ -89,6 +89,7 @@ module.exports = {
   getAllActive,
   findByEmail,
   findById,
+  findByToken,
   findByEmailAndId,
   register,
 };
