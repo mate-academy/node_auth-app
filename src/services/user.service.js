@@ -1,8 +1,8 @@
-import { User } from '../models/user.js';
-import bcrypt from 'bcrypt';
-import { emailService } from './email.service.js';
-import { v4 as uuidv4 } from 'uuid';
-import { ApiError } from '../exeptions/api.error.js';
+const { User } = require('../models/user');
+const bcrypt = require('bcrypt');
+const { emailService } = require('./email.service');
+const { v4: uuidv4 } = require('uuid');
+const ApiError = require('../exeptions/api.error');
 
 function getAllActivated() {
   return User.findAll({
@@ -20,17 +20,29 @@ function findByEmail(email) {
   });
 }
 
+function findByActivationToken(activationToken) {
+  return User.findOne({
+    where: { activationToken },
+  });
+}
+
 async function register(name, email, password) {
   const activationToken = uuidv4();
 
   const existUser = await findByEmail(email);
+
   if (existUser) {
     throw ApiError.BadRequest('User already exists', {
       email: 'User already exists',
     });
   }
 
-  await User.create({ name, email, password, activationToken });
+  await User.create({
+    name,
+    email,
+    password,
+    activationToken,
+  });
 
   await emailService.sendActivationEmail(email, activationToken);
 }
@@ -75,10 +87,13 @@ async function updateEmail(userId, newEmail, password) {
 
 async function updatePassword(userId, currentPassword, newPassword) {
   const user = await User.findByPk(userId);
+
   if (!user) {
     throw ApiError.NotFound();
   }
+
   const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Current password is incorrect');
   }
@@ -88,6 +103,7 @@ async function updatePassword(userId, currentPassword, newPassword) {
 
 async function resetPassword(userId, newPassword) {
   const user = await User.findByPk(userId);
+
   if (!user) {
     throw ApiError.NotFound();
   }
@@ -95,10 +111,11 @@ async function resetPassword(userId, newPassword) {
   await user.save();
 }
 
-export const userService = {
+module.exports = {
   getAllActivated,
   normalize,
   findByEmail,
+  findByActivationToken,
   register,
   updateName,
   updateEmail,

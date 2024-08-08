@@ -1,11 +1,23 @@
-import express from 'express';
-import { userController } from '../controllers/user.controller.js';
-import { authMiddleware } from '../middlewares/authMiddleware.js';
-import { catchError } from '../utils/catchError.js';
+const express = require('express');
+const {
+  getAllActivated,
+  updateName,
+  updateEmail,
+  updatePassword,
+} = require('../controllers/user.controller');
+const { authMiddleware } = require('../middlewares/authMiddleware');
+const { catchError } = require('../utils/catchError');
 
-export const userRouter = new express.Router();
+const userRouter = express.Router();
 
-userRouter.get('/', authMiddleware, catchError(userController.getAllActivated));
-userRouter.patch('/profile/name', authMiddleware, catchError(userController.updateName));
-userRouter.patch('/profile/email', authMiddleware, catchError(userController.updateEmail));
-userRouter.patch('/profile/password', authMiddleware, catchError(userController.updatePassword));
+userRouter.get('/', authMiddleware, catchError(getAllActivated));
+userRouter.patch('/profile/name', authMiddleware, catchError(updateName));
+userRouter.patch('/profile/email', authMiddleware, catchError(updateEmail));
+
+userRouter.patch(
+  '/profile/password',
+  authMiddleware,
+  catchError(updatePassword),
+);
+
+module.exports = userRouter;

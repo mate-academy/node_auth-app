@@ -1,6 +1,8 @@
-import jwt from 'jsonwebtoken';
-import 'dotenv/config';
-import { ApiError } from '../exeptions/api.error.js';
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+const ApiError = require('../exeptions/api.error');
+
+dotenv.config();
 
 function isPlainObject(obj) {
   return obj && typeof obj === 'object' && !Array.isArray(obj);
@@ -19,6 +21,7 @@ function sign(user) {
   const token = jwt.sign(payload, process.env.JWT_KEY, {
     expiresIn: '1h',
   });
+
   return token;
 }
 
@@ -26,7 +29,9 @@ function verify(token) {
   try {
     return jwt.verify(token, process.env.JWT_KEY);
   } catch (error) {
-    throw ApiError.Unauthorized('Access token verification failed: ' + error.message);
+    throw ApiError.Unauthorized(
+      'Access token verification failed: ' + error.message,
+    );
   }
 }
 
@@ -43,6 +48,7 @@ function signRefresh(user) {
   const token = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
     expiresIn: '7d',
   });
+
   return token;
 }
 
@@ -50,7 +56,9 @@ function verifyRefresh(token) {
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_KEY);
   } catch (error) {
-    throw ApiError.Unauthorized('Refresh token verification failed: ' + error.message);
+    throw ApiError.Unauthorized(
+      'Refresh token verification failed: ' + error.message,
+    );
   }
 }
 
@@ -67,10 +75,11 @@ function signResetToken(user) {
   const token = jwt.sign(payload, process.env.JWT_KEY, {
     expiresIn: '1h',
   });
+
   return token;
 }
 
-export const jwtService = {
+module.exports = {
   sign,
   verify,
   signRefresh,

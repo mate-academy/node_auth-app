@@ -1,15 +1,17 @@
-import bcrypt from 'bcrypt';
-import { userService } from '../services/user.service.js';
-import { jwtService } from '../services/jwt.service.js';
-import { ApiError } from '../exeptions/api.error.js';
-import { tokenService } from '../services/token.service.js';
-import { emailService } from '../services/email.service.js';
+const bcrypt = require('bcrypt');
+const userService = require('../services/user.service');
+const jwtService = require('../services/jwt.service');
+const ApiError = require('../exeptions/api.error');
+const tokenService = require('../services/token.service');
+const emailService = require('../services/email.service');
 
 function validateEmail(value) {
   if (!value) {
     return 'Email is required';
   }
+
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
+
   if (!emailPattern.test(value)) {
     return 'Email is not valid';
   }
@@ -19,6 +21,7 @@ function validatePassword(value) {
   if (!value) {
     return 'Password is required';
   }
+
   if (value.length < 6) {
     return 'At least 6 characters';
   }
@@ -39,6 +42,7 @@ const register = async (req, res, next) => {
     }
 
     const hashedPass = await bcrypt.hash(password, 10);
+
     await userService.register(name, email, hashedPass);
 
     res.send({ message: 'OK' });
@@ -54,6 +58,7 @@ const activate = async (req, res, next) => {
 
     if (!user) {
       res.sendStatus(404);
+
       return;
     }
 
@@ -85,17 +90,21 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     const user = await userService.findByEmail(email);
+
     if (!user) {
       throw ApiError.BadRequest('No such user');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
       throw ApiError.BadRequest('Wrong password');
     }
 
     if (user.activationToken) {
-      throw ApiError.BadRequest('Account not activated. Please check your email.');
+      throw ApiError.BadRequest(
+        'Account not activated. Please check your email.',
+      );
     }
 
     await generateTokens(res, user);
@@ -113,6 +122,7 @@ const refresh = async (req, res, next) => {
     }
 
     const userData = jwtService.verifyRefresh(refreshToken);
+
     if (!userData) {
       throw ApiError.Unauthorized('Invalid refresh token');
     }
@@ -170,6 +180,7 @@ const sendResetEmail = async (req, res, next) => {
     }
 
     const resetToken = jwtService.signResetToken({ id: user.id });
+
     await emailService.sendResetEmail(email, resetToken);
 
     res.send({ message: 'Password reset email sent' });
@@ -194,6 +205,7 @@ const resetPassword = async (req, res, next) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
     await userService.resetPassword(userData.id, hashedPassword);
 
     res.send({ message: 'Password updated successfully' });
@@ -202,12 +214,12 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
-export const authController = {
+module.exports = {
   register,
   activate,
   login,
   refresh,
   logout,
-  resetPassword,
   sendResetEmail,
+  resetPassword,
 };

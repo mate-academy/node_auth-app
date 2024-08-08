@@ -1,9 +1,10 @@
-import { userService } from '../services/user.service.js';
-import { ApiError } from '../exeptions/api.error.js';
+const ApiError = require('../exeptions/api.error');
+const userService = require('../services/user.service');
 
 const getAllActivated = async (req, res) => {
   const users = await userService.getAllActivated();
-  res.send(users.map(user => userService.normalize(user)));
+
+  res.send(users.map((user) => userService.normalize(user)));
 };
 
 const updateName = async (req, res) => {
@@ -15,6 +16,7 @@ const updateName = async (req, res) => {
   }
 
   const updatedUser = await userService.updateName(userId, name);
+
   res.send(updatedUser);
 };
 
@@ -27,6 +29,7 @@ const updateEmail = async (req, res) => {
   }
 
   const updatedUser = await userService.updateEmail(userId, newEmail, password);
+
   res.send(updatedUser);
 };
 
@@ -35,7 +38,9 @@ const updatePassword = async (req, res) => {
   const { currentPassword, newPassword, confirmation } = req.body;
 
   if (!currentPassword || !newPassword || !confirmation) {
-    return res.status(400).send({ message: 'All password fields are required' });
+    return res
+      .status(400)
+      .send({ message: 'All password fields are required' });
   }
 
   if (newPassword !== confirmation) {
@@ -46,7 +51,7 @@ const updatePassword = async (req, res) => {
   res.send({ message: 'Password changed successfully' });
 };
 
-export const userController = {
+module.exports = {
   getAllActivated,
   updateName,
   updateEmail,

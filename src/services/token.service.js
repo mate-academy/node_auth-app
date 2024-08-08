@@ -1,13 +1,14 @@
-import { Token } from "../models/token.js";
+const { Token } = require('../models/token');
 
 async function save(userId, refreshToken) {
   const token = await Token.findOne({
-    where: { userId }
+    where: { userId },
   });
 
   if (token) {
     token.refreshToken = refreshToken;
     await token.save();
+
     return;
   }
 
@@ -16,7 +17,7 @@ async function save(userId, refreshToken) {
 
 function getByToken(refreshToken) {
   return Token.findOne({
-    where: { refreshToken }
+    where: { refreshToken },
   });
 }
 
@@ -26,7 +27,7 @@ function remove(userId) {
   });
 }
 
-export const tokenService = {
+module.exports = {
   getByToken,
   save,
   remove,
