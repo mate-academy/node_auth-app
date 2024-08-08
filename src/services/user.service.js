@@ -1,8 +1,8 @@
 const { User } = require('../models/user');
 const bcrypt = require('bcrypt');
-const { emailService } = require('./email.service');
 const { v4: uuidv4 } = require('uuid');
 const ApiError = require('../exeptions/api.error');
+const { sendActivationEmail, sendEmailChangeNotification } = require('./email.service');
 
 function getAllActivated() {
   return User.findAll({
@@ -44,7 +44,7 @@ async function register(name, email, password) {
     activationToken,
   });
 
-  await emailService.sendActivationEmail(email, activationToken);
+  await sendActivationEmail(email, activationToken);
 }
 
 async function updateName(userId, newName) {
@@ -79,7 +79,7 @@ async function updateEmail(userId, newEmail, password) {
     throw ApiError.BadRequest('Email already in use');
   }
 
-  await emailService.sendEmailChangeNotification(user.email, newEmail);
+  await sendEmailChangeNotification(user.email, newEmail);
 
   user.email = newEmail;
   await user.save();
