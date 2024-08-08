@@ -3,6 +3,7 @@ const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
 const emailService = require('../services/email.service');
+const { validateName, validateEmail, validatePassword } = require('../utils');
 
 const sendAuthentication = async (res, user) => {
   const userData = userService.normalize(user);
@@ -28,9 +29,9 @@ const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    name: userService.validateName(name),
-    email: userService.validateEmail(email),
-    password: userService.validatePassword(password),
+    name: validateName(name),
+    email: validateEmail(email),
+    password: validatePassword(password),
   };
 
   if (Object.values(errors).some((error) => error)) {
@@ -63,8 +64,8 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   const errors = {
-    email: userService.validateEmail(email),
-    password: userService.validatePassword(password),
+    email: validateEmail(email),
+    password: validatePassword(password),
   };
 
   if (Object.values(errors).some((error) => error)) {
@@ -157,7 +158,7 @@ const resetPassword = async (req, res) => {
     throw ApiError.BadRequest('All fields are required.');
   }
 
-  const validationError = userService.validatePassword(password);
+  const validationError = validatePassword(password);
 
   if (validationError) {
     throw ApiError.BadRequest(validationError);

@@ -3,6 +3,7 @@ const emailService = require('../services/email.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
 const userService = require('../services/user.service');
+const { validateName, validateEmail, validatePassword } = require('../utils');
 
 const getAllActive = async (req, res) => {
   const users = await userService.getAllActive();
@@ -34,7 +35,7 @@ const updateName = async (req, res) => {
   const userData = await jwtService.validateRefreshToken(refreshToken);
   const token = await tokenService.getByToken(refreshToken);
 
-  const validationError = userService.validateName(name);
+  const validationError = validateName(name);
 
   if (validationError) {
     throw ApiError.BadRequest('Validation error', { name: validationError });
@@ -54,8 +55,8 @@ const updateEmail = async (req, res) => {
   const { password, email } = req.body;
 
   const errors = {
-    email: userService.validateEmail(email),
-    password: userService.validatePassword(password),
+    email: validateEmail(email),
+    password: validatePassword(password),
   };
 
   if (Object.values(errors).some((error) => error)) {
@@ -88,7 +89,7 @@ const updatePassword = async (req, res) => {
   const { oldPassword, newPassword, confirmation } = req.body;
   const { refreshToken } = req.cookies;
 
-  const validationError = userService.validatePassword(newPassword);
+  const validationError = validatePassword(newPassword);
 
   if (validationError) {
     throw ApiError.BadRequest(validationError);
