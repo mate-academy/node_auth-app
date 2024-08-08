@@ -1,5 +1,3 @@
-const bcrypt = require('bcrypt');
-
 const { ApiError } = require('../exceptions/api.error');
 const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
@@ -39,9 +37,11 @@ const register = async (req, res) => {
     throw ApiError.BadRequest('Validation error', errors);
   }
 
-  await userService.register(name, email, password);
+  await userService.create(name, email, password);
 
-  res.sendStatus(200);
+  res.status(200).send({
+    message: 'Further instructions were sent to your email',
+  });
 };
 
 const activate = async (req, res) => {
@@ -49,7 +49,7 @@ const activate = async (req, res) => {
   const user = await userService.findByToken(activationToken);
 
   if (!user) {
-    throw ApiError.NotFound();
+    throw ApiError.NotFound({ user: 'User does not exist' });
   }
 
   user.activationToken = null;
@@ -61,10 +61,20 @@ const activate = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
+
+  const errors = {
+    email: userService.validateEmail(email),
+    password: userService.validatePassword(password),
+  };
+
+  if (Object.values(errors).some((error) => error)) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
+
   const user = await userService.findByEmail(email);
 
   if (!user) {
-    throw ApiError.NotFound();
+    throw ApiError.NotFound({ user: 'Invalid email or password' });
   }
 
   if (user.activationToken) {
@@ -73,10 +83,13 @@ const login = async (req, res) => {
     });
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await userService.comparePasswords(
+    password,
+    user.password,
+  );
 
   if (!isPasswordValid) {
-    throw ApiError.badRequest('Invalid credentials');
+    throw ApiError.BadRequest('Invalid credentials');
   }
 
   await sendAuthentication(res, user);
@@ -84,16 +97,20 @@ const login = async (req, res) => {
 
 const refresh = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken || '';
-
   const userData = await jwtService.validateRefreshToken(refreshToken);
   const token = await tokenService.getByToken(refreshToken);
-  const user = await userService.findByEmail(userData.email);
 
-  if (!userData || !token || !user || token.userId !== user.id) {
+  if (!userData || !token) {
     res.clearCookie('refreshToken');
     throw ApiError.Unauthorized();
   }
 
+  const user = await userService.findByEmail(userData.email);
+
+  if (!user || token.userId !== user.id) {
+    res.clearCookie('refreshToken');
+    throw ApiError.Unauthorized();
+  }
   await sendAuthentication(res, user);
 };
 
@@ -105,7 +122,7 @@ const logout = async (req, res) => {
     throw ApiError.Unauthorized();
   }
 
-  tokenService.remove(userData.id);
+  await tokenService.removeByUserId(userData.id);
 
   res.clearCookie('refreshToken');
   res.sendStatus(204);
@@ -147,7 +164,7 @@ const resetPassword = async (req, res) => {
   }
 
   if (password !== passwordConfirm) {
-    throw ApiError.BadRequest('Incorrect data', {
+    throw ApiError.BadRequest('Invalid input', {
       confirmation: `Passwords do not match`,
     });
   }

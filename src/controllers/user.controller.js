@@ -11,15 +11,28 @@ const getAllActive = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-  const { refreshToken } = req.cookies;
-  const userData = jwtService.validateRefreshToken(refreshToken);
+  const refreshToken = req.cookies?.refreshToken || '';
+  const userData = await jwtService.validateRefreshToken(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
 
-  res.send(userData);
+  if (!userData || !token) {
+    throw ApiError.Unauthorized();
+  }
+
+  const user = await userService.findByEmail(userData.email);
+
+  if (!user || token.userId !== user.id) {
+    throw ApiError.Unauthorized();
+  }
+
+  res.send(userService.normalize(user));
 };
 
 const updateName = async (req, res) => {
   const { name } = req.body;
-  const { refreshToken } = req.cookies;
+  const refreshToken = req.cookies?.refreshToken || '';
+  const userData = await jwtService.validateRefreshToken(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
 
   const validationError = userService.validateName(name);
 
@@ -27,23 +40,13 @@ const updateName = async (req, res) => {
     throw ApiError.BadRequest('Validation error', { name: validationError });
   }
 
-  const userData = jwtService.validateRefreshToken(refreshToken);
+  const user = await userService.updateName(token.userId);
 
-  if (!userData) {
+  if (!userData || !token || token.userId !== user.id) {
     throw ApiError.Unauthorized();
   }
 
-  const tokenFromDB = await tokenService.getByToken(refreshToken);
-
-  if (!tokenFromDB) {
-    throw ApiError.Unauthorized();
-  }
-
-  await userService.updateName(tokenFromDB.userId);
-
-  // res.send(userService.normalize(user));
-
-  res.status(200).send({ message: 'Name updated successfully' });
+  res.status(200).send(userService.normalize(user));
 };
 
 const updateEmail = async (req, res) => {
@@ -74,17 +77,15 @@ const updateEmail = async (req, res) => {
   const user = await userService.findById(userData.id);
   const oldEmail = user.email;
 
-  await userService.updateEmail(email, user.id);
+  const updatedUser = await userService.updateEmail(email, user.id);
 
   await emailService.notifyOldEmail(user.name, email, oldEmail);
 
-  // res.send(userService.normalize(user));
-
-  res.status(200).send({ message: 'Email updated successfully' });
+  res.status(200).send(userService.normalize(updatedUser));
 };
 
 const updatePassword = async (req, res) => {
-  const { password, newPassword, confirmation } = req.body;
+  const { oldPassword, newPassword, confirmation } = req.body;
   const { refreshToken } = req.cookies;
 
   const validationError = userService.validatePassword(newPassword);
@@ -94,7 +95,7 @@ const updatePassword = async (req, res) => {
   }
 
   if (newPassword !== confirmation) {
-    throw ApiError.BadRequest('Incorrect data', {
+    throw ApiError.BadRequest('Invalid input', {
       confirmation: `Passwords do not match`,
     });
   }
@@ -114,12 +115,12 @@ const updatePassword = async (req, res) => {
   const user = userService.findById(userData.id);
 
   const isPasswordValid = await userService.comparePasswords(
-    password,
+    oldPassword,
     user.password,
   );
 
   if (!isPasswordValid) {
-    throw ApiError.badRequest('Invalid password');
+    throw ApiError.BadRequest('Original password not correct');
   }
 
   await userService.updatePassword(tokenFromDB.userId, newPassword);

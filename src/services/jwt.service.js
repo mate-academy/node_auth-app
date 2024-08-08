@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '5s' });
+  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '60s' });
 }
 
 function generateRefreshToken(user) {
