@@ -44,7 +44,7 @@ const sendResetLink = (name, email, token) => {
     subject: 'Password Reset Request',
     html: `
       <h1>Password reset</h1>
-      <p>Dear ${name}, We received a request to reset your password for your account.
+      <p>Dear ${name[0].toUpperCase() + name.slice(1)}, We received a request to reset your password for your account.
       Click the link below to reset your password:</p>
       <a href="${link}">${link}</a>
       <p>If you did not request this change, please ignore this email. The link will expire in an hour.
@@ -61,7 +61,7 @@ const notifyOldEmail = (name, newEmail, oldEmail) => {
     subject: 'Email Change Notification',
     html: `
     <h1>Email Change</h1>
-    <p>Dear ${name},</p>
+    <p>Dear ${name[0].toUpperCase() + name.slice(1)},</p>
     <p>Your email has been changed to <strong>${newEmail}</strong>.</p>
     <p>If you didn't request this change, contact support.</p>
   `,

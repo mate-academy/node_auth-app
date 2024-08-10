@@ -23,7 +23,7 @@ function validatePassword(password) {
 }
 
 function validateName(value) {
-  if (value.length < 3) {
+  if (!value || value.length < 3) {
     return 'Should be at least 3 characters';
   }
 }

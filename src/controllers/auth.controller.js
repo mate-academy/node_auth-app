@@ -3,7 +3,12 @@ const userService = require('../services/user.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
 const emailService = require('../services/email.service');
-const { validateName, validateEmail, validatePassword } = require('../utils');
+const {
+  validateName,
+  validateEmail,
+  validatePassword,
+  comparePasswords,
+} = require('../utils');
 
 const sendAuthentication = async (res, user) => {
   const userData = userService.normalize(user);
@@ -84,10 +89,7 @@ const login = async (req, res) => {
     });
   }
 
-  const isPasswordValid = await userService.comparePasswords(
-    password,
-    user.password,
-  );
+  const isPasswordValid = await comparePasswords(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Invalid credentials');
@@ -106,7 +108,7 @@ const refresh = async (req, res) => {
     throw ApiError.Unauthorized();
   }
 
-  const user = await userService.findByEmail(userData.email);
+  const user = await userService.findById(userData.id);
 
   if (!user || token.userId !== user.id) {
     res.clearCookie('refreshToken');
@@ -174,7 +176,7 @@ const resetPassword = async (req, res) => {
 
   if (!userData) {
     throw ApiError.BadRequest('Invalid token', {
-      resetToken: 'Invalid or expired reset token.',
+      resetToken: 'Invalid or expired reset token',
     });
   }
 
