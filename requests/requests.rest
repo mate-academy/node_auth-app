@@ -1,0 +1,45 @@
+# --------------------------------------------------------AUTH
+GET http://localhost:3000/activation/$2b$04$kSQGiuESHq7wOb9G39bTze
+content-type: application/json
+###
+POST http://localhost:3000/registration
+content-type: application/json
+
+{
+  "name": "vlad",
+  "email": "vladbuldenko@gmail.com",
+  "password": "123456"
+}
+###
+POST http://localhost:3000/login
+content-type: application/json
+
+{
+  "email": "vladbuldenko@gmail.com",
+  "password": "123456"
+}
+###
+GET http://localhost:3000/refresh
+content-type: application/json
+###
+POST http://localhost:3000/forgotPassword
+content-type: application/json
+
+{
+  "email": "vladbuldenko@gmail.com"
+}
+###
+POST http://localhost:3000/resetPassword/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InZsYWQiLCJlbWFpbCI6InZsYWRidWxkZW5rb0BnbWFpbC5jb20iLCJpYXQiOjE3MjMxMTM3MTMsImV4cCI6MTcyMzExNzMxM30.qTuEeKgu9wYtY9caHF_A-YIfGUGagpD0DH365Llb8bE
+content-type: application/json
+
+{
+  "password": "1234567",
+  "passwordConfirm": "1234567"
+}
+###
+
+# --------------------------------------------------------USERS
+GET http://localhost:3000/users/
+content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InZsYWQiLCJlbWFpbCI6InZsYWRidWxkZW5rb0BnbWFpbC5jb20iLCJpYXQiOjE3MjMxMTI5MjYsImV4cCI6MTcyMzExMjk4Nn0.suLXqNcBBxEXZzh7GicODPz93IfKrAx4XTUA0g_-adk
+###
