@@ -1,6 +1,9 @@
 const { ApiError } = require('../exceptions/api.error');
 
-const errorsHandler = (error, req, res, next) => {
+const errorMiddleware = (error, req, res, next) => {
+  // eslint-disable-next-line no-console
+  console.error(error);
+
   if (error instanceof ApiError) {
     res.statusCode = error.status;
 
@@ -20,5 +23,5 @@ const errorsHandler = (error, req, res, next) => {
 };
 
 module.exports = {
-  errorsHandler,
+  errorMiddleware,
 };
