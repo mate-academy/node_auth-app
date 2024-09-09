@@ -8,7 +8,7 @@ export const validateEmail = (value) => {
   if (!emailPattern.test(value)) {
     return 'Email is not valid';
   }
-}
+};
 
 export const validatePassword = (value) => {
   if (!value) {

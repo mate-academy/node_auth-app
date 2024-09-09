@@ -9,7 +9,11 @@ import {
 } from '../services/users-service.js';
 import { ApiError } from '../exeptions/api-error.js';
 import { validateEmail, validatePassword } from '../utils/validators.js';
-import { createAccessToken, createRefreshToken, verifyRefreshToken } from '../services/jwt-serwices.js';
+import {
+  createAccessToken,
+  createRefreshToken,
+  verifyRefreshToken,
+} from '../services/jwt-serwices.js';
 
 async function register(req, res, next) {
   const { email, password } = req.body;
@@ -91,17 +95,14 @@ async function sendAuth(user, res) {
     sameSite: 'none',
   });
 
-  console.log('2', refreshToken)
-
+  console.log('2', refreshToken);
 
   res.status(200).send({ user: { email: user.email }, accessToken });
 }
-
-
 
 export const authController = {
   register,
   activate,
   login,
-  refresh
+  refresh,
 };

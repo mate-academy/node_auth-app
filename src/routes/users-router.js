@@ -5,4 +5,8 @@ import { catchError } from '../utils/catch-error.js';
 
 export const usersRouter = new express.Router();
 
-usersRouter.get('/users',catchError(authMiddleware), catchError(usersController.getAll));
+usersRouter.get(
+  '/users',
+  catchError(authMiddleware),
+  catchError(usersController.getAll),
+);

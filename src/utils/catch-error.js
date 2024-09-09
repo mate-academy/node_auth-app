@@ -5,5 +5,5 @@ export const catchError = (middleware) => {
     } catch (error) {
       next(error);
     }
-  }
+  };
 };
