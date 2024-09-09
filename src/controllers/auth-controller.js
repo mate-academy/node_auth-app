@@ -14,6 +14,8 @@ import {
   createRefreshToken,
   verifyRefreshToken,
 } from '../services/jwt-serwices.js';
+import { tokenSerice } from '../services/tokens-services.js';
+import { Token } from '../models/token.js';
 
 async function register(req, res, next) {
   const { email, password } = req.body;
@@ -67,15 +69,28 @@ async function login(req, res, next) {
   return sendAuth(user, res);
 }
 
-export async function refresh(req, res, next) {
-  console.log('Cookies:', req.cookies);
+async function logout(req, res, next) {
   const { refreshToken } = req.cookies;
+  const userData = verifyRefreshToken(refreshToken);
 
-  console.log('1', refreshToken);
+  if (userData) {
+    await tokenSerice.remove(userData.id)
+  }
+
+  res.status(204).send()
+}
+
+export async function refresh(req, res, next) {
+  const { refreshToken } = req.cookies;
 
   const userData = verifyRefreshToken(refreshToken);
 
   if (userData === null) {
+    throw ApiError.Unauthorized();
+  }
+
+  const token = await tokenSerice.getByToken(refreshToken);
+  if (!token) {
     throw ApiError.Unauthorized();
   }
 
@@ -88,14 +103,14 @@ async function sendAuth(user, res) {
   const accessToken = createAccessToken({ id: user.id, email: user.email });
   const refreshToken = createRefreshToken({ id: user.id, email: user.email });
 
+  await tokenSerice.save(user.id, refreshToken);
+
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: true,
     sameSite: 'none',
   });
-
-  console.log('2', refreshToken);
 
   res.status(200).send({ user: { email: user.email }, accessToken });
 }
@@ -104,5 +119,6 @@ export const authController = {
   register,
   activate,
   login,
+  logout,
   refresh,
 };

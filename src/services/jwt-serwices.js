@@ -15,7 +15,7 @@ export const verifyAccessToken = (token) => {
 };
 
 export const createRefreshToken = (data) => {
-  return jwt.sign(data, process.env.JWT_SECRET_REFRESH, { expiresIn: '999s' });
+  return jwt.sign(data, process.env.JWT_SECRET_REFRESH, { expiresIn: '1d' });
 };
 
 export const verifyRefreshToken = (token) => {
