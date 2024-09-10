@@ -15,9 +15,7 @@ export const authMiddleware = (req, res, next) => {
   const [, token] = auth.split(' ');
 
   if (!auth) {
-    res.status(401).send();
-
-    return;
+    throw ApiError.Unauthorized();
   }
 
   const data = verifyAccessToken(token);

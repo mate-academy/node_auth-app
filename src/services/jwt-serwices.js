@@ -8,6 +8,7 @@ export const createAccessToken = (data) => {
 export const verifyAccessToken = (token) => {
   try {
     const data = jwt.verify(token, process.env.JWT_SECRET);
+
     return data;
   } catch (error) {
     return null;
@@ -21,6 +22,7 @@ export const createRefreshToken = (data) => {
 export const verifyRefreshToken = (token) => {
   try {
     const data = jwt.verify(token, process.env.JWT_SECRET_REFRESH);
+
     return data;
   } catch (error) {
     return null;

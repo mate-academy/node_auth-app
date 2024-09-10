@@ -15,7 +15,6 @@ import {
   verifyRefreshToken,
 } from '../services/jwt-serwices.js';
 import { tokenSerice } from '../services/tokens-services.js';
-import { Token } from '../models/token.js';
 
 async function register(req, res, next) {
   const { email, password } = req.body;
@@ -74,10 +73,10 @@ async function logout(req, res, next) {
   const userData = verifyRefreshToken(refreshToken);
 
   if (userData) {
-    await tokenSerice.remove(userData.id)
+    await tokenSerice.remove(userData.id);
   }
 
-  res.status(204).send()
+  res.status(204).send();
 }
 
 export async function refresh(req, res, next) {
@@ -90,6 +89,7 @@ export async function refresh(req, res, next) {
   }
 
   const token = await tokenSerice.getByToken(refreshToken);
+
   if (!token) {
     throw ApiError.Unauthorized();
   }
