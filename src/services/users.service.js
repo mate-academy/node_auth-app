@@ -1,9 +1,8 @@
 const { User } = require('../models/user.model.js');
-// const { ApiError } = require('../exeptions/api.error.js');
-const { UUIDV4 } = require('sequelize');
 const emailsService = require('./emails.service.js');
-const bcrypt = require('bcrypt');
 const ApiError = require('../exeptions/api.error.js');
+const { UUIDV4 } = require('sequelize');
+const bcrypt = require('bcrypt');
 
 function normalize({ id, email, name }) {
   return { id, email, name };
