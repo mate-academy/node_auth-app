@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+
 import 'dotenv/config';
 import { User } from './src/models/User.model.js';
 import { client } from './src/utils/db.js';
