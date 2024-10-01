@@ -2,21 +2,37 @@ import 'dotenv/config';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
   auth: {
-      user: 'loma98@ethereal.email',
-      pass: 'ctAJeeAv1aR6wCtz6G'
-  }
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
 });
 
-const info = await transporter.sendMail({
-  from: 'loma98@ethereal.email',
-  to: "spamer@helloWorld.net", // list of receivers
-  subject: "Hello ✔", // Subject line
-  text: "Hello world? world?dlfjldfjldfj", // plain text body
-  html: "<b>Hello world?</b>", // html body
-});
+export function send({ email, subject, html }) {
+  return transporter.sendMail({
+    to: email,
+    subject,
+    html,
+  });
+}
 
-console.log("Email is send", info);
+function sendActivationEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/activate/${token}`;
+  const html = `
+    <h1>Activate account</h1>
+    <a href=${href}>${href}</a>
+  `;
 
+  return send({
+    email,
+    subject: 'Activate',
+    html,
+  });
+}
+
+export const emailService = {
+  sendActivationEmail,
+  send,
+};
