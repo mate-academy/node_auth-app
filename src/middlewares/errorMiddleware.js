@@ -1,11 +1,20 @@
-export const errorMiddleware = (error, req, res, next) => {
-  if (error) {
-    res.statusCode = 500;
+import { ApiError } from '../exeptions/api.error.js';
 
-    res.send({
-      message: 'Server Error',
+export const errorMiddleware = (error, req, res, next) => {
+  if (error instanceof ApiError) {
+    const { status, message, errors } = error;
+
+    res.status(status).send({
+      message: message,
+      errors: errors,
     });
+
+    return;
   }
 
-  next();
+  res.statusCode = 500;
+
+  res.send({
+    message: 'Server Error',
+  });
 };

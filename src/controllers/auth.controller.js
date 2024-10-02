@@ -1,22 +1,13 @@
 import { User } from '../models/User.model.js';
-import { emailService } from '../services/email.service.js';
-import { v4 as uuid } from 'uuid';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
-  const activationToken = uuid();
 
-  const newUser = await User.create({
-    name,
-    email,
-    password,
-    activationToken,
-  });
+  await userService.register(name, email, password);
 
-  await emailService.sendActivationEmail(email, activationToken);
-  res.send(newUser);
+  res.send({ message: 'Ok, registration completed successfully' });
 };
 
 const activate = async (req, res) => {
