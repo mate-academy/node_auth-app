@@ -102,6 +102,7 @@ async function generateTokens(res, user) {
     sameSite: 'none',
     secure: true,
   });
+
   res.send({
     user: normolizedUser,
     accessToken,
