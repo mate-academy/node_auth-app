@@ -14,7 +14,7 @@ const validateEmail = (email) => {
   if (!emailPattern.test(email)) {
     return 'Email is not valid';
   }
-}
+};
 
 const validatePassword = (password) => {
   if (!password) {
@@ -24,7 +24,7 @@ const validatePassword = (password) => {
   if (password.length < 6) {
     return 'At least 6 characters';
   }
-}
+};
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
