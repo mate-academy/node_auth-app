@@ -10,4 +10,6 @@ authRouter.get(
   '/activate/:activationToken',
   catchError(authController.activate),
 );
-authRouter.get('/login', catchError(authController.login));
+authRouter.post('/login', catchError(authController.login));
+authRouter.get('/refresh', catchError(authController.refresh));
+
