@@ -22,12 +22,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRouter);
-// '!!!'
 app.use('/users', userRouter);
 app.use(errorMiddleware);
-
-// app.get('/', (req, res) => {
-//   res.send('Hello');
-// });
 
 app.listen(PORT);

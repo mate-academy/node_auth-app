@@ -6,7 +6,6 @@ import { jwtService } from '../services/jwtService.js';
 import { tokenService } from '../services/tokenService.js';
 import { userService } from '../services/userService.js';
 
-
 function validateEmail(value) {
   if (!value) {
     return 'Email is required';
@@ -55,6 +54,7 @@ async function activate(req, res, next) {
 
   if (!user) {
     res.sendStatus(404);
+
     return;
   }
 
@@ -100,25 +100,6 @@ async function refresh(req, res, next) {
   await sendAuthentication(res, user);
 }
 
-async function refresh(req, res, next) {
-  const { refreshToken } = req.cookies;
-  const userData = jwtService.validateRefreshToken(refreshToken);
-
-  if (!userData) {
-    throw ApiError.Unauthorized();
-  }
-
-  const token = await tokenService.getByToken(refreshToken);
-
-  if (!token) {
-    throw ApiError.Unauthorized();
-  }
-
-  const user = await userService.getByEmail(userData.email);
-
-  await sendAuthentication(res, user);
-}
-
 async function logout(req, res, next) {
   const { refreshToken } = req.cookies;
   const userData = jwtService.validateRefreshToken(refreshToken);
@@ -130,6 +111,26 @@ async function logout(req, res, next) {
   }
 
   res.sendStatus(204);
+}
+
+async function sendAuthentication(res, user) {
+  const userData = userService.normalize(user);
+  const accessToken = jwtService.generateAccessToken(userData);
+  const refreshToken = jwtService.generateRefreshToken(userData);
+
+  await tokenService.save(user.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  res.send({
+    user: userData,
+    accessToken,
+  });
 }
 
 export const authController = {
