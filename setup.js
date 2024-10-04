@@ -2,6 +2,7 @@
 
 import 'dotenv/config';
 import { User } from './src/models/User.model.js';
+import { Token } from './src/models/Token.model.js';
 import { client } from './src/utils/db.js';
 
 async function setupDatabase() {

@@ -3,6 +3,7 @@ import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
+import { tokenService } from '../services/token.service.js';
 
 const validateEmail = (email) => {
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
@@ -81,11 +82,14 @@ const login = async (req, res) => {
 
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
-  const user = jwtService.verifyRefresh(refreshToken);
+  const userData = jwtService.verifyRefresh(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
 
-  if (!user) {
+  if (!userData || !token) {
     throw ApiError.Unauthorized();
   }
+
+  const user = await userService.findByEmail(userData.email);
 
   await generateTokens(res, user);
 };
@@ -94,9 +98,11 @@ async function generateTokens(res, user) {
   const normolizedUser = userService.normolize(user);
 
   const accessToken = jwtService.sign(normolizedUser);
-  const refreshToken = jwtService.signRefresh(normolizedUser);
+  const refreshAccessToken = jwtService.signRefresh(normolizedUser);
 
-  res.cookie('refreshToken', refreshToken, {
+  await tokenService.save(normolizedUser.id, refreshAccessToken);
+
+  res.cookie('refreshToken', refreshAccessToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     sameSite: 'none',
