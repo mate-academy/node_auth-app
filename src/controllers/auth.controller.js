@@ -94,6 +94,20 @@ const refresh = async (req, res) => {
   await generateTokens(res, user);
 };
 
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const userData = await jwtService.verifyRefresh(refreshToken);
+
+  console.log('userData from logout ', userData);
+
+  if (!userData || !refreshToken) {
+    throw ApiError.Unauthorized();
+  }
+
+  await tokenService.removeByUserId(userData.id);
+  res.sendStatus(204);
+};
+
 async function generateTokens(res, user) {
   const normolizedUser = userService.normolize(user);
 
@@ -120,4 +134,5 @@ export const authController = {
   activate,
   login,
   refresh,
+  logout,
 };
