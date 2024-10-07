@@ -4,6 +4,7 @@ import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/token.service.js';
+import { emailService } from '../services/email.service.js';
 
 const validateEmail = (email) => {
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
@@ -102,8 +103,6 @@ const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
   const userData = await jwtService.verifyRefresh(refreshToken);
 
-  console.log('userData from logout ', userData);
-
   if (!userData || !refreshToken) {
     throw ApiError.Unauthorized();
   }
@@ -133,6 +132,82 @@ async function generateTokens(res, user) {
   });
 }
 
+async function resetPassword(req, res) {
+  const { email } = req.body;
+  const user = await userService.findByEmail(email);
+
+  if (!user) {
+    throw ApiError.BadRequest('No such user');
+  }
+
+  const normolizedUser = userService.normalize(user);
+  const resetToken = jwtService.signReset(normolizedUser);
+  const href = `${process.env.CLIENT_HOST}/resetPassword/${resetToken}`;
+  const html = `
+    <h1>Resetting password</h1>
+    <p>If you want to reset your password, click on this link:</p>
+    <p>
+      <a href="${href}">${href}</a>
+    </p>
+  `;
+
+  await emailService.send({
+    email: normolizedUser.email,
+    subject: 'Resetting password',
+    html,
+  });
+
+  res.status(200).send({
+    message: `For resetting your password, check your email.
+       A notification has been sent to your old email.
+      `,
+  });
+}
+
+const reset = async (req, res) => {
+  const { resetToken } = req.params;
+  const userData = jwtService.verify(resetToken);
+
+  if (!userData) {
+    throw ApiError.BadRequest('Invalid or expired reset token');
+  }
+
+  const user = await userService.findByEmail(userData.email);
+
+  if (!user) {
+    throw ApiError.BadRequest('User not found');
+  }
+
+  res.status(200).send(`
+    Enter your new password on '/updatePassword' endpoint
+`);
+};
+
+async function updatePassword(req, res) {
+  const { resetToken, password, confirmPassword } = req.body;
+
+  const userData = jwtService.verify(resetToken);
+
+  if (!userData) {
+    throw ApiError.BadRequest('Invalid or expired reset token');
+  }
+
+  if (password !== confirmPassword) {
+    throw ApiError.BadRequest('Passwords do not match');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const user = await userService.findByEmail(userData.email);
+
+  user.password = hashedPassword;
+  await user.save();
+
+  res
+    .status(200)
+    .send('Password successfully reset. <a href="/login">Login</a>');
+}
+
 export const authController = {
   register,
   activate,
@@ -141,4 +216,7 @@ export const authController = {
   logout,
   validatePassword,
   validateEmail,
+  resetPassword,
+  reset,
+  updatePassword,
 };

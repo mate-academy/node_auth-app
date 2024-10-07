@@ -11,8 +11,6 @@ const transporter = nodemailer.createTransport({
 });
 
 export function send({ email, subject, html }) {
-  console.log('send args ', arguments);
-
   return transporter.sendMail({
     to: email,
     subject,

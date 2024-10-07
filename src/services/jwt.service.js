@@ -8,6 +8,14 @@ function sign(user) {
   return token;
 }
 
+function signReset(user) {
+  const token = jwt.sign(user, process.env.JVT_KEY, {
+    expiresIn: '20m',
+  });
+
+  return token;
+}
+
 function verify(token) {
   try {
     return jwt.verify(token, process.env.JVT_KEY);
@@ -37,4 +45,5 @@ export const jwtService = {
   verify,
   signRefresh,
   verifyRefresh,
+  signReset,
 };
