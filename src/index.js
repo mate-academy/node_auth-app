@@ -7,6 +7,7 @@ import cors from 'cors';
 import { userRouter } from './routes/user.route.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 import cookieParser from 'cookie-parser';
+import { profileRouter } from './routes/profile.route.js';
 
 const PORT = process.env.PORT || 3005;
 
@@ -22,12 +23,13 @@ app.use(
   }),
 );
 
-app.use(authRouter);
-app.use('/users', userRouter);
-
 app.get('/', (req, res) => {
   res.send('Home Page');
 });
+
+app.use(authRouter);
+app.use('/users', userRouter);
+app.use('/profile', profileRouter);
 
 app.use(errorMiddleware);
 

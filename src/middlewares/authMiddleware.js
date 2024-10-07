@@ -4,8 +4,6 @@ export const authMiddleware = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';
   const [, token] = authorization.split(' ');
 
-  console.log('token ', token);
-
   if (!authorization || !token) {
     res.status(401).json({ message: 'Token is required' });
 
@@ -19,6 +17,8 @@ export const authMiddleware = (req, res, next) => {
 
     return;
   }
+
+  req.user = userData;
 
   next();
 };

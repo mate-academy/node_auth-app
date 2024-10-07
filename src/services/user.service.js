@@ -1,4 +1,4 @@
-import { ApiError } from '../exeptions/api.error.js';
+import { ApiError } from '../exceptions/api.error.js';
 import { User } from '../models/User.model.js';
 import { emailService } from '../services/email.service.js';
 import { v4 as uuid } from 'uuid';
@@ -11,7 +11,16 @@ function getAllActivated() {
   });
 }
 
-function normolize({ id, name, email }) {
+function getUserActivated(email) {
+  return User.findOne({
+    where: {
+      activationToken: null,
+      email: email,
+    },
+  });
+}
+
+function normalize({ id, name, email }) {
   return { id, name, email };
 }
 
@@ -21,7 +30,6 @@ function findByEmail(email) {
 
 async function register(name, email, password) {
   const activationToken = uuid();
-
   const existUser = await findByEmail(email);
 
   if (existUser) {
@@ -42,7 +50,8 @@ async function register(name, email, password) {
 
 export const userService = {
   getAllActivated,
-  normolize,
+  normalize,
   findByEmail,
   register,
+  getUserActivated,
 };

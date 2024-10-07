@@ -1,7 +1,7 @@
 import { User } from '../models/User.model.js';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
-import { ApiError } from '../exeptions/api.error.js';
+import { ApiError } from '../exceptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/token.service.js';
 
@@ -77,6 +77,10 @@ const login = async (req, res) => {
     throw ApiError.BadRequest('Wrong password');
   }
 
+  if (user.activationToken) {
+    throw ApiError.Unauthorized();
+  }
+
   await generateTokens(res, user);
 };
 
@@ -109,7 +113,7 @@ const logout = async (req, res) => {
 };
 
 async function generateTokens(res, user) {
-  const normolizedUser = userService.normolize(user);
+  const normolizedUser = userService.normalize(user);
 
   const accessToken = jwtService.sign(normolizedUser);
   const refreshAccessToken = jwtService.signRefresh(normolizedUser);
@@ -135,4 +139,6 @@ export const authController = {
   login,
   refresh,
   logout,
+  validatePassword,
+  validateEmail,
 };
