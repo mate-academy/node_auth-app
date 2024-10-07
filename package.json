@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Auth app",
   "main": "src/index.js",
-  "type": "module",
   "scripts": {
     "init": "mate-scripts init",
     "start": "node --watch src/index.js",
