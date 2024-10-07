@@ -34,5 +34,6 @@ app.use('/profile', profileRouter);
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
+  /* eslint-disable no-console */
   console.log(`Server is running on http://localhost:${PORT}`);
 });
