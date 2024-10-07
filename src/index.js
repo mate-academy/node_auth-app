@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 'use strict';
 
 import 'dotenv/config';
@@ -34,6 +35,5 @@ app.use('/profile', profileRouter);
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
-  /* eslint-disable no-console */
-  console.log(`Server is running on http://localhost:${PORT}`);
+  process.stdout.write(`Server is running on http://localhost:${PORT}`);
 });
