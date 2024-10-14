@@ -4,3 +4,4 @@ import { authController } from '../controllers/auth.controler.js';
 export const authRouter = Router();
 
 authRouter.post('/register', authController.register);
+authRouter.get('/activate/:activationToken', authController.activate);
