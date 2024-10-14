@@ -3,14 +3,14 @@
 
 import 'dotenv/config';
 import chalk from 'chalk';
-import { createServer } from './create-server.js';
+import { createServer } from './createServer.js';
 
-const apiPort = process.env.API_PORT || 3000;
+const PORT = process.env.API_PORT || 3000;
 
-createServer().listen(apiPort, () => {
+createServer().listen(PORT, () => {
   console.log(
     chalk.cyanBright(
-      `Server is running on ${chalk.yellow(`localhost:${apiPort}`)}`,
+      `Server is running on ${chalk.yellow(`${process.env.API_HOST}:${PORT}`)}`,
     ),
   );
 });
