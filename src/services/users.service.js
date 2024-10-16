@@ -38,7 +38,7 @@ async function getByActivationToken(activationToken) {
 }
 
 async function create({ name, email, password, activationToken }) {
-  const userExists = await User.findOne({ where: { email } });
+  const userExists = await getByEmail(email);
 
   if (userExists) {
     throw ApiError.BadRequest('User already exists', {

@@ -2,9 +2,20 @@ import { StatusCodes } from 'http-status-codes';
 import { sendActivationEmail } from '../services/mail.service.js';
 import { usersService } from '../services/users.service.js';
 import { ApiError } from '../exceptions/api.error.js';
+import { validateEmail, validatePassword } from '../utils/validation.js';
 
 async function registerUser(req, res) {
   const { name, email, password } = req.body;
+
+  const emailError = validateEmail(email);
+  const passwordError = validatePassword(password);
+
+  if (emailError || passwordError) {
+    throw ApiError.BadRequest('Bad request', {
+      email: emailError,
+      password: passwordError,
+    });
+  }
 
   const activationToken = usersService.generateActivationToken();
   const user = await usersService.create({

@@ -9,7 +9,8 @@ export const User = sequelize.define('user', {
     unique: true,
     validate: {
       isEmail: {
-        message: 'Invalid email',
+        args: true,
+        msg: 'Invalid e-mail',
       },
     },
   },

@@ -10,5 +10,5 @@ export const errorMiddleware = (error, req, res, next) => {
 
   return res
     .status(StatusCodes.INTERNAL_SERVER_ERROR)
-    .send(ReasonPhrases.INTERNAL_SERVER_ERROR);
+    .send(error.message || ReasonPhrases.INTERNAL_SERVER_ERROR);
 };
