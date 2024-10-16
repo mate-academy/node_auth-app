@@ -1,8 +1,6 @@
-/* eslint-disable no-console */
-import { StatusCodes, ReasonPhrases } from 'http-status-codes';
 import { usersService } from '../services/users.service.js';
+import { authService } from '../services/auth.service.js';
 import { ApiError } from '../exceptions/api.error.js';
-import jwt from 'jsonwebtoken';
 
 export const authMiddleware = async (req, res, next) => {
   const { authorization } = req.headers;
@@ -17,21 +15,17 @@ export const authMiddleware = async (req, res, next) => {
     throw ApiError.Unauthorized();
   }
 
-  try {
-    const { email } = jwt.verify(token, process.env.JWT_SECRET);
+  const tokenData = authService.verifyAccessToken(token);
 
-    const user = usersService.getByEmail(email);
-
-    if (!user) {
-      throw ApiError.Unauthorized();
-    }
-
-    next();
-  } catch (error) {
-    console.log('error', error);
-
-    return res
-      .status(StatusCodes.UNAUTHORIZED)
-      .send(ReasonPhrases.UNAUTHORIZED);
+  if (!tokenData) {
+    throw ApiError.Unauthorized();
   }
+
+  const user = usersService.getByEmail(tokenData.email);
+
+  if (!user) {
+    throw ApiError.Unauthorized();
+  }
+
+  next();
 };
