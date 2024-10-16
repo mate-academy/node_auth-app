@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { sendActivationEmail } from '../services/mail.service.js';
 import { usersService } from '../services/users.service.js';
+import { authService } from '../services/auth.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 import { validateEmail, validatePassword } from '../utils/validation.js';
 
@@ -11,17 +12,27 @@ async function registerUser(req, res) {
   const passwordError = validatePassword(password);
 
   if (emailError || passwordError) {
-    throw ApiError.BadRequest('Bad request', {
+    throw ApiError.BadRequest('Validation error', {
       email: emailError,
       password: passwordError,
     });
   }
 
-  const activationToken = usersService.generateActivationToken();
+  const userExists = await usersService.getByEmail(email);
+
+  if (userExists) {
+    throw ApiError.BadRequest('User already exists', {
+      email: 'This e-mail address is used by another user',
+    });
+  }
+
+  const passwordHash = await authService.hashPassword(password);
+  const activationToken = authService.generateActivationToken();
+
   const user = await usersService.create({
     name,
     email,
-    password,
+    passwordHash,
     activationToken,
   });
 
@@ -58,11 +69,16 @@ async function loginUser(req, res) {
     );
   }
 
-  if (user.passwordHash !== password) {
+  const passwordsMatch = await authService.comparePasswords(
+    password,
+    user.passwordHash,
+  );
+
+  if (!passwordsMatch) {
     throw ApiError.Unauthorized();
   }
 
-  const accessToken = usersService.createJwt({
+  const accessToken = authService.createAccessToken({
     id: user.id,
     email: user.email,
   });
