@@ -101,6 +101,17 @@ async function refresh(req, res) {
   return sendAuth(user, res);
 }
 
+async function logoutUser(req, res) {
+  const { refreshToken } = req.cookies;
+  const userData = authService.verifyRefreshToken(refreshToken);
+
+  if (userData) {
+    await tokensService.remove(userData.id);
+  }
+
+  return res.status(StatusCodes.NO_CONTENT).send();
+}
+
 async function sendAuth(user, res) {
   const accessToken = authService.createAccessToken({
     id: user.id,
@@ -130,4 +141,5 @@ export const authController = {
   activateUser,
   loginUser,
   refresh,
+  logoutUser,
 };
