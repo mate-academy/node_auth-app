@@ -19,8 +19,12 @@ const registerUser = async (name, email, password) => {
   await emailService.sendActivationEmail(email, activationToken);
 };
 
-const getAllUsers = async () => {
-  return await User.findAll();
+const getAllActivatedUsers = async () => {
+  return await User.findAll({
+    where: {
+      activationToken: null,
+    },
+  });
 };
 
 const normalize = ({ id, name, email }) => {
@@ -29,6 +33,7 @@ const normalize = ({ id, name, email }) => {
 
 export const userService = {
   registerUser,
-  getAllUsers,
+  getAllActivatedUsers,
   normalize,
+  getByEmail,
 };
