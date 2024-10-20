@@ -13,8 +13,7 @@ const requestReset = async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    res.sendStatus(400);
-    res.send('check your email');
+    throw ApiError.notFound('check your email');
   }
 
   const user = await userService.getByEmail(email);
@@ -23,7 +22,6 @@ const requestReset = async (req, res) => {
     const userData = userService.normalize(user);
     const resetToken = jwtService.generateResetPasswordToken(userData);
 
-    // Store reset token using existing token service
     await tokenService.saveResetToken(user.id, resetToken);
 
     await emailService.sendResetPasswordEmail(email, resetToken);
@@ -37,25 +35,32 @@ const requestReset = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { email, password, confirmPassword } = req.body;
+  const { password, confirmPassword } = req.body;
+  const { token } = req.params;
 
-  if (!email || !password || !confirmPassword) {
+  if (!password || !confirmPassword) {
     throw ApiError.badRequest('All field are required');
   }
 
-  // Validate password match
   if (password !== confirmPassword) {
     throw ApiError.badRequest('Passwords do not match');
   }
 
-  // Validate password strength
+  let payload;
+
+  try {
+    payload = jwtService.validateResetPasswordToken(token);
+  } catch (err) {
+    throw ApiError.badRequest('Invalid or expired token.');
+  }
+
   const passwordError = validatePassword(password);
 
   if (passwordError) {
     throw ApiError.badRequest('Check your password');
   }
 
-  const user = await userService.getByEmail(email);
+  const user = payload;
 
   if (!user) {
     throw ApiError.notFound('invalid attempt.');
@@ -64,7 +69,7 @@ const resetPassword = async (req, res) => {
   const tokenRecord = await Token.findOne({
     where: {
       userId: user.id,
-      resetToken: { [Op.ne]: null }, // check if reset token exist
+      resetToken: { [Op.ne]: null },
     },
   });
 
@@ -74,10 +79,8 @@ const resetPassword = async (req, res) => {
 
   const newPassword = await bcrypt.hash(password, 10);
 
-  // update password for user
   await User.update({ password: newPassword }, { where: { id: user.id } });
 
-  // Remove used reset token
   await Token.update({ resetToken: null }, { where: { userId: user.id } });
 
   return res.status(200).json({

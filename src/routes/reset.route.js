@@ -5,4 +5,8 @@ import { catchError } from '../utils/catchError.js';
 export const resetRoute = new express.Router();
 
 resetRoute.post('/requestReset', catchError(resetController.requestReset));
-resetRoute.post('/resetPassword', catchError(resetController.resetPassword));
+
+resetRoute.get(
+  '/resetPassword/:token',
+  catchError(resetController.resetPassword),
+);

@@ -6,7 +6,7 @@ import { tokenService } from '../services/token.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 import { validateEmail, validatePassword } from '../utils/methods.js';
 
-const register = async (req, res, next) => {
+const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
@@ -27,6 +27,11 @@ const register = async (req, res, next) => {
 
 const activate = async (req, res) => {
   const { activationToken } = req.params;
+
+  if (!activationToken) {
+    throw ApiError.badRequest('activation token expired');
+  }
+
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
