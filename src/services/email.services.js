@@ -20,7 +20,7 @@ function send({ email, subject, html }) {
 }
 
 function sendActivationEmail(email, token) {
-  const href = `http://localhost:3005/activation/${token}`;
+  const href = `${process.env.CLIENT_HOST}/activation/${token}`;
   const html = `
   <h1>Activate account</h1>
   <a href="${href}">${href}</a>
@@ -34,7 +34,7 @@ function sendActivationEmail(email, token) {
 }
 
 function sendResetPasswordEmail(email, token) {
-  const resetUrl = `http://localhost:3005/resetPassword/${token}`;
+  const resetUrl = `${process.env.CLIENT_HOST}/resetPassword/${token}`;
   const html = `
     <h1>Password Reset Request</h1>
     <p>You requested a password reset. Click the link below to reset your password:</p>
@@ -54,7 +54,7 @@ function sendEmailChangedApprove(email, newEmail) {
   const token = jwt.sign({ email, newEmail }, process.env.JWT_SECRET, {
     expiresIn: '1h',
   });
-  const href = `http://localhost:3005/changeEmailConfirm?token=${token}`;
+  const href = `${process.env.CLIENT_HOST}/changeEmailConfirm?token=${token}`;
   const html = `
   <h1>Email Changed to ${newEmail}</h1>
   To confirm: <a href="${href}">${href}</a>

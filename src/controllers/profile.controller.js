@@ -3,7 +3,7 @@ import { userService } from '../services/user.service.js';
 import { User } from '../models/user.js';
 import bcrypt from 'bcrypt';
 import { validatePassword } from '../utils/methods.js';
-import { emailService } from '../services/emai.services.js';
+import { emailService } from '../services/email.services.js';
 import jwt from 'jsonwebtoken';
 
 const rename = async (req, res) => {
@@ -15,6 +15,10 @@ const rename = async (req, res) => {
 
   const user = await userService.getByEmail(email);
 
+  if (!user) {
+    throw ApiError.badRequest('user not found');
+  }
+
   await User.update({ name: newName }, { where: { id: user.id } });
 
   res.status(200).send('Done');
@@ -23,6 +27,10 @@ const rename = async (req, res) => {
 const changePassword = async (req, res) => {
   const { email, password, newPassword, confirmationPassword } = req.body;
   const user = await userService.getByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('user not found');
+  }
 
   if (!email || !password || !newPassword || !confirmationPassword) {
     throw ApiError.badRequest('Need to provide all fields');

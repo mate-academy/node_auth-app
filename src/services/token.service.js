@@ -1,7 +1,7 @@
 import { Token } from '../models/token.js';
 
 const save = async (userId, refreshToken) => {
-  const token = await Token.findOne({ where: userId });
+  const token = await Token.findOne({ where: { userId } });
 
   if (token) {
     token.refreshToken = refreshToken;
@@ -14,7 +14,7 @@ const save = async (userId, refreshToken) => {
 };
 
 const saveResetToken = async (userId, resetToken) => {
-  const token = await Token.findOne({ where: userId });
+  const token = await Token.findOne({ where: { userId } });
 
   if (token) {
     await token.update({

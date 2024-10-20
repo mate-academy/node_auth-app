@@ -1,7 +1,7 @@
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
-import { emailService } from '../services/emai.services.js';
+import { emailService } from '../services/email.services.js';
 import { Token } from '../models/token.js';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
@@ -13,7 +13,7 @@ const requestReset = async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
-    throw ApiError.notFound('check your email');
+    throw ApiError.notFound('Email is required');
   }
 
   const user = await userService.getByEmail(email);
@@ -39,7 +39,7 @@ const resetPassword = async (req, res) => {
   const { token } = req.params;
 
   if (!password || !confirmPassword) {
-    throw ApiError.badRequest('All field are required');
+    throw ApiError.badRequest('All fields are required');
   }
 
   if (password !== confirmPassword) {
@@ -60,15 +60,15 @@ const resetPassword = async (req, res) => {
     throw ApiError.badRequest('Check your password');
   }
 
-  const user = payload;
+  const userPayload = payload;
 
-  if (!user) {
+  if (!userPayload) {
     throw ApiError.notFound('invalid attempt.');
   }
 
   const tokenRecord = await Token.findOne({
     where: {
-      userId: user.id,
+      userId: userPayload.id,
       resetToken: { [Op.ne]: null },
     },
   });
@@ -79,9 +79,15 @@ const resetPassword = async (req, res) => {
 
   const newPassword = await bcrypt.hash(password, 10);
 
-  await User.update({ password: newPassword }, { where: { id: user.id } });
+  await User.update(
+    { password: newPassword },
+    { where: { id: userPayload.id } },
+  );
 
-  await Token.update({ resetToken: null }, { where: { userId: user.id } });
+  await Token.update(
+    { resetToken: null },
+    { where: { userId: userPayload.id } },
+  );
 
   return res.status(200).json({
     message: 'Password successfully reset',

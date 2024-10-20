@@ -52,7 +52,7 @@ const login = async (req, res) => {
   }
 
   if (user.activationToken) {
-    throw ApiError.unathorized();
+    throw ApiError.unauthorized();
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -70,13 +70,13 @@ const refresh = async (req, res) => {
   const userData = await jwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {
-    throw ApiError.unathorized();
+    throw ApiError.unauthorized();
   }
 
   const token = await tokenService.getByToken(refreshToken);
 
   if (!token) {
-    throw ApiError.unathorized();
+    throw ApiError.unauthorized();
   }
 
   const user = await userService.getByEmail(userData.email);
@@ -110,7 +110,7 @@ const logout = async (req, res) => {
   const userData = await jwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {
-    throw ApiError.unathorized();
+    throw ApiError.unauthorized();
   }
 
   await tokenService.remove(userData.id);

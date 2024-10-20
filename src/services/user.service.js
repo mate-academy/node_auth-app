@@ -1,6 +1,6 @@
 import { User } from '../models/user.js';
 import { v4 as uuidv4 } from 'uuid';
-import { emailService } from './emai.services.js';
+import { emailService } from './email.services.js';
 import { ApiError } from '../exceptions/api.error.js';
 
 const getByEmail = (email) => {
@@ -12,7 +12,7 @@ const registerUser = async (name, email, password) => {
   const isUserExist = await getByEmail(email);
 
   if (isUserExist) {
-    throw ApiError.badRequest('User with this email already exist.');
+    throw ApiError.notFound();
   }
 
   await User.create({

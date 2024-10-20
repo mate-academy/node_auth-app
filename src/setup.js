@@ -5,4 +5,4 @@ import { User } from './models/user.js';
 // eslint-disable-next-line no-unused-vars
 import { Token } from './models/token.js';
 
-client.sync({ force: true });
+client.sync({ alter: true });

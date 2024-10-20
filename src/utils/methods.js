@@ -7,6 +7,8 @@ export function validateEmail(value) {
 
   if (!emailPattern.test(value)) {
     return 'Email is not valid';
+  } else {
+    return 'email is valid';
   }
 }
 
@@ -17,5 +19,7 @@ export function validatePassword(value) {
 
   if (value.length < 6) {
     return 'At least 6 characters';
+  } else {
+    return 'password is valid';
   }
 }
