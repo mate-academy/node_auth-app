@@ -13,6 +13,27 @@ const save = async (userId, refreshToken) => {
   await Token.create({ userId, refreshToken });
 };
 
+const saveResetToken = async (userId, resetToken) => {
+  const token = await Token.findOne({ where: userId });
+
+  if (token) {
+    await token.update({
+      resetToken,
+    });
+    return;
+  }
+
+  await Token.create({ userId, resetToken });
+};
+
+const getByResetToken = async (resetToken) => {
+  return Token.findOne({
+    where: {
+      resetToken,
+    },
+  });
+};
+
 function getByToken(refreshToken) {
   return Token.findOne({ where: { refreshToken } });
 }
@@ -25,4 +46,6 @@ export const tokenService = {
   save,
   getByToken,
   remove,
+  saveResetToken,
+  getByResetToken,
 };

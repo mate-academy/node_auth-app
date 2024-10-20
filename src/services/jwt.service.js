@@ -24,9 +24,23 @@ const validateRefreshToken = (refreshToken) => {
   }
 };
 
+const generateResetPasswordToken = (user) => {
+  return jwt.sign(user, process.env.JWT_RESET);
+};
+
+const validateResetPasswordToken = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_RESET);
+  } catch (e) {
+    return null;
+  }
+};
+
 export const jwtService = {
   generateAccessToken,
   generateRefreshToken,
   validateAccessToken,
   validateRefreshToken,
+  generateResetPasswordToken,
+  validateResetPasswordToken,
 };

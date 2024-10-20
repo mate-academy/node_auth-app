@@ -31,7 +31,25 @@ function sendActivationEmail(email, token) {
   });
 }
 
+function sendResetPasswordEmail(email, token) {
+  const resetUrl = `http://localhost:3005/resetPassword/${token}`;
+  const html = `
+    <h1>Password Reset Request</h1>
+    <p>You requested a password reset. Click the link below to reset your password:</p>
+    <a href="${resetUrl}">${resetUrl}</a>
+    <p>This link will expire in 1 hour.</p>
+    <p>If you didn't request this, please ignore this email.</p>
+  `;
+
+  return send({
+    email,
+    html,
+    subject: 'Reset password',
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
   send,
+  sendResetPasswordEmail,
 };
