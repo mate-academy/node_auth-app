@@ -31,7 +31,8 @@ const requestReset = async (req, res) => {
 
   return res.status(200).send({
     message:
-      'If an account exists with this email, you will receive reset instructions',
+      'If an account exists with this email, ' +
+      'you will receive reset instructions',
   });
 };
 
@@ -49,11 +50,13 @@ const resetPassword = async (req, res) => {
 
   // Validate password strength
   const passwordError = validatePassword(password);
+
   if (passwordError) {
     throw ApiError.badRequest('Check your password');
   }
 
   const user = await userService.getByEmail(email);
+
   if (!user) {
     throw ApiError.notFound('invalid attempt.');
   }
@@ -71,7 +74,7 @@ const resetPassword = async (req, res) => {
 
   const newPassword = await bcrypt.hash(password, 10);
 
-  //update password for user
+  // update password for user
   await User.update({ password: newPassword }, { where: { id: user.id } });
 
   // Remove used reset token

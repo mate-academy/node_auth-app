@@ -46,6 +46,10 @@ const login = async (req, res) => {
     throw ApiError.badRequest('User with this email does not exist');
   }
 
+  if (user.activationToken) {
+    throw ApiError.unathorized();
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
@@ -57,7 +61,7 @@ const login = async (req, res) => {
 
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
-  console.log(refreshToken);
+
   const userData = await jwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {

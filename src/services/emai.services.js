@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import 'dotenv/config';
+import jwt from 'jsonwebtoken';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -24,6 +25,7 @@ function sendActivationEmail(email, token) {
   <h1>Activate account</h1>
   <a href="${href}">${href}</a>
   `;
+
   return send({
     email,
     html,
@@ -48,8 +50,39 @@ function sendResetPasswordEmail(email, token) {
   });
 }
 
+function sendEmailChangedApprove(email, newEmail) {
+  const token = jwt.sign({ email, newEmail }, process.env.JWT_SECRET, {
+    expiresIn: '1h',
+  });
+  const href = `http://localhost:3005/changeEmailConfirm?token=${token}`;
+  const html = `
+  <h1>Email Changed to ${newEmail}</h1>
+  To confirm: <a href="${href}">${href}</a>
+  `;
+
+  return send({
+    email: newEmail,
+    html,
+    subject: 'Confirm Your Email Change',
+  });
+}
+
+function sendEmailChangedInfo(email, newEmail) {
+  const html = `
+  <h1>Your Email Changed to ${newEmail}</h1>
+  `;
+
+  return send({
+    email,
+    html,
+    subject: 'Email has been changed',
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
   send,
   sendResetPasswordEmail,
+  sendEmailChangedApprove,
+  sendEmailChangedInfo,
 };

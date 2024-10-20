@@ -20,6 +20,7 @@ const saveResetToken = async (userId, resetToken) => {
     await token.update({
       resetToken,
     });
+
     return;
   }
 

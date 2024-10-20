@@ -1,6 +1,7 @@
 import { User } from '../models/user.js';
 import { v4 as uuidv4 } from 'uuid';
 import { emailService } from './emai.services.js';
+import { ApiError } from '../exceptions/api.error.js';
 
 const getByEmail = (email) => {
   return User.findOne({ where: { email } });
@@ -11,16 +12,21 @@ const registerUser = async (name, email, password) => {
   const isUserExist = await getByEmail(email);
 
   if (isUserExist) {
-    console.log('user already exist');
+    throw ApiError.badRequest('User with this email already exist.');
   }
 
-  await User.create({ name, email, password, activationToken });
+  await User.create({
+    name,
+    email,
+    password,
+    activationToken,
+  });
 
   await emailService.sendActivationEmail(email, activationToken);
 };
 
 const getAllActivatedUsers = async () => {
-  return await User.findAll({
+  return User.findAll({
     where: {
       activationToken: null,
     },
