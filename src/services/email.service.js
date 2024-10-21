@@ -48,8 +48,16 @@ function sentResetPasswordEmail(email, token) {
   });
 }
 
+function sendEmailChangingNotification(email) {
+  return send({
+    email,
+    subject: `Your Email has been successfully changed to ${email}`,
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
   send,
   sentResetPasswordEmail,
+  sendEmailChangingNotification,
 };

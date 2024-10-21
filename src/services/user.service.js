@@ -12,8 +12,8 @@ export async function getAllActivated() {
   });
 }
 
-function normalize({ id, email }) {
-  return { id, email };
+function normalize({ id, email, name }) {
+  return { id, email, name };
 }
 
 function findByEmail(email) {
@@ -60,7 +60,7 @@ async function changePassword(newPassword, activationToken) {
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
-    throw new ApiError.notFound('User not found');
+    throw ApiError.notFound('User not found');
   }
 
   const hashedPass = await bcrypt.hash(newPassword, 5);
@@ -70,6 +70,59 @@ async function changePassword(newPassword, activationToken) {
 
   return user;
 }
+async function changeUserPassword(id, oldPassword, password) {
+  const user = await User.findOne({ where: { id } });
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  }
+
+  const hashedNewPassword = await bcrypt.hash(password, 5);
+
+  user.password = hashedNewPassword;
+
+  user.save();
+}
+
+async function changeNameService(id, newName) {
+  const user = await User.findOne({ where: { id } });
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  user.name = newName;
+
+  user.save();
+}
+
+async function changeEmail(id, newEmail, password) {
+  const user = await User.findOne({ where: { id } });
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  const oldEmail = user.email;
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
+  }
+
+  user.email = newEmail;
+
+  user.save();
+
+  await emailService.sendEmailChangingNotification(oldEmail);
+}
 
 export const userService = {
   getAllActivated,
@@ -78,4 +131,7 @@ export const userService = {
   register,
   resetPassword,
   changePassword,
+  changeNameService,
+  changeUserPassword,
+  changeEmail,
 };

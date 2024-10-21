@@ -66,14 +66,11 @@ const changePassword = async (req, res) => {
   const { activationToken } = req.params;
 
   if (password !== confirmation) {
-    throw ApiError.badRequest('Values should match', errors);
+    throw ApiError.badRequest('Values should match');
   }
 
   if (validatePassword(password)) {
-    throw ApiError.badRequest(
-      'Password should be 6 characters at least',
-      errors,
-    );
+    throw ApiError.badRequest('Password should be 6 characters at least');
   }
 
   const user = await userService.changePassword(password, activationToken);

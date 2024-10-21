@@ -6,7 +6,7 @@ import { Link, NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { RegistrationPage } from './pages/RegistrationPage';
-import { UsersPage } from './pages/UsersPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { AccountActivationPage } from './pages/AccountActivationPage';
 import { RequireAuth } from './components/RequireAuth';
 import { usePageError } from './hooks/usePageError';
@@ -14,6 +14,7 @@ import { AuthContext } from './components/AuthContext';
 import { Loader } from './components/loader/Loader';
 import { ResetPasswordRequest } from './pages/ResetPasswordRequest';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 export const App = () => {
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ export const App = () => {
     return <Loader />;
   }
 
+  const profileLink = user ? `/profile/change_name/${user.id}` : '/login';
+
   return (
     <>
       <nav
@@ -40,8 +43,8 @@ export const App = () => {
             Home
           </NavLink>
 
-          <NavLink to="/users" className="navbar-item">
-            Users
+          <NavLink to={profileLink} className="navbar-item">
+            Profile
           </NavLink>
         </div>
 
@@ -102,8 +105,12 @@ export const App = () => {
             <Route path="login" element={<LoginPage />} />
 
             <Route path="/" element={<RequireAuth />}>
-              <Route path="users" element={<UsersPage />} />
+              <Route
+                path="profile/change_name/:userId"
+                element={<ProfilePage />}
+              />
             </Route>
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </section>
 
