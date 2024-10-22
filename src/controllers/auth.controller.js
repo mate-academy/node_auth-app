@@ -75,7 +75,7 @@ const changePassword = async (req, res) => {
 
   const user = await userService.changePassword(password, activationToken);
 
-  user.save();
+  await user.save();
 
   generateTokens(res, user);
 };
@@ -100,7 +100,7 @@ const activate = async (req, res) => {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 
   await generateTokens(res, user);
 };

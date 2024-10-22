@@ -87,7 +87,7 @@ async function changeUserPassword(id, oldPassword, password) {
 
   user.password = hashedNewPassword;
 
-  user.save();
+  await user.save();
 }
 
 async function changeNameService(id, newName) {
@@ -99,7 +99,7 @@ async function changeNameService(id, newName) {
 
   user.name = newName;
 
-  user.save();
+  await user.save();
 }
 
 async function changeEmail(id, newEmail, password) {
@@ -119,7 +119,7 @@ async function changeEmail(id, newEmail, password) {
 
   user.email = newEmail;
 
-  user.save();
+  await user.save();
 
   await emailService.sendEmailChangingNotification(oldEmail);
 }
