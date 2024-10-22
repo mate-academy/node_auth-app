@@ -204,7 +204,7 @@ export const RegistrationPage = () => {
                   'is-loading': isSubmitting,
                 })}
                 disabled={
-                  isSubmitting || error.name || errors.email || errors.password
+                  isSubmitting || errors.name || errors.email || errors.password
                 }
               >
                 Sign up

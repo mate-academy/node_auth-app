@@ -345,7 +345,7 @@ export const ProfilePage = () => {
 
               const { errors, message } = error.response.data;
 
-              formikHelpers.setFieldError('email', errors?.newEmail);
+              formikHelpers.setFieldError('newEmail', errors?.newEmail);
               formikHelpers.setFieldError('password', errors?.password);
 
               if (message) {
@@ -399,7 +399,7 @@ export const ProfilePage = () => {
 
               <div className="control has-icons-left has-icons-right">
                 <Field
-                  validate={validatePassword}
+                  // validate={validatePassword}
                   name="password"
                   type="password"
                   id="password"
@@ -432,7 +432,7 @@ export const ProfilePage = () => {
                 className={cn('button is-success has-text-weight-bold', {
                   'is-loading': isSubmitting,
                 })}
-                disabled={isSubmitting || errors.email || errors.password}
+                disabled={isSubmitting || errors.newEmail || errors.password}
               >
                 Submit
               </button>

@@ -104,7 +104,7 @@ export const App = () => {
             />
             <Route path="login" element={<LoginPage />} />
 
-            <Route path="/" element={<RequireAuth />}>
+            <Route element={<RequireAuth />}>
               <Route
                 path="profile/change_name/:userId"
                 element={<ProfilePage />}

@@ -14,9 +14,9 @@ export class ApiError extends Error {
     });
   }
 
-  static unautorized(errors) {
+  static unauthorized(errors) {
     return new ApiError({
-      message: 'unautirized user',
+      message: 'unauthorized user',
       errors,
       status: 401,
     });

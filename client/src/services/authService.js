@@ -24,8 +24,8 @@ function resetPasswordRequest({ email }) {
   return authClient.post('/reset-password', { email });
 }
 
-function changePassword({ password, confirmation, activationToken }) {
-  return authClient.post(`/reset-password/${activationToken}`, {
+function changePassword({ password, confirmation, resetToken }) {
+  return authClient.post(`/reset-password/${resetToken}`, {
     password,
     confirmation,
   });

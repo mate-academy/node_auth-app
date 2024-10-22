@@ -48,7 +48,7 @@ const changeName = async (req, res) => {
   const { userId } = req.params;
 
   if (validateName(newName)) {
-    throw ApiError.badRequest('Enter correct name');
+    throw ApiError.badRequest(validateName(newName));
   }
 
   await userService.changeNameService(userId, newName);
@@ -66,8 +66,8 @@ const changeUserPassword = async (req, res) => {
     );
   }
 
-  if (validatePassword(oldPassword) || validatePassword(password)) {
-    throw ApiError.badRequest('Password should be 6 characters at least');
+  if (validatePassword(oldPassword)) {
+    throw ApiError.badRequest(validatePassword(oldPassword));
   }
 
   await userService.changeUserPassword(userId, oldPassword, password);
@@ -80,11 +80,11 @@ const changeEmail = async (req, res) => {
   const { newEmail, password } = req.body;
 
   if (validateEmail(newEmail)) {
-    throw ApiError.badRequest('Enter correct Email');
+    throw ApiError.badRequest(validateEmail(newEmail));
   }
 
   if (validatePassword(password)) {
-    throw ApiError.badRequest('Password should be 6 characters at least');
+    throw ApiError.badRequest(validatePassword(password));
   }
 
   await userService.changeEmail(userId, newEmail, password);

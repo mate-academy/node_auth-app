@@ -31,7 +31,15 @@ async function onResponseError(error) {
   try {
     const { accessToken } = await authService.refresh();
 
-    accessTokenService.save(accessToken);
+    if (!accessToken) {
+      throw new Error('Access token is missing or invalid');
+    }
+
+    const isSaved = accessTokenService.save(accessToken);
+
+    if (!isSaved) {
+      throw new Error('Failed to save access token');
+    }
 
     return httpClient.request(originalRequest);
   } catch (error) {

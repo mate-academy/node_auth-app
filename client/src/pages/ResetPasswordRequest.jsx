@@ -25,7 +25,7 @@ export const ResetPasswordRequest = () => {
     return (
       <section className="">
         <h1 className="title">Check your email</h1>
-        <p>We have sent you following instructions</p>
+        <p>We have sent you the following instructions</p>
       </section>
     );
   }
@@ -62,7 +62,9 @@ export const ResetPasswordRequest = () => {
                 setError(message);
               }
             })
-            .finally(formikHelpers.setSubmitting(false));
+            .finally(() => {
+              formikHelpers.setSubmitting(false);
+            });
         }}
       >
         {({ touched, errors, isSubmitting }) => (

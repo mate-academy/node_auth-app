@@ -6,17 +6,13 @@ export const authMiddleware = (req, res, next) => {
   const [, token] = authorization.split(' ');
 
   if (!authorization || !token) {
-    res.sendStatus(401);
-
-    return;
+    return res.sendStatus(401);
   }
 
   const userData = jwtService.verifyToken(token);
 
   if (!userData) {
-    res.sendStatus(401);
-
-    return;
+    return res.sendStatus(401);
   }
 
   next();

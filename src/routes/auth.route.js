@@ -2,7 +2,7 @@ import express from 'express';
 import { authController } from '../controllers/auth.controller.js';
 import { catchError } from '../catchError.js';
 
-export const authRouter = new express.Router();
+export const authRouter = express.Router();
 
 authRouter.post('/registration', authController.registration);
 
@@ -16,6 +16,6 @@ authRouter.post('/logout', catchError(authController.logout));
 authRouter.post('/reset-password', catchError(authController.reset));
 
 authRouter.post(
-  '/reset-password/:activationToken',
+  '/reset-password/:resetToken',
   catchError(authController.changePassword),
 );

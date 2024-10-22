@@ -70,7 +70,7 @@ const changePassword = async (req, res) => {
   }
 
   if (validatePassword(password)) {
-    throw ApiError.badRequest('Password should be 6 characters at least');
+    throw ApiError.badRequest(validatePassword(password));
   }
 
   const user = await userService.changePassword(password, activationToken);
@@ -96,7 +96,7 @@ const activate = async (req, res) => {
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
-    res.sendStatus(404);
+    return res.sendStatus(404);
   }
 
   user.activationToken = null;
@@ -151,7 +151,7 @@ const refresh = async (req, res) => {
   const userData = jwtService.verifyTokenRefresh(refreshToken);
 
   if (!userData) {
-    throw ApiError.unautorized();
+    throw ApiError.unauthorized();
   }
 
   const token = await tokenService.getByToken(refreshToken);
@@ -167,10 +167,10 @@ const refresh = async (req, res) => {
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
-  const userData = await jwtService.verifyTokenRefresh(refreshToken);
+  const userData = jwtService.verifyTokenRefresh(refreshToken);
 
   if (!userData || !refreshToken) {
-    throw ApiError.unautorized();
+    throw ApiError.unauthorized();
   }
 
   await tokenService.remove(userData.id);

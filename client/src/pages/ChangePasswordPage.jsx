@@ -16,7 +16,7 @@ const validatePassword = (value) => {
 };
 
 export const ChangePasswordPage = () => {
-  const { activationToken } = useParams();
+  const { resetToken } = useParams();
   const [error, setError] = usePageError('');
   const [changed, setChanged] = useState(false);
 
@@ -43,7 +43,7 @@ export const ChangePasswordPage = () => {
           formikHelpers.setSubmitting(true);
 
           authService
-            .changePassword({ password, confirmation, activationToken })
+            .changePassword({ password, confirmation, resetToken })
             .then(() => {
               setChanged(true);
             })
@@ -150,10 +150,10 @@ export const ChangePasswordPage = () => {
                   'is-loading': isSubmitting,
                 })}
                 disabled={
-                  isSubmitting || error.newPassword || errors.confirmation
+                  isSubmitting || errors.password || errors.confirmation
                 }
               >
-                Sign up
+                Submit
               </button>
             </div>
           </Form>
