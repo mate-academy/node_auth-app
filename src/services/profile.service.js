@@ -10,7 +10,7 @@ const passReset = async (accessToken) => {
   const user = await userService.getByAccessToken(accessToken);
 
   if (!user) {
-    throw ApiError.badRequest('bad request', {
+    throw ApiError.BadRequest('bad request', {
       noUser: 'no user was found',
     });
   }
@@ -31,7 +31,7 @@ const passResetConfirm = async (accessToken, newPass, newPassConfirmation) => {
   };
 
   if (errors.accessToken || errors.newPassConfirmation || errors.newPass) {
-    throw ApiError.badRequest('bad request', errors);
+    throw ApiError.BadRequest('bad request', errors);
   }
 
   const user = await userService.getByAccessToken(accessToken);
@@ -41,7 +41,7 @@ const passResetConfirm = async (accessToken, newPass, newPassConfirmation) => {
   }
 
   if (!(newPass === newPassConfirmation)) {
-    throw ApiError.badRequest('entered passwords are not equal');
+    throw ApiError.BadRequest('entered passwords are not equal');
   }
 
   user.password = await bcrypt.hash(newPass, 10);
@@ -54,13 +54,13 @@ const changeName = async (newName, accessToken) => {
   const newNameRequiredError = checkRequired(newName, 'new name');
 
   if (newNameRequiredError) {
-    throw ApiError.badRequest(newNameRequiredError);
+    throw ApiError.BadRequest(newNameRequiredError);
   }
 
   const user = await userService.getByAccessToken(accessToken);
 
   if (!user) {
-    throw ApiError.badRequest('bad request', {
+    throw ApiError.BadRequest('bad request', {
       noUser: 'no user was found',
     });
   }
@@ -78,7 +78,7 @@ const changeEmail = async (newEmail, password, accessToken) => {
   };
 
   if (errors.newEmail || errors.password) {
-    throw ApiError.badRequest('bad request', errors);
+    throw ApiError.BadRequest('bad request', errors);
   }
 
   const user = await userService.getByAccessToken(accessToken);
@@ -86,7 +86,7 @@ const changeEmail = async (newEmail, password, accessToken) => {
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw ApiError.badRequest('wrong password');
+    throw ApiError.BadRequest('wrong password');
   }
 
   await emailService.sendEmailChangeConfirmation(newEmail, accessToken);
@@ -101,7 +101,7 @@ const changeEmailConfirm = async (newEmail, accessToken) => {
   };
 
   if (errors.newEmail || errors.accessToken) {
-    throw ApiError.badRequest('bad request', errors);
+    throw ApiError.BadRequest('bad request', errors);
   }
 
   const user = await userService.getByAccessToken(accessToken);

@@ -18,11 +18,11 @@ const register = async ({ name, email, password }) => {
   };
 
   if (errors.email || errors.name || errors.password) {
-    throw ApiError.badRequest('bad request', errors);
+    throw ApiError.BadRequest('bad request', errors);
   }
 
   if (await userService.getByEmail(email)) {
-    throw ApiError.badRequest('bad request', {
+    throw ApiError.BadRequest('bad request', {
       userExists: 'user already exists',
     });
   }
@@ -72,19 +72,19 @@ const login = async ({ email, password }) => {
   };
 
   if (errors.email || errors.password) {
-    throw ApiError.badRequest('bad request', errors);
+    throw ApiError.BadRequest('bad request', errors);
   }
 
   const user = await userService.getByEmail(email);
 
   if (!user) {
-    throw ApiError.badRequest('no such user');
+    throw ApiError.BadRequest('no such user');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw ApiError.badRequest('wrong password');
+    throw ApiError.BadRequest('wrong password');
   }
 
   return generateTokens(user);
@@ -95,7 +95,7 @@ const refresh = async (refreshToken) => {
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
-    throw ApiError.unauthorized();
+    throw ApiError.Unauthorized();
   }
 
   const user = await userService.getByEmail(userData.email);
@@ -107,7 +107,7 @@ const logout = async (refreshToken) => {
   const userData = jwtService.verifyRefresh(refreshToken);
 
   if (!userData || !refreshToken) {
-    throw ApiError.unauthorized();
+    throw ApiError.Unauthorized();
   }
 
   await tokenService.remove(userData.id);
@@ -115,13 +115,13 @@ const logout = async (refreshToken) => {
 
 const passReset = async (email) => {
   if (!email) {
-    throw ApiError.badRequest('bad request', { email: 'email is required' });
+    throw ApiError.BadRequest('bad request', { email: 'email is required' });
   }
 
   const user = await userService.getByEmail(email);
 
   if (!user) {
-    throw ApiError.badRequest('bad request', {
+    throw ApiError.BadRequest('bad request', {
       noUser: 'no user with such email was found',
     });
   }
@@ -142,7 +142,7 @@ const passResetConfirm = async (accessToken, newPass, newPassConfirmation) => {
   };
 
   if (errors.userId || errors.newPassConfirmation || errors.newPass) {
-    throw ApiError.badRequest('bad request', errors);
+    throw ApiError.BadRequest('bad request', errors);
   }
 
   const user = await userService.getByAccessToken(accessToken);
@@ -152,7 +152,7 @@ const passResetConfirm = async (accessToken, newPass, newPassConfirmation) => {
   }
 
   if (!(newPass === newPassConfirmation)) {
-    throw ApiError.badRequest('entered passwords are not equal');
+    throw ApiError.BadRequest('entered passwords are not equal');
   }
 
   user.password = await bcrypt.hash(newPass, 10);
