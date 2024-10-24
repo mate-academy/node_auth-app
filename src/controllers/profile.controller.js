@@ -21,7 +21,7 @@ const getProfile = async (req, res) => {
 
 const changeName = async (req, res) => {
   const { newName } = req.body;
-  const userId = req.userId;
+  const userId = req.user.id;
 
   if (!newName) {
     throw ApiError.badRequest('Enter new name');
@@ -53,7 +53,7 @@ const changeEmail = async (req, res) => {
   const user = await User.findOne({ where: { userId } });
 
   if (!user) {
-    throw ApiError.unauthorized('Please authorized');
+    throw ApiError.unauthorized('Please authorize');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);

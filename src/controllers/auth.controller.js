@@ -59,7 +59,7 @@ const activate = async (req, res) => {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 
   await generateTokens(res, user);
   res.redirect(`/profile/${user.id}`);
@@ -81,7 +81,7 @@ const login = async (req, res) => {
   }
 
   if (user.activationToken) {
-    throw ApiError.unauthorized();
+    throw ApiError.unauthorized('Please activate your profile');
   }
 
   await generateTokens(res, user);
@@ -131,7 +131,7 @@ const logout = async (req, res) => {
   const userData = jwtService.verifyRefresh(refreshToken);
 
   if (!userData) {
-    throw ApiError.unauthorized();
+    throw ApiError.unauthorized('User not authorized');
   }
 
   await tokenService.remove(userData.id);

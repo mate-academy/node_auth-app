@@ -28,7 +28,7 @@ function sendActivationEmail(email, token) {
   return send({
     email,
     html,
-    subject: 'Acitvate',
+    subject: 'Activate',
   });
 }
 

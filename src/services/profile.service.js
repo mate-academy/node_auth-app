@@ -22,8 +22,8 @@ function normalize({ id, name, email, password }) {
   };
 }
 
-function findByEmail(email) {
-  const user = User.findOne({ where: { email } });
+async function findByEmail(email) {
+  const user = await User.findOne({ where: { email } });
 
   return user;
 }

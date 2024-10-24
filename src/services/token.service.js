@@ -14,12 +14,16 @@ async function save(id, newToken) {
   await token.save();
 }
 
-function getByToken(refreshToken) {
-  return Token.findOne({ where: { refreshToken } });
+async function getByToken(refreshToken) {
+  const token = await Token.findOne({ where: { refreshToken } });
+
+  return token;
 }
 
-function remove(id) {
-  return Token.destroy({ where: { id } });
+async function remove(id) {
+  const dToken = await Token.destroy({ where: { id } });
+
+  return dToken;
 }
 
 export const tokenService = {
