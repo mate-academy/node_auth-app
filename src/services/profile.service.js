@@ -34,8 +34,8 @@ async function register(name, email, password) {
   const existUser = await findByEmail(email);
 
   if (existUser) {
-    throw ApiError.badRequest('User alredy exist', {
-      email: 'User alredy exist',
+    throw ApiError.badRequest('User already exist', {
+      email: 'User already exist',
     });
   }
 
@@ -65,8 +65,8 @@ async function resetPassword(email) {
   await emailService.sendResetPasswordEmail(user.email, resetToken);
 }
 
-const updateUserData = async (data, userId) => {
-  const user = await User.findOne({ where: { userId } });
+const updateUserData = async (data, id) => {
+  const user = await User.findOne({ where: { id } });
 
   if (!user) {
     throw ApiError.notFound();

@@ -10,15 +10,27 @@ profileRouter.get(
   authMiddleware,
   catchError(profileController.getAllInfo),
 );
-profileRouter.get('/profile', catchError(profileController.getProfile));
-profileRouter.patch('/profile/name', catchError(profileController.changeName));
+
+profileRouter.get(
+  '/profile',
+  authMiddleware,
+  catchError(profileController.getProfile),
+);
+
+profileRouter.patch(
+  '/profile/name',
+  authMiddleware,
+  catchError(profileController.changeName),
+);
 
 profileRouter.patch(
   '/profile/email',
+  authMiddleware,
   catchError(profileController.changeEmail),
 );
 
 profileRouter.patch(
   '/profile/password',
+  authMiddleware,
   catchError(profileController.changePassword),
 );

@@ -14,17 +14,17 @@ export class ApiError extends Error {
     });
   }
 
-  static unauthorized(errors) {
+  static unauthorized(message, errors) {
     return new ApiError({
-      message: 'Unauthorized user',
+      message,
       errors,
       status: 401,
     });
   }
 
-  static notFound(errors) {
+  static notFound(message, errors) {
     return new ApiError({
-      message: 'Not Found',
+      message,
       errors,
       status: 404,
     });

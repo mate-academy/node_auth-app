@@ -21,16 +21,16 @@ const getProfile = async (req, res) => {
 
 const changeName = async (req, res) => {
   const { newName } = req.body;
-  const { refreshToken } = req.cookies;
+  const userId = req.userId;
 
   if (!newName) {
     throw ApiError.badRequest('Enter new name');
   }
 
-  const user = await User.findOne({ where: { refreshToken } });
+  const user = await User.findOne({ where: { userId } });
 
   if (!user) {
-    throw ApiError.unauthorized('Please authorized');
+    throw ApiError.unauthorized('Please authorize');
   }
 
   const updatedUser = await profileService.updateUserData({ newName }, user.id);
@@ -40,7 +40,7 @@ const changeName = async (req, res) => {
 
 const changeEmail = async (req, res) => {
   const { newEmail, confEmail, password } = req.body;
-  const { refreshToken } = req.cookies;
+  const userId = req.userId;
 
   if (!newEmail || !confEmail) {
     throw ApiError.badRequest('Enter new email and confirmation');
@@ -50,7 +50,7 @@ const changeEmail = async (req, res) => {
     throw ApiError.badRequest('Email and confirmation must be equal');
   }
 
-  const user = await User.findOne({ where: { refreshToken } });
+  const user = await User.findOne({ where: { userId } });
 
   if (!user) {
     throw ApiError.unauthorized('Please authorized');
@@ -74,7 +74,7 @@ const changeEmail = async (req, res) => {
 
 const changePassword = async (req, res) => {
   const { password, newPassword, confPassword } = req.body;
-  const { refreshToken } = req.cookies;
+  const userId = req.userId;
 
   if (!newPassword || !confPassword) {
     throw ApiError.badRequest('Enter new password and confirmation');
@@ -84,7 +84,7 @@ const changePassword = async (req, res) => {
     throw ApiError.badRequest('Password and confirmation must be equal');
   }
 
-  const user = await User.findOne({ where: { refreshToken } });
+  const user = await User.findOne({ where: { userId } });
 
   if (!user) {
     throw ApiError.unauthorized('Please authorize');
@@ -96,8 +96,10 @@ const changePassword = async (req, res) => {
     throw ApiError.badRequest('Wrong old password');
   }
 
+  const newHashPassword = bcrypt.hash(newPassword);
+
   const updatedUser = await profileService.updateUserData(
-    { newPassword },
+    { newHashPassword },
     user.id,
   );
 

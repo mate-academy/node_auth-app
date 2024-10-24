@@ -138,7 +138,7 @@ const logout = async (req, res) => {
 
   res.clearCookie('refreshToken');
 
-  return res.status(204).redirect('/login/');
+  return res.status(302).redirect('/login/');
 };
 
 const resetPassword = async (req, res) => {
@@ -174,19 +174,11 @@ const resetForm = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   user.password = hashedPassword;
-  // user.resetToken = null;
+  user.resetToken = null;
 
   await user.save();
 
   res.status(200).send('The password has been changed');
-
-  // res.redirect(`newPassword/${user.id}`);
-
-  // res.redirect('/profile/');
-  // ${user.id}
-  // res.send(user);
-  // await generateTokens(res, user);
-  // res.redirect(`/profile/${user.id}`);
 };
 
 export const authController = {
