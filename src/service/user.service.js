@@ -44,11 +44,11 @@ async function register(email, password, userName) {
   if (existUser) {
     const errorMessage = {};
 
-    if (existUser.email === email) {
+    if (existUser.emailUser === email) {
       errorMessage.email = 'Email already exists';
     }
 
-    if (existUser.userName === userName) {
+    if (existUser.nameUser === userName) {
       errorMessage.userName = 'Username already exists';
     }
 
@@ -103,7 +103,7 @@ const changePassword = async (userName, newPassword) => {
 
 const changeName = async (userName, newName) => {
   const user = await User.findOne({ where: { userName } });
-  const existUser = await User.findOne({ where: { newName } });
+  const existUser = await User.findOne({ where: { userName: newName } });
 
   if (existUser) {
     throw ApiError.badRequest('Username is already taken');
@@ -122,6 +122,11 @@ const changeName = async (userName, newName) => {
 const changeEmail = async (userName, newEmail) => {
   const resetToken = uuidv4();
   const user = await User.findOne({ where: { userName } });
+  const existUser = await User.findOne({ where: { userName: newEmail } });
+
+  if (existUser) {
+    throw ApiError.badRequest('Email is already taken');
+  }
 
   if (!user) {
     throw ApiError.badRequest('User not found');
