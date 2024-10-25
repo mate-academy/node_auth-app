@@ -1,8 +1,8 @@
 import { ApiError } from '../exeptions/api.error.js';
-import { ConsoleLoger } from '../untils/consoleLoger.js';
+import { ConsoleLogger } from '../untils/consoleLogger.js';
 
 export const errorMiddleware = (error, req, res, next) => {
-  ConsoleLoger.error('Error: ', error);
+  ConsoleLogger.error('Error: ', error);
 
   if (error instanceof ApiError) {
     return res.status(error.status).send({

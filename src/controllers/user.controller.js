@@ -18,7 +18,7 @@ const changeName = async (req, res) => {
   }
 
   await userService.changeName(userName, newName);
-  res.send('Name change sucssessfull');
+  res.send('Name change successful');
 };
 
 const changePassword = async (req, res) => {
@@ -27,13 +27,19 @@ const changePassword = async (req, res) => {
 
   const user = await User.findOne({ where: { userName } });
 
+  if (!oldPassword || !newPassword || !confirmation) {
+    throw ApiError.badRequest(
+      'Please provide old password, new password, and confirmation',
+    );
+  }
+
   const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong old password');
   }
 
-  if (!userName) {
+  if (!user) {
     throw ApiError.badRequest('Something wrong');
   }
 
@@ -46,17 +52,21 @@ const changePassword = async (req, res) => {
   const hashPass = await bcrypt.hash(newPassword, 10);
 
   await userService.changePassword(userName, hashPass);
-  res.send('Password change sucssessfull');
+  res.send('Password change successful');
 };
 
 const changeEmail = async (req, res) => {
   const { userName } = req.params;
   const { password, newEmail } = req.body;
 
+  if (!newEmail) {
+    throw ApiError.badRequest('Please provide');
+  }
+
   const user = await User.findOne({ where: { userName } });
 
   if (!user) {
-    throw ApiError.badRequest('Error not found user');
+    throw ApiError.badRequest('User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -67,7 +77,10 @@ const changeEmail = async (req, res) => {
 
   await userService.changeEmail(userName, newEmail);
 
-  res.send('Send activation link to your new email');
+  res.send(
+    `An activation link has been sent to your new email.
+     Your email change will be completed once the new email is activated.`,
+  );
 };
 
 const activationNewEmail = async (req, res) => {
@@ -84,7 +97,7 @@ const activationNewEmail = async (req, res) => {
 
   await user.save();
 
-  res.send('Email change sucssessfull');
+  res.send('Email change successful');
 };
 
 export const userController = {

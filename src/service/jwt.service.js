@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
-import { ConsoleLoger } from '../untils/consoleLoger.js';
+import { ConsoleLogger } from '../untils/consoleLogger.js';
 
 function sign(user) {
   const token = jwt.sign(user, process.env.JWT_KEY, {
@@ -14,7 +14,7 @@ function verify(token) {
   try {
     return jwt.verify(token, process.env.JWT_KEY);
   } catch (error) {
-    ConsoleLoger.error(error);
+    ConsoleLogger.error(error);
 
     return null;
   }
@@ -32,7 +32,7 @@ function verifyRefresh(token) {
   try {
     return jwt.verify(token, process.env.JWT_REFRESHKEY);
   } catch (error) {
-    ConsoleLoger.error(error);
+    ConsoleLogger.error(error);
 
     return null;
   }

@@ -4,36 +4,36 @@ import { jwtService } from '../service/jwt.service.js';
 import { tokenService } from '../service/token.service.js';
 import { userService } from '../service/user.service.js';
 import bcrypt from 'bcrypt';
-import { ConsoleLoger } from '../untils/consoleLoger.js';
+import { ConsoleLogger } from '../untils/consoleLogger.js';
 
-function validateEmail(value) {
-  const EMAIL_PATTERN = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
+// function validateEmail(value) {
+//   const EMAIL_PATTERN = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
-  if (!value) {
-    return 'Email is required';
-  }
+//   if (!value) {
+//     return 'Email is required';
+//   }
 
-  if (!EMAIL_PATTERN.test(value)) {
-    return 'Email is not valid';
-  }
-}
+//   if (!EMAIL_PATTERN.test(value)) {
+//     return 'Email is not valid';
+//   }
+// }
 
-function validatePassword(value) {
-  if (!value) {
-    return 'Password is required';
-  }
+// function validatePassword(value) {
+//   if (!value) {
+//     return 'Password is required';
+//   }
 
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-}
+//   if (value.length < 6) {
+//     return 'At least 6 characters';
+//   }
+// }
 
 const register = async (req, res) => {
   const { email, password, userName } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    email: userService.validateEmail(email),
+    password: userService.validatePassword(password),
   };
 
   if (errors.email || errors.password) {
@@ -83,7 +83,7 @@ const login = async (req, res) => {
   }
 
   generateToken(res, user);
-  ConsoleLoger.log(`${user.email} login`);
+  ConsoleLogger.log(`${user.email} login`);
 };
 // як перенаправити на профіль????
 
@@ -140,7 +140,7 @@ const logout = async (req, res) => {
 
 const reset = async (req, res) => {
   const { email } = req.body;
-  const user = User.findOne({ where: { email } });
+  const user = await User.findOne({ where: { email } });
 
   if (!user) {
     throw ApiError.badRequest('Not found');
@@ -148,8 +148,8 @@ const reset = async (req, res) => {
 
   userService.sendResetEmail(email);
 
-  ConsoleLoger.log(email);
-  res.send('Email send, check your email for reset password');
+  ConsoleLogger.log(email);
+  res.send('Email sent, check your email to reset your password');
 };
 
 const resetPassword = async (req, res) => {
@@ -170,8 +170,8 @@ const resetPassword = async (req, res) => {
 
   const hashPass = await bcrypt.hash(newPassword, 10);
 
-  userService.changePassword(user.userName, hashPass);
-  res.send('Password change sucssessfull');
+  await userService.changePassword(user.userName, hashPass);
+  res.send('Password change successful');
 };
 
 export const authController = {

@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { User } from '../modules/User.js';
 import { emailService } from './email.service.js';
 import { ApiError } from '../exeptions/api.error.js';
-import { ConsoleLoger } from '../untils/consoleLoger.js';
+import { ConsoleLogger } from '../untils/consoleLogger.js';
 
 async function findByUser(email, userName) {
   const emailUser = await User.findOne({ where: { email } });
@@ -14,19 +14,47 @@ async function findByUser(email, userName) {
   };
 }
 
+function validateEmail(value) {
+  const EMAIL_PATTERN = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
+
+  if (!value) {
+    return 'Email is required';
+  }
+
+  if (!EMAIL_PATTERN.test(value)) {
+    return 'Email is not valid';
+  }
+}
+
+function validatePassword(value) {
+  if (!value) {
+    return 'Password is required';
+  }
+
+  if (value.length < 6) {
+    return 'At least 6 characters';
+  }
+}
+
 async function register(email, password, userName) {
   const activationToken = uuidv4();
 
   const existUser = await findByUser(email, userName);
 
-  if (existUser.emailUser || existUser.nameUser) {
-    throw ApiError.badRequest('User already exist', {
-      email: 'User already exist',
-    });
-    // throw AppiError.badRequest('User already exist', {
-    //   email: existUser.emailUser ? 'Email already exist' : '',
-    //   userName: existUser.nameUser ? 'User already exist' : ''
-    // });
+  if (existUser) {
+    const errorMessage = {};
+
+    if (existUser.email === email) {
+      errorMessage.email = 'Email already exists';
+    }
+
+    if (existUser.userName === userName) {
+      errorMessage.userName = 'Username already exists';
+    }
+
+    if (Object.keys(errorMessage).length > 0) {
+      throw ApiError.badRequest('User already exists', errorMessage);
+    }
   }
 
   await User.create({
@@ -78,7 +106,7 @@ const changeName = async (userName, newName) => {
   const existUser = await User.findOne({ where: { newName } });
 
   if (existUser) {
-    throw ApiError.badRequest('Username is busy ');
+    throw ApiError.badRequest('Username is already taken');
   }
 
   if (!user) {
@@ -88,7 +116,7 @@ const changeName = async (userName, newName) => {
   user.userName = newName;
   await user.save();
 
-  ConsoleLoger.log(`${userName} change to ${newName}`);
+  ConsoleLogger.log(`${userName} change to ${newName}`);
 };
 
 const changeEmail = async (userName, newEmail) => {
@@ -108,6 +136,8 @@ const changeEmail = async (userName, newEmail) => {
 export const userService = {
   register,
   normalize,
+  validateEmail,
+  validatePassword,
   getAllActivated,
   sendResetEmail,
   changePassword,

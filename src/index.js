@@ -7,7 +7,7 @@ import { authRouter } from './routes/auth.routes.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 import cookieParser from 'cookie-parser';
 import { userRouter } from './routes/user.routes.js';
-import { ConsoleLoger } from './untils/consoleLoger.js';
+import { ConsoleLogger } from './untils/consoleLogger.js';
 
 const PORT = process.env.PORT || 3004;
 
@@ -24,7 +24,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  res.send('Hello BRO');
+  res.send('Welcome');
 });
 
 app.use('/auth', authRouter);
@@ -33,5 +33,5 @@ app.use('/users', userRouter);
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
-  ConsoleLoger.log(`Server is runing ${PORT}`);
+  ConsoleLogger.log(`Server is running ${PORT}`);
 });
