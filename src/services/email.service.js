@@ -12,18 +12,30 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-async function main() {
-  console.log('enter in func');
-  const info = await transporter.sendMail({
-    to: "prokopovych2006@gmail.com", // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
+function send({email, subject, html}) {
+  return transporter.sendMail({
+    to: email,
+    subject,
+    html,
   });
-
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
 }
 
+// send email with token
+function sendActivationEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/activation/${token}`;
+  const html = `
+    <h1>Activate account</h1>
+    <a href="${href}">${href}</a>
+  `;
 
-main().catch(console.error);
+  return send({
+    email,
+    html,
+    subject: 'Activate',
+  });
+}
+
+export const emailService = {
+  sendActivationEmail,
+  send,
+};

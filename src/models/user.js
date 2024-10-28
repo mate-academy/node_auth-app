@@ -6,10 +6,13 @@ export const User = client.define('user', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true
+    unique: false
   },
   password: {
     type: DataTypes.STRING,
     allowNull: false
   },
+  activationToken: {
+    type: DataTypes.STRING,
+  }
 });

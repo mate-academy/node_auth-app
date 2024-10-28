@@ -1,12 +1,10 @@
-import { User } from "../models/user.js";
+import express from 'express';
+import { authController } from '../controllers/auth.controller.js';
+import { catchError } from '../utils/catchErrors.js';
 
-const register = async (req, res) => {
-  const { email, password } = req.body;
+export const authRouter = new express.Router();
 
-  const newUser = await User.create({ email, password });
-  res.send(newUser);
-};
-
-export const authController = {
-  register,
-};
+authRouter.post('/registration', catchError(authController.register)); // registrate new user
+authRouter.get('/activation/:activationToken', catchError(authController.activate)); // confirm email
+authRouter.post('/login', catchError(authController.login)); // login user
+authRouter.get('/refresh', catchError(authController.refresh)); // login user
