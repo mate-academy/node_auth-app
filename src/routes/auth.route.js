@@ -8,3 +8,4 @@ authRouter.post('/registration', catchError(authController.register)); // regist
 authRouter.get('/activation/:activationToken', catchError(authController.activate)); // confirm email
 authRouter.post('/login', catchError(authController.login)); // login user
 authRouter.get('/refresh', catchError(authController.refresh)); // login user
+authRouter.post('/logout', catchError(authController.logout));

@@ -3,6 +3,7 @@ import { userService } from "../services/user.service.js";
 import { jwtService } from "../services/jwt.service.js";
 import { ApiError } from "../exeptions/api.error.js";
 import bcrypt from 'bcrypt';
+import { toeknService } from "../services/token.service.js";
 
 function validateEmail(value) {
   if (!value) {
@@ -30,6 +31,8 @@ async function generateTokens(res, user) {
   const normalizedUser = userService.normalize(user);
   const accessToken = jwtService.sign(normalizedUser);
   const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  await toeknService.save(normalizedUser.id, refreshToken);
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -100,21 +103,39 @@ const login = async (req, res) => {
   // });
 };
 
-const refresh = (req, res) => {
+const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
-  const user = jwtService.verifyRefresh(refreshToken);
+  const userData = jwtService.verifyRefresh(refreshToken);
+  const token = await toeknService.getByToken(refreshToken);
 
-  if (!user) {
+  if (!userData || !token) {
     throw ApiError.unAuthorized();
+    return;
   }
 
+  const user = await userService.findByEmail(userData.email);
   generateTokens(res, user);
 };
+
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const userData = jwtService.verifyRefresh(refreshToken);
+
+  if (!userData || !refreshToken) {
+    throw ApiError.unAuthorized();
+    return;
+  }
+
+  await toeknService.remove(userData.id);
+
+  res.status(200).send('You were succesfully logout');
+}
 
 export const authController = {
   register,
   activate,
   login,
   refresh,
+  logout,
 };
