@@ -33,7 +33,22 @@ function sendActivationEmail(email, token) {
   });
 }
 
+// send email with warning
+function sendWarningEmail(email) {
+  const html = `
+    <h1>Your email was successfully updated</h1>
+    <p>We are glad to inform you, that your email was updated</p>
+  `;
+
+  return send({
+    email,
+    html,
+    subject: 'Update email',
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
+  sendWarningEmail,
   send,
 };

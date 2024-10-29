@@ -64,7 +64,7 @@ const register = async (req, res) => {
     password: validatePassword(password),
   };
 
-  if (errors.email || errors.password) {
+  if (errors.name || errors.email || errors.password) {
     throw ApiError.badRequest('Incorrect email or password', errors);
   }
 
@@ -95,13 +95,13 @@ const login = async (req, res) => {
   const user = await userService.findByEmail(email);
 
   if (!user) {
-    throw ApiError.badRequest('No such user');
+    throw ApiError.badRequest('There is no such user on the server');
   }
 
   const isUserValid = await bcrypt.compare(password, user.password);
 
   if (!isUserValid) {
-    throw ApiError.badRequest('Incorrect password');
+    throw ApiError.badRequest('Invalid credentials');
   }
 
   generateTokens(res, user);
