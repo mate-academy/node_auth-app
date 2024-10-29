@@ -1,5 +1,5 @@
 export class ApiError extends Error {
-  constructor({message, status, errors = {}}) {
+  constructor({ message, status, errors = {} }) {
     super(message);
 
     this.status = status;
@@ -29,4 +29,4 @@ export class ApiError extends Error {
       status: 404,
     });
   }
-};
+}

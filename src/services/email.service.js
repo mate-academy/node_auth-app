@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import nodemailer from "nodemailer";
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function send({email, subject, html}) {
+function send({ email, subject, html }) {
   return transporter.sendMail({
     to: email,
     subject,

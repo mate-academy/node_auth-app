@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from 'sequelize';
 
 export const client = new Sequelize({
   host: process.env.DB_HOST,

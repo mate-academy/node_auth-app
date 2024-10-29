@@ -1,18 +1,18 @@
-import { User } from "../models/user.js";
-import { userService } from "../services/user.service.js";
-import { jwtService } from "../services/jwt.service.js";
-import { ApiError } from "../exeptions/api.error.js";
+import { User } from '../models/user.js';
+import { userService } from '../services/user.service.js';
+import { jwtService } from '../services/jwt.service.js';
+import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
-import { tokenService } from "../services/token.service.js";
+import { tokenService } from '../services/token.service.js';
 
 function validateName(value) {
-    if (!value) {
-      return 'Name is required';
-    }
+  if (!value) {
+    return 'Name is required';
+  }
 
-    if (value.length > 20) {
-      return 'Name is too long';
-    }
+  if (value.length > 20) {
+    return 'Name is too long';
+  }
 }
 
 function validateEmail(value) {
@@ -48,9 +48,10 @@ async function generateTokens(res, user) {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     HttpOnly: true,
   });
+
   res.send({
     user: normalizedUser,
-    accessToken
+    accessToken,
   });
 }
 
@@ -58,6 +59,7 @@ const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
+    name: validateName(name),
     email: validateEmail(email),
     password: validatePassword(password),
   };
@@ -75,7 +77,7 @@ const register = async (req, res) => {
 
 const activate = async (req, res) => {
   const { activationToken } = req.params;
-  const user = await User.findOne({ where: { activationToken }});
+  const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
     return res.status(404).send('No such user');
@@ -113,12 +115,11 @@ const refresh = async (req, res) => {
 
   if (!userData || !token) {
     throw ApiError.unAuthorized();
-    return;
   }
 
   const user = await userService.findByEmail(userData.email);
-  generateTokens(res, user);
 
+  generateTokens(res, user);
 };
 
 const logout = async (req, res) => {
@@ -127,13 +128,12 @@ const logout = async (req, res) => {
 
   if (!userData || !refreshToken) {
     throw ApiError.unAuthorized();
-    return;
   }
 
   await tokenService.remove(userData.id);
 
   res.status(200).send('You were successfully logged out');
-}
+};
 
 export const authController = {
   register,

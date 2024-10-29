@@ -1,11 +1,12 @@
-import { jwtService } from "../services/jwt.service.js";
+import { jwtService } from '../services/jwt.service.js';
 
 export const authMiddleware = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';
-  const [,token] = authorization.split(' ');
+  const [, token] = authorization.split(' ');
 
   if (!authorization || !token) {
     res.status(401).send('Token is not valid');
+
     return;
   }
 
@@ -13,6 +14,7 @@ export const authMiddleware = (req, res, next) => {
 
   if (!userData) {
     res.status(401).send('Token is not valid');
+
     return;
   }
 
