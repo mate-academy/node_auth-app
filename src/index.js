@@ -14,11 +14,13 @@ const app = express(); // create web-server
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors({
-  // use cors to enter from different url
-  origin: process.env.CLIENT_HOST,
-  credentials: true,
-}));
+app.use(
+  cors({
+    // use cors to enter from different url
+    origin: process.env.CLIENT_HOST,
+    credentials: true,
+  }),
+);
 
 app.use(authRouter); // connecting authroutes
 app.use('/users', userRouter);
@@ -33,4 +35,3 @@ app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Server is running on port ${PORT}`);
 });
-

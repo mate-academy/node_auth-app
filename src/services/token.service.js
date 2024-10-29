@@ -1,10 +1,11 @@
-import { Token } from "../models/token.js";
+import { Token } from '../models/token.js';
 
 async function save(userId, newToken) {
-  const token = await Token.findOne({ where: { userId }});
+  const token = await Token.findOne({ where: { userId } });
 
   if (!token) {
     await Token.create({ userId, refreshToken: newToken });
+
     return;
   }
 
@@ -25,9 +26,9 @@ async function remove(userId) {
     }
 
     await Token.destroy({ where: { userId } });
+
     return { success: true, message: 'Token removed successfully' };
   } catch (error) {
-    console.error('Error removing token:', error);
     return { success: false, message: 'Failed to remove token' };
   }
 }
