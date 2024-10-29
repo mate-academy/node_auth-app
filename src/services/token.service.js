@@ -20,7 +20,7 @@ function remove(userId) {
   return Token.destroy({ where: { userId } })
 }
 
-export const toeknService = {
+export const tokenService = {
   save,
   getByToken,
   remove,

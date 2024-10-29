@@ -3,7 +3,17 @@ import { userService } from "../services/user.service.js";
 import { jwtService } from "../services/jwt.service.js";
 import { ApiError } from "../exeptions/api.error.js";
 import bcrypt from 'bcrypt';
-import { toeknService } from "../services/token.service.js";
+import { tokenService } from "../services/token.service.js";
+
+function validateName(value) {
+    if (!value) {
+      return 'Name is required';
+    }
+
+    if (value.length > 20) {
+      return 'Name is too long';
+    }
+}
 
 function validateEmail(value) {
   if (!value) {
@@ -32,7 +42,7 @@ async function generateTokens(res, user) {
   const accessToken = jwtService.sign(normalizedUser);
   const refreshToken = jwtService.signRefresh(normalizedUser);
 
-  await toeknService.save(normalizedUser.id, refreshToken);
+  await tokenService.save(normalizedUser.id, refreshToken);
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -45,7 +55,7 @@ async function generateTokens(res, user) {
 }
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   const errors = {
     email: validateEmail(email),
@@ -56,9 +66,9 @@ const register = async (req, res) => {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10); // problem
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  await userService.register(email, hashedPassword);
+  await userService.register(name, email, hashedPassword);
 
   res.send({ message: 'Okay' });
 };
@@ -93,21 +103,13 @@ const login = async (req, res) => {
   }
 
   generateTokens(res, user);
-
-  // const normalizedUser = userService.normalize(user);
-  // const accessToken = jwtService.sign(normalizedUser);
-
-  // res.send({
-  //   user: normalizedUser,
-  //   accessToken
-  // });
 };
 
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
   const userData = jwtService.verifyRefresh(refreshToken);
-  const token = await toeknService.getByToken(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
     throw ApiError.unAuthorized();
@@ -116,6 +118,7 @@ const refresh = async (req, res) => {
 
   const user = await userService.findByEmail(userData.email);
   generateTokens(res, user);
+
 };
 
 const logout = async (req, res) => {
@@ -127,7 +130,7 @@ const logout = async (req, res) => {
     return;
   }
 
-  await toeknService.remove(userData.id);
+  await tokenService.remove(userData.id);
 
   res.status(200).send('You were succesfully logout');
 }

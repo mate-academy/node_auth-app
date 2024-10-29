@@ -11,15 +11,15 @@ function getAllActivated() {
     });
 }
 
-function normalize({ id, email }) {
-  return { id, email };
+function normalize({ id, email, name }) {
+  return { id, email, name };
 }
 
 function findByEmail(email) {
   return User.findOne({where: { email }})
 }
 
-async function register(email, password) {
+async function register(name, email, password) {
   const activationToken = uuidv4(); // token generation
 
   const existUser = await findByEmail(email);
@@ -30,7 +30,7 @@ async function register(email, password) {
     });
   }
 
-  await User.create({ email, password, activationToken }); // create a user
+  await User.create({ name, email, password, activationToken }); // create a user
   await emailService.sendActivationEmail(email, activationToken);
 }
 

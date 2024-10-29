@@ -3,4 +3,4 @@ import { User } from './src/models/user.js';
 import { Token } from "./src/models/token.js";
 import { client } from './src/utils/db.js';
 
-client.sync({ force: true });
+client.sync({ alter: true });
