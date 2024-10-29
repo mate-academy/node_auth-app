@@ -63,7 +63,7 @@ const register = async (req, res) => {
   };
 
   if (errors.email || errors.password) {
-    throw ApiError.badRequest('Bad request', errors);
+    throw ApiError.badRequest('Incorrect email or password', errors);
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -82,7 +82,7 @@ const activate = async (req, res) => {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 
   res.send(user);
 };
@@ -96,9 +96,9 @@ const login = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
-  const isUserValide = await bcrypt.compare(password, user.password);
+  const isUserValid = await bcrypt.compare(password, user.password);
 
-  if (!isUserValide) {
+  if (!isUserValid) {
     throw ApiError.badRequest('Incorrect password');
   }
 
@@ -132,7 +132,7 @@ const logout = async (req, res) => {
 
   await tokenService.remove(userData.id);
 
-  res.status(200).send('You were succesfully logout');
+  res.status(200).send('You were successfully logged out');
 }
 
 export const authController = {

@@ -10,12 +10,12 @@ export const authMiddleware = (req, res, next) => {
   }
 
   const userData = jwtService.verify(token);
-  console.log(userData);
 
   if (!userData) {
     res.status(401).send('Token is not valid');
     return;
   }
 
+  req.user = userData;
   next();
 };

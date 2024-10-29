@@ -14,6 +14,4 @@ export const errorMiddleware = (error, req, res, next) => {
       message: 'Server error'
     });
   }
-
-  next();
 };

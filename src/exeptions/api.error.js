@@ -14,7 +14,7 @@ export class ApiError extends Error {
     });
   }
 
-  static unAuthorized(errors) {
+  static unAuthorized(errors = {}) {
     return new ApiError({
       message: 'unauthorized user',
       errors,
@@ -22,7 +22,7 @@ export class ApiError extends Error {
     });
   }
 
-  static notFound(errors) {
+  static notFound(errors = {}) {
     return new ApiError({
       message: 'not found',
       errors,

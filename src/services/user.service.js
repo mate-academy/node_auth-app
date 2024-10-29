@@ -26,7 +26,7 @@ async function register(name, email, password) {
 
   if (existUser) {
     throw  ApiError.badRequest('User already exists', {
-      email: 'User already exists'
+      email: 'User with this email already exists'
     });
   }
 
