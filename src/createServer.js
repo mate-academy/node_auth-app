@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { authRouter } from './routes/auth.route.js';
 import cors from 'cors';
 import { userRouter } from './routes/user.route.js';
+import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
 const app = express();
 
@@ -12,6 +13,7 @@ export const createServer = () => {
   app.use(express.json());
   app.use(authRouter);
   app.use('/users', userRouter);
+  app.use(errorMiddleware);
 
   return app;
 };

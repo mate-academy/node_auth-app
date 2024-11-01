@@ -1,3 +1,5 @@
+import { ApiError } from '../exceptions/api.error.js';
+
 export function checkRequiredFields(fields) {
   return function (req, res, next) {
     const extractedValues = fields.reduce(
@@ -9,9 +11,15 @@ export function checkRequiredFields(fields) {
     );
 
     if (Object.values(extractedValues).every((value) => value !== undefined)) {
-      return next();
+      next();
     } else {
-      res.sendStatus(400);
+      const missingFields = Object.keys(extractedValues).filter(
+        (key) => extractedValues[key] === undefined,
+      );
+      const errorMessage = `Required field(s) missing: ${missingFields.join(', ')}`;
+      const error = ApiError.badRequest(errorMessage, { missingFields });
+
+      next(error);
     }
   };
 }

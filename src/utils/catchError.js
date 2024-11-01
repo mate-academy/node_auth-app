@@ -3,7 +3,7 @@ export const catchError = (action) => {
     try {
       await action(req, res, next);
     } catch (error) {
-      next(error)
+      next(error);
     }
-  }
-}
+  };
+};
