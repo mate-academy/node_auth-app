@@ -47,7 +47,7 @@ async function register(req, res, next) {
 async function activate(req, res, next) {
   const { activationToken } = req.params;
 
-  const user = User.findOne({ where: { activationToken } });
+  const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
     res.sendStatus(404);
@@ -64,7 +64,7 @@ async function activate(req, res, next) {
 
 async function login(req, res, next) {
   const { email, password } = req.body;
-  const user = userService.getByEmail(email);
+  const user = await userService.getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('User with this email does not exist');
@@ -133,7 +133,7 @@ async function sendAuthentication(res, user) {
 
 async function reset(req, res, next) {
   const { email } = req.body;
-  const user = userService.getByEmail(email);
+  const user = await userService.getByEmail(email);
 
   if (!user) {
     throw ApiError.badRequest('User not found');

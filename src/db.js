@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
-require('dotenv').config()
+
+require('dotenv').config();
 
 const client = new Sequelize({
   host: process.env.DB_HOST,

@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express');
 const { userController } = require('../controllers/user.controller.js');
 const { authMiddleware } = require('../middlewares/authMiddleware.js');
 const { catchError } = require('../middlewares/catchMiddleware.js');

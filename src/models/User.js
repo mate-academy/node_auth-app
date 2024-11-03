@@ -16,11 +16,11 @@ const User = client.define('users', {
     allowNull: false,
   },
   activationToken: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.UUID,
     allowNull: true,
   },
   resetToken: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.UUID,
     allowNull: true,
   },
 });

@@ -1,6 +1,6 @@
 const { ApiError } = require('../exceptions/ApiError.js');
 const { User } = require('../models/User.js');
-const { emailService } = require('./email.service.js')
+const { emailService } = require('./email.service.js');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 
@@ -42,7 +42,7 @@ async function resetEmail(email) {
   const user = await User.findOne({ where: { email } });
 
   if (!user) {
-    throw ApiError.badRequest('Not found users');
+    throw ApiError.BadRequest('Not found users');
   }
 
   await emailService.sendReset(email, resetToken);
@@ -55,10 +55,12 @@ async function changePassword(userName, newPassword) {
   const user = await User.findOne({ where: { userName } });
 
   if (!user) {
-    throw ApiError.badRequest('User not found');
+    throw ApiError.BadRequest('User not found');
   }
 
-  user.password = newPassword;
+  const hash = await bcrypt.hash(newPassword, 10);
+
+  user.password = hash;
   user.resetToken = null;
 
   await user.save();
@@ -69,11 +71,11 @@ async function changeName(userName, newName) {
   const existUser = await User.findOne({ where: { userName: newName } });
 
   if (existUser) {
-    throw ApiError.badRequest('Username is already taken');
+    throw ApiError.BadRequest('Username is already taken');
   }
 
   if (!user) {
-    throw ApiError.badRequest('User not found');
+    throw ApiError.BadRequest('User not found');
   }
 
   user.userName = newName;
@@ -85,13 +87,13 @@ const changeEmail = async (userName, newEmail) => {
   const existEmail = await getByEmail(newEmail);
 
   if (existEmail) {
-    throw ApiError.badRequest('Email is already taken');
+    throw ApiError.BadRequest('Email is already taken');
   }
 
   const user = await User.findOne({ where: { userName } });
 
   if (!user) {
-    throw ApiError.badRequest('User not found');
+    throw ApiError.BadRequest('User not found');
   }
 
   await emailService.sendConfirmation(newEmail, resetToken);

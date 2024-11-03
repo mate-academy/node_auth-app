@@ -4,7 +4,7 @@ const { User } = require('./User.js');
 
 const Token = client.define('token', {
   refreshToken: {
-    type: DataTypes.UUIDV4,
+    type: DataTypes.UUID,
     allowNull: false,
   },
 });

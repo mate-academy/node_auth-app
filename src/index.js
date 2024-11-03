@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
 'use strict';
 
-const express = require('express')
-var cors = require('cors')
-require('dotenv').config()
+const express = require('express');
+const cors = require('cors');
+
+require('dotenv').config();
+
 const cookieParser = require('cookie-parser');
 const { authRouter } = require('./routes/auth.route.js');
-const { userRouter } = require('./routes/user.route.js')
+const { userRouter } = require('./routes/user.route.js');
 const { errorMiddleware } = require('./middlewares/errorMiddleware.js');
 
 const PORT = process.env.PORT || 3001;
@@ -22,7 +24,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use(authRouter);
-app.use('users', userRouter);
+app.use('/users', userRouter);
 app.use(errorMiddleware);
 
 app.get('/', (req, res) => {

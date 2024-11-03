@@ -1,7 +1,5 @@
 const { userService } = require('../services/user.service.js');
 
-
-
 async function getAll(req, res, next) {
   const users = await userService.getAllActive();
 
@@ -9,4 +7,5 @@ async function getAll(req, res, next) {
 }
 
 const userController = { getAll };
+
 module.exports = { userController };
