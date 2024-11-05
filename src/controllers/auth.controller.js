@@ -47,7 +47,7 @@ const register = async (req, res) => {
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await userService.register(email, hashedPass);
+  await userService.register(email, hashedPass, name);
 
   res.send({ message: 'OK' });
 };
@@ -107,6 +107,7 @@ async function refresh(req, res) {
   }
 
   const user = await userService.findByEmail(userData.email);
+
   await generateTokens(res, user);
 }
 
@@ -115,6 +116,7 @@ async function generateTokens(res, user) {
 
   const accessToken = jwtService.sign(normalizedUser);
   const refreshAccessToken = jwtService.signRefresh(normalizedUser);
+
   await tokenService.save(normalizedUser.id, refreshAccessToken);
 
   res.cookie('refreshToken', refreshAccessToken, {

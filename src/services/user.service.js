@@ -25,7 +25,12 @@ async function register(email, password, name) {
     });
   }
 
-  await User.create({ email, password, name, activationToken });
+  await User.create({
+    email,
+    password,
+    name,
+    activationToken,
+  });
 
   await emailService.sendActivationEmail(email, activationToken);
 }
