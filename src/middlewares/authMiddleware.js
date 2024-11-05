@@ -1,21 +1,25 @@
+import { ApiError } from '../exceptions/api.error.js';
 import { jwtService } from '../services/jwt.service.js';
 
 export const authMiddleware = (req, res, next) => {
   const authorization = req.header('authorization') || '';
   const [, token] = authorization.split(' ');
-
-  if (!authorization || !token) {
-    res.sendStatus(401);
-
-    return;
-  }
-
   const userData = jwtService.verify(token);
 
-  if (!userData) {
-    res.sendStatus(401);
+  const errors = {
+    authorization: !authorization
+      ? 'Authorization header is required'
+      : undefined,
+    token: authorization
+      ? !token
+        ? 'Token is required'
+        : undefined
+      : undefined,
+    userData: token ? (!userData ? 'Invalid token' : undefined) : undefined,
+  };
 
-    return;
+  if (errors.authorization || errors.token || errors.userData) {
+    throw ApiError.unauthorized({ errors });
   }
 
   next();
