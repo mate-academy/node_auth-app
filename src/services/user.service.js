@@ -1,8 +1,8 @@
-import { User } from '../models/user.js';
-import { v4 as uuidv4 } from 'uuid';
-import { emailService } from './email.service.js';
-import { ApiError } from '../exceptions/api.error.js';
-import bcrypt from 'bcrypt';
+const User = require('../models/user.js');
+const uuidv4 = require('uuid');
+const emailService = require('./email.service.js');
+const ApiError = require('../exceptions/api.error.js');
+const bcrypt = require('bcrypt');
 
 function getAllActivated() {
   return User.findAll({ where: { activationToken: null } });
@@ -75,7 +75,7 @@ async function update(
   user.save();
 }
 
-export const userService = {
+module.exports = {
   getAllActivated,
   normalize,
   findByEmail,

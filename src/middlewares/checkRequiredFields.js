@@ -1,4 +1,4 @@
-import { ApiError } from '../exceptions/api.error.js';
+const ApiError = require('../exceptions/api.error.js');
 
 export function checkRequiredFields(fields) {
   return function (req, res, next) {

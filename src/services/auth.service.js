@@ -26,7 +26,7 @@ function validatePassword(value) {
   }
 }
 
-export const authService = {
+module.exports = {
   validateEmail,
   validatePassword,
 };

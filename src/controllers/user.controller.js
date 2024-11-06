@@ -1,7 +1,7 @@
-import { ApiError } from '../exceptions/api.error.js';
-import { userService } from '../services/user.service.js';
-import { authService } from '../services/auth.service.js';
-import bcrypt from 'bcrypt';
+const ApiError = require('../exceptions/api.error.js');
+const userService = require('../services/user.service.js');
+const authService = require('../services/auth.service.js');
+const bcrypt = require('bcrypt');
 
 async function getAllActivated(req, res) {
   const users = await userService
@@ -62,7 +62,7 @@ async function update(req, res) {
   res.send(updatedUser);
 }
 
-export const userController = {
+module.exports = {
   getAllActivated,
   getOne,
   update,

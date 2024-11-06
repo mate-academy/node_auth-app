@@ -1,10 +1,10 @@
-import { ApiError } from '../exceptions/api.error.js';
-import { User } from '../models/user.js';
-import { jwtService } from '../services/jwt.service.js';
-import { tokenService } from '../services/token.service.js';
-import { userService } from '../services/user.service.js';
-import { authService } from '../services/auth.service.js';
-import bcrypt from 'bcrypt';
+const ApiError = require('../exceptions/api.error.js');
+const User = require('../models/user.js');
+const jwtService = require('../services/jwt.service.js');
+const tokenService = require('../services/token.service.js');
+const userService = require('../services/user.service.js');
+const authService = require('../services/auth.service.js');
+const bcrypt = require('bcrypt');
 
 const register = async (req, res) => {
   const { email, password, name } = req.body;
@@ -181,7 +181,7 @@ async function pwdReset(req, res) {
   res.sendStatus(204);
 }
 
-export const authController = {
+module.exports = {
   register,
   activate,
   login,

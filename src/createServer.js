@@ -1,14 +1,16 @@
-import express from 'express';
-import 'dotenv/config';
-import { authRouter } from './routes/auth.route.js';
-import cors from 'cors';
-import { userRouter } from './routes/user.route.js';
-import { errorMiddleware } from './middlewares/errorMiddleware.js';
-import cookieParser from 'cookie-parser';
+const express = require('express');
+
+require('dotenv/config');
+
+const authRouter = require('./routes/auth.route.js');
+const cors = require('cors');
+const userRouter = require('./routes/user.route.js');
+const errorMiddleware = require('./middlewares/errorMiddleware.js');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
-export const createServer = () => {
+const createServer = () => {
   app.use(express.static('public'));
   app.use(express.json());
   app.use(cookieParser());
@@ -19,3 +21,5 @@ export const createServer = () => {
 
   return app;
 };
+
+module.exports = createServer;
