@@ -3,42 +3,15 @@ import { User } from '../models/user.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
 import { userService } from '../services/user.service.js';
+import { authService } from '../services/auth.service.js';
 import bcrypt from 'bcrypt';
-
-function validateEmail(value) {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-}
-
-function validatePassword(value) {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-
-  if (value.length < 6) {
-    return 'Password must be at least 6 characters long';
-  }
-
-  if (!passwordPattern.test(value)) {
-    return 'Password must contain at least one letter and one number';
-  }
-}
 
 const register = async (req, res) => {
   const { email, password, name } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    email: authService.validateEmail(email),
+    password: authService.validatePassword(password),
   };
 
   if (errors.email || errors.password) {
@@ -79,7 +52,7 @@ const login = async (req, res) => {
 
   const errors = {
     email:
-      validateEmail(email) ||
+      authService.validateEmail(email) ||
       (!user ? 'User not found' : undefined) ||
       (user.activationToken ? 'User not activated' : undefined),
     password: user
@@ -130,9 +103,91 @@ async function generateTokens(res, user) {
   });
 }
 
+async function logout(req, res) {
+  const { refreshToken } = req.cookies;
+
+  const userData = await jwtService.verifyRefresh(refreshToken);
+
+  const errors = {
+    isLoggedIn: !refreshToken ? 'User not logged in' : undefined,
+  };
+
+  if (!userData || !refreshToken) {
+    throw ApiError.unauthorized({ errors });
+  }
+
+  tokenService.remove(userData.id);
+
+  res.sendStatus(204);
+}
+
+async function reqPwdReset(req, res) {
+  const { email } = req.body;
+  const user = await userService.findByEmail(email);
+
+  const errors = {
+    email:
+      authService.validateEmail(email) ||
+      (!user ? 'Email not found' : undefined) ||
+      (user.activationToken ? 'User not activated' : undefined),
+  };
+
+  if (errors.email) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  await userService.reqPwdReset(email);
+  res.send({ message: 'OK' });
+}
+
+async function validatePwResetToken(req, res) {
+  const { pwdResetToken } = req.params;
+  const user = await User.findOne({ where: { pwdResetToken } });
+
+  const errors = {
+    token:
+      (!user ? 'invalid token' : undefined) ||
+      (!pwdResetToken ? 'token required' : undefined),
+  };
+
+  if (errors.pwdResetToken) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  res.send({ message: 'OK' });
+}
+
+async function pwdReset(req, res) {
+  const { pwdResetToken } = req.params;
+  const { password, confirmPassword } = req.body;
+  const user = await User.findOne({ where: { pwdResetToken } });
+
+  const errors = {
+    password:
+      authService.validatePassword(password) ||
+      (confirmPassword !== password ? 'Passwords do not match' : undefined),
+  };
+
+  if (errors.password) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  const hashedPass = await bcrypt.hash(password, 10);
+
+  user.password = hashedPass;
+  user.pwdResetToken = null;
+  user.save();
+
+  res.sendStatus(204);
+}
+
 export const authController = {
   register,
   activate,
   login,
   refresh,
+  logout,
+  reqPwdReset,
+  validatePwResetToken,
+  pwdReset,
 };
