@@ -2,6 +2,7 @@ import { ApiError } from '../exceptions/api.error.js';
 import { userService } from '../services/user.service.js';
 import { authService } from '../services/auth.service.js';
 import bcrypt from 'bcrypt';
+
 async function getAllActivated(req, res) {
   const users = await userService
     .getAllActivated()
@@ -34,6 +35,7 @@ async function update(req, res) {
 
   if (email || (newPwd && confirmNewPwd)) {
     const isPwdCorrect = await bcrypt.compare(password, user.password);
+
     if (!isPwdCorrect) {
       throw ApiError.badRequest('Auth failed', {
         password: 'Incorrect password',

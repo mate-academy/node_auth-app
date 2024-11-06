@@ -33,6 +33,7 @@ function sendActivationEmail(email, token) {
     subject: 'Activate',
   });
 }
+
 function sendResetEmail(email, token) {
   const href = `${process.env.CLIENT_HOST}/pwdReset/${token}`;
   const html = `

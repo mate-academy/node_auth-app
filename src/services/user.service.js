@@ -2,7 +2,7 @@ import { User } from '../models/user.js';
 import { v4 as uuidv4 } from 'uuid';
 import { emailService } from './email.service.js';
 import { ApiError } from '../exceptions/api.error.js';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 
 function getAllActivated() {
   return User.findAll({ where: { activationToken: null } });
@@ -43,6 +43,7 @@ async function register(email, password, name) {
 async function reqPwdReset(email) {
   const pwdResetToken = uuidv4();
   const user = await findByEmail(email);
+
   user.pwdResetToken = pwdResetToken;
   await user.save();
 
@@ -56,13 +57,17 @@ async function update(
   email = undefined,
 ) {
   const user = await User.findOne({ where: { id } });
+
   if (name) {
     user.name = name;
   }
+
   if (password) {
     const hashedPass = await bcrypt.hash(password, 10);
+
     user.password = hashedPass;
   }
+
   if (email) {
     user.email = email;
   }

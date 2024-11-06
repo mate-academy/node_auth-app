@@ -19,6 +19,12 @@ authRouter.get('/logout', catchError(authController.logout));
 
 authRouter.post('/pwdReset/', catchError(authController.reqPwdReset));
 
-authRouter.get('/pwdReset/:pwdResetToken', catchError(authController.validatePwResetToken));
+authRouter.get(
+  '/pwdReset/:pwdResetToken',
+  catchError(authController.validatePwResetToken),
+);
 
-authRouter.post('/pwdReset/:pwdResetToken', catchError(authController.pwdReset));
+authRouter.post(
+  '/pwdReset/:pwdResetToken',
+  catchError(authController.pwdReset),
+);
