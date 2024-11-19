@@ -136,7 +136,7 @@ async function reset(req, res, next) {
   const user = await userService.getByEmail(email);
 
   if (!user) {
-    throw ApiError.badRequest('User not found');
+    throw ApiError.BadRequest('User not found');
   }
 
   await userService.resetEmail(email);
@@ -155,7 +155,7 @@ async function resetPassword(req, res, next) {
   }
 
   if (!resetToken) {
-    throw ApiError.badRequest('Invalid reset token');
+    throw ApiError.BadRequest('Invalid reset token');
   }
 
   if (newPassword !== confirmation) {

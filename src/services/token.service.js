@@ -10,10 +10,12 @@ async function save(userId, refreshToken) {
 
     await token.save();
 
-    return;
+    return true;
   }
 
   await Token.create({ userId, refreshToken });
+
+  return false;
 }
 
 function getByToken(refreshToken) {

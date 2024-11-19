@@ -42,7 +42,7 @@ async function resetEmail(email) {
   const user = await User.findOne({ where: { email } });
 
   if (!user) {
-    throw ApiError.BadRequest('Not found users');
+    throw ApiError.BadRequest('User not found');
   }
 
   await emailService.sendReset(email, resetToken);
@@ -82,7 +82,7 @@ async function changeName(userName, newName) {
   await user.save();
 }
 
-const changeEmail = async (userName, newEmail) => {
+async function changeEmail(userName, newEmail) {
   const resetToken = uuidv4();
   const existEmail = await getByEmail(newEmail);
 
@@ -100,7 +100,7 @@ const changeEmail = async (userName, newEmail) => {
 
   user.resetToken = resetToken;
   await user.save();
-};
+}
 
 const userService = {
   getAllActive,

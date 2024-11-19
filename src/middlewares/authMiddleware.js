@@ -19,6 +19,7 @@ function authMiddleware(req, res, next) {
   if (!userData) {
     throw ApiError.Unauthorized();
   }
+  req.user = userData;
 
   next();
 }
