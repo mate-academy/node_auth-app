@@ -11,15 +11,15 @@ export class ApiError extends Error {
       message,
       errors,
       status: 400,
-    })
+    });
   }
 
   static unauthorized(errors) {
     return new ApiError({
       message: 'unauthorized',
       errors,
-      status: 400,
-    })
+      status: 401,
+    });
   }
 
   static notFound(errors) {
@@ -27,7 +27,6 @@ export class ApiError extends Error {
       message: 'not found',
       errors,
       status: 404,
-    })
+    });
   }
 }
-

@@ -32,7 +32,7 @@ const register = async (req, res) => {
 
   const errors = {
     email: validateEmail(email),
-    password: validatePassword(email),
+    password: validatePassword(password),
   };
   if (errors.email || errors.password) {
     throw ApiError.badRequest('Bad request', errors);
@@ -70,7 +70,7 @@ const login = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
-  const isPasswordValid = bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
@@ -114,13 +114,12 @@ const logout = async (req, res) => {
   const userData = await jwtService.verifyRefresh(refreshToken);
 
   if (!userData || !refreshToken) {
-    throw ApiError.unauthorized()
-    return
+    throw ApiError.unauthorized();
   }
 
   tokenService.remove(userData.id);
 
-  res.send(204)
+  res.sendStatus(204);
 };
 
 export const authController = {
