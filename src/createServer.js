@@ -1,10 +1,10 @@
 'use strict';
 
-import express from 'express';
-import cors from 'cors';
-import { authRouter } from './routes/auth.router.js';
+const express = require('express');
+const cors = require('cors');
+const { authRouter } = require('./routes/auth.router.js');
 
-export const createServer = () => {
+const createServer = () => {
   const app = express();
 
   app.use(express.json());
@@ -14,3 +14,5 @@ export const createServer = () => {
 
   return app;
 };
+
+module.exports = { createServer };
