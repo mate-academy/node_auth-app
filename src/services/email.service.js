@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const info = await transporter.sendMail({
+const info = transporter.sendMail({
   to: 'sacoboj809@gitated.com', // list of receivers
   subject: 'Hello ✔', // Subject line
   text: 'Hello world?', // plain text body
