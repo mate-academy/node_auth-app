@@ -41,4 +41,19 @@ const sendResetPasswordEmail = (email, token) => {
   return sendMail(email, html);
 };
 
-module.exports = { sendMail, sendVerificationEmail, sendResetPasswordEmail };
+const sendResetEmail = (email, token, isReseted = false) => {
+  const href = `${process.env.BASE}/reset/${token}`;
+  const html = `
+  <h1>${isReseted ? 'If you want to reset your email follow the link' : `Your email was replaced with new email ${email}`}</h1>
+  ${isReseted ? '' : `<a href="${href}">${href}</a>`} 
+  `;
+
+  return sendMail(email, html);
+};
+
+module.exports = {
+  sendMail,
+  sendVerificationEmail,
+  sendResetPasswordEmail,
+  sendResetEmail,
+};

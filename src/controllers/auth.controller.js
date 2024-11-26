@@ -153,18 +153,16 @@ const sendResetPassword = async (req, res) => {
   const user = await User.findOne({ where: { email } });
 
   if (refreshToken) {
-    // const token = await tokenService.getByToken(refreshToken);
+    const token = await tokenService.getByToken(refreshToken);
 
-    // if (token) {
-    throw ApiError.badRequest('Only for not authorized!');
-    // }
+    if (token) {
+      throw ApiError.badRequest('Only for not authorized!');
+    }
   }
 
   if (!user) {
     throw ApiError.notFound();
   }
-
-  // const normalizedUser = userService.normalize(user);
 
   const resetToken = jwtService.generateAccessToken({ email, password });
 
@@ -207,7 +205,49 @@ const resetPassword = async (req, res) => {
   user.password = hashedPassword;
   user.save();
   res.send('The password was changed!');
-  // res.send('The');
+};
+
+const sendResetEmail = async (req, res) => {
+  const { password, email } = req.body;
+
+  if (!password || !email) {
+    throw ApiError.badRequest('Not all the credentials are provided');
+  }
+
+  const user = await userService.getByEmail(email);
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  const resetEmailToken = jwtService.generateAccessToken({ email, password });
+
+  user.activationToken = resetEmailToken;
+  user.save();
+
+  emailService.sendResetEmail(user.email, resetEmailToken);
+  res.sendStatus(200);
+};
+
+const resetEmail = async (req, res) => {
+  const { resetToken } = req.params;
+
+  const user = await User.findOne({ where: { activationToken: resetToken } });
+  const userData = await jwtService.validateAccessToken(resetToken);
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  if (!userData) {
+    throw ApiError.badRequest('Invalid reset token');
+  }
+
+  emailService.sendResetEmail(user.email, null, true);
+  user.activationToken = null;
+  user.email = userData.email;
+  user.save();
+  res.send('The email was changed!');
 };
 
 module.exports = {
@@ -218,4 +258,6 @@ module.exports = {
   logout,
   resetPassword,
   sendResetPassword,
+  sendResetEmail,
+  resetEmail,
 };
