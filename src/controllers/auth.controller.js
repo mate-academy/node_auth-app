@@ -28,7 +28,7 @@ const register = async (req, res) => {
   const user = await userService.getByEmail(email);
 
   if (user) {
-    throw ApiError.badRequest('The user with this email is already exists!');
+    throw ApiError.badRequest('The user with this email already exists!');
   }
 
   const hashedPassword = await bcrypt.hash(password, +process.env.HASH_ROUNDS);
@@ -75,7 +75,6 @@ const activate = async (req, res) => {
   user.save();
 
   const normalizedUser = userService.normalize(user);
-  // const accesToken = jwtService.generateAccessToken(normalizedUser);
 
   await sendAuthentication(res, normalizedUser);
 };
@@ -123,7 +122,7 @@ const refresh = async (req, res) => {
   const userData = jwtService.validateRefreshToken(refreshToken);
 
   if (!userData) {
-    throw ApiError.badRequest('Invalid token!');
+    throw ApiError.badRequest('Token is expired or revoked!');
   }
 
   await sendAuthentication(res, userData);
@@ -156,7 +155,7 @@ const sendResetPassword = async (req, res) => {
     const token = await tokenService.getByToken(refreshToken);
 
     if (token) {
-      throw ApiError.badRequest('Only for not authorized!');
+      throw ApiError.badRequest('Action restricted to unauthorized users only!');
     }
   }
 
@@ -211,7 +210,7 @@ const sendResetEmail = async (req, res) => {
   const { password, email } = req.body;
 
   if (!password || !email) {
-    throw ApiError.badRequest('Not all the credentials are provided');
+    throw ApiError.badRequest('Not all credentials are provided');
   }
 
   const user = await userService.getByEmail(email);

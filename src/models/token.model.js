@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
-const { sequilize } = require('../utils/db');
+const { sequelize } = require('../utils/db');
 const { User } = require('./user.model');
 
-const Token = sequilize.define(
+const Token = sequelize.define(
   'token',
   {
     refreshToken: {

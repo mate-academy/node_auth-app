@@ -6,13 +6,13 @@ function authMiddleware(req, res, next) {
   const [, accessToken] = authHeader.split(' ');
 
   if (!authHeader || !accessToken) {
-    throw ApiError.badRequest('Token is required');
+    throw ApiError.unauthorized();
   }
 
   const userData = jwtService.validateAccessToken(accessToken);
 
   if (!userData) {
-    throw ApiError.badRequest('Invalid token');
+    throw ApiError.unauthorized();
   }
 
   next();

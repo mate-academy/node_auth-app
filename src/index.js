@@ -1,6 +1,6 @@
 'use strict';
 /* eslint-disable no-unused-expressions */
-require('dotenv').config;
+require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
@@ -30,5 +30,5 @@ app.use(errorMiddleware);
 
 app.listen(process.env.PORT || 3006, () => {
   /* eslint-disable no-console */
-  console.log(`Server is runnig on ${process.env.BASE}`);
+  console.log(`Server is running on ${process.env.BASE}`);
 });
