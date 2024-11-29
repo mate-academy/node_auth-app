@@ -1,11 +1,10 @@
-import { DataTypes, UUIDV4 } from "sequelize";
-import { client } from "../utils/db.js";
+const { DataTypes } = require('sequelize');
+const { client } = require('../../setup.js');
 
-export const User = client.define('users', {
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: UUIDV4,
-    primaryKey: true,
+const User = client.define('users', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   email: {
     type: DataTypes.STRING,
@@ -17,10 +16,13 @@ export const User = client.define('users', {
     allowNull: false,
   },
   activationToken: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
+    allowNull: true,
   },
-}, {
-  tableName: 'users',
-  updatedAt: false,
-  createdAt: false,
+  resetToken: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
 });
+
+module.exports = { User };

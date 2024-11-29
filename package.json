@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Auth app",
   "main": "src/index.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "init": "mate-scripts init",
     "start": "nodemon src/index.js",
@@ -18,7 +18,7 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "@mate-academy/eslint-config": "latest",
-    "@mate-academy/scripts": "^1.8.1",
+    "@mate-academy/scripts": "^1.9.12",
     "dotenv": "^16.4.5",
     "eslint": "^7.32.0",
     "eslint-plugin-jest": "^22.4.1",
@@ -32,15 +32,18 @@
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "cookie-parser": "^1.4.6",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.14",
+    "password-validator": "^5.3.0",
     "pg": "^8.12.0",
     "pg-hstore": "^2.3.4",
     "react-router-dom": "^6.24.1",
     "sequelize": "^6.37.3",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "validator": "^13.12.0"
   }
 }

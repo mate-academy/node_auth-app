@@ -1,12 +1,11 @@
-import jwt from 'jsonwebtoken';
-import 'dotenv/config.js';
+const jwt = require('jsonwebtoken');
 
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '5s' });
+  return jwt.sign(user, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
 }
 
 function generateRefreshToken(user) {
-  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: '30s' });
+  return jwt.sign(user, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 }
 
 function validateAccessToken(token) {
@@ -25,9 +24,11 @@ function validateRefreshToken(token) {
   }
 }
 
-export const jwtService = {
+const jwtService = {
   generateAccessToken,
   generateRefreshToken,
   validateAccessToken,
   validateRefreshToken,
 };
+
+module.exports = { jwtService };

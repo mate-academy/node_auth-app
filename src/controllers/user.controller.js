@@ -1,13 +1,20 @@
-import { userService } from "../services/user.service.js"
+const { userService } = require('../services/user.service.js');
 
-const getAllActivated = async (req, res) => {
+async function getAllActive(req, res, next) {
   const users = await userService.getAllActive();
 
-  res.send(
-    users.map(userService.normalize)
-  );
+  res.send({ message: users });
 }
 
-export const userController = {
-  getAllActivated,
+async function getAllNotActive(req, res, next) {
+  const users = await userService.getAllNotActive();
+
+  res.send({ message: users });
 }
+
+const userController = {
+  getAllActive,
+  getAllNotActive,
+};
+
+module.exports = { userController };

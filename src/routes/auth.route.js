@@ -1,15 +1,25 @@
-import express from 'express';
+const express = require('express');
+const { authController } = require('../controllers/auth.controller.js');
+const { catchError } = require('../middleware/catchMiddleware.js');
+const { authMiddleware } = require('../middleware/authMiddleware.js');
 
-import { authController } from '../controllers/auth.controller.js';
-import { catchError } from '../utils/catchError.js';
+const authRouter = new express.Router();
 
-export const authRouter = new express.Router();
+authRouter.post('/registration', catchError(authController.register));
 
-authRouter.post('/registration', catchError(authController.registration));
 authRouter.get(
   '/activation/:activationToken',
   catchError(authController.activate),
 );
+
 authRouter.post('/login', catchError(authController.login));
-authRouter.post('/logout', catchError(authController.logout));
-authRouter.get('/refresh', catchError(authController.refresh));
+authRouter.post('/logout', authMiddleware, catchError(authController.logout));
+authRouter.get('/refresh', authMiddleware, catchError(authController.refresh));
+authRouter.post('/reset', catchError(authController.reset));
+
+authRouter.post(
+  '/resetPassword/:resetToken',
+  catchError(authController.resetPassword),
+);
+
+module.exports = { authRouter };

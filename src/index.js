@@ -1,34 +1,45 @@
+/* eslint-disable no-console */
 'use strict';
 
-import 'dotenv/config';
-import express from 'express';
-import { authRouter } from './routes/auth.route.js';
-import { userRouter } from './routes/user.route.js';
-import cors from 'cors';
-import { errorMiddleware } from './middleware/errorMiddleware.js';
+const express = require('express');
+const cors = require('cors');
+
+require('dotenv').config();
+
+const cookieParser = require('cookie-parser');
+const { authRouter } = require('./routes/auth.route.js');
+const { userRouter } = require('./routes/user.route.js');
+const { errorMiddleware } = require('./middleware/errorMiddleware.js');
+const { syncDatabase } = require('./utils/synchronize.js');
+
+syncDatabase(true)
+  .then(() => {
+    console.log('Server is starting...');
+  })
+  .catch((error) => {
+    console.error('Failed to start the server:', error);
+  });
+
+const PORT = process.env.PORT || 3001;
 
 const app = express();
-const PORT = process.env.PORT || 3005;
 
-const corsOptions = {
-  origin: process.env.CLIENT_HOST,
-  optionsSuccessStatus: 200,
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
+app.use(
+  cors({
+    origin: process.env.CLIENT_HOST,
+    credentials: true,
+  }),
+);
 app.use(express.json());
-
+app.use(cookieParser());
 app.use(authRouter);
 app.use('/users', userRouter);
-
-app.get('/', (req, res) => {
-  res.send('Hello from the server!');
-});
-
 app.use(errorMiddleware);
 
+app.get('/', (req, res) => {
+  res.send(`PORT:${PORT}`);
+});
+
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on localhost:${PORT}`);
 });

@@ -1,24 +1,27 @@
-import { ApiError } from '../exceptions/api.error.js';
-import { jwtService } from '../services/jwt.service.js';
+const { ApiError } = require('../exceptions/ApiError.js');
+const { jwtService } = require('../services/jwt.service.js');
 
-export function authMiddleware(req, res, next) {
+function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader) {
-    throw ApiError.unauthorized();
+    throw ApiError.Unauthorized();
   }
 
   const [, accessToken] = authHeader.split(' ');
 
   if (!accessToken) {
-    throw ApiError.unauthorized();
+    throw ApiError.Unauthorized();
   }
 
   const userData = jwtService.validateAccessToken(accessToken);
 
   if (!userData) {
-    throw ApiError.unauthorized();
+    throw ApiError.Unauthorized();
   }
+  req.user = userData;
 
   next();
 }
+
+module.exports = { authMiddleware };
