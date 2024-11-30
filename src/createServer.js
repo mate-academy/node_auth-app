@@ -3,6 +3,8 @@
 const express = require('express');
 const cors = require('cors');
 const { authRouter } = require('./routes/auth.router.js');
+const { userRouter } = require('./routes/user.router.js');
+const { errorMiddleware } = require('./middlewares/errorMiddleware.js');
 
 const createServer = () => {
   const app = express();
@@ -11,6 +13,8 @@ const createServer = () => {
   app.use(cors());
 
   app.use('/', authRouter);
+  app.use('/users', userRouter);
+  app.use(errorMiddleware);
 
   return app;
 };

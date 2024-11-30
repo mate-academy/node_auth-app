@@ -1,8 +1,10 @@
 const { Router } = require('express');
-const { authController } = require('../controllers/auth.controller.js');
+const { userController } = require('../controllers/user.controller.js');
+const { authMiddleware } = require('../middlewares/authMiddleware.js');
+const { catchError } = require('../utils/catchError.js');
 
-const authRouter = Router();
+const userRouter = Router();
 
-authRouter.get('/', authController.activate);
+userRouter.get('/', authMiddleware, catchError(userController.getAllActivated));
 
-module.exports = { authRouter };
+module.exports = { userRouter };

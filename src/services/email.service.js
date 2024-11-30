@@ -33,6 +33,8 @@ const sendActivationEmail = async (email, token) => {
 };
 
 module.exports = {
-  sendActivationEmail,
-  send,
+  emailService: {
+    sendActivationEmail,
+    send,
+  },
 };
