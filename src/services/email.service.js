@@ -12,11 +12,27 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const info = transporter.sendMail({
-  to: 'sacoboj809@gitated.com', // list of receivers
-  subject: 'Hello ✔', // Subject line
-  text: 'Hello world?', // plain text body
-  html: '<b>Hello world?</b>', // html body
-});
+const send = ({ email, subject, html }) => {
+  return transporter.sendMail({
+    to: email,
+    subject,
+    html,
+  });
+};
 
-console.log('email is sent');
+const sendActivationEmail = async (email, token) => {
+  const href = `${process.env.CLIENT_HOST}/activation/${token}`;
+
+  const html = `
+    <h1>Activation email</h1>
+    <p>Please click the link below to activate your account:</p>
+    <a href="${href}">${href}</a>
+  `;
+
+  send({ email, subject: 'Activation email', html });
+};
+
+module.exports = {
+  sendActivationEmail,
+  send,
+};
