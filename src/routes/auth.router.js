@@ -13,4 +13,8 @@ authRouter.get(
 
 authRouter.post('/login', catchError(authController.login));
 
+authRouter.post('/refresh', catchError(authController.refresh));
+
+authRouter.post('/logout', catchError(authController.logout));
+
 module.exports = { authRouter };

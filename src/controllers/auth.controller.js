@@ -1,7 +1,11 @@
+const bcrypt = require('bcrypt');
+
 const { User } = require('../models/user.js');
+const { ApiError } = require('../exceptions/api.error.js');
+
 const { userService } = require('../services/user.service.js');
 const { jwtService } = require('../services/jwt.servece.js');
-const { ApiError } = require('../exceptions/api.error.js');
+const { tokenService } = require('../services/token.service.js');
 
 const validateEmail = (value) => {
   if (!value) {
@@ -37,7 +41,9 @@ const register = async (req, res) => {
     throw ApiError.badRequest('invalid credentials', errors);
   }
 
-  await userService.register({ name, email, password });
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await userService.register({ name, email, password: hashedPassword });
 
   res.send({ message: 'user created' });
 };
@@ -63,15 +69,44 @@ const login = async (req, res) => {
 
   const user = await userService.findByEmail(email);
 
-  if (!user || user.password !== password) {
-    res.sendStatus(401);
-
-    return;
+  if (!user) {
+    throw ApiError.badRequest('no such user');
   }
 
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('wrong password');
+  }
+
+  generateTokens(res, user);
+};
+
+const refresh = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const user = jwtService.verifyRefresh(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!user || !token) {
+    throw ApiError.unauthorized();
+  }
+
+  generateTokens(res, user);
+};
+
+const generateTokens = async (res, user) => {
   const normalizedUser = userService.normalize(user);
 
   const accessToken = jwtService.sign(normalizedUser);
+  const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  });
 
   res.send({
     user: normalizedUser,
@@ -79,10 +114,26 @@ const login = async (req, res) => {
   });
 };
 
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const userData = jwtService.verify(refreshToken);
+
+  if (!userData) {
+    throw ApiError.unauthorized();
+  }
+
+  await tokenService.remove(userData.id);
+
+  res.sendStatus(204);
+};
+
 module.exports = {
   authController: {
     register,
     activate,
     login,
+    refresh,
+    logout,
   },
 };
