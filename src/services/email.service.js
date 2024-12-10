@@ -34,7 +34,7 @@ export const emailService = {
     const href = `${process.env.CLIENT_HOST}/confirmation-email/${token}`;
     const subject = 'Confirmate';
     const html = `
-  <h1>Confirmate email</h1>
+  <h1>Confirm email</h1>
   <a href="${href}">${href}</a>
   `;
 

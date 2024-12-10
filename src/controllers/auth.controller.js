@@ -41,6 +41,25 @@ const activate = async (req, res) => {
   res.send({ message: 'OK' });
 };
 
+const generateTokens = async (res, user) => {
+  const normalizedUser = usersService.normalize(user);
+
+  const accessToken = jwtService.sign(normalizedUser);
+  const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 1000,
+    httpOnly: true,
+  });
+
+  res.send({
+    user: normalizedUser,
+    accessToken,
+  });
+};
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -119,8 +138,8 @@ const changePassword = async (req, res) => {
   }
 
   if (password !== confirmPassword) {
-    throw ApiError.badRequest('Passwords are differents', {
-      password: 'Passwords are differents',
+    throw ApiError.badRequest('Passwords are different', {
+      password: 'Passwords are different',
     });
   }
 
@@ -172,8 +191,8 @@ const updateUser = async (req, res) => {
     }
 
     if (newPassword !== confirmPassword || !isPasswordValid) {
-      throw ApiError.badRequest('Passwords are differents', {
-        password: 'Passwords are differents',
+      throw ApiError.badRequest('Passwords are different', {
+        password: 'Passwords are different',
       });
     }
 
@@ -276,25 +295,6 @@ const refresh = async (req, res) => {
   }
 
   generateTokens(res, user);
-};
-
-const generateTokens = async (res, user) => {
-  const normalizedUser = usersService.normalize(user);
-
-  const accessToken = jwtService.sign(normalizedUser);
-  const refreshToken = jwtService.signRefresh(normalizedUser);
-
-  await tokenService.save(normalizedUser.id, refreshToken);
-
-  res.cookie('refreshToken', refreshToken, {
-    maxAge: 30 * 24 * 60 * 1000,
-    httpOnly: true,
-  });
-
-  res.send({
-    user: normalizedUser,
-    accessToken,
-  });
 };
 
 const logout = async (req, res) => {
