@@ -33,7 +33,24 @@ const sendActivationEmail = (email, token) => {
   });
 };
 
+const sendResetPasswordEmail = (email, resetToken) => {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${resetToken}`; // Вставляємо токен у посилання для скидання пароля
+  const html = `
+  <h1>Reset your password</h1>
+  <p>If you requested a password reset, click the link below to reset your password:</p>
+  <a href="${href}">${href}</a>
+  <p>If you did not request a password reset, please ignore this email.</p>
+  `;
+
+  return send({
+    email,
+    html,
+    subject: 'Password Reset Instructions',
+  });
+};
+
 module.exports = {
   send,
   sendActivationEmail,
+  sendResetPasswordEmail,
 };

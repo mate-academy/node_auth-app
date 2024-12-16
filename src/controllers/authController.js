@@ -1,9 +1,11 @@
 const User = require('../models/user.js');
 const userService = require('../services/userService.js');
 const tokenService = require('../services/tokenService.js');
+const emailService = require('../services/emailService.js');
 const jwtService = require('../services/jwtService.js');
 const ApiError = require('../exeptions/apiError.js');
 const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
 
 const validateEmail = (value) => {
   if (!value) {
@@ -17,7 +19,7 @@ const validateEmail = (value) => {
   }
 };
 
-const validaPassword = (value) => {
+const validatePassword = (value) => {
   if (!value) {
     return 'Password is required';
   }
@@ -27,12 +29,30 @@ const validaPassword = (value) => {
   }
 };
 
+const generateTokens = async (res, user) => {
+  const normalizedUser = userService.normalize(user);
+  const accessToken = jwtService.sign(normalizedUser);
+  const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    HttpOnly: true,
+  });
+
+  res.send({
+    user: normalizedUser,
+    accessToken,
+  });
+};
+
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
     email: validateEmail(email),
-    password: validaPassword(password),
+    password: validatePassword(password),
   };
 
   if (errors.email || errors.password) {
@@ -70,7 +90,7 @@ const login = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
-  const isPasswordValid = bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
@@ -94,24 +114,6 @@ const refresh = async (req, res) => {
   generateTokens(res, user);
 };
 
-const generateTokens = async (res, user) => {
-  const normalizedUser = userService.normalize(user);
-  const accessToken = jwtService.sign(normalizedUser);
-  const refreshToken = jwtService.signRefresh(normalizedUser);
-
-  await tokenService.save(normalizedUser.id, refreshToken);
-
-  res.cookies('refreshToken', refreshToken, {
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    HttpOnly: true,
-  });
-
-  res.send({
-    user: normalizedUser,
-    accessToken,
-  });
-};
-
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
   const userData = await jwtService.verifyRefresh(refreshToken);
@@ -132,22 +134,27 @@ const sendResetPassword = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
-  generateTokens(res, user);
+  const resetToken = uuidv4();
+
+  user.resetToken = resetToken;
+  await user.save();
+
+  await emailService.sendResetPasswordEmail(email, resetToken);
+
+  res.sendStatus(200);
 };
 
 const resetPassword = async (req, res) => {
-  const { refreshToken } = req.cookies;
   const { resetToken } = req.params;
   const { password, email } = req.body;
-
-  if (refreshToken !== resetToken) {
-    throw ApiError.badRequest('Invalid or expired reset token');
-  }
-
   const user = await userService.findByEmail(email);
 
   if (!user) {
     throw ApiError.badRequest('No such user');
+  }
+
+  if (user.resetToken !== resetToken) {
+    throw ApiError.badRequest('Invalid or expired reset token');
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
@@ -161,6 +168,11 @@ const resetPassword = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await userService.updatePassword(user.id, hashedPassword);
+
+  user.resetToken = null;
+  await user.save();
+
+  res.sendStatus(200);
 };
 
 module.exports = {
@@ -168,7 +180,7 @@ module.exports = {
   activate,
   login,
   validateEmail,
-  validaPassword,
+  validatePassword,
   refresh,
   logout,
   sendResetPassword,

@@ -6,6 +6,8 @@ const errorMiddleware = (error, req, res, next) => {
       message: error.message,
       errors: error.errors,
     });
+
+    return;
   }
 
   res.statusCode = 500;
