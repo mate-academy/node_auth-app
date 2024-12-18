@@ -1,10 +1,7 @@
-const { DataTypes } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 
 const { User } = require('./user');
 const { sequelize } = require('../utils/db.js');
-const { getExpireTime } = require('../utils/getExpireTime.js');
-
-const MONTH_IN_MINUTES = 30 * 24 * 60;
 
 const Token = sequelize.define(
   'Token',
@@ -16,7 +13,7 @@ const Token = sequelize.define(
     expireAt: {
       type: DataTypes.DATE,
       allowNull: false,
-      defaultValue: getExpireTime(MONTH_IN_MINUTES),
+      defaultValue: Sequelize.literal(`NOW() + INTERVAL 30 DAYS`),
     },
   },
   {
