@@ -1,6 +1,6 @@
 'use strict';
 
-const { Sequelize, DataTypes, UUIDV4 } = require('sequelize');
+const { DataTypes, UUIDV4 } = require('sequelize');
 const yup = require('yup');
 
 const { email } = require('../utils/validation/email.js');
@@ -32,7 +32,6 @@ const User = sequelize.define(
     },
     resetToken: {
       type: DataTypes.STRING,
-      defaultValue: Sequelize.literal("NOW() + INTERVAL '30 MINUTES'"),
     },
   },
   {

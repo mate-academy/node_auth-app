@@ -14,7 +14,7 @@ const saveToken = async (userId, refreshToken) => {
   }
 
   token.refreshToken = refreshToken;
-  token.save();
+  await token.save();
 };
 
 const removeToken = async (refreshToken) => {

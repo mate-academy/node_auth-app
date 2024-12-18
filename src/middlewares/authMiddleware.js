@@ -12,7 +12,7 @@ module.exports = {
       req.cookies.token;
 
     if (!token) {
-      throw ApiError.unauthorized();
+      throw ApiError.unauthorized('Authorization token is missing');
     }
 
     const { email } = jwtServices.verify(token, process.env.JW_REFRESH_KEY);

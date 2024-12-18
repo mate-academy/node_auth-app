@@ -27,7 +27,7 @@ const authValidation = async (req, _, next) => {
   next();
 };
 
-const sighUp = async (req, res) => {
+const signUp = async (req, res) => {
   const user = !!(await usersServices.getUserByEmail(req.userData.email));
 
   if (user) {
@@ -118,7 +118,7 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
   authController: {
-    sighUp: asyncHandler(sighUp),
+    signUp: asyncHandler(signUp),
     authValidation: asyncHandler(authValidation),
     signIn: asyncHandler(signIn),
     logOut: asyncHandler(logOut),

@@ -40,6 +40,11 @@ const updateUser = async (req, res) => {
   }
 
   if (email) {
+    if (email === user.mail) {
+      throw ApiError.badRequest(
+        'The new email address must be different from the old one.',
+      );
+    }
     await emailSchema.validate({ email });
 
     sendEmailNotify(user.email, email);

@@ -24,7 +24,7 @@ const activate = async (activationToken) => {
 
   user.activationToken = null;
 
-  user.save();
+  await user.save();
 };
 
 const resetPassword = async (resetToken, password) => {

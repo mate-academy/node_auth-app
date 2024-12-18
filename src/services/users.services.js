@@ -25,14 +25,13 @@ const removeUser = async (id) => {
 };
 
 const updateUser = async (user, userData) => {
-  Object.entries(userData).forEach(async ([field, data]) => {
+  for (const [field, data] of Object.entries(userData)) {
     if (data && field === 'password') {
       user[field] = await hashPassword(data);
     } else if (data) {
       user[field] = data;
     }
-  });
-
+  }
   await user.save();
 
   const updatedUser = await getUsersById(user.id);

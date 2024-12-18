@@ -10,11 +10,11 @@ class ApiError extends Error {
   }
 
   static unauthorized(errors) {
-    return new ApiError(401, 'Unauthorized', errors);
+    return new ApiError('Unauthorized', 401, errors);
   }
 
   static notFound(errors) {
-    return new ApiError(404, 'Not Found', errors);
+    return new ApiError('Not Found', 404, errors);
   }
 }
 

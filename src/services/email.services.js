@@ -2,7 +2,7 @@ const configOptions = require('nodemailer').createTransport({
   service: 'gmail',
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
-  secure: false,
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
@@ -11,7 +11,7 @@ const configOptions = require('nodemailer').createTransport({
 
 const sendActivationLink = async (to, link) => {
   const transporter = await configOptions.sendMail({
-    from: 'ab3mn3@gmail.com',
+    from: process.env.SMTP_FROM,
     to: to,
     subject: 'Activation Link',
     text: 'You need to activate your account, check your email',
@@ -26,7 +26,7 @@ const sendActivationLink = async (to, link) => {
 
 const sendResetLink = async (to, link) => {
   const transporter = await configOptions.sendMail({
-    from: 'ab3mn3@gmail.com',
+    from: process.env.SMTP_FROM,
     to: to,
     subject: 'Reset Password',
     text: 'Reset Password',
@@ -41,7 +41,7 @@ const sendResetLink = async (to, link) => {
 
 const sendEmailNotify = async (to, newEmail) => {
   const transporter = await configOptions.sendMail({
-    from: 'ab3mn3@gmail.com',
+    from: process.env.SMTP_FROM,
     to: to,
     subject: 'New email',
     text: `Your email was changed to ${newEmail} `,

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { userDto } = require('../dto/user.dto');
+const { ApiError } = require('../exeptions/auth.error');
 
 const sign = (payload, key, expiresIn) => jwt.sign(payload, key, { expiresIn });
 
@@ -7,7 +8,7 @@ const verify = (payload, key) => {
   try {
     return jwt.verify(payload, key);
   } catch {
-    return null;
+    throw ApiError.unauthorized('The token is invalid');
   }
 };
 
