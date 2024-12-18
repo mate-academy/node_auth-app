@@ -1,4 +1,4 @@
-class AuthError extends Error {
+class ApiError extends Error {
   constructor(message, status, errors = {}) {
     super(message);
 
@@ -6,18 +6,18 @@ class AuthError extends Error {
   }
 
   static badRequest(message, errors) {
-    return new AuthError(message, 400, errors);
+    return new ApiError(message, 400, errors);
   }
 
   static unauthorized(errors) {
-    return new AuthError(401, 'Unauthorized', errors);
+    return new ApiError(401, 'Unauthorized', errors);
   }
 
   static notFound(errors) {
-    return new AuthError(404, 'Not Found', errors);
+    return new ApiError(404, 'Not Found', errors);
   }
 }
 
 module.exports = {
-  AuthError,
+  ApiError,
 };

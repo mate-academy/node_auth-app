@@ -1,8 +1,9 @@
 module.exports = {
-  userDto: ({ id, email, createdAt, updatedAt }) => ({
+  userDto: ({ id, email, createdAt, updatedAt, name }) => ({
     id,
     email,
     createdAt,
     updatedAt,
+    name,
   }),
 };

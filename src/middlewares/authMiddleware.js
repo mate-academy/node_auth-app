@@ -1,4 +1,4 @@
-const { AuthError } = require('../exeptions/auth.error');
+const { ApiError } = require('../exeptions/auth.error');
 const { jwtServices } = require('../services/jwt.services');
 const { usersServices } = require('../services/users.services');
 
@@ -12,7 +12,7 @@ module.exports = {
       req.cookies.token;
 
     if (!token) {
-      throw AuthError.unauthorized();
+      throw ApiError.unauthorized();
     }
 
     const { email } = jwtServices.verify(token, process.env.JW_REFRESH_KEY);
@@ -20,7 +20,7 @@ module.exports = {
     const user = await usersServices.getUserByEmail(email);
 
     if (!user) {
-      throw AuthError.badRequest('Bad token');
+      throw ApiError.badRequest('Bad token');
     }
 
     req.refreshToken = token;

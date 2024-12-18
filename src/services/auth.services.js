@@ -1,4 +1,4 @@
-const { AuthError } = require('../exeptions/auth.error');
+const { ApiError } = require('../exeptions/auth.error');
 const { User } = require('../models/user');
 const { hashPassword } = require('../utils/password/hashPassword');
 const { randomUUID } = require('crypto');
@@ -19,7 +19,7 @@ const activate = async (activationToken) => {
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
-    throw AuthError.badRequest('Bad activation link');
+    throw ApiError.badRequest('Bad activation link');
   }
 
   user.activationToken = null;
@@ -31,7 +31,7 @@ const resetPassword = async (resetToken, password) => {
   const user = await User.findOne({ where: { resetToken } });
 
   if (!user) {
-    throw AuthError.badRequest('Bad reset password link');
+    throw ApiError.badRequest('Bad reset password link');
   }
 
   const hashedPassword = await hashPassword(password);

@@ -1,5 +1,6 @@
 // const { ApiError } = require('../exceptions/ApiError');
 const { User } = require('../models/user');
+const { hashPassword } = require('../utils/password/hashPassword');
 
 const getUsers = async () => {
   const users = await User.findAll();
@@ -13,7 +14,7 @@ const getUserByEmail = async (email) => {
   return user;
 };
 
-const getUsersByID = async (id) => {
+const getUsersById = async (id) => {
   const user = await User.findOne({ where: { id } });
 
   return user;
@@ -23,11 +24,28 @@ const removeUser = async (id) => {
   await User.destroy({ where: { id } });
 };
 
+const updateUser = async (user, userData) => {
+  Object.entries(userData).forEach(async ([field, data]) => {
+    if (data && field === 'password') {
+      user[field] = await hashPassword(data);
+    } else if (data) {
+      user[field] = data;
+    }
+  });
+
+  await user.save();
+
+  const updatedUser = await getUsersById(user.id);
+
+  return updatedUser;
+};
+
 module.exports = {
   usersServices: {
     getUsers,
-    getUsersByID,
+    getUsersById,
     removeUser,
     getUserByEmail,
+    updateUser,
   },
 };

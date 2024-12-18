@@ -21,4 +21,7 @@ const password = yup
 
 module.exports = {
   password,
+  passwordSchema: yup.object().shape({
+    password,
+  }),
 };

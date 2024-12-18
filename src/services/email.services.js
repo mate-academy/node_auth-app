@@ -10,7 +10,7 @@ const configOptions = require('nodemailer').createTransport({
 });
 
 const sendActivationLink = async (to, link) => {
-  const activationLink = await configOptions.sendMail({
+  const transporter = await configOptions.sendMail({
     from: 'ab3mn3@gmail.com',
     to: to,
     subject: 'Activation Link',
@@ -21,11 +21,11 @@ const sendActivationLink = async (to, link) => {
       </div>`,
   });
 
-  return activationLink;
+  return transporter;
 };
 
 const sendResetLink = async (to, link) => {
-  const activationLink = await configOptions.sendMail({
+  const transporter = await configOptions.sendMail({
     from: 'ab3mn3@gmail.com',
     to: to,
     subject: 'Reset Password',
@@ -36,10 +36,22 @@ const sendResetLink = async (to, link) => {
       </div>`,
   });
 
-  return activationLink;
+  return transporter;
+};
+
+const sendEmailNotify = async (to, newEmail) => {
+  const transporter = await configOptions.sendMail({
+    from: 'ab3mn3@gmail.com',
+    to: to,
+    subject: 'New email',
+    text: `Your email was changed to ${newEmail} `,
+  });
+
+  return transporter;
 };
 
 module.exports = {
   sendActivationLink,
   sendResetLink,
+  sendEmailNotify,
 };

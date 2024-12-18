@@ -9,7 +9,7 @@ const {
   sendResetLink,
 } = require('../services/email.services');
 
-const { AuthError } = require('../exeptions/auth.error');
+const { ApiError } = require('../exeptions/auth.error');
 
 const { checkPassword } = require('../utils/password/checkPassword');
 const { asyncHandler } = require('../utils/asyncHandler');
@@ -20,7 +20,7 @@ const authValidation = async (req, _, next) => {
   try {
     await userSchema.validate({ email, password });
   } catch (e) {
-    throw AuthError.badRequest(e.message);
+    throw ApiError.badRequest(e.message);
   }
 
   req.userData = { email, password };
@@ -31,7 +31,7 @@ const sighUp = async (req, res) => {
   const user = !!(await usersServices.getUserByEmail(req.userData.email));
 
   if (user) {
-    throw AuthError.badRequest('User already exists');
+    throw ApiError.badRequest('User already exists');
   }
 
   const { email, activationToken } = await authServices.signUp(req.userData);
@@ -49,15 +49,15 @@ const signIn = async (req, res) => {
   const user = await usersServices.getUserByEmail(email);
 
   if (!user) {
-    throw AuthError.badRequest('No such user');
+    throw ApiError.badRequest('No such user');
   }
 
   if (user.activationToken) {
-    throw AuthError.badRequest('Need to activate an account, check your email');
+    throw ApiError.badRequest('Need to activate an account, check your email');
   }
 
   if (!(await checkPassword(password, user.password))) {
-    throw AuthError.badRequest('Password is wrong');
+    throw ApiError.badRequest('Password is wrong');
   }
 
   const userWithToken = await jwtServices.getUserWithToken(res, user);
@@ -91,7 +91,7 @@ const getResetLink = async (req, res) => {
   const user = await usersServices.getUserByEmail(email);
 
   if (!user) {
-    throw AuthError.badRequest('There is no user with the following email');
+    throw ApiError.badRequest('There is no user with the following email');
   }
 
   const resetToken = await authServices.getResetToken(user, email);
@@ -108,7 +108,7 @@ const resetPassword = async (req, res) => {
   const { password, confirmPassword } = req.body;
 
   if (password !== confirmPassword) {
-    throw AuthError.badRequest('Passwords must match');
+    throw ApiError.badRequest('Passwords must match');
   }
 
   await authServices.resetPassword(resetToken, password);

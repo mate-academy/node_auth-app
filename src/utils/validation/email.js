@@ -7,4 +7,7 @@ const email = yup
 
 module.exports = {
   email,
+  emailSchema: yup.object().shape({
+    email,
+  }),
 };
