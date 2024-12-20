@@ -28,7 +28,9 @@
     "projectType": "javascript"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -37,7 +39,7 @@
     "passport": "^0.7.0",
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.5"
-  },
-  "type": "module"
+    "sequelize": "^6.37.5",
+    "uuid": "^11.0.3"
+  }
 }

@@ -1,11 +1,18 @@
-import express from 'express';
-import { authController } from '../controllers/auth.controller.js';
+const express = require('express');
+const authController = require('../controllers/auth.controller.js');
+const catchError = require('../utils/catchError.js');
 
-export const authRouter = new express.Router();
+const authRouter = new express.Router();
 
-router.post('/register', authController.register);
-router.post('/login', authController.login);
-router.get('/activate/:token', authController.activate);
-router.post('/password-reset', authController.requestPasswordReset);
+authRouter.post('/registration', catchError(authController.register));
 
+authRouter.get(
+  '/activation/:activationToken',
+  catchError(authController.activate),
+);
+authRouter.post('/login', catchError(authController.login));
+authRouter.get('/refresh', catchError(authController.refresh));
+authRouter.post('/logout', catchError(authController.logout));
+authRouter.get('/password-reset', catchError(authController.passwordReset));
 
+module.exports = { authRouter };
