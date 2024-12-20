@@ -35,12 +35,20 @@ const updateUser = async (req, res) => {
     );
   }
 
+  if (newPassword && confirmedPassword) {
+    if (newPassword !== confirmedPassword) {
+      throw ApiError.badRequest(
+        'New password and confirmed password must match.',
+      );
+    }
+  }
+
   if (name) {
     await nameSchema.validate({ name });
   }
 
   if (email) {
-    if (email === user.mail) {
+    if (email === user.email) {
       throw ApiError.badRequest(
         'The new email address must be different from the old one.',
       );

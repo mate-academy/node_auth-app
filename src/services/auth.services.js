@@ -42,7 +42,7 @@ const resetPassword = async (resetToken, password) => {
   await user.save();
 };
 
-const getResetToken = async (user, email) => {
+const getResetToken = async (user) => {
   const resetToken = randomUUID();
 
   user.resetToken = resetToken;

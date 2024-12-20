@@ -14,7 +14,7 @@ const getUserByEmail = async (email) => {
   return user;
 };
 
-const getUsersById = async (id) => {
+const getUserById = async (id) => {
   const user = await User.findOne({ where: { id } });
 
   return user;
@@ -34,7 +34,7 @@ const updateUser = async (user, userData) => {
   }
   await user.save();
 
-  const updatedUser = await getUsersById(user.id);
+  const updatedUser = await getUserById(user.id);
 
   return updatedUser;
 };
@@ -42,7 +42,7 @@ const updateUser = async (user, userData) => {
 module.exports = {
   usersServices: {
     getUsers,
-    getUsersById,
+    getUserById,
     removeUser,
     getUserByEmail,
     updateUser,

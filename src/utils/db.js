@@ -1,7 +1,4 @@
 const { Sequelize } = require('sequelize');
-const utils = require('util');
-
-global.TextEncoder = utils.TextEncoder;
 
 const sequelize = new Sequelize({
   database: process.env.POSTGRES_DB,

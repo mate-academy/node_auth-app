@@ -40,7 +40,7 @@ const User = sequelize.define(
 module.exports = {
   User,
   userSchema: yup.object().shape({
-    email,
-    password,
+    email: email.required('Email is required'),
+    password: password.required('Password is required'),
   }),
 };

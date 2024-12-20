@@ -10,10 +10,13 @@ const saveToken = async (userId, refreshToken) => {
   const token = await getToken(userId);
 
   if (!token) {
-    return Token.create({ userId, refreshToken });
+    const expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    return Token.create({ userId, refreshToken, expireAt });
   }
 
   token.refreshToken = refreshToken;
+  token.expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   await token.save();
 };
 

@@ -4,11 +4,17 @@ const { ApiError } = require('../exeptions/auth.error');
 
 const sign = (payload, key, expiresIn) => jwt.sign(payload, key, { expiresIn });
 
-const verify = (payload, key) => {
+const verify = (token, key) => {
   try {
-    return jwt.verify(payload, key);
-  } catch {
-    throw ApiError.unauthorized('The token is invalid');
+    return jwt.verify(token, key);
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      throw ApiError.unauthorized('The token has expired');
+    } else if (error.name === 'JsonWebTokenError') {
+      throw ApiError.unauthorized('The token is invalid');
+    } else {
+      throw ApiError.unauthorized('Token verification failed');
+    }
   }
 };
 
@@ -22,7 +28,7 @@ const getUserWithToken = async (res, user) => {
   const accessToken = generateAccessToken({ email: user.email });
   const refreshToken = generateRefreshToken({ email: user.email });
 
-  res.cookie('token', refreshToken, {
+  res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: true,

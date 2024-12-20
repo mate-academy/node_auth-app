@@ -22,6 +22,15 @@ const Token = sequelize.define(
   },
 );
 
+Token.beforeCreate((token) => {
+  if (!token.expireAt) {
+    token.expireAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  }
+});
+
+Token.belongsTo(User, { foreignKey: 'userId' });
+User.hasOne(Token, { foreignKey: 'userId' });
+
 Token.belongsTo(User, { foreignKey: 'userId' });
 User.hasOne(Token, { foreignKey: 'userId' });
 

@@ -12,8 +12,8 @@ function createServer() {
   /* CORS  */
   const options = {
     origin: true,
-    methods: 'GET, POST, PUT, DELETE , PATCH',
-    allowedHeaders: 'Content-Type',
+    methods: 'GET, POST, PUT, DELETE, PATCH',
+    allowedHeaders: 'Content-Type, Authorization, X-Requested-With, Accept',
     credentials: true,
   };
 

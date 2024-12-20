@@ -1,4 +1,4 @@
-const configOptions = require('nodemailer').createTransport({
+const createTransport = require('nodemailer').createTransport({
   service: 'gmail',
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
@@ -10,7 +10,7 @@ const configOptions = require('nodemailer').createTransport({
 });
 
 const sendActivationLink = async (to, link) => {
-  const transporter = await configOptions.sendMail({
+  const transporter = await createTransport.sendMail({
     from: process.env.SMTP_FROM,
     to: to,
     subject: 'Activation Link',
@@ -25,7 +25,7 @@ const sendActivationLink = async (to, link) => {
 };
 
 const sendResetLink = async (to, link) => {
-  const transporter = await configOptions.sendMail({
+  const transporter = await createTransport.sendMail({
     from: process.env.SMTP_FROM,
     to: to,
     subject: 'Reset Password',
@@ -40,7 +40,7 @@ const sendResetLink = async (to, link) => {
 };
 
 const sendEmailNotify = async (to, newEmail) => {
-  const transporter = await configOptions.sendMail({
+  const transporter = await createTransport.sendMail({
     from: process.env.SMTP_FROM,
     to: to,
     subject: 'New email',

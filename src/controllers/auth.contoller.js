@@ -68,7 +68,11 @@ const signIn = async (req, res) => {
 };
 
 const logOut = async (req, res) => {
-  const { refreshToken } = req;
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    throw ApiError.badRequest('No refresh token found in cookies');
+  }
 
   res.clearCookie('refreshToken');
 
@@ -118,9 +122,8 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
   authController: {
-    signUp: asyncHandler(signUp),
-    authValidation: asyncHandler(authValidation),
-    signIn: asyncHandler(signIn),
+    signUp: asyncHandler(authValidation(signUp)),
+    signIn: asyncHandler(authValidation(signIn)),
     logOut: asyncHandler(logOut),
     activate: asyncHandler(activate),
     getResetLink: asyncHandler(getResetLink),
