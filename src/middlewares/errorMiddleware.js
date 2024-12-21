@@ -13,6 +13,8 @@ const errorMiddleware = (error, req, res, next) => {
   res.send({
     message: 'Server error',
   });
+
+  next();
 };
 
 module.exports = errorMiddleware;

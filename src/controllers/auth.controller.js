@@ -1,4 +1,4 @@
-const { User } = require("../models/user");
+const { User } = require("../models/user.js");
 const userService = require('../services/user.service.js');
 const jwtService = require('../services/jwt.service.js');
 const ApiError = require("../exeptions/api.error");
@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const tokenService = require('../services/token.service.js');
 const sendResetEmail = require('../services/resetEmail.services.js');
 const { Token } = require("../models/token");
-const { user } = require("../../src copy/models/user");
+// const { user } = require("../../src copy/models/user");
 
 function validateEmail(value) {
   if (!value) {

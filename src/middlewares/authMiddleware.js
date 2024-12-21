@@ -18,6 +18,8 @@ const authMiddleware = (req, res) => {
     return;
   }
 
+  req.user = userData;
+
   next();
 };
 
