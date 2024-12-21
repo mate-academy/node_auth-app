@@ -17,4 +17,6 @@ const errorMiddleware = (error, req, res, next) => {
   next();
 };
 
-module.exports = errorMiddleware;
+module.exports = {
+  errorMiddleware,
+};
