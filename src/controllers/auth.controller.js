@@ -4,9 +4,9 @@ const jwtService = require('../services/jwt.service.js');
 const ApiError = require("../exeptions/api.error");
 const bcrypt = require('bcrypt');
 const tokenService = require('../services/token.service.js');
-const emailService = require('../services/email.service.js');
 const sendResetEmail = require('../services/resetEmail.services.js');
 const { Token } = require("../models/token");
+const { user } = require("../../src copy/models/user");
 
 function validateEmail(value) {
   if (!value) {
@@ -79,7 +79,7 @@ const login = async (req, res) => {
 
 }
 
-const refresh = (req, res) => {
+const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
   const userData = jwtService.verifyRefresh(refreshToken);
@@ -87,7 +87,6 @@ const refresh = (req, res) => {
 
   if (!userData || !token) {
     throw ApiError.unauthorized();
-    return;
   }
 
   const user = await userService.findByEmail(userData.email)
@@ -101,7 +100,6 @@ const logout = async (req, res) => {
 
   if (!userData || !refreshToken) {
     throw ApiError.unauthorized();
-    return;
   }
 
   await tokenService.remove(userData.id);
@@ -118,9 +116,33 @@ const passwordReset = async (req, res) => {
     throw ApiError.unauthorized('User with that email does not exist');
   }
 
-  const resetToken = jwtService.sign(user);
-  await emailService.sendResetEmail(user.email, resetToken);
+  const resetToken = jwtService.sign(userService.normalize(user));
+  await Token.save(user.id, resetToken);
+  await sendResetEmail.sendResetEmail(user.email, resetToken);
 
+  res.send({ message: 'Password reset link sent to your email' });
+
+
+}
+
+const resetPassword = async (req, res) => {
+  const { token, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const userData = jwtService.verify(token);
+  if (!userData) {
+    throw ApiError.badRequest('Invalid or expired token');
+  }
+
+  const hashedPass = await bcrypt.hash(password, 10)
+  user.password = hashedPass;
+
+  await user.save();
+
+  res.send({ message: 'Password successfully reset' });
 
 }
 
@@ -149,6 +171,8 @@ module.exports = {
   login,
   refresh,
   generateToken,
-  logout
+  logout,
+  passwordReset,
+  resetPassword
 
 }

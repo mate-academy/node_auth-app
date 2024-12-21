@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { User } = require('./user');
-const { client } = require('../utils/db.js');
+const { client } = require('../utils/db');
 
 const Token = client.define('token', {
   refreshToken: {

@@ -11,9 +11,11 @@ const client = new Sequelize({
   dialect: 'postgres',
 });
 
+console.log(client instanceof Sequelize);
+
 async function checkConnection() {
   try {
-    await client.authenticate(); // перевірка з'єднання з базою даних
+    await client.authenticate();
     console.log('Connection has been established successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
@@ -22,4 +24,6 @@ async function checkConnection() {
 
 checkConnection();
 
-module.exports = client;
+module.exports = {
+  client,
+};
