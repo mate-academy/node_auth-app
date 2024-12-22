@@ -39,7 +39,7 @@ const register = async (req, res, next) => {
   };
 
   if (errors.email || errors.password) {
-    throw ApiError.badRequest('Bad request', errors);
+    return next(ApiError.badRequest('Bad request', errors));
   }
 
   const hashedPass = await bcrypt.hash(password, 10);
@@ -65,7 +65,7 @@ const activate = async (req, res) => {
   res.send(user);
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   const user = await userService.findByEmail(email);
@@ -77,20 +77,20 @@ const login = async (req, res) => {
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw ApiError.badRequest('Invalid email or password');
+    return next(ApiError.badRequest('Invalid email or password'));
   }
 
   await generateToken(res, user);
 };
 
-const refresh = async (req, res) => {
+const refresh = async (req, res, next) => {
   const { refreshToken } = req.cookies;
 
   const userData = jwtService.verifyRefresh(refreshToken);
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
-    throw ApiError.unauthorized();
+    return next(ApiError.unauthorized());
   }
 
   const user = await userService.findByEmail(userData.email);
@@ -98,12 +98,12 @@ const refresh = async (req, res) => {
   await generateToken(res, user);
 };
 
-const logout = async (req, res) => {
+const logout = async (req, res, next) => {
   const { refreshToken } = req.cookies;
   const userData = await jwtService.verifyRefresh(refreshToken);
 
   if (!userData || !refreshToken) {
-    throw ApiError.unauthorized();
+    return next(ApiError.unauthorized());
   }
 
   await tokenService.remove(userData.id);
@@ -111,12 +111,12 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
-const passwordReset = async (req, res) => {
+const passwordReset = async (req, res, next) => {
   const { email } = req.body;
   const user = await userService.findByEmail(email);
 
   if (!user) {
-    throw ApiError.unauthorized('User with that email does not exist');
+    return next(ApiError.unauthorized('User with that email does not exist'));
   }
 
   const resetToken = jwtService.sign(userService.normalize(user));
@@ -127,11 +127,11 @@ const passwordReset = async (req, res) => {
   res.send({ message: 'Password reset link sent to your email' });
 };
 
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
   const { token, password, confirmPassword } = req.body;
 
   if (password !== confirmPassword) {
-    throw ApiError.badRequest('Passwords do not match');
+    return next(ApiError.badRequest('Passwords do not match'));
   }
 
   const userData = jwtService.verify(token);
@@ -143,7 +143,7 @@ const resetPassword = async (req, res) => {
   const user = await User.findByPk(userData.id);
 
   if (!user) {
-    throw ApiError.badRequest('User not found');
+    return next(ApiError.badRequest('User not found'));
   }
 
   const hashedPass = await bcrypt.hash(password, 10);
@@ -155,7 +155,7 @@ const resetPassword = async (req, res) => {
   res.send({ message: 'Password successfully reset' });
 };
 
-const updateProfile = async (req, res) => {
+const updateProfile = async (req, res, next) => {
   const {
     name,
     oldPassword,
@@ -169,12 +169,14 @@ const updateProfile = async (req, res) => {
   const user = await User.findByPk(userId);
 
   if (!user) {
-    throw ApiError.notFound('User not found');
+    return next(ApiError.notFound('User not found'));
   }
 
   if (name) {
     if (name.trim().length < 2) {
-      throw ApiError.badRequest('Name should be at least 2 characters long');
+      return next(
+        ApiError.badRequest('Name should be at least 2 characters long'),
+      );
     }
 
     user.name = name.trim();
@@ -182,17 +184,19 @@ const updateProfile = async (req, res) => {
 
   if (newPassword) {
     if (!oldPassword) {
-      throw ApiError.badRequest('Old password is required');
+      return next(ApiError.badRequest('Old password is required'));
     }
 
     if (newPassword !== confirmPassword) {
-      throw ApiError.badRequest('New password and confirmation do not match');
+      return next(
+        ApiError.badRequest('New password and confirmation do not match'),
+      );
     }
 
     const isValidPassword = await bcrypt.compare(oldPassword, user.password);
 
     if (!isValidPassword) {
-      throw ApiError.badRequest('Invalid old password');
+      return next(ApiError.badRequest('Invalid old password'));
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -202,29 +206,33 @@ const updateProfile = async (req, res) => {
 
   if (newEmail) {
     if (newEmail !== confirmEmail) {
-      throw ApiError.badRequest('New email and confirmation do not match');
+      return next(
+        ApiError.badRequest('New email and confirmation do not match'),
+      );
     }
 
     if (!oldPassword) {
-      throw ApiError.badRequest('Old password is required for email change');
+      return next(
+        ApiError.badRequest('Old password is required for email change'),
+      );
     }
 
     const isValidPassword = await bcrypt.compare(oldPassword, user.password);
 
     if (!isValidPassword) {
-      throw ApiError.badRequest('Invalid old password for email change');
+      return next(ApiError.badRequest('Invalid old password for email change'));
     }
 
     const emailError = validateEmail(newEmail);
 
     if (emailError) {
-      throw ApiError.badRequest('Invalid email', { email: emailError });
+      return next(ApiError.badRequest('Invalid email', { email: emailError }));
     }
 
     const existingUser = await userService.findByEmail(newEmail);
 
     if (existingUser) {
-      throw ApiError.badRequest('Email already in use');
+      return next(ApiError.badRequest('Email already in use'));
     }
 
     const oldEmail = user.email;
