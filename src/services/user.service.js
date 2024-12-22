@@ -1,6 +1,6 @@
 const ApiError = require('../exeptions/api.error.js');
 const { User } = require('../models/user.js');
-const { v4, uuidv4 } = require('uuid');
+const { uuidv4 } = require('uuid');
 const emailService = require('../services/email.service');
 
 function getAllActivated() {

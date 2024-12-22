@@ -19,5 +19,4 @@ app.use(authRouter);
 app.use('/users', userRouter);
 app.use(errorMiddleware);
 
-
 module.exports = app;
