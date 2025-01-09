@@ -22,7 +22,7 @@ function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_URL}/activate/${token}`;
   const html = `
     <h1>Activate account</h1>
-    <a href=${href}>${href}</a>
+    <a href="${href}">${href}</a>
   `;
 
   return send({

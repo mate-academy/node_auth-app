@@ -8,10 +8,11 @@ export function errorMiddleware(error, req, res, next) {
       message: error.message,
       errors: error.errors,
     });
+
+    return;
   }
 
   console.log(error);
 
-  res.statusCode = 500;
-  res.send({ message: 'Server error' });
+  res.status(500).send({ message: 'Server error' });
 }

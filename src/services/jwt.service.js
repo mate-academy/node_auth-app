@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 
-const sing = (user) => {
+const sign = (user) => {
   const token = jwt.sign(user, process.env.JWT_KEY, {
-    expiresIn: '5s',
+    expiresIn: '15m',
   });
 
   return token;
@@ -31,7 +31,7 @@ const verifyRefresh = (token) => {
 };
 
 export const jwtService = {
-  sing,
+  sign,
   verify,
   signRefresh,
   verifyRefresh,

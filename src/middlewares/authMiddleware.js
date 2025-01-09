@@ -10,13 +10,17 @@ export const authMiddleware = (req, res, next) => {
     return;
   }
 
-  const userData = jwtService.verify(token);
+  try {
+    const userData = jwtService.verify(token);
 
-  if (!userData) {
+    if (!userData) {
+      res.sendStatus(401);
+
+      return;
+    }
+
+    next();
+  } catch (error) {
     res.sendStatus(401);
-
-    return;
   }
-
-  next();
 };

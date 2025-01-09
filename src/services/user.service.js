@@ -25,7 +25,7 @@ async function register(email, password) {
   const existUser = await findByEmail(email);
 
   if (existUser) {
-    throw ApiError.BadRequest('User already exists', {
+    throw ApiError.badRequest('User already exists', {
       email: 'User already exists',
     });
   }
