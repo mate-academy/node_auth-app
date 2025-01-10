@@ -15,7 +15,11 @@ async function activate(req, res) {
 
   const user = await AuthService.activate(activationToken);
 
-  res.send(user);
+  if (!user) {
+    return res.status(400).send({ message: 'Invalid activation token' });
+  }
+
+  res.redirect('/profile');
 }
 
 async function logIn(req, res) {
@@ -23,13 +27,15 @@ async function logIn(req, res) {
 
   const data = await AuthService.logIn(email, password);
 
+  if (!data.user.isActive) {
+    return res
+      .status(403)
+      .send({ message: 'Please activate your email to log in' });
+  }
+
   res.cookie('refreshToken', data.refreshToken);
 
-  res.send({
-    user: data.user,
-    accessToken: data.accessToken,
-    refreshToken: data.refreshToken,
-  });
+  res.redirect('/profile');
 }
 
 async function refresh(req, res) {
@@ -53,7 +59,11 @@ async function logOut(req, res) {
 }
 
 async function resetPassword(req, res) {
-  const { email, password } = req.body;
+  const { email, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.status(400).send({ message: 'Passwords do not match' });
+  }
 
   await AuthService.refreshPassword(email, password);
 

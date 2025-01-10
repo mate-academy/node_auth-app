@@ -5,7 +5,6 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const UsersRouter = require('./components/routes/users.routes');
 const AuthRouter = require('./components/routes/auth.routes');
@@ -20,12 +19,14 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: '/auth/google/callback',
     },
-    async (email, password, done) => {
+    async (accessToken, refreshToken, profile, done) => {
       try {
-        const user = await UsersService.getOneByEmail(email);
+        const email = profile.emails[0].value;
 
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-          return done(null, false, { message: 'Invalid email or password' });
+        let user = await UsersService.getOneByEmail(email);
+
+        if (!user) {
+          user = await UsersService.save(email, null, null);
         }
 
         return done(null, user);
@@ -35,6 +36,20 @@ passport.use(
     },
   ),
 );
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await UsersService.getOne(id);
+
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});
 
 function createServer() {
   const app = express();

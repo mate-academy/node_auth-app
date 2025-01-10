@@ -1,7 +1,6 @@
 'use strict';
 
 const { hash } = require('bcrypt');
-
 const UsersRepository = require('./users.repository');
 
 const hashPassword = (password) => {
@@ -33,7 +32,13 @@ const getOne = (id) => {
 const findOneByActivationToken = async (activationToken) => {
   const user = await UsersRepository.findOneByActivationToken(activationToken);
 
+  if (!user) {
+    throw new Error('User not found');
+  }
+
   user.activationToken = null;
+
+  await user.save();
 
   return user;
 };

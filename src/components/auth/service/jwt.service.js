@@ -1,7 +1,6 @@
 'use strict';
 
 const jwt = require('jsonwebtoken');
-
 const config = require('../config/config');
 
 function generateAccessToken(user) {
@@ -16,7 +15,7 @@ function validateAccessToken(token) {
   try {
     return jwt.verify(token, config.jwtAccessSecret);
   } catch (error) {
-    return error;
+    return null;
   }
 }
 
@@ -24,7 +23,7 @@ function validateRefreshToken(token) {
   try {
     return jwt.verify(token, config.jwtRefreshSecret);
   } catch (error) {
-    return error;
+    return null;
   }
 }
 

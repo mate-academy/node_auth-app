@@ -2,11 +2,11 @@
 
 const ApplicationErrors = require('../../exceptions/application.errors');
 
-function errorMiddleware(error, req, res) {
+function errorMiddleware(error, req, res, next) {
   if (error instanceof ApplicationErrors) {
     const { status, message, errors } = error;
 
-    res.status(status).send({
+    return res.status(status).send({
       message,
       errors,
     });

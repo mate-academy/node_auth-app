@@ -7,22 +7,24 @@ function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'];
 
   if (!authHeader) {
-    throw ApplicationErrors.Unauthorized();
+    return next(ApplicationErrors.Unauthorized());
   }
 
   const [, accessToken] = authHeader.split(' ');
 
   if (!accessToken) {
-    throw ApplicationErrors.Unauthorized();
+    return next(ApplicationErrors.Unauthorized());
   }
 
   const userData = JwtService.validateAccessToken(accessToken);
 
   if (!userData) {
-    throw ApplicationErrors.Unauthorized();
+    return next(ApplicationErrors.Unauthorized());
   }
 
-  next(req.user);
+  req.user = userData;
+
+  next();
 }
 
 module.exports = authMiddleware;

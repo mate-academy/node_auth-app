@@ -12,26 +12,28 @@ const ApplicationErrors = require('../../exceptions/application.errors');
 
 const validateEmail = (email) => {
   if (!email) {
-    throw ApplicationErrors.BadRequest('Email should be added');
+    return 'Email should be added';
   }
 
   const emailPattern = /^[\w.-]+@[\w.-]+\.\w+$/;
 
   if (!emailPattern.test(email)) {
-    throw ApplicationErrors.BadRequest('Email should be valid');
+    return 'Email should be valid';
   }
+
+  return null;
 };
 
 const validatePassword = (password) => {
   if (!password) {
-    throw ApplicationErrors.BadRequest('Password is required');
+    return 'Password is required';
   }
 
   if (password.length < 8) {
-    throw ApplicationErrors.BadRequest(
-      'The password length should not be less than 8 characters',
-    );
+    return 'The password length should not be less than 8 characters';
   }
+
+  return null;
 };
 
 const register = async (email, password) => {
@@ -40,8 +42,19 @@ const register = async (email, password) => {
     password: validatePassword(password),
   };
 
-  if (errors.email || errors.password) {
-    throw ApplicationErrors.BadRequest('Validation error', errors);
+  const validationErrors = Object.entries(errors).reduce(
+    (acc, [key, value]) => {
+      if (value) {
+        acc[key] = value;
+      }
+
+      return acc;
+    },
+    {},
+  );
+
+  if (Object.keys(validationErrors).length > 0) {
+    throw ApplicationErrors.BadRequest('Validation error', validationErrors);
   }
 
   const existUser = await UsersService.getOneByEmail(email);
@@ -72,6 +85,7 @@ const activate = async (activationToken) => {
     throw ApplicationErrors.NotFound();
   }
 
+  user.isActive = true;
   await user.save();
 
   return user;
@@ -79,6 +93,12 @@ const activate = async (activationToken) => {
 
 const logIn = async (email, password) => {
   const user = await UsersService.getOneByEmail(email);
+
+  if (!user || !user.isActive) {
+    throw ApplicationErrors.BadRequest(
+      'User is not active. Please activate your email.',
+    );
+  }
 
   if (
     !user.dataValues ||
@@ -147,8 +167,19 @@ const refreshPassword = async (email, password) => {
     password: validatePassword(password),
   };
 
-  if (errors.email || errors.password) {
-    throw ApplicationErrors.BadRequest('Validation error', errors);
+  const validationErrors = Object.entries(errors).reduce(
+    (acc, [key, value]) => {
+      if (value) {
+        acc[key] = value;
+      }
+
+      return acc;
+    },
+    {},
+  );
+
+  if (Object.keys(validationErrors).length > 0) {
+    throw ApplicationErrors.BadRequest('Validation error', validationErrors);
   }
 
   const user = await UsersService.getOneByEmail(email);

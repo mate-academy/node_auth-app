@@ -9,11 +9,11 @@ const catchError = require('../../utils/catch-error');
 const AuthRouter = express.Router();
 
 AuthRouter.post('/register', catchError(AuthController.register));
-AuthRouter.post('/activate', AuthController.activate);
+AuthRouter.post('/activate', catchError(AuthController.activate));
 AuthRouter.post('/login', catchError(AuthController.logIn));
-AuthRouter.post('/refresh', AuthController.refresh);
-AuthRouter.delete('/logout', AuthController.logOut);
-AuthRouter.patch('/reset-password', AuthController.resetPassword);
+AuthRouter.post('/refresh', catchError(AuthController.refresh));
+AuthRouter.delete('/logout', catchError(AuthController.logOut));
+AuthRouter.patch('/reset-password', catchError(AuthController.resetPassword));
 
 AuthRouter.get(
   '/auth/google',
