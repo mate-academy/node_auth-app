@@ -1,7 +1,7 @@
 import express from 'express';
-import { authController } from './conrollers/auth.controller';
-import { profileController } from './conrollers/profile.controller';
-import { authenticateUser } from './midlleware/authenticateUser';
+import { authController } from './controller/auth.controller';
+import { profileController } from './controller/profile.controller';
+import { authenticateUser } from './middleware/authenticateUser';
 
 const authRouter = new express.Router();
 

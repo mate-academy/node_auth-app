@@ -5,7 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import { compare, genSalt, hash } from 'bcrypt';
 
 const transporter = nodemailer.createTransport({
-  host: 'givotkov11@gmail.com',
+  host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
