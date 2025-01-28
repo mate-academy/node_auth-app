@@ -73,7 +73,7 @@ const login = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
-  const isPasswordValid = bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
@@ -100,19 +100,19 @@ const refresh = async (req, res) => {
 const generateTokens = async (res, user) => {
   const normalizedUser = userService.normalize(user);
 
-  const accessToket = jwtService.sign();
-  const refreshToken = jwtService.sign();
+  const accessToken = jwtService.sign({ id: normalizedUser.id });
+  const refreshToken = jwtService.sign({ id: normalizedUser.id });
 
   await tokenService.save(normalizedUser.id, refreshToken);
 
-  res.cookies('refreshToken', refreshToken, {
+  res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
   });
 
   res.send({
     user: normalizedUser,
-    accessToket,
+    accessToken,
   });
 };
 

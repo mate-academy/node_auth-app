@@ -4,7 +4,7 @@ const save = async (userId, newToken) => {
   const token = await Token.findOne({ where: { userId } });
 
   if (!token) {
-    await Token.create({ userId, token: newToken });
+    await Token.create({ userId, refreshToken: newToken });
 
     return;
   }
