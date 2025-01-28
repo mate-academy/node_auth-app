@@ -1,5 +1,7 @@
 import { userService } from '../services/user.service.js';
 import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
+import { emailService } from '../services/email.service.js';
 
 function validateEmail(email) {
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
@@ -50,6 +52,10 @@ const register = async (req, res) => {
   const hashPassword = await bcrypt.hash(password, 10);
 
   const newUser = await userService.create(email, hashPassword);
+
+  const token = uuidv4();
+
+  await emailService.sendActivationLink(email, token);
 
   res.send(newUser);
 };
