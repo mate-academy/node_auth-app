@@ -3,3 +3,4 @@ import { authController } from './../controllers/auth.contoller.js';
 export const authRouter = new express.Router();
 
 authRouter.post('/registration', authController.register);
+authRouter.get('/activation/:email/:token', authController.activate);

@@ -14,6 +14,9 @@ export const User = client.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    activationToken: {
+      type: DataTypes.STRING,
+    },
   },
   {
     tableName: 'Users',

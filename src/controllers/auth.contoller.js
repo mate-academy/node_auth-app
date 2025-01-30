@@ -50,16 +50,31 @@ const register = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-
-  const newUser = await userService.create(email, hashPassword);
-
   const token = uuidv4();
+
+  const newUser = await userService.create(email, hashPassword, token);
 
   await emailService.sendActivationLink(email, token);
 
   res.send(newUser);
 };
 
+const activate = async (req, res) => {
+  const { email, token } = req.params;
+
+  const user = await userService.getByEmail(email);
+
+  if (!user || user.activationToken !== token) {
+    return res.status(404);
+  }
+
+  user.activationToken = null;
+  await user.save();
+
+  res.status(200).json({ message: 'Activation successful' });
+};
+
 export const authController = {
   register,
+  activate,
 };

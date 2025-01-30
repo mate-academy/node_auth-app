@@ -7,8 +7,14 @@ const app = express();
 
 export const createServer = () => {
   app.use(express.json());
-  app.use(cors());
-  app.use(authRouter);
+
+  app.use(
+    cors({
+      origin: process.env.CLIENT_HOST,
+      credentials: true,
+    }),
+  );
+  app.use('/auth', authRouter);
 
   return app;
 };
