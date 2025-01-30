@@ -1,8 +1,8 @@
 import { userService } from '../services/user.service.js';
 import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
-import { emailService } from '../services/email.service.js';
+
 import { jwtService } from '../services/jwt.service.js';
+import { ApiError } from '../exceptions/api.error.js';
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -12,30 +12,13 @@ const register = async (req, res) => {
     password: userService.validatePassword(password),
   };
 
-  if (Object.values(errors).some((error) => error)) {
-    return res.status(400).json({
-      errors,
-      message: 'Validation error',
-    });
+  if (errors.email || errors.password) {
+    throw ApiError.badRequest('Bad request', errors);
   }
 
-  const existingUser = await userService.getByEmail(email);
+  await userService.create(email, password);
 
-  if (existingUser) {
-    return res.status(400).json({
-      errors: { email: 'Email is already taken' },
-      message: 'Validation error',
-    });
-  }
-
-  const hashPassword = await bcrypt.hash(password, 10);
-  const token = uuidv4();
-
-  const newUser = await userService.create(email, hashPassword, token);
-
-  await emailService.sendActivationLink(email, token);
-
-  res.send(newUser);
+  res.send({ message: 'User was created' });
 };
 
 const activate = async (req, res) => {
@@ -43,8 +26,12 @@ const activate = async (req, res) => {
 
   const user = await userService.getByEmail(email);
 
-  if (!user || user.activationToken !== token) {
-    return res.status(404);
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  if (user.activationToken !== token) {
+    throw ApiError.badRequest('ActivationToken is wrong');
   }
 
   user.activationToken = null;
