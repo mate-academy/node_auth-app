@@ -54,10 +54,31 @@ const login = async (req, res) => {
   if (!user || !isValidPassword) {
     res.status(401).json({ message: 'Invalid credentials' });
   }
+  generateTokens(res, user);
+};
 
+const refresh = (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const user = jwtService.validateRefreshToken(refreshToken);
+
+  if (!user) {
+    throw ApiError.unauthorized();
+  }
+
+  generateTokens(res, user);
+};
+
+const generateTokens = (res, user) => {
   const normalizedUser = userService.normalize(user);
-  const accessToken = jwtService.generateAccessToken(normalizedUser);
 
+  const accessToken = jwtService.generateAccessToken(normalizedUser);
+  const refreshToken = jwtService.generateRefreshToken(normalizedUser);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  });
   res.send({ user: normalizedUser, accessToken });
 };
 
@@ -65,4 +86,5 @@ export const authController = {
   register,
   activate,
   login,
+  refresh
 };
