@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
+import { tokenService } from '../services/token.service.js';
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -15,8 +16,7 @@ const register = async (req, res) => {
   if (errors.email || errors.password) {
     throw ApiError.badRequest('Bad request', errors);
   }
-
-  await userService.create(email, password);
+  await userService.create({ email, password });
 
   res.send({ message: 'User was created' });
 };
@@ -49,15 +49,19 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await userService.getByEmail(email);
 
-  const isValidPassword = bcrypt.compare(password, user?.password || '');
-
-  if (!user || !isValidPassword) {
-    res.status(401).json({ message: 'Invalid credentials' });
+  if (!user) {
+    throw ApiError.badRequest('No such user');
   }
-  generateTokens(res, user);
+
+  const isValidPassword = await bcrypt.compare(password, user?.password || '');
+
+  if (!isValidPassword) {
+    throw ApiError.badRequest('Wrong password');
+  }
+  await sendAuthentication(res, user);
 };
 
-const refresh = (req, res) => {
+const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
   const user = jwtService.validateRefreshToken(refreshToken);
@@ -66,25 +70,38 @@ const refresh = (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  generateTokens(res, user);
+  await sendAuthentication(res, user);
 };
 
-const generateTokens = (res, user) => {
-  const normalizedUser = userService.normalize(user);
+async function sendAuthentication(res, user) {
+  const userData = userService.normalize(user);
+  const accessToken = jwtService.generateAccessToken(userData);
+  const refreshToken = jwtService.generateRefreshToken(userData);
 
-  const accessToken = jwtService.generateAccessToken(normalizedUser);
-  const refreshToken = jwtService.generateRefreshToken(normalizedUser);
+  await tokenService.save(user.id, refreshToken);
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
+    sameSite: 'none',
+    secure: true,
   });
-  res.send({ user: normalizedUser, accessToken });
+
+  res.send({
+    user: userData,
+    accessToken,
+  });
+}
+
+const logout = async (req, res) => {
+  res.clearCookie('refreshToken');
+  res.sendStatus(204);
 };
 
 export const authController = {
   register,
   activate,
   login,
-  refresh
+  refresh,
+  logout,
 };

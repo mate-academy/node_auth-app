@@ -1,4 +1,4 @@
 import 'dotenv/config';
-import { User } from './models/user.model.js';
+import { client } from './utils/db.js';
 
-User.sync({ force: true });
+client.sync({ force: true });

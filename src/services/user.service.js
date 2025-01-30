@@ -34,8 +34,9 @@ const normalize = ({ id, email }) => {
   return { id, email };
 };
 
-const create = async (email, password) => {
+const create = async ({ email, password }) => {
   const existingUser = await userService.getByEmail(email);
+
 
   if (existingUser) {
     throw ApiError.badRequest('User already exist', {
@@ -46,9 +47,9 @@ const create = async (email, password) => {
   const hashPassword = await bcrypt.hash(password, 10);
   const token = uuidv4();
 
-  await emailService.sendActivationLink(email, token);
+  await User.create({ email, password: hashPassword, activationToken: token });
 
-  await User.create({ email, hashPassword, token });
+  await emailService.sendActivationLink(email, token);
 };
 
 const getAllActive = () => {
