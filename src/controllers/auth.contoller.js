@@ -2,35 +2,14 @@ import { userService } from '../services/user.service.js';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { emailService } from '../services/email.service.js';
-
-function validateEmail(email) {
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!email) {
-    return 'Email is required';
-  }
-
-  if (!emailPattern.test(email)) {
-    return 'Email is not valid';
-  }
-}
-
-function validatePassword(password) {
-  if (!password) {
-    return 'Password is required';
-  }
-
-  if (password.length < 6) {
-    return 'At least 6 characters';
-  }
-}
+import { jwtService } from '../services/jwt.service.js';
 
 const register = async (req, res) => {
   const { email, password } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    email: userService.validateEmail(email),
+    password: userService.validatePassword(password),
   };
 
   if (Object.values(errors).some((error) => error)) {
@@ -71,10 +50,32 @@ const activate = async (req, res) => {
   user.activationToken = null;
   await user.save();
 
-  res.status(200).json({ message: 'Activation successful' });
+  const normalizedUser = userService.normalize(user);
+
+  res.json({
+    user: normalizedUser,
+    accessToken: jwtService.generateAccessToken(normalizedUser),
+  });
+};
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await userService.getByEmail(email);
+
+  const isValidPassword = bcrypt.compare(password, user?.password || '');
+
+  if (!user || !isValidPassword) {
+    res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  const normalizedUser = userService.normalize(user);
+  const accessToken = jwtService.generateAccessToken(normalizedUser);
+
+  res.send({ user: normalizedUser, accessToken });
 };
 
 export const authController = {
   register,
   activate,
+  login,
 };
