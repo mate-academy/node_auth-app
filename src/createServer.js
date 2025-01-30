@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/auth.route.js';
 import { usersRouter } from './routes/users.route.js';
+import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
 const app = express();
 
@@ -17,6 +18,7 @@ export const createServer = () => {
   );
   app.use('/auth', authRouter);
   app.use('/users', usersRouter);
+  app.use(errorMiddleware);
 
   return app;
 };
