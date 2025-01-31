@@ -4,19 +4,21 @@ import bcrypt from 'bcrypt';
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 import { tokenService } from '../services/token.service.js';
+import { emailService } from '../services/email.service.js';
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   const errors = {
+    name: userService.validateName(name),
     email: userService.validateEmail(email),
     password: userService.validatePassword(password),
   };
 
-  if (errors.email || errors.password) {
+  if (errors.email || errors.password || errors.name) {
     throw ApiError.badRequest('Bad request', errors);
   }
-  await userService.create({ email, password });
+  await userService.create({ name, email, password });
 
   res.send({ message: 'User was created' });
 };

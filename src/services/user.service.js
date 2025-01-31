@@ -4,6 +4,18 @@ import { v4 as uuidv4 } from 'uuid';
 import { emailService } from './email.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 
+function validateName(name) {
+  const namePattern = /^[a-zA-Zа-яА-ЯёЁіІїЇєЄґҐ0-9]+$/;
+
+  if (!name) {
+    return 'Name is required';
+  }
+
+  if (!namePattern.test(name)) {
+    return 'Name can only contain letters and numbers';
+  }
+}
+
 function validateEmail(email) {
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
@@ -34,7 +46,7 @@ const normalize = ({ id, email }) => {
   return { id, email };
 };
 
-const create = async ({ email, password }) => {
+const create = async ({ name, email, password }) => {
   const existingUser = await userService.getByEmail(email);
 
   if (existingUser) {
@@ -46,7 +58,12 @@ const create = async ({ email, password }) => {
   const hashPassword = await bcrypt.hash(password, 10);
   const token = uuidv4();
 
-  await User.create({ email, password: hashPassword, activationToken: token });
+  await User.create({
+    name: name,
+    email,
+    password: hashPassword,
+    activationToken: token,
+  });
 
   await emailService.sendActivationLink(email, token);
 };
@@ -56,6 +73,7 @@ const getAllActive = () => {
 };
 
 export const userService = {
+  validateName,
   validateEmail,
   validatePassword,
   create,
