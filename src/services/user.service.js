@@ -37,7 +37,6 @@ const normalize = ({ id, email }) => {
 const create = async ({ email, password }) => {
   const existingUser = await userService.getByEmail(email);
 
-
   if (existingUser) {
     throw ApiError.badRequest('User already exist', {
       email: 'User already exist',

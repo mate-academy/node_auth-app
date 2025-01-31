@@ -16,7 +16,7 @@ export function authMiddleware(req, res, next) {
   const userData = jwtService.validateAccessToken(accessToken);
 
   if (!userData) {
-    res.status(401).json({ message: 'Invalid token' });
+    throw ApiError.unauthorized();
   }
 
   next();
