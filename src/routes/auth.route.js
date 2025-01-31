@@ -11,4 +11,6 @@ authRouter.get(
 );
 authRouter.post('/login', authController.login);
 authRouter.get('/refresh', catchError(authController.refresh));
-authRouter.post('/logout', authController.logout);
+authRouter.post('/logout', catchError(authController.logout));
+authRouter.post('/forgotPassword', catchError(authController.forgotPassword));
+authRouter.post('/resetPassword', catchError(authController.resetPassword));

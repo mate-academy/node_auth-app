@@ -7,10 +7,15 @@ function generateAccessToken(user) {
 }
 
 function generateRefreshToken(user) {
-  return jsonwebtoken.sign(
-    user,
-    process.env.JWT_REFRESH_SECRET /* {expiresIn: '2m'} */,
-  );
+  return jsonwebtoken.sign(user, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: '2m',
+  });
+}
+
+function generateResetToken(user) {
+  return jsonwebtoken.sign(user, process.env.JWT_RESET_SECRET, {
+    expiresIn: '15m',
+  });
 }
 
 function validateAccessToken(token) {
@@ -29,9 +34,19 @@ function validateRefreshToken(token) {
   }
 }
 
+function validateResetToken(token) {
+  try {
+    return jsonwebtoken.verify(token, process.env.JWT_RESET_SECRET);
+  } catch (e) {
+    return null;
+  }
+}
+
 export const jwtService = {
   generateAccessToken,
   validateAccessToken,
   generateRefreshToken,
   validateRefreshToken,
+  generateResetToken,
+  validateResetToken,
 };

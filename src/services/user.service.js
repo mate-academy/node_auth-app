@@ -38,6 +38,10 @@ function validatePassword(password) {
   }
 }
 
+const getById = (id) => {
+  return User.findByPk(id);
+};
+
 const getByEmail = (email) => {
   return User.findOne({ where: { email } });
 };
@@ -79,5 +83,6 @@ export const userService = {
   create,
   getByEmail,
   getAllActive,
+  getById,
   normalize,
 };

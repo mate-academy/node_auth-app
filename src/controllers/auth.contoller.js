@@ -100,10 +100,61 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await userService.getByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  const normalizedUser = userService.normalize(user);
+
+  const resetToken = jwtService.generateResetToken(normalizedUser);
+
+  await emailService.sendResetLink(email, resetToken);
+
+  res.json({ message: 'Reset link sent' });
+};
+
+const resetPassword = async (req, res) => {
+  const { token, newPassword, confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const isValidPassword = userService.validatePassword(newPassword);
+
+  if (isValidPassword) {
+    throw ApiError.badRequest('Wrong password', { isValidPassword });
+  }
+
+  const resetToken = jwtService.validateResetToken(token);
+
+  if (!resetToken) {
+    throw ApiError.badRequest('Invalid or expired token');
+  }
+
+  const user = await userService.getById(resetToken.id);
+
+  if (!user) {
+    throw ApiError.notFound('No such User');
+  }
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  res.json({ message: 'Password successfully reset' });
+};
+
 export const authController = {
   register,
   activate,
   login,
   refresh,
   logout,
+  forgotPassword,
+  resetPassword,
 };
