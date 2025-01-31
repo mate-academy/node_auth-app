@@ -25,7 +25,7 @@ const validateEmail = (email) => {
 
 const validatePassword = (password) => {
   if (!password) {
-    return 'Email is required';
+    return 'Password is required';
   }
 
   if (password.length < 6) {
