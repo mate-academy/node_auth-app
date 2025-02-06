@@ -36,6 +36,12 @@ const changePassword = async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
   const { id: userId } = res.locals.user;
 
+  const isPasswordValid = userService.validatePassword(newPassword);
+
+  if (isPasswordValid) {
+    throw ApiError.badRequest('Bad request', isPasswordValid);
+  }
+
   if (newPassword !== confirmPassword) {
     throw ApiError.badRequest('Passwords do not match');
   }
@@ -58,8 +64,41 @@ const changePassword = async (req, res) => {
   res.json({ message: 'Password successfully changed' });
 };
 
+const changeEmail = async (req, res) => {
+  const { password, newEmail } = req.body;
+  const { id: userId } = res.locals.user;
+
+  const isEmailValid = userService.validatePassword(newEmail);
+
+  if (isEmailValid) {
+    throw ApiError.badRequest('Bad request', isEmailValid);
+  }
+
+  const user = await userService.getById(userId);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  const isMatch = await bcrypt.compare(password, user.password);
+
+  if (!isMatch) {
+    throw ApiError.badRequest('Incorrect password');
+  }
+
+  const oldEmail = user.email;
+
+  user.email = newEmail;
+  await user.save();
+
+  await emailService.sendNewEmailNotification(oldEmail, newEmail);
+
+  res.json({ message: 'Email successfully updated' });
+};
+
 export const usersController = {
   getAllUsers,
   changeName,
   changePassword,
+  changeEmail,
 };

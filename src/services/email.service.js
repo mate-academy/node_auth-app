@@ -45,8 +45,22 @@ function sendResetLink(email, token) {
   return send(email, 'Password reset', html);
 }
 
+function sendNewEmailNotification(oldEmail, newEmail) {
+  const html = `
+  <div style="font-family: Arial, sans-serif; text-align: center;">
+    <h1>Email Change Notification</h1>
+    <p>Your email has been changed to <strong>${newEmail}</strong>.</p>
+    <p>If this was you, no action is needed.</p>
+    <p>If you did not request this change, please contact our support team immediately.</p>
+  </div>
+  `;
+
+  return send(oldEmail, 'Your email has been changed', html);
+}
+
 export const emailService = {
   send,
   sendActivationLink,
   sendResetLink,
+  sendNewEmailNotification,
 };
