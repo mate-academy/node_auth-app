@@ -31,6 +31,35 @@ const changeName = async (req, res) => {
 
   res.json({ message: 'Name successfully updated', name: user.name });
 };
+
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+  const { id: userId } = res.locals.user;
+
+  if (newPassword !== confirmPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const user = await userService.getById(userId);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isMatch) {
+    throw ApiError.badRequest('Incorrect old password');
+  }
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  res.json({ message: 'Password successfully changed' });
+};
+
 export const usersController = {
   getAllUsers,
+  changeName,
+  changePassword,
 };

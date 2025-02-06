@@ -9,7 +9,7 @@ authRouter.get(
   '/activation/:email/:token',
   catchError(authController.activate),
 );
-authRouter.post('/login', authController.login);
+authRouter.post('/login', catchError(authController.login));
 authRouter.get('/refresh', catchError(authController.refresh));
 authRouter.post('/logout', catchError(authController.logout));
 authRouter.post('/forgotPassword', catchError(authController.forgotPassword));
