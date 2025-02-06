@@ -5,10 +5,6 @@ export function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'] || '';
   const [, accessToken] = authHeader.split(' ');
 
-  if (!authHeader) {
-    throw ApiError.unauthorized();
-  }
-
   if (!accessToken) {
     throw ApiError.unauthorized();
   }
@@ -18,6 +14,7 @@ export function authMiddleware(req, res, next) {
   if (!userData) {
     throw ApiError.unauthorized();
   }
+  res.locals.user = userData;
 
   next();
 }
