@@ -1,22 +1,27 @@
 const { validateAccessToken } = require('../utils/jwt.js');
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers['authorization'] || '';
-  const [, accessToken] = authHeader.split(' ');
+  const authHeader = req.headers['authorization'];
 
-  if (!authHeader || !accessToken) {
-    res.status(401).send({ message: 'Token is required' });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res
+      .status(401)
+      .json({ message: 'Invalid or missing authorization token' });
+  }
 
-    return;
+  const accessToken = authHeader.split(' ')[1];
+
+  if (!accessToken) {
+    return res.status(401).json({ message: 'Token is required' });
   }
 
   const userData = validateAccessToken(accessToken);
 
   if (!userData) {
-    res.status(401).send({ message: 'Invalid token' });
-
-    return;
+    return res.status(401).json({ message: 'Invalid token' });
   }
+
+  req.user = userData;
 
   next();
 };

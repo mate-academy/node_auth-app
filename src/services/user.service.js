@@ -6,6 +6,4 @@ const usersRouter = Router();
 
 usersRouter.get('/', authMiddleware, usersController.getAll);
 
-module.exports = {
-  usersRouter,
-};
+module.exports = { usersRouter };
