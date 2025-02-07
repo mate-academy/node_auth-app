@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body background-color="#ffffff">
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#222222"></mj-divider>
+
+        <mj-text font-size="20px" color="#222222" font-family="helvetica">Dear {{name}},</mj-text>
+        <mj-text font-size="15px">You can reset your account password by clicking the link below. If you did not request a password reset, please ignore this email. The link is valid for 24 hours.</mj-text>
+        
+        <mj-button href="{{host}}/reset?id={{resetId}}" background-color="#222222">Reset password</mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

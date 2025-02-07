@@ -1,0 +1,12 @@
+<mjml>
+  <mj-body background-color="#ffffff">
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#222222"></mj-divider>
+
+        <mj-text font-size="20px" color="#222222" font-family="helvetica">Dear {{name}},</mj-text>
+        <mj-text font-size="15px">Your email has been changed. If you did not request this change, please contact us immediately.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

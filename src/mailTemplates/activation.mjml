@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body background-color="#ffffff">
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#222222"></mj-divider>
+
+        <mj-text font-size="20px" color="#222222" font-family="helvetica">Dear {{name}},</mj-text>
+        <mj-text font-size="15px">Thank you for registering your account. First, let's make sure you're you! Click to confirm your email address. Link expires in 24 hours.</mj-text>
+        
+        <mj-button href="{{host}}/activate?id={{activationId}}" background-color="#222222">Confirm email</mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
