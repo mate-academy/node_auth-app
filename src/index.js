@@ -12,10 +12,12 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({
-  origin: process.env.CLIENT_HOST,
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_HOST,
+    credentials: true,
+  }),
+);
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);

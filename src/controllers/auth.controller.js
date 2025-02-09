@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
-import { ApiError } from "../exeptions/api.error.js";
-import { userService } from "../services/user.service.js";
+import { ApiError } from '../exeptions/api.error.js';
+import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
 
@@ -29,31 +29,31 @@ const generateTokens = async (res, user) => {
     httpOnly: true,
     sameSite: 'none',
     secure: true,
-  })
+  });
 
-  res.send({ 
-    user: normalizedUser, 
-    accessToken 
+  res.send({
+    user: normalizedUser,
+    accessToken,
   });
 };
 
 const register = async (req, res) => {
   const { email, password } = req.body;
-  
+
   const errors = {
     email: validateEmail(email),
     password: validatePassword(password),
   };
 
-  if(errors.email || errors.password) {
+  if (errors.email || errors.password) {
     throw ApiError.badRequest('Bad request', errors);
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  await userService.register(email, hashedPassword);
+  const newUser = await userService.register(email, hashedPassword);
 
-  res.send({message: 'OK' });
+  res.send(userService.normalize(newUser));
 };
 
 const activate = async (req, res) => {
@@ -69,16 +69,18 @@ const login = async (req, res) => {
 
   const user = await userService.findByEmail(email);
 
-  if(!user) {
+  if (!user) {
     throw ApiError.badRequest('No such user');
   }
-  if(user.activationToken !== null) {
-    throw ApiError.badRequest('You must activate your akk, please check your mail');
+  if (user.activationToken !== null) {
+    throw ApiError.badRequest(
+      'You must activate your account, please check your mail',
+    );
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
-  if(!isPasswordValid) {
+  if (!isPasswordValid) {
     throw ApiError.badRequest('Password is wrong');
   }
 
@@ -86,12 +88,12 @@ const login = async (req, res) => {
 };
 
 const refresh = async (req, res) => {
-  const refreshToken = req.cookies?.refreshToken || '';;
+  const refreshToken = req.cookies?.refreshToken || '';
 
   const userData = jwtService.verifyRefresh(refreshToken);
   const token = await tokenService.getByToken(refreshToken);
 
-  if(!userData || !token) {
+  if (!userData || !token) {
     throw ApiError.unauthorized();
     return;
   }
@@ -100,13 +102,12 @@ const refresh = async (req, res) => {
   await generateTokens(res, user);
 };
 
-
 const logout = async (req, res) => {
-  const refreshToken = req.cookies?.refreshToken || '';;
+  const refreshToken = req.cookies?.refreshToken || '';
 
   const userData = jwtService.verifyRefresh(refreshToken);
 
-  if(!userData || !refreshToken) {
+  if (!userData || !refreshToken) {
     throw ApiError.unauthorized();
     return;
   }
@@ -121,5 +122,5 @@ export const authController = {
   activate,
   login,
   refresh,
-  logout
+  logout,
 };
