@@ -48,7 +48,7 @@ async function activation(activationToken) {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 }
 
 async function reset(email) {

@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 function sign(user) {
   const token = jwt.sign(user, process.env.JWT_KEY, {
-    expiresIn: '50s',
+    expiresIn: Math.floor(Date.now() / 1000) + 60 * 60,
   });
 
   return token;
@@ -18,13 +18,13 @@ function verify(token) {
   }
 }
 
-function signRefesh(user) {
+function signRefresh(user) {
   const token = jwt.sign(user, process.env.JWT_REFRESH_KEY);
 
   return token;
 }
 
-function verifyRefesh(token) {
+function verifyRefresh(token) {
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_KEY);
   } catch (error) {
@@ -35,6 +35,6 @@ function verifyRefesh(token) {
 module.exports = {
   sign,
   verify,
-  signRefesh,
-  verifyRefesh,
+  signRefresh,
+  verifyRefresh,
 };

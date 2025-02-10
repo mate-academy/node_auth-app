@@ -22,7 +22,7 @@ function send({ email, subject, html }) {
 function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_HOST}/activate/${token}`;
   const html = `
-  <h1>Activate your account)</h1>
+  <h1>Activate your account</h1>
   <a href="${href}">${href}</a>
   `;
 
@@ -47,8 +47,26 @@ function sendEmailResetPass(email, token) {
   });
 }
 
+function sendEmailUpdateEmail(email) {
+  const href = `${process.env.CLIENT_HOST}/`;
+  const html = `
+  <h1>Email has been changed</h1>
+  <p>
+    Your email has been changed. If it wasn't you, please let support know. 
+  </p>
+  <a href="${href}">${href}</a>
+  `;
+
+  return send({
+    email,
+    subject: 'Changed email',
+    html,
+  });
+}
+
 module.exports = {
   send,
   sendActivationEmail,
   sendEmailResetPass,
+  sendEmailUpdateEmail,
 };

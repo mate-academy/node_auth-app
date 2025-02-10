@@ -60,7 +60,7 @@ const generateTokens = async (res, user) => {
   const normalizedUser = userService.normalized(user);
 
   const accessToken = jwtService.sign(normalizedUser);
-  const refreshToken = jwtService.signRefesh(normalizedUser);
+  const refreshToken = jwtService.signRefresh(normalizedUser);
 
   await tokenService.save(normalizedUser.id, refreshToken);
 
@@ -96,7 +96,7 @@ const login = async (req, res) => {
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
-  const userData = jwtService.verifyRefesh(refreshToken);
+  const userData = jwtService.verifyRefresh(refreshToken);
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
@@ -110,7 +110,7 @@ const refresh = async (req, res) => {
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
-  const userData = jwtService.verifyRefesh(refreshToken);
+  const userData = jwtService.verifyRefresh(refreshToken);
 
   if (!userData || !refreshToken) {
     throw ApiError.unauthorized();
