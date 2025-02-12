@@ -8,7 +8,7 @@ const errorMiddleware = (error, req, res, next) => {
       message: error.message,
       errors: error.errors,
     });
-  }
+  };
 
   res.status(500).send('Server error');
 

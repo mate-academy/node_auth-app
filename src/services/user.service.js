@@ -5,6 +5,16 @@ const { User } = require('../models/User.model');
 const emailService = require('../services/email.service');
 const ApiError = require('../exception/api.error');
 
+async function findByID(id) {
+  const user = await User.findByPk(id);
+
+  if (!user) {
+    throw ApiError.notFound({ user: user });
+  };
+
+  return user;
+};
+
 function normalized({ name, email, id }) {
   return { name, email, id };
 }
@@ -23,8 +33,8 @@ async function register(name, email, password) {
   const existUser = await findByEmail(email);
 
   if (existUser) {
-    throw ApiError.badRequest('User already exist', {
-      email: 'User already exist',
+    throw ApiError.badRequest('A user with this email already exists', {
+      email: 'A user with this email already exists',
     });
   }
 
@@ -87,6 +97,7 @@ async function update(updateToken, hashedPass) {
 }
 
 module.exports = {
+  findByID,
   normalized,
   findByEmail,
   register,

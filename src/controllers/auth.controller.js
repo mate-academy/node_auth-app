@@ -2,39 +2,17 @@
 
 const bcrypt = require('bcrypt');
 const userService = require('../services/user.service');
+const authService = require('../services/auth.service');
 const jwtService = require('../services/jwt.service');
 const tokenService = require('../services/token.service');
 const ApiError = require('../exception/api.error');
-
-const validateEmail = (value) => {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  // eslint-disable-next-line
-  const emailPattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-};
-
-const validatePassword = (value) => {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-};
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    email: authService.validateEmail(email),
+    password: authService.validatePassword(password),
   };
 
   if (errors.email || errors.password) {
@@ -45,7 +23,7 @@ const register = async (req, res) => {
 
   await userService.register(name, email, hashedPass);
 
-  res.status(200).send('User create');
+  res.status(200).send('User successfully created');
 };
 
 const activate = async (req, res) => {
@@ -82,9 +60,15 @@ const login = async (req, res) => {
 
   const user = await userService.findByEmail(email);
 
+  if (!user) {
+    res.status(401).send('Wrong password or email');
+
+    return;
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
-  if (!user || !isPasswordValid) {
+  if (!isPasswordValid) {
     res.status(401).send('Wrong password or email');
 
     return;
@@ -125,7 +109,7 @@ const reset = async (req, res) => {
   const { email } = req.body;
 
   const errors = {
-    email: validateEmail(email),
+    email: authService.validateEmail(email),
   };
 
   if (errors.email) {

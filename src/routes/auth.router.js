@@ -17,7 +17,7 @@ authRouter.get('/refresh', catchError(authController.refresh));
 authRouter.post('/logout', catchError(authController.logout));
 authRouter.post('/reset-password', catchError(authController.reset));
 
-authRouter.post(
+authRouter.patch( // from POST to PATCH
   '/update-password/:updateToken',
   catchError(authController.update),
 );

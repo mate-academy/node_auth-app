@@ -4,10 +4,17 @@ const jwtService = require('../services/jwt.service');
 
 const authMiddleWare = (req, res, next) => {
   const authorization = req.headers['authorization'] || null;
+
+  if (!authorization) {
+    res.status(401).send('Authorization header is missing or malformed');
+
+    return;
+  }
+
   const [, token] = authorization.split(' ');
 
-  if (!authorization || !token) {
-    res.status(401).send('Not authorization');
+  if (!token) {
+    res.status(401).send('Authorization header is missing or malformed');
 
     return;
   }
@@ -16,14 +23,14 @@ const authMiddleWare = (req, res, next) => {
     const userData = jwtService.verify(token);
 
     if (!userData) {
-      return res.status(401).send('Invalid token');
+      return res.status(401).send('Token verification failed');
     }
 
     req.user = userData;
 
     next();
   } catch (error) {
-    return res.status(401).send('Invalid token');
+    return res.status(401).send('Token verification failed');
   }
 };
 
