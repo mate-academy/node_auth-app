@@ -106,7 +106,7 @@ const forgotPassword = async (req, res) => {
   const user = await userService.getByEmail(email);
 
   if (!user) {
-    throw ApiError.badRequest('No such user');
+    throw ApiError.badRequest('User with this email does not exist');
   }
 
   const normalizedUser = userService.normalize(user);

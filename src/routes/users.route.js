@@ -19,7 +19,7 @@ usersRouter.patch(
 );
 
 usersRouter.patch(
-  '/profile/email',
+  '/:field',
   authMiddleware,
-  catchError(usersController.changeEmail),
+  catchError(usersController.updateProfile),
 );

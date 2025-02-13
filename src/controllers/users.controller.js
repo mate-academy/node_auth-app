@@ -3,6 +3,36 @@ import bcrypt from 'bcrypt';
 import { emailService } from '../services/email.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 
+const getUser = async (req, res) => {
+  const { id } = req.params;
+  const user = await userService.getById(id);
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  return res.json({
+    id: user.id,
+    email: user.email,
+    name: user.name || null,
+  });
+};
+
+export const updateProfile = async (req, res) => {
+  const { field } = req.params;
+
+  switch (field) {
+    case 'name':
+      return changeName(req, res);
+    case 'email':
+      return changeEmail(req, res);
+    case 'password':
+      return changePassword(req, res);
+    default:
+      return res.status(400).json({ message: 'Invalid field' });
+  }
+};
+
 const getAllUsers = async (req, res) => {
   const users = await userService.getAllActive();
   const normalizedUsers = users.map(userService.normalize);
@@ -75,6 +105,13 @@ const changeEmail = async (req, res) => {
   }
 
   const user = await userService.getById(userId);
+  const oldEmail = user.email;
+
+  if (oldEmail === newEmail) {
+    throw ApiError.badRequest(
+      'The new email address is identical to the old one',
+    );
+  }
 
   if (!user) {
     throw ApiError.notFound('User not found');
@@ -86,8 +123,6 @@ const changeEmail = async (req, res) => {
     throw ApiError.badRequest('Incorrect password');
   }
 
-  const oldEmail = user.email;
-
   user.email = newEmail;
   await user.save();
 
@@ -97,8 +132,10 @@ const changeEmail = async (req, res) => {
 };
 
 export const usersController = {
+  getUser,
   getAllUsers,
   changeName,
   changePassword,
   changeEmail,
+  updateProfile,
 };

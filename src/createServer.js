@@ -19,7 +19,7 @@ export const createServer = () => {
     }),
   );
   app.use('/auth', authRouter);
-  app.use('/users', usersRouter);
+  app.use('/profile', usersRouter);
   app.use(errorMiddleware);
 
   return app;

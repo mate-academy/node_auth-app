@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
@@ -32,7 +33,7 @@ function sendActivationLink(email, token) {
 }
 
 function sendResetLink(email, token) {
-  const link = `${process.env.CLIENT_HOST}/resetPassword/${token}`;
+  const link = `${process.env.CLIENT_HOST}/reset-password/${token}`;
   const html = `
   <div style="font-family: Arial, sans-serif; text-align: center;">
     <h1>Password Reset</h1>
