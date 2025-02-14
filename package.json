@@ -1,5 +1,6 @@
 {
   "name": "node_auth-app",
+  "type": "module",
   "version": "1.0.0",
   "description": "Auth app",
   "main": "src/index.js",
@@ -22,9 +23,23 @@
     "eslint-plugin-jest": "^28.6.0",
     "eslint-plugin-node": "^11.1.0",
     "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
     "prettier": "^3.3.2"
   },
   "mateAcademy": {
     "projectType": "javascript"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.10.0",
+    "pg": "^8.13.3",
+    "sequelize": "^6.37.5",
+    "uuid": "^11.0.5",
+    "yup": "^1.6.1"
   }
 }
