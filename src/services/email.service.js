@@ -31,7 +31,20 @@ const sendActivationEmail = (email, token) => {
   });
 };
 
+const notifyOldEmail = (email) => {
+  const html = `
+    <h1>Email has been changed</h1>
+  `;
+
+  return send({
+    email,
+    html,
+    subject: 'Your email has been changed',
+  });
+};
+
 export const emailService = {
   send,
   sendActivationEmail,
+  notifyOldEmail,
 };

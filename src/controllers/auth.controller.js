@@ -1,14 +1,15 @@
-import { createUserSchema } from '../helpers/schemas_users.js';
+import { Schemas } from '../helpers/schemas_users.js';
 import bcrypt from 'bcrypt';
 import { userService } from '../services/user.service.js';
 import { User } from '../models/User.model.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
+import { emailService } from '../services/email.service.js';
 
 const create = async (req, res) => {
   const { name, email, password } = req.body;
 
-  await createUserSchema.validate({ name, password, email });
+  await Schemas.createUserSchema.validateAsync({ name, password, email });
 
   const userExists = await userService.getByEmail(email);
 
@@ -42,6 +43,9 @@ const activate = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
+
+  await Schemas.loginUserSchema.validateAsync({ email, password });
+
   const user = await userService.getByEmail(email);
 
   if (!user) {
@@ -54,6 +58,12 @@ const login = async (req, res) => {
 
   if (!isPasswordValid) {
     return res.status(401).send({ message: 'Invalid password' });
+  }
+
+  if (user.dataValues.activationToken !== null) {
+    return res
+      .status(401)
+      .send({ message: 'You need to activate your user first' });
   }
 
   await sendAuthentication(res, user);
@@ -91,6 +101,72 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
+const profile = async (req, res) => {
+  const { name, email, password, newPassword, confirmation } = req.body;
+
+  await Schemas.profileUserSchema.validateAsync({
+    name,
+    email,
+    password,
+    newPassword,
+    confirmation,
+  });
+
+  const { refreshToken } = req.cookies;
+
+  const userData = await jwtService.validateRefreshToken(refreshToken);
+
+  if (!userData) {
+    return res.status(401).send({ message: 'Token is invalid' });
+  }
+
+  const user = await userService.getByEmail(userData.email);
+
+  if (!user) {
+    return res.status(404).send({ message: 'User not found' });
+  }
+
+  if (password) {
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(401).send({ message: 'Invalid password' });
+    }
+  }
+
+  if (name) {
+    user.name = name;
+  }
+
+  if (newPassword && confirmation) {
+    if (newPassword !== confirmation) {
+      return res
+        .status(400)
+        .send({ message: 'New password and confirmation do not match' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+  }
+
+  if (email) {
+    const emailExists = await userService.getByEmail(email);
+
+    if (emailExists) {
+      return res.status(409).send({ message: 'Email already registered' });
+    }
+
+    await emailService.notifyOldEmail(user.email);
+
+    user.email = email;
+  }
+
+  await user.save();
+
+  return res.status(200).send({ name: user.name, email: user.email });
+};
+
 export const sendAuthentication = async (res, user) => {
   const userData = userService.normalize(user);
   const accessToken = jwtService.generateAccessToken(userData);
@@ -117,4 +193,5 @@ export const authController = {
   login,
   refresh,
   logout,
+  profile,
 };
