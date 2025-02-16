@@ -1,7 +1,9 @@
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
+import { userService } from '../services/user.service.js';
+import 'express-async-errors';
 
-export function authMiddleware(req, res, next) {
+export async function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'] || '';
   const [, accessToken] = authHeader.split(' ');
 
@@ -14,7 +16,14 @@ export function authMiddleware(req, res, next) {
   if (!userData) {
     throw ApiError.unauthorized();
   }
-  res.locals.user = userData;
+
+  const user = await userService.getById(userData.id);
+
+  if (user.activationToken !== null) {
+    throw ApiError.forbidden();
+  }
+
+  res.locals.user = { id: user.id, email: user.email };
 
   next();
 }

@@ -21,6 +21,14 @@ export class ApiError extends Error {
     });
   }
 
+  static forbidden(errors) {
+    return new ApiError({
+      message: 'Needs activation of the account',
+      errors,
+      status: 403,
+    });
+  }
+
   static notFound(errors) {
     return new ApiError({
       message: 'not found',
