@@ -2,7 +2,7 @@
 import express from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/auth.route.js';
-import { usersRouter } from './routes/users.route.js';
+import { userRouter } from './routes/user.route.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 import cookieParser from 'cookie-parser';
 
@@ -19,7 +19,7 @@ export const createServer = () => {
     }),
   );
   app.use('/auth', authRouter);
-  app.use('/profile', usersRouter);
+  app.use('/profile', userRouter);
   app.use(errorMiddleware);
 
   return app;

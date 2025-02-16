@@ -18,27 +18,6 @@ const getUser = async (req, res) => {
   });
 };
 
-export const updateProfile = async (req, res) => {
-  const { field } = req.params;
-
-  switch (field) {
-    case 'name':
-      return changeName(req, res);
-    case 'email':
-      return changeEmail(req, res);
-    case 'password':
-      return changePassword(req, res);
-    default:
-      return res.status(400).json({ message: 'Invalid field' });
-  }
-};
-
-const getAllUsers = async (req, res) => {
-  const users = await userService.getAllActive();
-  const normalizedUsers = users.map(userService.normalize);
-
-  res.send(normalizedUsers);
-};
 
 const changeName = async (req, res) => {
   const { newName } = req.body;
@@ -131,11 +110,9 @@ const changeEmail = async (req, res) => {
   res.json({ message: 'Email successfully updated' });
 };
 
-export const usersController = {
+export const userController = {
   getUser,
-  getAllUsers,
   changeName,
   changePassword,
   changeEmail,
-  updateProfile,
 };
