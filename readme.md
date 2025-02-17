@@ -11,7 +11,7 @@ The project uses **Sequelize ORM** to work with the **PostgreSQL** database and 
 ## **2️⃣ Frontend Links**
 
 🔗 **Frontend Repository:**  
-[GitHub: Frontend](https://github.com/YOUR_LINK)
+[GitHub: Frontend](https://github.com/DmytroHoncharuk/nodejs-theory_login-app-react)
 
 🚀 **Frontend Deployment:**  
 [https://your_frontend.onrender.com](https://authapp-dmytrohoncharuk.onrender.com)
