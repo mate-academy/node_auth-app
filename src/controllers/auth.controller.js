@@ -1,7 +1,10 @@
+import bcrypt from 'bcrypt';
 import { User } from '../models/user.js';
+import { ApiError } from '../exeptions/api.error.js';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
-import bcrypt from 'bcrypt';
+import { tokenService } from '../services/token.service.js';
+import { authService } from '../services/auth.service.js';
 
 const register = async (req, res, next) => {
   const { name, email, password } = req.body;
