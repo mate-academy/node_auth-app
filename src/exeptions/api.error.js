@@ -14,9 +14,17 @@ export class ApiError extends Error {
     });
   }
 
+  static forbidden(message, errors) {
+    return new ApiError({
+      message,
+      errors,
+      status: 403,
+    });
+  }
+
   static unauthorized(errors) {
     return new ApiError({
-      message: 'unauthorized user',
+      message: 'Unauthorized user',
       errors,
       status: 401,
     });
@@ -24,9 +32,17 @@ export class ApiError extends Error {
 
   static notFound(errors) {
     return new ApiError({
-      message: 'not found',
+      message: 'Not found',
       errors,
       status: 404,
+    });
+  }
+
+  static conflict(errors) {
+    return new ApiError({
+      message: 'Conflict',
+      errors,
+      status: 409,
     });
   }
 }

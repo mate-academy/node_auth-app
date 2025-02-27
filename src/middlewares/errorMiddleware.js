@@ -12,7 +12,6 @@ export const errorMiddleware = (error, req, res, next) => {
 
   res.send({
     message: 'Server error',
-    error,
   });
 
   next();

@@ -1,13 +1,13 @@
 import { DataTypes } from 'sequelize';
-import { client } from '../utils/db.js';
+import { sequelize } from '../utils/db.js';
 import { User } from './user.js';
 
-export const Token = client.define('Token', {
+export const Token = sequelize.define('Token', {
   refreshToken: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 });
 
-Token.belongsTo(User);
-User.hasOne(Token);
+Token.belongsTo(User, { foreignKey: 'userId' });
+User.hasOne(Token, { foreignKey: 'userId' });

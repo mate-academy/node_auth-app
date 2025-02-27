@@ -1,5 +1,9 @@
 import 'dotenv/config';
 
-import { client } from './src/utils/db.js';
+import { sequelize } from './src/utils/db.js';
+import { User } from './src/models/user.js';
+import { Token } from './src/models/token.js';
 
-client.sync({ force: true });
+// await User.sync({ force: true });
+// await Token.sync({ force: true });
+await sequelize.sync({ force: true });

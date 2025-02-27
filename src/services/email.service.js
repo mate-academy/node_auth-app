@@ -32,7 +32,35 @@ function sendActivationEmail(email, token) {
   return send({ email, html, subject: 'Activate' });
 }
 
+function sendPasswordResetEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${token}`;
+
+  const html = `
+    <h1>Password reset</h1>
+    <a href="${href}">${href}</a>
+  `;
+
+  // eslint-disable-next-line no-console
+  console.log('Password reset email is sent');
+
+  return send({ email, html, subject: 'Password Reset' });
+}
+
+function sendEmailChangeEmail(email, newEmail) {
+  const html = `
+    <h1>Change Email</h1>
+    <p>Your email was changed to: ${newEmail}</p>
+  `;
+
+  // eslint-disable-next-line no-console
+  console.log('Email-change email is sent');
+
+  return send({ email, html, subject: 'Your email was changed' });
+}
+
 export const emailService = {
   sendActivationEmail,
+  sendPasswordResetEmail,
+  sendEmailChangeEmail,
   send,
 };

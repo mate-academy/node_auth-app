@@ -3,32 +3,48 @@ import { User } from '../models/user.js';
 import { jwtService } from '../services/jwt.service.js';
 import { userService } from '../services/user.service.js';
 import { tokenService } from '../services/token.service.js';
-import bcrypt from 'bcrypt';
 
-const register = async (req, res, next) => {
-  const { email, password } = req.body;
+const register = async (req, res) => {
+  const { email, password, name } = req.body;
 
-  const hashedPass = await bcrypt.hash(password, 10);
+  await userService.register(email, password, name);
 
-  await userService.register(email, hashedPass);
+  res.status(200).send({ message: 'Please, check your email' });
+};
 
-  res.send({ message: 'OK' });
+const requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+
+  await userService.resetEmail(email);
+
+  res.status(200).json({ message: 'Check your email' });
+};
+
+const passwordReset = async (req, res) => {
+  const { resetToken } = req.params;
+  const { password } = req.body;
+
+  await userService.resetPassword(resetToken, password);
+
+  res.status(200).send({ message: 'Password successfully reset' });
 };
 
 const activate = async (req, res) => {
   const { activationToken } = req.params;
   const user = await User.findOne({ where: { activationToken } });
+  const normalizedUser = userService.normalize(user);
 
   if (!user) {
-    res.sendStatus(404);
+    res.status(404).send({ message: 'Invalid email activation token' });
 
     return;
   }
 
   user.activationToken = null;
-  user.save();
+  user.isVerified = true;
+  await user.save();
 
-  res.send(user);
+  res.send(normalizedUser);
 };
 
 async function generateTokens(res, user) {
@@ -58,21 +74,23 @@ const login = async (req, res) => {
 
   const user = await userService.findByEmail(email);
 
-  if (!user) {
-    throw ApiError.badRequest('No such user', {
-      email: 'No such user',
-    });
+  await userService.login(user, password);
+
+  await generateTokens(res, user);
+};
+
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const userData = jwtService.verifyRefresh(refreshToken);
+
+  if (!userData || !refreshToken) {
+    throw ApiError.unauthorized();
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  await tokenService.remove(userData.id);
 
-  if (!isPasswordValid) {
-    throw ApiError.badRequest('Wrong password', {
-      password: 'Wrong password',
-    });
-  }
-
-  generateTokens(res, user);
+  res.sendStatus(204);
 };
 
 const refresh = async (req, res) => {
@@ -92,7 +110,10 @@ const refresh = async (req, res) => {
 
 export const authController = {
   register,
+  requestPasswordReset,
+  passwordReset,
   activate,
   login,
+  logout,
   refresh,
 };

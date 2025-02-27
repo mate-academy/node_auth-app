@@ -22,13 +22,9 @@ app.use(
   }),
 );
 app.use(authRouter);
-app.use('/users', userRouter);
+app.use('/user', userRouter);
 
-app.get('/', (req, res) => {
-  res.send('Running');
-});
-
-// app.use(errorMiddleware);
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
