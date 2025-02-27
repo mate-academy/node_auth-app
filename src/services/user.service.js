@@ -126,7 +126,7 @@ async function changeEmail(email, newEmail, id) {
   }
 
   user.email = newEmail;
-  user.save();
+  await user.save();
 
   await emailService.sendEmailChangeEmail(email, newEmail);
 }
@@ -141,7 +141,7 @@ async function changePassword(password, id) {
   const hashedPass = await bcrypt.hash(password, 10);
 
   user.password = hashedPass;
-  user.save();
+  await user.save();
 }
 
 async function changeName(newName, id) {
@@ -152,7 +152,7 @@ async function changeName(newName, id) {
   }
 
   user.name = newName;
-  user.save();
+  await user.save();
 }
 
 export const userService = {

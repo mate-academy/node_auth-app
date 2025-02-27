@@ -32,13 +32,14 @@ const passwordReset = async (req, res) => {
 const activate = async (req, res) => {
   const { activationToken } = req.params;
   const user = await User.findOne({ where: { activationToken } });
-  const normalizedUser = userService.normalize(user);
 
   if (!user) {
     res.status(404).send({ message: 'Invalid email activation token' });
 
     return;
   }
+
+  const normalizedUser = userService.normalize(user);
 
   user.activationToken = null;
   user.isVerified = true;
