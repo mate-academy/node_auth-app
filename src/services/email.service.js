@@ -16,6 +16,9 @@ async function send({ email, subject, html }) {
     subject,
     html,
   });
+
+  // eslint-disable-next-line no-console
+  console.log('Message sent: %s', verificationEmail.messageId);
 }
 
 function sendActivationEmail(email, token) {

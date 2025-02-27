@@ -20,7 +20,7 @@ const register = async (req, res, next) => {
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await userService.register(email, hashedPass);
+  await userService.register(email, hashedPass, name);
 
   res.send({ message: 'Ok' });
 };
@@ -146,7 +146,7 @@ const validatePwResetToken = async (req, res) => {
   const errors = {
     token:
       (!user ? 'invalid token' : undefined) ||
-      (!errors.token ? 'token required' : undefined),
+      (!pwdResetToken ? 'token required' : undefined),
   };
 
   if (errors.pwdResetToken) {
