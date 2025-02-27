@@ -21,7 +21,7 @@ function normalize({ id, email, name }) {
 }
 
 function findByEmail(email) {
-  User.findOne({ where: { email } });
+  return User.findOne({ where: { email } });
 }
 
 async function register(email, password, name) {
@@ -40,7 +40,7 @@ async function register(email, password, name) {
     name,
     activationToken,
   });
-  await emailService.sendActivatoinEmail(email, activationToken);
+  await emailService.sendActivationEmail(email, activationToken);
 }
 
 async function reqPwdReset(email) {

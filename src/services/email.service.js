@@ -18,7 +18,7 @@ async function send({ email, subject, html }) {
   });
 }
 
-function sendActivatoinEmail(email, token) {
+function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_HOST}/activate/${token}`;
   const html = `
     <h1>Activate account</h1>
@@ -43,6 +43,6 @@ function sendResetEmail(email, token) {
 
 export const emailService = {
   send,
-  sendActivatoinEmail,
+  sendActivationEmail,
   sendResetEmail,
 };

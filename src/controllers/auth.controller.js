@@ -22,7 +22,7 @@ const register = async (req, res, next) => {
 
   await userService.register(email, hashedPass);
 
-  res.send({ massage: 'Ok' });
+  res.send({ message: 'Ok' });
 };
 
 const activate = async (req, res) => {
@@ -146,7 +146,7 @@ const validatePwResetToken = async (req, res) => {
   const errors = {
     token:
       (!user ? 'invalid token' : undefined) ||
-      (!pwdResetToken ? 'token required' : undefined),
+      (!errors.token ? 'token required' : undefined),
   };
 
   if (errors.pwdResetToken) {

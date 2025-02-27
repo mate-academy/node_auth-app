@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import { ApiError } from '../exeptions/api.error.js';
 
 const getAllActivated = async (req, res) => {
-  const user = await userService
+  const users = await userService
     .getAllActivated()
     .then((activatedUsers) => activatedUsers.map(userService.normalize));
 

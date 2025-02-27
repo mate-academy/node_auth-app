@@ -14,8 +14,8 @@ async function save(userId, newToken) {
   await token.save();
 }
 
-function getByToken(token) {
-  return Token.findOne({ where: { token } });
+function getByToken(refreshToken) {
+  return Token.findOne({ where: { refreshToken } });
 }
 
 function remove(userId) {

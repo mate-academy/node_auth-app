@@ -16,7 +16,7 @@ export const User = client.define(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      uniqe: true,
+      unique: true,
     },
     password: {
       type: DataTypes.STRING,
