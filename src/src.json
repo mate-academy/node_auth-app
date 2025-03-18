@@ -1,0 +1,11 @@
+{
+  "project": "XPNS Web App",
+  "front-end": {
+    "static-server": "https://github.com/MaxManis/xpns-accounting-app-client-side-server"
+  },
+  "back-end": {
+    "REST-API-server": "https://github.com/MaxManis/expenses-api-server"
+  },
+  "about": "XPNS web application allows users to count theirs expenses and store them all in one place.",
+  "stack": "React, Redux, NodeJS, Express, PostgresSQL, JWT, Bulma"
+}
