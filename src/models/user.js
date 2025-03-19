@@ -1,5 +1,5 @@
-import { client } from "../utils/db.js";
-import { DataTypes } from "sequelize";
+import { client } from '../utils/db.js';
+import { DataTypes } from 'sequelize';
 
 export const User = client.define('user', {
   email: {
@@ -13,5 +13,5 @@ export const User = client.define('user', {
   },
   activationToken: {
     type: DataTypes.STRING,
-  }
-})
+  },
+});

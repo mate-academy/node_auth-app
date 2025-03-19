@@ -1,7 +1,7 @@
-import { User } from "../models/user.js";
-import { v4 as uuidv4 } from "uuid";
-import { emailService } from "./email.service.js";
-import { ApiError } from "../exeptions/api.error.js";
+import { User } from '../models/user.js';
+import { v4 as uuidv4 } from 'uuid';
+import { emailService } from './email.service.js';
+import { ApiError } from '../exeptions/api.error.js';
 
 function validateEmail(value) {
   if (!value) {
@@ -38,18 +38,20 @@ function normalize({ id, email }) {
 }
 
 function findByEmail(email) {
-  return User.findOne({ where: { email } })
+  return User.findOne({ where: { email } });
 }
 
 async function register({ email, password }) {
   const existUser = await findByEmail(email);
 
   if (existUser) {
-    throw ApiError.badRequest('User already exists', { email: "Email already exists" });
+    throw ApiError.badRequest('User already exists', {
+      email: 'Email already exists',
+    });
   }
 
   const activationToken = uuidv4();
-  const newUser= await User.create({ email, password, activationToken })
+  const newUser = await User.create({ email, password, activationToken });
 
   await emailService.sendActivationEmail(email, activationToken);
 
@@ -60,10 +62,10 @@ function validateDataForRegistration({ email, password }) {
   const errors = {
     email: validateEmail(email),
     password: validatePassword(password),
-  }
+  };
 
   if (errors.email || errors.password) {
-    throw ApiError.badRequest("Bad request", errors);
+    throw ApiError.badRequest('Bad request', errors);
   }
 }
 
@@ -72,5 +74,5 @@ export const userService = {
   normalize,
   findByEmail,
   register,
-  validateDataForRegistration
-}
+  validateDataForRegistration,
+};
