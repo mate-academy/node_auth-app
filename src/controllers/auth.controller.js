@@ -6,12 +6,16 @@ import bcrypt from 'bcrypt';
 import { tokenService } from '../services/token.service.js';
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
   userService.validateDataForRegistration({ email, password });
 
   const hashedPass = await bcrypt.hash(password, 10);
-  const newUser = await userService.register({ email, password: hashedPass });
+  const newUser = await userService.register({
+    email,
+    password: hashedPass,
+    name,
+  });
 
   res.send(newUser);
 };
@@ -44,6 +48,10 @@ const login = async (req, res) => {
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
+  }
+
+  if (user.activationToken) {
+    throw ApiError.badRequest('Please confirm registration on email');
   }
 
   generateTokens(res, user);
@@ -94,10 +102,139 @@ const logout = async (req, res) => {
   await tokenService.remove(user.id);
 };
 
+const sendResetPasswordLink = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await userService.findByEmail(email);
+
+  const successMessage = 'Reset link has been sent';
+
+  if (!user) {
+    return res.status(200).json({ message: successMessage });
+  }
+
+  await userService.createResetPasswordToken(user);
+
+  res.status(200).json({ message: successMessage });
+};
+
+const resetPasswordConfirmation = async (req, res) => {
+  const { password, confirmPassword } = req.body;
+  const { token } = req.params.token;
+
+  const passwordError = userService.validatePassword(password);
+
+  if (passwordError) {
+    throw ApiError.badRequest('Invalid password');
+  }
+
+  if (password !== confirmPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw ApiError.badRequest('Invalid or expired token');
+  }
+
+  await userService.changeUserPassword(user, password);
+
+  res.status(200).json({ message: 'Password updated successfully' });
+};
+
+const updateName = async (req, res) => {
+  const { name, email } = req.body;
+
+  if (!name || name.length < 3) {
+    throw ApiError.badRequest('Name must be at least 3 characters long');
+  }
+
+  const user = await userService.findByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('User not found');
+  }
+
+  user.name = name;
+  await user.save();
+
+  res.status(201).json({ message: 'Name updated successfully' });
+};
+
+const updatePassword = async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword, email } = req.body;
+
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    throw ApiError.badRequest('All fields are required');
+  }
+
+  const errors = {
+    newPassword: userService.validatePassword(newPassword),
+    confirmPassword: userService.validatePassword(confirmPassword),
+  };
+
+  if (errors.newPassword || errors.confirmPassword) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  if (newPassword !== confirmPassword) {
+    throw ApiError.badRequest("Password doesn't match");
+  }
+
+  const user = await userService.findByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('User not found');
+  }
+
+  const isOldPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isOldPasswordMatch) {
+    throw ApiError.badRequest('Old password is incorrect');
+  }
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+
+  res.status(201).json({ message: 'Password updated successfully' });
+};
+
+const updateEmail = async (req, res) => {
+  const { password, newEmail, oldEmail } = req.body;
+
+  if (!password || !newEmail || !oldEmail) {
+    throw ApiError.badRequest('All fields are required');
+  }
+
+  const user = await userService.findByEmail(oldEmail);
+
+  if (!user) {
+    throw ApiError.badRequest('User not found');
+  }
+
+  await userService.updateEmail({
+    user,
+    password,
+    newEmail,
+    oldEmail,
+  });
+
+  res.status(200).json({ message: 'Email updated successfully' });
+};
+
 export const authController = {
   register,
   activate,
   login,
   refresh,
   logout,
+  sendResetPasswordLink,
+  resetPasswordConfirmation,
+  updateName,
+  updatePassword,
+  updateEmail,
 };

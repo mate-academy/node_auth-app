@@ -2,6 +2,7 @@ import { User } from '../models/user.js';
 import { v4 as uuidv4 } from 'uuid';
 import { emailService } from './email.service.js';
 import { ApiError } from '../exeptions/api.error.js';
+import bcrypt from 'bcrypt';
 
 function validateEmail(value) {
   if (!value) {
@@ -37,11 +38,11 @@ function normalize({ id, email }) {
   return { id, email };
 }
 
-function findByEmail(email) {
+function findByEmail(email = '') {
   return User.findOne({ where: { email } });
 }
 
-async function register({ email, password }) {
+async function register({ email, password, name }) {
   const existUser = await findByEmail(email);
 
   if (existUser) {
@@ -51,7 +52,12 @@ async function register({ email, password }) {
   }
 
   const activationToken = uuidv4();
-  const newUser = await User.create({ email, password, activationToken });
+  const newUser = await User.create({
+    email,
+    password,
+    activationToken,
+    name,
+  });
 
   await emailService.sendActivationEmail(email, activationToken);
 
@@ -69,10 +75,48 @@ function validateDataForRegistration({ email, password }) {
   }
 }
 
+async function createResetPasswordToken(user) {
+  const token = uuidv4();
+
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 3600000;
+  emailService.sendRefreshPassEmail(user.email, token);
+
+  await user.save();
+}
+
+async function changeUserPassword(user, password) {
+  user.password = await bcrypt.hash(password, 10);
+  user.resetPasswordToken = null;
+  user.resetPasswordExpires = null;
+
+  await user.save();
+}
+
+async function updateEmail({ user, password, newEmail, oldEmail }) {
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
+    throw ApiError.badRequest("Password doesn't match");
+  }
+
+  if (user.email === newEmail) {
+    throw ApiError.badRequest('New email cannot be the same as the old email');
+  }
+
+  user.email = newEmail;
+  await user.save();
+  emailService.sendEmailWasChangedMessage(oldEmail);
+}
+
 export const userService = {
   getAllActivated,
   normalize,
   findByEmail,
   register,
   validateDataForRegistration,
+  createResetPasswordToken,
+  changeUserPassword,
+  validatePassword,
+  updateEmail,
 };
