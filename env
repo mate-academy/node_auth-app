@@ -1,0 +1,4 @@
+CLIENT_HOST=http://localhost:3000
+EMAIL_USER=test@gmail.com
+EMAIL_PASS=test123
+PORT=3005
