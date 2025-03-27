@@ -49,5 +49,3 @@ export const userService = {
   normalize,
   register,
 };
-
-uuidv4();

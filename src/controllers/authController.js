@@ -12,9 +12,7 @@ function validateEmail(value) {
 
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
+  return emailPattern.test(value) ? null : 'Email is not valid';
 }
 
 function validatePassword(value) {
@@ -22,9 +20,7 @@ function validatePassword(value) {
     return 'Password is required';
   }
 
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
+  return value.length >= 6 ? null : 'At least 6 characters';
 }
 
 async function register(req, res, next) {
@@ -47,20 +43,17 @@ async function register(req, res, next) {
 async function activate(req, res, next) {
   const { activationToken } = req.params;
 
-  const user = await User.findOne({
-    where: { activationToken },
-  });
+  const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
-    res.sendStatus(404);
-
-    return;
+    return res.sendStatus(404);
   }
 
   user.activationToken = null;
   await user.save();
-  // '!!!
   await sendAuthentication(res, user);
+
+  res.redirect('/profile');
 }
 
 async function login(req, res, next) {
@@ -117,7 +110,10 @@ async function sendAuthentication(res, user) {
   const accessToken = jwtService.generateAccessToken(userData);
   const refreshToken = jwtService.generateRefreshToken(userData);
 
-  await tokenService.save(user.id, refreshToken);
+  await tokenService.save(
+    user.id || jwtService.decode(refreshToken).id,
+    refreshToken,
+  );
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
