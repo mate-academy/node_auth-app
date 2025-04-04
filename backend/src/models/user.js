@@ -12,7 +12,7 @@ export const User = client.define('user', {
     allowNull: false,
     unique: false,
   },
-  name: {
+  username: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: false,

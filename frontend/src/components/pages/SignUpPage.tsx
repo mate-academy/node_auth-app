@@ -1,24 +1,64 @@
+import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { PASSWORD_PATTERN } from '../../utils/constants';
+import { useState } from 'react';
 
 type Inputs = {
   email: string;
-  name: string;
+  username: string;
   password: string;
   'confirm-password': string;
 };
 
 const SignUpPage = () => {
+  const [messages, setMessages] = useState<{ success: string; error: string }>({
+    success: '',
+    error: '',
+  });
+
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<Inputs>();
   const password = watch('password');
+  const email = watch('email');
+  const username = watch('username');
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+    try {
+      const response = await axios.post(
+        'http://localhost:3005/register',
+        formData
+      );
+
+      console.log('User registered successfully:', response.data);
+      setMessages({
+        success: `Registration allowed. The confirmation email was sent to ${email}`,
+        error: '',
+      });
+      reset();
+    } catch (error) {
+      console.log(formData);
+
+      if (axios.isAxiosError(error)) {
+        console.error('Error registering user:', error.response?.data);
+        setMessages({
+          success: '',
+          error: error.response?.data || 'Registration failed',
+        });
+      } else {
+        console.error('Unexpected error:', error);
+        setMessages({
+          success: '',
+          error: 'An unexpected error occurred',
+        });
+      }
+    }
+  };
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -33,12 +73,7 @@ const SignUpPage = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form
-          action=""
-          method="POST"
-          onSubmit={handleSubmit(onSubmit)}
-          className="space-y-6"
-        >
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <label
               htmlFor="email"
@@ -61,19 +96,19 @@ const SignUpPage = () => {
 
           <div>
             <label
-              htmlFor="name"
+              htmlFor="username"
               className="block text-sm/6 font-medium text-gray-300"
             >
               Name
             </label>
             <div className="mt-2">
               <input
-                {...register('name')}
-                id="name"
-                name="name"
+                {...register('username')}
+                id="username"
+                name="username"
                 type="text"
                 required
-                autoComplete="name"
+                autoComplete="username"
                 className="block w-full rounded-md bg-gray-800 px-3 py-1.5 text-base text-gray-100 outline-1 -outline-offset-1 outline-gray-600 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-400 sm:text-sm/6"
               />
             </div>
@@ -151,6 +186,13 @@ const SignUpPage = () => {
               Sign up
             </button>
           </div>
+
+          {messages.success && (
+            <p className="mt-2 text-sm/6 text-green-500">{messages.success}</p>
+          )}
+          {messages.error && (
+            <p className="mt-2 text-sm/6 text-red-500">{messages.error}</p>
+          )}
 
           <p className="mt-10 text-center text-sm/6 text-gray-300">
             Already have an account?{' '}
