@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/auth.router.js';
 import { client } from './utils/db.js';
+import { userRouter } from './routes/user.router.js';
 
 const PORT = process.env.PORT || 3004;
 const app = express();
@@ -24,6 +25,7 @@ app.use(
   }),
 );
 app.use(authRouter);
+app.use('/users', userRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

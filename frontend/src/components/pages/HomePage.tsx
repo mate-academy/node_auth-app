@@ -1,14 +1,36 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import '../../assets/styles/App.css';
 import { UserContext } from '../../features/user/UserContext';
+import axios from 'axios';
+import { User } from '../../features/types';
 
 const HomePage = () => {
   const { user } = useContext(UserContext);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3005/users');
+        setUsers(response.data);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      }
+    };
+    fetchUsers();
+  }, []);
+
   return (
     <>
       <h2 className="text-2xl font-semibold pt-5">{`Hello, ${
-        user ? user.name : 'guest'
+        user ? user.username : 'guest'
       }!`}</h2>
+      <ul>
+        Activated users:
+        {users.map((user) => (
+          <li>{user.username}</li>
+        ))}
+      </ul>
       <div className="perspective-[600px] flex justify-center items-center h-[80vh] bg-[#333]">
         <div className="w-[200px] h-[200px] logo-spin">
           {' '}
