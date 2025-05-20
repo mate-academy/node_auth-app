@@ -12,6 +12,7 @@ type Inputs = {
 };
 
 const SignUpPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<{ success: string; error: string }>({
     success: '',
     error: '',
@@ -26,22 +27,20 @@ const SignUpPage = () => {
   } = useForm<Inputs>();
   const password = watch('password');
   const email = watch('email');
-  const username = watch('username');
 
   const onSubmit: SubmitHandler<Inputs> = async (formData) => {
+    setIsLoading(true);
     try {
-      const response = await axios.post(
-        'http://localhost:3005/register',
-        formData
-      );
+      await axios.post('http://localhost:3005/register', formData);
 
-      console.log('User registered successfully:', response.data);
       setMessages({
         success: `Registration allowed. The confirmation email was sent to ${email}`,
         error: '',
       });
+      setIsLoading(false);
       reset();
     } catch (error) {
+      setIsLoading(false);
       console.log(formData);
 
       if (axios.isAxiosError(error)) {
@@ -59,6 +58,7 @@ const SignUpPage = () => {
       }
     }
   };
+
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -183,7 +183,7 @@ const SignUpPage = () => {
               type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400"
             >
-              Sign up
+              {isLoading ? '...loading' : 'Sign up'}
             </button>
           </div>
 

@@ -1,15 +1,11 @@
+import { v4 as uuidV4 } from 'uuid';
 import { User } from '../models/user.js';
+import { emailService } from '../services/email.service.js';
 import { PASSWORD_PATTERN } from '../utils/constants.js';
 
 const register = async (req, res) => {
   try {
     const { email, password, username } = req.body;
-
-    // const existingUser = await User.findOne({ email });
-    // if (existingUser) {
-    //   res.status(400).send('Email is already in use');
-    //   return;
-    // }
 
     if (!email || !password || !username) {
       res.status(400).send('All fields are required');
@@ -25,7 +21,15 @@ const register = async (req, res) => {
       return;
     }
 
-    const newUser = await User.create({ email, password, username });
+    const activationToken = uuidV4();
+    const newUser = await User.create({
+      email,
+      password,
+      username,
+      activationToken,
+    });
+
+    await emailService.sendActivationEmail(email, activationToken);
 
     res.send(newUser);
   } catch (error) {
@@ -34,6 +38,28 @@ const register = async (req, res) => {
   }
 };
 
+const activate = async (req, res) => {
+  const { activationToken } = req.params;
+
+  if (!activationToken) {
+    res.status(400).send('Activation token is required');
+    return;
+  }
+
+  const user = await User.findOne({ where: { activationToken } });
+
+  if (!user) {
+    res.status(404).send('User not found');
+    return;
+  }
+
+  await user.update({ activationToken: null }, { where: { activationToken } });
+  await user.save();
+
+  res.send(user);
+};
+
 export const authController = {
   register,
+  activate,
 };

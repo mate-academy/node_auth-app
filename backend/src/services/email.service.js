@@ -1,19 +1,43 @@
-const nodemailer = require('nodemailer');
+import 'dotenv/config.js';
+import { createTransport } from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
-  secure: false, // true for port 465, false for other ports
+const transporter = createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false,
   auth: {
-    user: 'maddison53@ethereal.email',
-    pass: 'jn7jnAPss4f63QBp6D',
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
-const info = await transporter.sendMail({
-  from: '"Maddison Foo Koch 👻" <maddison53@ethereal.email>', // sender address
-  to: 'bar@example.com, baz@example.com', // list of receivers
-  subject: 'Hello ✔', // Subject line
-  text: 'Hello world?', // plain text body
-  html: '<b>Hello world?</b>', // html body
-});
+function send(email, subject, html) {
+  return transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: email,
+    subject,
+    html,
+  });
+}
+
+function sendActivationEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/activate/${token}`;
+  const subject = 'Account Activation';
+  const html = `
+    <div>
+      <h1>Welcome to our service!</h1>
+      <p>To activate your account, please click the link below:</p>
+      <a href="${href}">${href}</a>
+    </div>
+  `;
+
+  return send(email, subject, html);
+}
+
+export const emailService = {
+  send,
+  sendActivationEmail,
+};

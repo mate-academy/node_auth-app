@@ -2,9 +2,19 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { authRouter } from './routes/auth.router.js';
+import { client } from './utils/db.js';
 
 const PORT = process.env.PORT || 3004;
 const app = express();
+
+(async function testConnection() {
+  try {
+    await client.authenticate();
+    console.log('✅ Successfully connected to database!');
+  } catch (error) {
+    console.error('❌ Error connecting database:', error);
+  }
+})();
 
 app.use(express.json());
 app.use(

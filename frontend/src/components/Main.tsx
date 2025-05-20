@@ -26,7 +26,7 @@ const Main = () => {
           <Route path="reset-password" element={<ResetPasswordPage />} />
 
           <Route
-            path="activation/:activationToken"
+            path="activate/:activationToken"
             element={<ActivationPage />}
           />
 
