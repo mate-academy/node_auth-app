@@ -1,7 +1,9 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserContext } from '../../features/user/UserContext';
+import { User } from '../../features/types';
 
 type Inputs = {
   email: string;
@@ -9,6 +11,7 @@ type Inputs = {
 };
 
 const LoginPage = () => {
+  const { setUser } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<{ success: string; error: string }>({
     success: '',
@@ -36,7 +39,7 @@ const LoginPage = () => {
       setIsLoading(false);
       reset();
       navigate('/');
-      console.log(responce.data);
+      setUser(responce.data as User);
     } catch (error) {
       setIsLoading(false);
 
