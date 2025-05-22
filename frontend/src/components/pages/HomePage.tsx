@@ -11,7 +11,9 @@ const HomePage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:3005/users');
+        const response = await axios.get('http://localhost:3005/users', {
+          withCredentials: true,
+        });
         setUsers(response.data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
@@ -28,7 +30,7 @@ const HomePage = () => {
       <ul>
         Activated users:
         {users.map((user) => (
-          <li>{user.username}</li>
+          <li key={user.email}>{user.username}</li>
         ))}
       </ul>
       <div className="perspective-[600px] flex justify-center items-center h-[80vh] bg-[#333]">

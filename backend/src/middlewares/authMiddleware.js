@@ -1,15 +1,9 @@
 import { jwtService } from '../services/jwt.service.js';
 
 export const authMiddleware = (req, res, next) => {
-  const authorization = req.headers['authorization'] || '';
-  if (!authorization) {
-    res.status(401).send('Authorization header is required');
-    return;
-  }
-
-  const [, token] = authorization.split(' ');
+  const token = req.cookies?.accessToken;
   if (!token) {
-    res.status(401).send('Token is required');
+    res.status(401).send('Access token cookie is required');
     return;
   }
 
