@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { authRouter } from './routes/auth.router.js';
 import { client } from './utils/db.js';
 import { userRouter } from './routes/user.router.js';
@@ -16,6 +17,8 @@ const app = express();
     console.error('❌ Error connecting database:', error);
   }
 })();
+
+app.use(cookieParser());
 
 app.use(express.json());
 app.use(

@@ -76,10 +76,15 @@ const login = async (req, res) => {
 
   const accessToken = jwtService.sign(normalizedUser);
 
-  res.send({
-    user: normalizedUser,
-    accessToken,
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'none',
+    maxAge: 48 * 60 * 60 * 1000,
+    path: '/',
   });
+
+  res.send(normalizedUser);
 };
 
 export const authController = {
