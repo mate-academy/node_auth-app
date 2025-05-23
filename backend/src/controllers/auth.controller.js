@@ -1,9 +1,18 @@
-import { v4 as uuidV4 } from 'uuid';
 import { User } from '../models/user.js';
-import { emailService } from '../services/email.service.js';
 import { PASSWORD_PATTERN } from '../utils/constants.js';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
+import { ApiError } from '../exeptions/api.error.js';
+
+function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(String(email).toLowerCase());
+}
+
+function validatePassword(password) {
+  const re = PASSWORD_PATTERN;
+  return re.test(String(password));
+}
 
 const register = async (req, res) => {
   const { email, password, username } = req.body;
@@ -13,26 +22,23 @@ const register = async (req, res) => {
     return;
   }
 
-  if (!PASSWORD_PATTERN.test(password)) {
-    res
-      .status(400)
-      .send(
-        'Password must be at least 6 characters long and contain at least one letter and one number',
-      );
-    return;
+  const errors = {
+    email: !validateEmail(email) ? 'Invalid email' : null,
+    password: !validatePassword(password)
+      ? 'Password must be at least 6 characters long and contain at least one letter and one number'
+      : null,
+  };
+
+  if (errors.email || errors.password) {
+    throw ApiError.badRequest('Validation error', errors);
   }
 
-  const activationToken = uuidV4();
-  const newUser = await User.create({
-    email,
-    password,
-    username,
-    activationToken,
+  await userService.register({ email, password, username });
+
+  res.send({
+    message:
+      'User registered successfully. Please check your email to activate your account.',
   });
-
-  await emailService.sendActivationEmail(email, activationToken);
-
-  res.send(newUser);
 };
 
 const activate = async (req, res) => {
@@ -86,8 +92,27 @@ const login = async (req, res) => {
   res.send(normalizedUser);
 };
 
+const getMe = async (req, res) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    res.status(401).send('Access token cookie is required');
+    return;
+  }
+
+  const decoded = jwtService.verify(token);
+
+  if (!decoded) {
+    res.status(401).send('Invalid token');
+    return;
+  }
+
+  res.send(decoded);
+};
+
 export const authController = {
   register,
   activate,
   login,
+  getMe,
 };
