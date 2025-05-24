@@ -8,6 +8,7 @@ import { privateAxiosInstance } from './api/axios';
 
 function App() {
   const { setUser } = useContext(UserContext);
+
   useEffect(() => {
     (async function getMe() {
       try {
@@ -20,6 +21,8 @@ function App() {
         });
       } catch (err) {
         console.error('Error fetching user data:', err);
+        // navigate('/login'); - нема потреби, інакше неавторизований користувач не зможе побачити домашню сторінку
+        setUser(null);
       }
     })();
   }, [setUser]);

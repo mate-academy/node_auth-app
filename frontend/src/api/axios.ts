@@ -8,22 +8,39 @@ export const privateAxiosInstance = axios.create({
   withCredentials: true,
 });
 
+export const publicAxiosInstance = axios.create({
+  baseURL: 'http://localhost:3005',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: false,
+});
+
 privateAxiosInstance.interceptors.response.use(
-  (response) => response, // Directly return successful responses.
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Якщо запит до /refresh не пройшов — більше не пробуємо
+    if (error.response.status === 401 && originalRequest.url === '/refresh') {
+      console.error('Token refresh failed. Redirecting to login.');
+      return Promise.reject(error);
+    }
+
+    // Якщо 401 отримано на іншому запиті — пробуємо оновити токен
     if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
+      originalRequest._retry = true;
       try {
-        await axios.get('http://localhost:3005/refresh');
-        return privateAxiosInstance(originalRequest); // Retry the original request with the new access token.
+        await axios.get('http://localhost:3005/refresh', {
+          withCredentials: true,
+        });
+        return privateAxiosInstance(originalRequest);
       } catch (refreshError) {
-        // Handle refresh token errors by clearing stored tokens and redirecting to the login page.
         console.error('Token refresh failed:', refreshError);
-        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }
-    return Promise.reject(error); // For all other errors, return the error as is.
+
+    return Promise.reject(error);
   }
 );

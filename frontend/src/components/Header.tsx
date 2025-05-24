@@ -1,7 +1,8 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { styles } from '../utils/styles';
 import { useContext } from 'react';
 import { UserContext } from '../features/user/UserContext';
+import { privateAxiosInstance } from '../api/axios';
 
 const Header = () => {
   const isActive = ({ isActive }: { isActive: boolean }) =>
@@ -9,7 +10,8 @@ const Header = () => {
       ? styles.header.nav.navlink.active
       : styles.header.nav.navlink.unactive;
 
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+  const navigate = useNavigate();
   return (
     <header>
       <nav className={styles.header.nav.container}>
@@ -38,7 +40,16 @@ const Header = () => {
           )}
 
           {user && (
-            <NavLink to="logout" className={isActive}>
+            <NavLink
+              to="logout"
+              className={isActive}
+              onClick={async () => {
+                if (!window.confirm('Are you sure?')) return;
+                await privateAxiosInstance.get('/logout');
+                setUser(null);
+                navigate('/');
+              }}
+            >
               Logout
             </NavLink>
           )}

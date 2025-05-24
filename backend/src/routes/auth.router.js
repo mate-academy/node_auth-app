@@ -12,3 +12,4 @@ authRouter.get(
 authRouter.post('/login', catchError(authController.login));
 authRouter.get('/me', catchError(authController.getMe));
 authRouter.get('/refresh', catchError(authController.refresh));
+authRouter.get('/logout', catchError(authController.logout));

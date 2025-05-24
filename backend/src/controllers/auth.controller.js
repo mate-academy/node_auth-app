@@ -90,6 +90,29 @@ const login = async (req, res) => {
   res.send(normalizedUser);
 };
 
+const logout = async (req, res) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    res.status(401).send('Access token cookie is required');
+    return;
+  }
+
+  const decoded = jwtService.verify(token);
+
+  if (!decoded) {
+    res.status(401).send('Invalid token');
+    return;
+  }
+
+  await userService.updateRefreshToken(decoded.id, null);
+
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
+
+  res.send({ message: 'Logged out successfully' });
+};
+
 const getMe = async (req, res) => {
   const token = req.cookies?.accessToken;
 
@@ -148,5 +171,5 @@ export const authController = {
   login,
   getMe,
   refresh,
-  // logout,
+  logout,
 };
