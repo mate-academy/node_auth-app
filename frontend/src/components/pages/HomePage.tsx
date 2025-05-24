@@ -1,25 +1,22 @@
 import { useContext, useEffect, useState } from 'react';
 import '../../assets/styles/App.css';
 import { UserContext } from '../../features/user/UserContext';
-import axios from 'axios';
 import { User } from '../../features/types';
+import { privateAxiosInstance } from '../../api/axios';
 
 const HomePage = () => {
   const { user } = useContext(UserContext);
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    (async function fetchUsers() {
       try {
-        const response = await axios.get('http://localhost:3005/users', {
-          withCredentials: true,
-        });
+        const response = await privateAxiosInstance.get('/users');
         setUsers(response.data);
       } catch (error) {
         console.error('Failed to fetch users:', error);
       }
-    };
-    fetchUsers();
+    })();
   }, []);
 
   return (

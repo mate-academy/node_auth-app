@@ -7,23 +7,28 @@ import ActivationPage from './pages/ActivationPage';
 import EditPage from './pages/EditPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import LogoutPage from './pages/LogoutPage';
+import { useContext } from 'react';
+import { UserContext } from '../features/user/UserContext';
 
 const Main = () => {
+  const { user } = useContext(UserContext);
   return (
     <main className="px-4 py-2">
       <Routes>
         <Route path="/">
           <Route index element={<HomePage />} />
 
-          <Route path="edit" element={<EditPage />} />
+          {user && <Route path="edit" element={<EditPage />} />}
 
-          <Route path="sign-up" element={<SignUpPage />} />
+          {!user && <Route path="sign-up" element={<SignUpPage />} />}
 
-          <Route path="login" element={<LoginPage />} />
+          {!user && <Route path="login" element={<LoginPage />} />}
 
-          <Route path="logout" element={<LogoutPage />} />
+          {user && <Route path="logout" element={<LogoutPage />} />}
 
-          <Route path="reset-password" element={<ResetPasswordPage />} />
+          {user && (
+            <Route path="reset-password" element={<ResetPasswordPage />} />
+          )}
 
           <Route
             path="activate/:activationToken"

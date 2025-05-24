@@ -3,24 +3,23 @@ import './assets/styles/App.css';
 import Header from './components/Header';
 import Main from './components/Main';
 import { UserContext } from './features/user/UserContext';
-import axios from 'axios';
 import { User } from './features/types';
+import { privateAxiosInstance } from './api/axios';
 
 function App() {
   const { setUser } = useContext(UserContext);
-
   useEffect(() => {
     (async function getMe() {
-      const response = await axios.get('http://localhost:3005/me', {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
+      try {
+        const response = await privateAxiosInstance.get('/me');
         const { id, email, username } = response.data as User;
         setUser({
           id,
           email,
           username,
         });
+      } catch (err) {
+        console.error('Error fetching user data:', err);
       }
     })();
   }, [setUser]);

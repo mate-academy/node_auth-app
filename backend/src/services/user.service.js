@@ -11,6 +11,10 @@ function findByEmail(email) {
   return User.findOne({ where: { email } });
 }
 
+function findById(id) {
+  return User.findByPk(id);
+}
+
 function normalize({ id, email, username }) {
   return { id, email, username };
 }
@@ -35,9 +39,15 @@ async function register({ email, password, username }) {
   await emailService.sendActivationEmail(email, activationToken);
 }
 
+function updateRefreshToken(userId, refreshToken) {
+  return User.update({ refreshToken }, { where: { id: userId } });
+}
+
 export const userService = {
   getAllActivated,
   findByEmail,
+  findById,
   normalize,
   register,
+  updateRefreshToken,
 };

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { userService } from './user.service.js';
 
 function sign(user) {
   const token = jwt.sign(user, process.env.JWT_KEY, {
@@ -46,6 +47,8 @@ async function generatePair(res, user) {
     secure: true,
     maxAge: 30 * 24 * 60 * 60 * 1000,
   }); // 30 днів
+
+  userService.updateRefreshToken(user.id, refreshToken);
 }
 
 export const jwtService = {

@@ -109,6 +109,8 @@ const getMe = async (req, res) => {
 };
 
 const refresh = async (req, res) => {
+  console.log('Refreshing token...');
+
   const refreshToken = req.cookies?.refreshToken;
 
   if (!refreshToken) {
@@ -123,7 +125,21 @@ const refresh = async (req, res) => {
     return;
   }
 
-  res.send(decoded);
+  const user = await userService.findById(decoded.id);
+  if (!user) {
+    res.status(401).send('User not found');
+    return;
+  }
+
+  if (user.refreshToken !== refreshToken) {
+    res.status(401).send('Invalid refresh token');
+    return;
+  }
+
+  const normalizedUser = userService.normalize(user);
+  await jwtService.generatePair(res, normalizedUser);
+
+  res.send(normalizedUser);
 };
 
 export const authController = {

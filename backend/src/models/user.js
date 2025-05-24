@@ -22,4 +22,9 @@ export const User = client.define('user', {
     allowNull: true,
     unique: true,
   },
+  refreshToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
+  },
 });
