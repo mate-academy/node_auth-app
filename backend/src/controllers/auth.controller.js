@@ -3,6 +3,7 @@ import { PASSWORD_PATTERN } from '../utils/constants.js';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exeptions/api.error.js';
+import bcrypt from 'bcrypt';
 
 function validateEmail(email) {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,7 +34,9 @@ const register = async (req, res) => {
     throw ApiError.badRequest('Validation error', errors);
   }
 
-  await userService.register({ email, password, username });
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await userService.register({ email, password: hashedPassword, username });
 
   res.send({
     message:
@@ -72,7 +75,9 @@ const login = async (req, res) => {
 
   const user = await userService.findByEmail(email);
 
-  if (!user || user.password !== password) {
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid || !user) {
     res.status(401).send('Invalid email or password');
 
     return;
@@ -80,14 +85,7 @@ const login = async (req, res) => {
 
   const normalizedUser = userService.normalize(user);
 
-  const accessToken = jwtService.sign(normalizedUser);
-
-  res.cookie('accessToken', accessToken, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
-    maxAge: 48 * 60 * 60 * 1000,
-  });
+  await jwtService.generatePair(res, normalizedUser);
 
   res.send(normalizedUser);
 };
@@ -110,9 +108,29 @@ const getMe = async (req, res) => {
   res.send(decoded);
 };
 
+const refresh = async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+
+  if (!refreshToken) {
+    res.status(401).send('Refresh token cookie is required');
+    return;
+  }
+
+  const decoded = jwtService.verifyRefresh(refreshToken);
+
+  if (!decoded) {
+    res.status(401).send('Invalid token');
+    return;
+  }
+
+  res.send(decoded);
+};
+
 export const authController = {
   register,
   activate,
   login,
   getMe,
+  refresh,
+  // logout,
 };
