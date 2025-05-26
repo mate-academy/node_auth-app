@@ -1,9 +1,14 @@
-import { Router } from "express";
-import { register } from '../controllers/authController';
+import { Router } from 'express';
+import { register, login } from '../controllers/authController';
 
 const router = Router();
 
 router.post('/register', register);
 
-export default router;
+router.post('/login', login);
 
+router.get('/test', (_, res) => {
+  res.send('Auth route is working');
+})
+
+export default router;

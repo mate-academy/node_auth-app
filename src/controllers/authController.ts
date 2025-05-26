@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { users, User } from '../models/User';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
+import { generateToken } from '../utils/generateToken';
 
 export const register = async (
   req: Request,
@@ -35,7 +36,7 @@ export const register = async (
       name,
       email: emailLower,
       passwordHash,
-      isActive: false,
+      isActive: true,
     };
 
     users.push(newUser);
@@ -48,3 +49,26 @@ export const register = async (
     next(error);
   }
 };
+
+export const login = async (req: Request, res: Response): Promise<Response> => {
+  const { email, password } = req.body;
+
+  const user = users.find((u) => u.email === email.toLowerCase());
+
+  if (!user) {
+    return res.status(400).json({ error: 'Invalid email or password' });
+  }
+
+  const isMatch = await bcrypt.compare(password, user.passwordHash);
+  if (!isMatch) {
+    return res.status(400).json({ error: 'Invalid email or password' });
+  }
+
+  if (!user.isActive) {
+    return res.status(403).json({ error: 'Account is not activated' });
+  }
+
+  const token = generateToken(user.id);
+
+  return res.status(200).json({ message: 'Login successful', token  });
+}
