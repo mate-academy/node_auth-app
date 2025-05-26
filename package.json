@@ -1,30 +1,19 @@
 {
-  "name": "node_auth-app",
-  "version": "1.0.0",
-  "description": "Auth app",
-  "main": "src/index.js",
+  "name": "fullstack-auth-app",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
   "scripts": {
-    "init": "mate-scripts init",
-    "start": "node src/index.js",
-    "lint": "npm run format && mate-scripts lint",
-    "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
-    "test:only": "mate-scripts test",
-    "update": "mate-scripts update",
-    "postinstall": "npm run update",
-    "test": "npm run lint && npm run test:only"
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm run start --workspace=server",
+    "dev:client": "npm run start --workspace=client",
+    "start-server": "npm run runapp --workspace=server",
+    "start-client": "npm --workspace client start",
+    "start": "concurrently \"npm run start-server\" \"npm run start-client\""
   },
-  "author": "Mate academy",
-  "license": "GPL-3.0",
   "devDependencies": {
-    "@mate-academy/eslint-config": "latest",
-    "@mate-academy/scripts": "^1.8.6",
-    "eslint": "^8.57.0",
-    "eslint-plugin-jest": "^28.6.0",
-    "eslint-plugin-node": "^11.1.0",
-    "jest": "^29.7.0",
-    "prettier": "^3.3.2"
-  },
-  "mateAcademy": {
-    "projectType": "javascript"
+    "concurrently": "^8.2.2"
   }
 }
