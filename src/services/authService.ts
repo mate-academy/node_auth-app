@@ -177,7 +177,7 @@ export async function updateUserProfile(
 
   if (newEmail && newEmail !== user.email) {
     const activationToken = uuidv4();
-    updateData.email = newEmail;
+    updateData.email = newEmail.toLowerCase();
     updateData.isActive = false;
     updateData.activationToken = activationToken;
     emailChanged = true;

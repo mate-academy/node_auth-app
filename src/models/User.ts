@@ -4,5 +4,5 @@ export interface User {
   email: string;
   passwordHash: string;
   isActive: boolean;
-  activationToken: string;
+  activationToken?: string | null;
 }

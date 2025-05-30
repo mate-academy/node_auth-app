@@ -9,7 +9,7 @@ import {
   updateProfile,
 } from '../controllers/authController';
 import {
-  authenicate,
+  authenticate,
   AuthenticatedRequest,
 } from '../middleware/authMiddleware';
 import prisma from '../prismaClient';
@@ -26,7 +26,7 @@ router.get('/test', (_, res) => {
 
 router.get(
   '/me',
-  authenicate,
+  authenticate,
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const user = await prisma.user.findUnique({
@@ -72,11 +72,11 @@ router.get('/reset-password/:token', (req, res) => {
   });
 });
 
-router.patch('/profile', authenicate, updateProfile as express.RequestHandler);
+router.patch('/profile', authenticate, updateProfile as express.RequestHandler);
 
 router.post(
   '/logout',
-  authenicate,
+  authenticate,
   (req: AuthenticatedRequest, res: Response) => {
     return res.status(200).json({ message: 'Successfully logged out' });
   },

@@ -142,9 +142,6 @@ export const resetPasswordController = async (
 
     await resetPassword(token, newPassword);
 
-    if (!process.env.FRONTEND_URL) {
-      throw new Error('FRONTEND_URL is not defined');
-    }
     return res
       .status(200)
       .json({ message: 'Password reset successful. You can now log in.' });

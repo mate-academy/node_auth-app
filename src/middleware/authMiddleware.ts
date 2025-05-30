@@ -10,7 +10,7 @@ export interface AuthenticatedRequest extends Request {
   userId?: string;
 }
 
-export const authenicate = (
+export const authenticate = (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,

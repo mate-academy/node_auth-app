@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
 import prisma from '../prismaClient';
 import { sendEmail } from './mailService';
@@ -51,9 +52,9 @@ export const updateUserProfile = async ({
   }
 
   if (newEmail && newEmail !== user.email) {
-    const newToken = crypto.randomUUID();
+    const newToken = uuidv4();
 
-    dataToUpdate.email = newEmail;
+    dataToUpdate.email = newEmail.toLowerCase();
     dataToUpdate.isActive = false;
     dataToUpdate.activationToken = newToken;
 
