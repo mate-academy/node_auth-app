@@ -4,6 +4,5 @@ export interface User {
   email: string;
   passwordHash: string;
   isActive: boolean;
+  activationToken: string;
 }
-
-export const users: User[] = [];

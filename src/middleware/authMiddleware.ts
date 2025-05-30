@@ -24,10 +24,9 @@ export const authenicate = (
   }
 
   const token = authHeader.split(' ')[1];
-
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    req.userId = decoded.userId;
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+    req.userId = decoded.id;
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired token' });

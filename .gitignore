@@ -10,3 +10,5 @@ node_modules
 
 # Environment variables
 .env
+
+/src/generated/prisma
