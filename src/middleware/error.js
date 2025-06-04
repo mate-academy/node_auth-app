@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 const errorHandler = (err, req, res, next) => {
   console.error('Error:', err);
 
