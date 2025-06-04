@@ -132,6 +132,11 @@ const setResetToken = async (email) => {
       resetToken,
       resetTokenExpiry,
     },
+    select: {
+      email: true,
+      resetToken: true,
+      resetTokenExpiry: true,
+    },
   });
 
   return user;

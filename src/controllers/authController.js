@@ -181,8 +181,9 @@ const requestPasswordReset = async (req, res, next) => {
       });
     }
 
-    await setResetToken(email);
-    await sendPasswordResetEmail(user.email, user.resetToken);
+    const updatedUser = await setResetToken(email);
+
+    await sendPasswordResetEmail(updatedUser.email, updatedUser.resetToken);
 
     res.json({
       success: true,
