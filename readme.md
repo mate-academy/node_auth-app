@@ -26,3 +26,102 @@ Implement an application that allows user to:
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
 - Profile page should allow to add/remove any social account
 - Add authentication to your Accounting App
+
+## API Endpoints
+
+### Authentication Routes
+
+``` POST /api/auth/register ```
+
+Register a new user (guest only)
+
+```
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+```GET /api/auth/activate/:token```
+
+Activate user account via email token (guest only)
+
+```POST /api/auth/login```
+
+Login with credentials (guest only)
+
+```
+{
+  "email": "john@example.com",
+  "password": "SecurePass123!"
+}
+```
+
+```POST /api/auth/logout```
+
+Logout user (authenticated only)
+
+```POST /api/auth/forgot-password```
+
+Request password reset (guest only)
+
+```
+{
+  "email": "john@example.com"
+}
+```
+
+```POST /api/auth/reset-password/:token```
+
+Reset password with token (guest only)
+
+```
+{
+  "password": "NewSecurePass123!",
+  "confirmPassword": "NewSecurePass123!"
+}
+```
+
+```POST /api/auth/refresh-token```
+
+Refresh access token using refresh token
+
+### User Routes
+
+```GET /api/user/profile```
+
+Get user profile (authenticated only)
+
+```PUT /api/user/profile```
+
+Update user profile (authenticated only)
+
+```
+{
+  "name": "John Smith"
+}
+```
+
+```PUT /api/user/change-password```
+
+Change user password (authenticated only)
+
+```
+{
+  "oldPassword": "CurrentPass123!",
+  "newPassword": "NewSecurePass123!",
+  "confirmPassword": "NewSecurePass123!"
+}
+```
+
+```PUT /api/user/change-email```
+
+Change user email (authenticated only)
+
+```
+{
+  "password": "CurrentPass123!",
+  "newEmail": "newemail@example.com"
+}
+```
