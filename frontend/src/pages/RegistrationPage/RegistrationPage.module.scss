@@ -1,0 +1,321 @@
+@use '../../styles/mixins/typography' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background-color: #fff;
+  min-height: 100vh;
+}
+
+.title {
+  @include h2;
+
+  display: flex;
+  width: 100%;
+  margin-top: 32px;
+
+  justify-content: center;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.navBlock {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+}
+
+.iconLink {
+  position: absolute;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  background-image: url('back.svg');
+}
+
+.step {
+  @include h4;
+
+  padding-top: 2px;
+  margin: auto;
+}
+
+.navLine {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 4px;
+  margin-top: 16px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bgLine {
+  height: 100%;
+  width: 100%;
+  background-color: #b9d1ff;
+}
+
+.mainLine {
+  position: absolute;
+  height: 100%;
+  width: 50%;
+  background-color: #2d39a9;
+  border-radius: 4px;
+  transition: width 1s ease-in-out;
+
+  &:hover {
+    width: 100%;
+  }
+
+  &.secondStep {
+    width: 100%;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 64px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  @include small-text;
+
+  font-size: 14px;
+  line-height: 140%;
+}
+
+.input {
+  @include placeholder-text;
+
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border: 1px solid #5c5c70;
+  border-radius: 12px;
+  height: 56px;
+
+  &::placeholder {
+    color: #8f8fa3;
+  }
+
+  &:focus {
+    border: 2px solid #0097db;
+    outline: none;
+  }
+
+  &.inputError {
+    border: 2px solid #ff5b32;
+  }
+}
+
+.inputField label {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.inputField input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.textContainer {
+  margin-top: 8px;
+}
+
+.help {
+  @include small-text;
+
+  color: #5c5c70;
+}
+
+.error {
+  @include small-text;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: #ff5b32;
+
+  &::before {
+    content: '';
+    display: flex;
+    height: 24px;
+    width: 24px;
+    margin-right: 4px;
+    transform: translateY(-2px);
+    background-image: url('warning.svg');
+  }
+}
+
+.checkboxGroup {
+  display: flex;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.checkboxInput {
+  display: none;
+}
+
+.customBox {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #101017;
+  border-radius: 4px;
+  margin-right: 8px;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    width: 5px;
+    height: 10px;
+    border: solid #2d39a9;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+}
+
+.checkboxInput:checked + .customBox {
+  &::after {
+    opacity: 1;
+  }
+}
+
+.labelText {
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 120%;
+
+  margin-top: 3px;
+}
+
+.termsLink {
+  color: #2d39a9;
+  text-decoration: underline;
+}
+
+.submitBtn {
+  @include button-text;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-top: 8px;
+
+  width: 100%;
+  height: 56px;
+  color: white;
+  background-color: #de58e9;
+  border-radius: 12px;
+}
+
+.submitBtn:disabled {
+  background-color: #e389eb;
+  cursor: not-allowed;
+}
+
+.socialLogin {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.socialTitle {
+  @include body-text;
+
+  font-weight: 300;
+}
+
+.socialIcons {
+  display: flex;
+  gap: 10px;
+}
+
+.socialBtn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50%;
+}
+
+.github {
+  background-image: url('icons/github.svg');
+}
+
+.google {
+  background-image: url('icons/google.svg');
+}
+
+.facebook {
+  background-image: url('/icons/facebook.svg');
+}
+
+.bottomText {
+  margin-top: 16px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.bottomText a {
+  color: #5b4dfa;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.loginLink {
+  text-align: center;
+  font-weight: 300;
+  font-size: 16px;
+  margin-top: 16px;
+  margin-bottom: 24px;
+}
+
+.loginLink a {
+  color: #2d39a9;
+  text-decoration: underline;
+}
+
+.confirmation {
+  @include small-text;
+
+  margin-top: 64px;
+}
+
+.userEmail {
+  color: #2d39a9;
+}

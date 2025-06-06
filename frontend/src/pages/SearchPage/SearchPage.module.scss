@@ -1,0 +1,16 @@
+@use '../../styles/mixins/typography' as *;
+
+.container{
+  background-color: #fff;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.title {
+  @include h2;
+  
+  display: flex;
+  align-items: center;
+  height: calc(100vh - 98px);
+  text-align: center;
+}

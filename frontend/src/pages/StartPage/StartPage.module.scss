@@ -1,0 +1,180 @@
+@use '../../styles/mixins/typography' as *;
+
+.block {
+  display: flex;
+  position: relative;
+  background-color: transparent;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.background {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  background-color: #000000;
+}
+
+.backgroundImg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(5px);
+  opacity: 0.7;
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-color: #2D39A9;
+  mix-blend-mode: soft-light;
+  z-index: 1;
+}
+
+.contantBlock {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFFFFF;
+  transform: translateY(100%);
+  height: 50%;
+  width: 100%;
+  z-index: 2;
+  animation-timing-function: ease;
+  animation-duration: 800ms;
+  animation-fill-mode: both;
+
+}
+
+.bottomBackground {
+  position: absolute;
+  background-color: #FFFFFF;
+  transform: translateY(100%);
+  height: 50%;
+  width: 100%;
+  z-index: 1;
+}
+
+.contantContainer {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFFFFF;
+  width: 100%;
+  z-index: 2;
+  padding: 16px;
+  z-index: 10;
+}
+
+.headerText {
+  @include h1;
+
+  color: #DE58E9;
+}
+
+.description {
+  @include h4;
+
+  text-align: center;
+  color: #101017;
+}
+
+.authButtons {
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+  gap: 16px;
+  width: 100%;
+}
+
+.buttonRegister {
+  @include button-text;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 56px;
+  color: white;
+  background-color: #DE58E9;
+  border-radius: 12px;
+}
+
+.buttonLogin {
+  @include button-text;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 56px;
+  color:#2D39A9;
+  border: 2px solid #2D39A9;
+  border-radius: 12px;
+}
+
+.elipsContainer {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  // overflow: hidden;
+  margin-top: -150px;
+  width: 100%;
+}
+
+.elips {
+  width: 100%;
+  height: 100px;
+  background-color: #06139333;
+  border-radius: 50%;
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    top: 8px;
+    left: 0;
+    filter: blur(8px);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+}
+
+.bottomBlock {
+  display: flex;
+  position: absolute;
+  left: -5%;
+  bottom: -20px;
+  height: 70px;
+  width: 110%;
+  background-color: #FFFFFF;
+  filter: blur(3px);
+  z-index: 3;
+}

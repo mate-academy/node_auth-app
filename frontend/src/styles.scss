@@ -1,0 +1,150 @@
+@charset "utf-8";
+@use './styles/base/_fonts.scss';
+@use './styles/mixins/' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Helvetica Neue Cyr', sans-serif;
+  font-weight: 400;
+  background-color: #fff;
+  color: #101017;
+  line-height: 1.4;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+.blockSlideDown {
+  animation-name: slideDown;
+}
+
+.blockSlideUp {
+  animation-name: slideUp;
+  animation-delay: 800ms;
+}
+
+@for $i from 1 through 20 {
+  $delay: $i * 50;
+
+  .fadeIn_#{$delay} {
+    animation-delay: #{$delay}ms;
+  }
+}
+
+@for $i from 1 through 20 {
+  $delay: $i * 50;
+
+  .fadeOut_#{$delay} {
+    animation-delay: #{$delay}ms;
+  }
+}
+
+input:-webkit-autofill {
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: #101017 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
+  -webkit-text-fill-color: #101017 !important;
+}
+
+$navbar-breakpoint: 480px !default;
+
+.active {
+  font-weight: bold;
+}
+
+.loader {
+  height: 80px;
+  width: 80px;
+}
+
+.loader-wrapper {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background {
+  position: fixed;
+  inset: 0;
+  background-color: #000000;
+  overflow: hidden;
+}
+
+.backgroundImg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(5px);
+  opacity: 0.7;
+  transform: scale(1.1);
+  z-index: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background-color: #2D39A9;
+  mix-blend-mode: soft-light;
+  z-index: 1;
+}
+
+.container {
+  position: relative;
+  z-index: 3;
+  min-height: 100vh;
+  
+  @include respond-to(tablet) {
+    width: 500px;
+    margin-inline: auto;
+  }
+}
