@@ -1,0 +1,58 @@
+@use '../../styles/mixins' as *;
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #FFF;
+  padding: 19px 24px 35px;  
+  border-top: 1px solid #E3E3E8;
+  z-index: 99;
+
+  @include respond-to(tablet) {
+    flex-direction: column;
+    width: max-content;
+    border: 1px solid #E3E3E8;
+    border-radius: 12px;
+    gap: 24px;
+    padding: 14px;
+    left: 24px;
+    bottom: 50%;
+    transform: translateY(50%);
+  }
+}
+
+.navLink {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &:hover,
+  &.active {
+    svg {
+      path {
+        fill: #DE58E9;
+      }
+    }
+  
+    .navText {
+      color: #DE58E9;
+    }
+  }
+}
+
+.navText {
+  @include nav-text;
+  color: #5C5C70;
+  transition: all 0.3s ease;
+}
+
+svg {
+  path {
+    fill: #5C5C70;
+    transition: all 0.3s ease;
+  }
+}

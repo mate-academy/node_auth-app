@@ -1,0 +1,28 @@
+@use '../../styles/mixins/typography' as *;
+
+.container{
+  background-color: #fff;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.title {
+  @include h2;
+
+  display: flex;
+  align-items: center;
+  height: calc(100vh - 98px);
+  text-align: center;
+}
+
+.iconLink {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 16px;
+  width: 24px;
+  height: 24px;
+  background-image: url('back.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
