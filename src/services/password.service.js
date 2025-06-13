@@ -45,8 +45,8 @@ async function verifyResetToken(token) {
   return user;
 }
 
-async function checkPasswordValid(user, password) {
-  return bcrypt.compare(password, user.password);
+async function checkPasswordValid(hashedPassword, plainPassword) {
+  return bcrypt.compare(plainPassword, hashedPassword);
 }
 
 async function hashPassword(password) {

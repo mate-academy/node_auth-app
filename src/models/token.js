@@ -4,7 +4,7 @@ const { User } = require('./user');
 
 const Token = client.define('token', {
   refreshToken: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
 });
