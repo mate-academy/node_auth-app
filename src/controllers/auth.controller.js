@@ -78,7 +78,10 @@ const login = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await passwordService.checkPasswordValid(
+    user.password,
+    password,
+  );
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
@@ -112,8 +115,6 @@ const logout = async (req, res) => {
 
   if (!user || !refreshToken) {
     throw ApiError.unauthorized();
-
-    // return;
   }
 
   await tokenService.remove(user.id);

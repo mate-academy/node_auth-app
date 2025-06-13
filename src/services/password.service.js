@@ -45,6 +45,14 @@ async function verifyResetToken(token) {
   return user;
 }
 
+async function checkPasswordValid(user, password) {
+  return bcrypt.compare(password, user.password);
+}
+
+async function hashPassword(password) {
+  return bcrypt.hash(password, 10);
+}
+
 async function updatePassword(token, password) {
   const user = await User.findOne({
     where: {
@@ -60,7 +68,7 @@ async function updatePassword(token, password) {
   }
 
   // update password
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
 
   user.password = hashedPassword;
   user.resetPasswordToken = null;
@@ -70,10 +78,33 @@ async function updatePassword(token, password) {
   return true;
 }
 
+async function updateProfilePassword(userId, oldPassword, newPassword) {
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  const isPasswordValid = await checkPasswordValid(user, oldPassword);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Invalid current password');
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  user.password = hashedPassword;
+  await user.save();
+
+  return true;
+}
+
 const passwordService = {
   requestReset,
   verifyResetToken,
   updatePassword,
+  checkPasswordValid,
+  updateProfilePassword,
 };
 
 module.exports = { passwordService };

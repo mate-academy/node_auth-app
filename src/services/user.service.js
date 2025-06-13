@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const { User } = require('../models/user');
 const { emailService } = require('./email.service');
 const { ApiError } = require('../exeptions/api.error');
+const { validateName } = require('../utils/validators');
 
 const normalizeUser = (user) => {
   const { id, name, email, createdAt, updatedAt } = user;
@@ -42,10 +43,30 @@ const register = async (name, email, password) => {
   await emailService.sendActivationEmail(email, activationToken);
 };
 
+const updateUserName = async (userId, newName) => {
+  const nameError = validateName(newName);
+
+  if (nameError) {
+    throw ApiError.badRequest('Invalid name', { name: nameError });
+  }
+
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  user.name = newName;
+  await user.save();
+
+  return user;
+};
+
 const userService = {
   register,
   normalizeUser,
   findByEmail,
+  updateUserName,
 };
 
 module.exports = { userService };
