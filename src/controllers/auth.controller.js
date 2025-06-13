@@ -111,6 +111,7 @@ const refresh = async (req, res) => {
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
+
   const user = jwtService.verifyRefresh(refreshToken);
 
   if (!user || !refreshToken) {

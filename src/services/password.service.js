@@ -85,7 +85,7 @@ async function updateProfilePassword(userId, oldPassword, newPassword) {
     throw ApiError.notFound('User not found');
   }
 
-  const isPasswordValid = await checkPasswordValid(user, oldPassword);
+  const isPasswordValid = await checkPasswordValid(user.password, oldPassword);
 
   if (!isPasswordValid) {
     throw ApiError.badRequest('Invalid current password');
