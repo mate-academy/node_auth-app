@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTestAccount({
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   secure: false,
@@ -22,7 +22,7 @@ function send({ email, subject, html }) {
 
 function sendActivationEmail({ name, email, activationToken }) {
   const href = `${process.env.CLIENT_HOST}/activate/${activationToken}`;
-  const html = `<h1>Activate your account, ${name}</h>
+  const html = `<h1>Activate your account, ${name}</h1>
   <a href="${href}">${href}</a>
   `;
 

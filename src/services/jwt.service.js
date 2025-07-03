@@ -14,7 +14,7 @@ function verify(token) {
   }
 }
 
-function singRefresh(user) {
+function signRefresh(user) {
   const token = jwt.sign(user, process.env.JWT_REFRESH_KEY);
 
   return token;
@@ -32,7 +32,7 @@ module.exports = {
   jwtService: {
     sign,
     verify,
-    singRefresh,
+    signRefresh,
     verifyRefresh,
   },
 };

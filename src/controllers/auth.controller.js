@@ -9,6 +9,8 @@ const validateName = (name) => {
   if (!name) {
     return 'Name is required';
   }
+
+  return null;
 };
 
 const validateEmail = (email) => {
@@ -33,6 +35,8 @@ const validatePassword = (password) => {
   if (password.length < 6) {
     return 'At least 6 characters required';
   }
+
+  return null;
 };
 
 const register = async (req, res) => {
