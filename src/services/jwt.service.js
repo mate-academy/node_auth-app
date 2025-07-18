@@ -11,10 +11,7 @@ function sign(user) {
 function verify(token) {
   try {
     return jwt.verify(token, process.env.JWT_KEY);
-  } catch {
-    e;
-  }
-  {
+  } catch (e) {
     return null;
   }
 }
@@ -28,10 +25,7 @@ function signRefresh(user) {
 function verifyRefresh(token) {
   try {
     return jwt.verify(token, process.env.JWT_REFRESH_KEY);
-  } catch {
-    e;
-  }
-  {
+  } catch (e) {
     return null;
   }
 }

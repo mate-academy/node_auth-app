@@ -6,7 +6,7 @@ import { v4 as uuid4 } from 'uuid';
 const register = async ({ name, email, password }) => {
   const existUSer = await findByEmail(email);
   const activationToken = uuid4();
-  const href = `${process.env.CLIENT_HOST}/auth/activation/${token}`;
+  const href = `${process.env.CLIENT_HOST}/auth/activation/${activationToken}`;
   const html = `
   <h1>Click for activate Account</h1>
   <a href="${href}">${href}</a>
@@ -21,8 +21,8 @@ const register = async ({ name, email, password }) => {
   await emailService.sendActivationEmail(email, html);
 };
 
-const activateUser = async (req, res) => {
-  const { activationToken } = req.params;
+const activateUser = async ({ activationToken }) => {
+
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
@@ -30,7 +30,7 @@ const activateUser = async (req, res) => {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 };
 
 const findByEmail = async (email) => {

@@ -1,8 +1,9 @@
 import { User } from '../models/User.model.js';
 import { ApiError } from '../exeptetion/apiError.js';
 import bcrypt from 'bcrypt';
+import { emailService } from '../services/email.service.js';
 
-const getProfile = async (res, req) => {
+const getProfile = async (req, res) => {
   const user = await User.findByPk(req.user.id, {
     attributes: ['id', 'name', 'email'],
   });
@@ -21,21 +22,21 @@ const changeName = async (req, res) => {
   res.status(200).send({ message: 'Your name have been changed' });
 };
 
-const changePassword = async (res, req) => {
-  const { oldPassword, newPasword, confirmPassword } = req.body;
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword , confirmPassword } = req.body;
 
-  if (newPasword !== confirmPassword) {
+  if (newPassword !== confirmPassword) {
     throw ApiError.badRequest('Passwords do not match');
   }
 
-  const user = User.findByPk(req.user.id);
-  const verifyPassword = bcrypt.compare(user.password, oldPassword);
+  const user = await User.findByPk(req.user.id);
+  const verifyPassword = await bcrypt.compare(user.password, oldPassword);
 
   if (!verifyPassword) {
     throw ApiError.badRequest('Passwords do not match');
   }
 
-  const hashedPassword = bcrypt.hash(newPasword, 10);
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
 
   user.password = hashedPassword;
   await user.save();
@@ -56,8 +57,8 @@ const changeEmail = async (req, res) => {
     throw ApiError.badRequest('This email is registed');
   }
 
-  const user = User.findByPk(req.user.id);
-  const verifyPassword = bcrypt.compare(user.password, password);
+  const user = await User.findByPk(req.user.id);
+  const verifyPassword = await bcrypt.compare(password, user.password);
 
   if (!verifyPassword) {
     throw ApiError.badRequest('Passwords do not match');
@@ -67,7 +68,7 @@ const changeEmail = async (req, res) => {
   <h1>Your Email have been changed</h1>
 `;
 
-  await emailService.sendActivationEmail(email, html);
+  await emailService.sendActivationEmail(user.email, html);
 
   user.email = newEmail;
   await user.save();

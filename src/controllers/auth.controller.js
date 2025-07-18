@@ -4,6 +4,7 @@ import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
 import { ApiError } from '../exeptetion/apiError.js';
 import bcrypt from 'bcrypt';
+import { emailService } from '../services/email.service.js';
 
 const validateEmail = (value) => {
   if (!value) {
@@ -50,7 +51,8 @@ const registration = async (req, res) => {
 };
 
 const activate = async (req, res) => {
-  const user = await authService.activateUser();
+  const { activationToken } = req.params;
+  const user = await authService.activateUser({ activationToken });
 
   res.send(user);
 };
@@ -66,7 +68,7 @@ const login = async (req, res) => {
     });
   }
 
-  const isValidPassword = bcrypt.compare(password, user.password);
+  const isValidPassword = await bcrypt.compare(password, user.password);
 
   if (!isValidPassword) {
     throw ApiError.badRequest('wrong password', {
@@ -74,10 +76,10 @@ const login = async (req, res) => {
     });
   }
 
-  generateTokens(res, user);
+  await generateTokens(res, user);
 };
 
-const refresh = (req, res) => {
+const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
   const user = jwtService.verifyRefresh(refreshToken);
   const token = tokenService.getByToken(refreshToken);
@@ -86,7 +88,7 @@ const refresh = (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  generateTokens(res, user);
+  await generateTokens(res, user);
 };
 
 const generateTokens = async (res, user) => {
