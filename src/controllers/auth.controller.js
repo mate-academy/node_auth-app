@@ -62,7 +62,7 @@ const login = async (req, res) => {
 
   const user = await authService.findByEmail(email);
 
-  if (!email) {
+  if (!user) {
     throw ApiError.badRequest('wrong email', {
       email: 'wrong email',
     });
@@ -81,8 +81,8 @@ const login = async (req, res) => {
 
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
-  const user = jwtService.verifyRefresh(refreshToken);
-  const token = tokenService.getByToken(refreshToken);
+  const user = await jwtService.verifyRefresh(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
 
   if (!user || !token) {
     throw ApiError.unauthorized();
@@ -110,7 +110,7 @@ const generateTokens = async (res, user) => {
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
-  const user = jwtService.verifyRefresh(refreshToken);
+  const user = await jwtService.verifyRefresh(refreshToken);
 
   if (!user || !refreshToken) {
     throw ApiError.unauthorized();
@@ -160,6 +160,8 @@ const verifyResetToken = async (req, res) => {
 
   user.resetToken = resetToken;
   await user.save();
+
+  res.status(201);
 };
 
 const resetPassword = async (req, res) => {

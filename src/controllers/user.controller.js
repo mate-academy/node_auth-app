@@ -30,7 +30,7 @@ const changePassword = async (req, res) => {
   }
 
   const user = await User.findByPk(req.user.id);
-  const verifyPassword = await bcrypt.compare(user.password, oldPassword);
+  const verifyPassword = await bcrypt.compare(oldPassword, user.password);
 
   if (!verifyPassword) {
     throw ApiError.badRequest('Passwords do not match');
