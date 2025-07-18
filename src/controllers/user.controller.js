@@ -1,0 +1,84 @@
+import { User } from '../models/User.model.js';
+import { ApiError } from '../exeptetion/apiError.js';
+import bcrypt from 'bcrypt';
+import { emailService } from '../services/email.service.js';
+
+const getProfile = async (req, res) => {
+  const user = await User.findByPk(req.user.id, {
+    attributes: ['id', 'name', 'email'],
+  });
+
+  return user;
+};
+
+const changeName = async (req, res) => {
+  const { newName } = req.body;
+  const user = await User.findByPk(req.user.id);
+
+  user.name = newName;
+
+  await user.save();
+
+  res.status(200).send({ message: 'Your name have been changed' });
+};
+
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword , confirmPassword } = req.body;
+
+  if (newPassword !== confirmPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const user = await User.findByPk(req.user.id);
+  const verifyPassword = await bcrypt.compare(oldPassword, user.password);
+
+  if (!verifyPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  await user.save();
+
+  res.status(200).send({ message: 'Your password have been changed' });
+};
+
+const changeEmail = async (req, res) => {
+  const { password, newEmail, confirmEmail } = req.body;
+
+  if (newEmail !== confirmEmail) {
+    throw ApiError.badRequest('Emails do not match');
+  }
+
+  const existingEmail = await User.findOne({ where: { email: newEmail } });
+
+  if (existingEmail) {
+    throw ApiError.badRequest('This email is registed');
+  }
+
+  const user = await User.findByPk(req.user.id);
+  const verifyPassword = await bcrypt.compare(password, user.password);
+
+  if (!verifyPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const html = `
+  <h1>Your Email have been changed</h1>
+`;
+
+  await emailService.sendActivationEmail(user.email, html);
+
+  user.email = newEmail;
+  await user.save();
+
+  res.status(200).send({ message: 'Check your email' });
+};
+
+export const userController = {
+  getProfile,
+  changeName,
+  changePassword,
+  changeEmail,
+};
