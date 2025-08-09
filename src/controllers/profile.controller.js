@@ -1,60 +1,104 @@
-const profileService = require('../services/profile.service');
-const { getTokenFromRequest } = require('../utils/getTokenFromRequest');
+import bcrypt from 'bcrypt';
+import { User } from '../models/User.js';
+import { sendEmail } from '../utils/sendEmail.js';
+import { v4 as uuidv4 } from 'uuid';
 
-const passReset = async (req, res) => {
-  const accessToken = getTokenFromRequest(req);
-  const updatedUser = await profileService.passReset(accessToken);
+export const updateUserName = async (req, res) => {
+  const { name } = req.body;
 
-  res.send(updatedUser);
+  try {
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Користувача не знайдено' });
+    }
+
+    user.name = name;
+    await user.save();
+
+    res.json({ message: 'Імʼя оновлено', name });
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка сервера' });
+  }
 };
 
-const passResetConfirm = async (req, res) => {
-  const { userId } = req.params;
-  const { newPass, newPassConfirmation } = req.body;
-  const newUser = await profileService.passResetConfirm(
-    userId,
-    newPass,
-    newPassConfirmation,
-  );
+export const updateUserPassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
 
-  res.send(newUser);
+  try {
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Користувача не знайдено' });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Невірний поточний пароль' });
+    }
+
+    const hash = await bcrypt.hash(newPassword, 10);
+
+    user.passwordHash = hash;
+    await user.save();
+
+    res.json({ message: 'Пароль оновлено' });
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка сервера' });
+  }
 };
 
-const changeName = async (req, res) => {
-  const accessToken = getTokenFromRequest(req);
-  const { newName } = req.body;
-  const updatedUser = await profileService.changeName(newName, accessToken);
-
-  res.send(updatedUser);
-};
-
-const changeEmail = async (req, res) => {
-  const accessToken = getTokenFromRequest(req);
+export const requestEmailChange = async (req, res) => {
   const { newEmail, password } = req.body;
-  const user = await profileService.changeEmail(
-    newEmail,
-    password,
-    accessToken,
-  );
 
-  res.send(user);
+  try {
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Користувача не знайдено' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Невірний пароль' });
+    }
+
+    const token = uuidv4();
+
+    user.emailChangeToken = token;
+    user.newEmail = newEmail;
+    await user.save();
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Зміна email',
+      html: `<p>Хтось намагається змінити вашу електронну пошту на ${newEmail}. Якщо це не ви — нічого не робіть. Якщо це ви — підтвердьте зміну, перейшовши за <a href="http://localhost:5000/api/user/confirm-email-change/${token}">цим посиланням</a>.</p>`,
+    });
+
+    res.json({ message: 'На стару пошту надіслано листа з підтвердженням' });
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка сервера' });
+  }
 };
 
-const changeEmailConfirm = async (req, res) => {
-  const { accessToken } = req.params;
-  const { newEmail } = req.body;
-  const updatedUser = await profileService.changeEmailConfirm(
-    newEmail,
-    accessToken,
-  );
+export const confirmEmailChange = async (req, res) => {
+  const { token } = req.params;
 
-  res.send(updatedUser);
-};
+  try {
+    const user = await User.findOne({ where: { emailChangeToken: token } });
 
-module.exports = {
-  passReset,
-  passResetConfirm,
-  changeName,
-  changeEmail,
-  changeEmailConfirm,
+    if (!user) {
+      return res.status(400).json({ message: 'Невірний токен' });
+    }
+    user.email = user.newEmail;
+    user.newEmail = null;
+    user.emailChangeToken = null;
+    await user.save();
+
+    res.redirect('/email-changed-success.html');
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка сервера' });
+  }
 };
