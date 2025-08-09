@@ -1,12 +1,24 @@
 /* eslint-disable no-console */
+
 'use strict';
+import express from 'express';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
-require('dotenv/config');
+const app = express();
 
-const { createServer } = require('./createServer');
+app.use(express.json());
+app.use('/api/user', userRoutes);
 
-const PORT = process.env.PORT || 3005;
+app.use('/api/auth', authRoutes);
 
-createServer().listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+// 404 middleware
+app.use((req, res) => {
+  res.status(404).json({ message: 'Сторінку не знайдено' });
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
