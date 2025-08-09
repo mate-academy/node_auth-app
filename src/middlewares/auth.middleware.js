@@ -1,23 +1,26 @@
-const { ApiError } = require('../exceptions/api.error');
-const jwtService = require('../services/jwt.service');
+import jwt from 'jsonwebtoken';
 
-const authMiddleware = (req, res, next) => {
-  const authorization = req.headers['authorization'] || '';
-  const [, token] = authorization.split(' ');
+const JWT_SECRET = process.env.JWT_SECRET;
 
-  if (!authorization || !token) {
-    throw ApiError.unauthorized();
+export const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Необхідна авторизація' });
   }
 
-  const userData = jwtService.verify(token);
+  const token = authHeader.split(' ')[1];
 
-  if (!userData) {
-    throw ApiError.unauthorized();
+  if (!token) {
+    return res.status(401).json({ message: 'Токен не надано' });
   }
 
-  next();
-};
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
 
-module.exports = {
-  authMiddleware,
+    req.user = { id: decoded.id, email: decoded.email };
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Невірний токен' });
+  }
 };
