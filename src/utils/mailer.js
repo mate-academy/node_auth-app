@@ -1,0 +1,26 @@
+import nodemailer from 'nodemailer';
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: process.env.SMTP_SECURE === 'true',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+export const sendActivationEmail = async (toEmail, activationLink) => {
+  const mailOptions = {
+    from: process.env.SMTP_FROM,
+    to: toEmail,
+    subject: 'Активація акаунта',
+    html: `
+      <p>Дякуємо за реєстрацію!</p>
+      <p>Щоб активувати акаунт, будь ласка, перейдіть за посиланням:</p>
+      <a href="${activationLink}">${activationLink}</a>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
