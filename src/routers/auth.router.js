@@ -1,45 +1,19 @@
-const express = require('express');
-const authController = require('../controllers/auth.controller');
-const { catchError } = require('../utils/catchError');
-const { noAuthMiddleware } = require('../middlewares/noAuth.middleware');
-const { authMiddleware } = require('../middlewares/auth.middleware');
+import express from 'express';
+import {
+  register,
+  activateUser,
+  login,
+  requestPasswordReset,
+  resetPassword,
+} from '../controllers/authController.js';
 
-const authRouter = new express.Router();
+const router = express.Router();
 
-authRouter.post(
-  '/registration',
-  noAuthMiddleware,
-  catchError(authController.register),
-);
+router.post('/register', register);
+router.get('/activate/:token', activateUser);
+router.post('/login', login);
 
-authRouter.get(
-  '/activation/:activationToken',
-  noAuthMiddleware,
-  catchError(authController.activate),
-);
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password/:token', resetPassword);
 
-authRouter.post('/login', noAuthMiddleware, catchError(authController.login));
-
-authRouter.get(
-  '/refresh',
-  noAuthMiddleware,
-  catchError(authController.refresh),
-);
-
-authRouter.post('/logout', authMiddleware, catchError(authController.logout));
-
-authRouter.patch(
-  '/passReset',
-  noAuthMiddleware,
-  catchError(authController.passReset),
-);
-
-authRouter.get(
-  '/passResetConfirmation/:accessToken',
-  noAuthMiddleware,
-  catchError(authController.passResetConfirm),
-);
-
-module.exports = {
-  authRouter,
-};
+export default router;
