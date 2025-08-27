@@ -4,7 +4,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const EmailService = require('../services/emailService');
-const { isNotAuthenticated } = require('../middleware/auth');
+const { isNotAuthenticated, isAuthenticated } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -203,33 +203,45 @@ router.post(
     try {
       const { email } = req.body;
 
-      // Створення токена для скидання
-      const resetToken = User.createResetToken(email);
+      // Завжди показуємо однакову відповідь для безпеки
+      // (не розкриваємо, чи існує користувач з такою поштою)
 
-      // Отримання користувача для відправки листа
-      const user = User.findByEmail(email);
+      try {
+        // Створення токена для скидання
+        const resetToken = User.createResetToken(email);
 
-      // Відправка листа
-      const emailSent = await EmailService.sendPasswordResetEmail(
-        email,
-        user.name,
-        resetToken,
-      );
+        // Отримання користувача для відправки листа
+        const user = User.findByEmail(email);
 
-      if (emailSent) {
-        res.render('auth/email-sent', {
-          title: 'Email надіслано',
-          user: null,
-          message:
-            'Лист для скидання пароля надіслано на вашу електронну пошту.',
-        });
-      } else {
-        req.flash('error', 'Не вдалося надіслати лист.');
-        res.redirect('/auth/login');
+        if (user) {
+          // Відправка листа тільки якщо користувач існує
+          await EmailService.sendPasswordResetEmail(
+            email,
+            user.name,
+            resetToken,
+          );
+        }
+      } catch (error) {
+        // Ігноруємо помилки - завжди показуємо успіх
       }
+
+      // Завжди показуємо сторінку "email надіслано"
+      res.render('auth/email-sent', {
+        title: 'Email надіслано',
+        user: null,
+        message:
+          'Якщо вказана електронна адреса існує в нашій системі, ' +
+          'лист для скидання пароля буде надіслано.',
+      });
     } catch (error) {
-      req.flash('error', error.message);
-      res.redirect('/auth/forgot-password');
+      // У випадку критичних помилок все одно показуємо успіх
+      res.render('auth/email-sent', {
+        title: 'Email надіслано',
+        user: null,
+        message:
+          'Якщо вказана електронна адреса існує в нашій системі, ' +
+          'лист для скидання пароля буде надіслано.',
+      });
     }
   },
 );
@@ -295,7 +307,7 @@ router.post(
 );
 
 // Вихід
-router.get('/logout', (req, res) => {
+router.get('/logout', isAuthenticated, (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       // eslint-disable-next-line no-console

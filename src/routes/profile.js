@@ -127,6 +127,17 @@ router.post(
       .isEmail()
       .normalizeEmail()
       .withMessage('Введіть коректну нову електронну пошту'),
+    body('confirmNewEmail')
+      .isEmail()
+      .normalizeEmail()
+      .withMessage('Введіть коректне підтвердження електронної пошти')
+      .custom((value, { req }) => {
+        if (value !== req.body.newEmail) {
+          throw new Error('Нові електронні адреси не співпадають');
+        }
+
+        return true;
+      }),
   ],
   handleValidationErrors,
   async (req, res) => {
@@ -149,8 +160,8 @@ router.post(
       // Збереження старого email для повідомлення
       const oldEmail = user.email;
 
-      // Оновлення email
-      user.updateEmail(newEmail, password);
+      // Оновлення email (перевірка пароля вже виконана)
+      user.updateEmail(newEmail);
 
       // Оновлення сесії
       req.session.user.email = newEmail;

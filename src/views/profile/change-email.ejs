@@ -31,6 +31,11 @@
                             <input type="email" class="form-control" id="newEmail"
                                    name="newEmail" value="<%= locals.newEmail || '' %>" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="confirmNewEmail" class="form-label">Підтвердження нової електронної адреси</label>
+                            <input type="email" class="form-control" id="confirmNewEmail"
+                                   name="confirmNewEmail" required>
+                        </div>
 
                         <div class="d-flex gap-2">
                             <a href="/profile" class="btn btn-secondary flex-fill">

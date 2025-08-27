@@ -186,7 +186,7 @@ class User {
   }
 
   // Оновлення email
-  updateEmail(newEmail, password) {
+  updateEmail(newEmail) {
     // Перевірка, чи існує користувач з новою поштою
     const existingUser = users.find(
       (u) => u.email === newEmail && u.id !== this.id,
