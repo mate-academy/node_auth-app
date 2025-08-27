@@ -1,28 +1,190 @@
-# Auth application
-Implement an application that allows user to:
-- Register using name, email and password (only non authenticated)
-  - Inform the users about the rules for a password and check them
-  - send and activation email
-- Actvation page (only non authenticated)
-  - the user should be activated only after email confirmation
-  - redirect to Profile after the activation
-- Login with valid credentials (email and password) (only non authenticated)
-  - If user is not active ask them to activate their email
-  - Redirect to profile after login
-- Logout (only authenticated)
-  - Redirect to login after logging out
-- Password reset (only non authenticated)
-  - Ask for an email
-  - Show email sent page
-  - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
-  - Show Success page with a link to login
-- Profile page (only authenticated)
-  - You can change a name
-  - It allows to change a password (require an old one, `new password` and `confirmation`)
-  - To change an email you should type the password, confirm the new email and notify the old email about the change
-- 404 for all the other pages
+# Система авторизації користувачів
 
-## (Optional) Advanced tasks
-- Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
-- Profile page should allow to add/remove any social account
-- Add authentication to your Accounting App
+Повноцінний веб-додаток для авторизації користувачів з усіма необхідними функціями безпеки та управління профілем.
+
+## Функціональність
+
+### 🔐 Автентифікація
+- **Реєстрація** - створення нового облікового запису з валідацією
+- **Вхід** - авторизація зареєстрованих користувачів
+- **Вихід** - безпечне завершення сесії
+- **Активація** - підтвердження облікового запису через email
+
+### 🔒 Безпека паролів
+- Хешування паролів з використанням bcrypt
+- Валідація складності пароля (мінімум 8 символів, великі/малі літери, цифри)
+- Підтвердження пароля при реєстрації та зміні
+- Скидання пароля через email
+
+### 📧 Електронна пошта
+- Автоматична відправка листів активації
+- Листи для скидання пароля
+- Повідомлення про зміну email
+- Підтримка SMTP та тестового режиму
+
+### 👤 Управління профілем
+- Перегляд інформації про користувача
+- Зміна імені
+- Зміна пароля з підтвердженням поточного
+- Зміна email з повідомленням на стару адресу
+
+### 🛡️ Безпека
+- Сесійна автентифікація
+- Middleware для захисту маршрутів
+- Валідація вхідних даних
+- Flash повідомлення для користувача
+
+## Технології
+
+- **Backend**: Node.js, Express.js
+- **Шаблони**: EJS
+- **Стилі**: Bootstrap 5, Font Awesome
+- **Безпека**: bcryptjs, express-session, express-validator
+- **Email**: Nodemailer
+- **Розробка**: Nodemon для автоматичного перезапуску
+
+## Встановлення
+
+1. **Клонування репозиторію**
+   ```bash
+   git clone <repository-url>
+   cd node_auth-app
+   ```
+
+2. **Встановлення залежностей**
+   ```bash
+   npm install
+   ```
+
+3. **Налаштування змінних середовища** (опціонально)
+   Створіть файл `.env` в корені проекту:
+   ```env
+   NODE_ENV=development
+   PORT=3000
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASS=your-app-password
+   ```
+
+4. **Запуск додатку**
+   ```bash
+   # Розробка (з автоматичним перезапуском)
+   npm run dev
+
+   # Продакшн
+   npm start
+   ```
+
+5. **Відкрийте браузер**
+   Перейдіть на `http://localhost:3000`
+
+## Структура проекту
+
+```
+src/
+├── index.js              # Головний файл сервера
+├── middleware/
+│   └── auth.js          # Middleware для автентифікації
+├── models/
+│   └── User.js          # Модель користувача
+├── routes/
+│   ├── auth.js          # Маршрути автентифікації
+│   └── profile.js       # Маршрути профілю
+├── services/
+│   └── emailService.js  # Сервіс для відправки email
+└── views/
+    ├── layout.ejs       # Базовий шаблон
+    ├── 404.ejs          # Сторінка 404
+    ├── error.ejs        # Сторінка помилки
+    ├── auth/            # Шаблони автентифікації
+    │   ├── register.ejs
+    │   ├── login.ejs
+    │   ├── forgot-password.ejs
+    │   └── reset-password.ejs
+    └── profile/         # Шаблони профілю
+        ├── index.ejs
+        ├── edit-name.ejs
+        ├── change-password.ejs
+        └── change-email.ejs
+```
+
+## API Маршрути
+
+### Автентифікація
+- `GET /auth/register` - форма реєстрації
+- `POST /auth/register` - обробка реєстрації
+- `GET /auth/login` - форма входу
+- `POST /auth/login` - обробка входу
+- `GET /auth/activate/:token` - активація облікового запису
+- `GET /auth/forgot-password` - форма запиту скидання пароля
+- `POST /auth/forgot-password` - обробка запиту
+- `GET /auth/reset-password/:token` - форма скидання пароля
+- `POST /auth/reset-password/:token` - обробка скидання
+- `GET /auth/logout` - вихід з системи
+
+### Профіль
+- `GET /profile` - головна сторінка профілю
+- `GET /profile/edit-name` - форма зміни імені
+- `POST /profile/edit-name` - обробка зміни імені
+- `GET /profile/change-password` - форма зміни пароля
+- `POST /profile/change-password` - обробка зміни пароля
+- `GET /profile/change-email` - форма зміни email
+- `POST /profile/change-email` - обробка зміни email
+
+## Валідація
+
+### Пароль
+- Мінімум 8 символів
+- Обов'язково великі та малі літери
+- Обов'язково хоча б одна цифра
+
+### Email
+- Коректний формат email адреси
+- Унікальність в системі
+
+### Ім'я
+- Від 2 до 50 символів
+- Не може бути порожнім
+
+## Безпека
+
+- Паролі хешуються з використанням bcrypt (10 раундів солі)
+- Сесії зберігаються на сервері
+- Валідація всіх вхідних даних
+- Захист від CSRF через сесії
+- Безпечне завершення сесій
+
+## Email налаштування
+
+Для налаштування відправки email у продакшні:
+
+1. Встановіть змінні середовища `EMAIL_USER` та `EMAIL_PASS`
+2. Налаштуйте SMTP сервер у `src/services/emailService.js`
+3. Встановіть `NODE_ENV=production`
+
+## Розробка
+
+```bash
+# Запуск в режимі розробки
+npm run dev
+
+# Перевірка коду
+npm run lint
+
+# Форматування коду
+npm run format
+
+# Запуск тестів
+npm test
+```
+
+## Ліцензія
+
+GPL-3.0
+
+## Автор
+
+Mate Academy
+
+---
+
+**Примітка**: Цей додаток використовує імітацію бази даних для демонстрації. У реальному проекті замініть масиви на справжню базу даних (MongoDB, PostgreSQL тощо).

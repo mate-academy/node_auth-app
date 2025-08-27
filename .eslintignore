@@ -1,0 +1,10 @@
+# Ігнорувати EJS шаблони
+src/views/**/*.ejs
+
+# Ігнорувати node_modules
+node_modules/
+
+# Ігнорувати інші файли
+*.min.js
+dist/
+build/

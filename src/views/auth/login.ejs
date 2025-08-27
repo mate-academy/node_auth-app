@@ -1,0 +1,41 @@
+<div class="auth-container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h3><i class="fas fa-sign-in-alt me-2"></i>Вхід в систему</h3>
+        </div>
+        <div class="card-body">
+            <form action="/auth/login" method="POST">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Електронна пошта</label>
+                    <input type="email" class="form-control" id="email" name="email"
+                           value="<%= locals.email || '' %>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>Увійти
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer text-center">
+            <div class="row">
+                <div class="col-6">
+                    <a href="/auth/forgot-password" class="text-decoration-none">
+                        <i class="fas fa-key me-1"></i>Забули пароль?
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a href="/auth/register" class="text-decoration-none">
+                        <i class="fas fa-user-plus me-1"></i>Реєстрація
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

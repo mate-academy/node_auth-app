@@ -1,0 +1,29 @@
+<div class="container text-center py-5">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="display-1 text-muted">404</h1>
+                    <h2 class="mb-4">Сторінку не знайдено</h2>
+                    <p class="text-muted mb-4">
+                        Вибачте, але сторінка, яку ви шукаєте, не існує або була переміщена.
+                    </p>
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a href="/" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i>На головну
+                        </a>
+                        <% if (user) { %>
+                            <a href="/profile" class="btn btn-outline-primary">
+                                <i class="fas fa-user me-2"></i>Профіль
+                            </a>
+                        <% } else { %>
+                            <a href="/auth/login" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Увійти
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

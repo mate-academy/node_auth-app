@@ -1,0 +1,77 @@
+<div class="auth-container">
+    <div class="card">
+        <div class="card-header text-center">
+            <h3><i class="fas fa-user-plus me-2"></i>Реєстрація</h3>
+        </div>
+        <div class="card-body">
+            <form action="/auth/register" method="POST">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Ім'я</label>
+                    <input type="text" class="form-control" id="name" name="name"
+                           value="<%= locals.name || '' %>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Електронна пошта</label>
+                    <input type="email" class="form-control" id="email" name="email"
+                           value="<%= locals.email || '' %>" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="password-requirements">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            Пароль має містити:
+                            <ul class="mt-1 mb-0">
+                                <li>Мінімум 8 символів</li>
+                                <li>Великі та малі літери</li>
+                                <li>Хоча б одну цифру</li>
+                            </ul>
+                        </small>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Підтвердження пароля</label>
+                    <input type="password" class="form-control" id="confirmPassword"
+                           name="confirmPassword" required>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>Зареєструватися
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer text-center">
+            <p class="mb-0">
+                Вже маєте обліковий запис?
+                <a href="/auth/login" class="text-decoration-none">Увійти</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Валідація паролів в реальному часі
+document.getElementById('confirmPassword').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+
+    if (password !== confirmPassword) {
+        this.setCustomValidity('Паролі не співпадають');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+
+document.getElementById('password').addEventListener('input', function() {
+    const confirmPassword = document.getElementById('confirmPassword');
+    if (confirmPassword.value) {
+        confirmPassword.dispatchEvent(new Event('input'));
+    }
+});
+</script>
