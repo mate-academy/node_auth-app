@@ -62,13 +62,12 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   const user = await userService.findByEmail(email);
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
 
   if (user.activationToken) {
     throw ApiError.badRequest('Please activate the profile');
-  }
-
-  if (!user) {
-    throw ApiError.badRequest('No such user');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -125,12 +124,17 @@ const forgotPassword = async (req, res) => {
   await userService.saveResetToken(user.id, resetToken, Date.now() + 3600000);
 
   res.status(200);
-  res.send({ message: 'Reset token generated', resetToken });
-}
+  res.send({ message: 'Кeset link has been sent' });
+};
 
 const resetPassword = async (req, res) => {
   const { token } = req.params;
-  const { password } = req.body;
+  const { password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
 
   const passwordError = validate.validatePassword(password);
   if (passwordError) {
@@ -157,5 +161,5 @@ export const authController = {
   refresh,
   logout,
   forgotPassword,
-  resetPassword
+  resetPassword,
 };

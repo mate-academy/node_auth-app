@@ -76,12 +76,13 @@ async function updatePassword(userId, hashedPass) {
   return user;
 }
 
-async function updateProfile(userId, { username, email }) {
+async function updateProfile(userId, { username, email, password }) {
   const user = await User.findByPk(userId);
   if (!user) throw ApiError.notFound('User not found');
 
   if (username) user.username = username;
   if (email) user.email = email;
+  if (password) user.password = password;
 
   await user.save();
   return user;

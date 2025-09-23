@@ -33,7 +33,10 @@ const updateProfile = async (req, res) => {
   const userData = jwtService.verify(token);
   if (!userData) throw ApiError.unauthorized();
 
-  const { username, email } = req.body;
+  const { userId, username, email, password, currentPassword } = req.body;
+  if (!userId) throw ApiError.badRequest('User ID is required');
+
+  const user = await userService.findById(userId);
 
   const errors = {};
 
@@ -41,9 +44,36 @@ const updateProfile = async (req, res) => {
     const usernameError = validate.validateUsername(username);
     if (usernameError) errors.username = usernameError;
   }
+
   if (email) {
+    if (!currentPassword) {
+      errors.currentPassword = 'Current password is required to change email';
+    } else {
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isPasswordValid) {
+        errors.currentPassword = 'Current password is incorrect';
+      }
+    }
+
     const emailError = validate.validateEmail(email);
     if (emailError) errors.email = emailError;
+  }
+
+  let hashedPassword;
+  if (password) {
+    if (!currentPassword) {
+      errors.currentPassword = 'Current password is required to change password';
+    } else {
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isPasswordValid) {
+        errors.currentPassword = 'Current password is incorrect';
+      }
+    }
+
+    const passwordError = validate.validatePassword(password);
+    if (passwordError) errors.password = passwordError;
+
+    hashedPassword = await bcrypt.hash(password, 10);
   }
 
   if (Object.keys(errors).length > 0) {
@@ -53,6 +83,7 @@ const updateProfile = async (req, res) => {
   const updatedUser = await userService.updateProfile(userData.id, {
     username,
     email,
+    password: hashedPassword,
   });
 
   res.status(200);
