@@ -7,7 +7,13 @@ const { mailer } = require('../utils/mailer');
 
 const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
+
+    if (!name || name.trim().length < 2) {
+      return res
+        .status(400)
+        .json({ message: 'Name is required (min 2 chars)' });
+    }
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password required' });
@@ -30,6 +36,7 @@ const register = async (req, res) => {
 
     const user = await db.user.create({
       data: {
+        name,
         email,
         password: hashedPassword,
         isActive: false,
@@ -50,6 +57,8 @@ const register = async (req, res) => {
       userId: user.id,
     });
   } catch (error) {
+    console.error(error);
+
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -70,7 +79,7 @@ const activate = async (req, res) => {
       data: { isActive: true, activationToken: null },
     });
 
-    return res.json({ message: 'Account activated successfully' });
+    return res.redirect(process.env.CLIENT_URL + '/profile');
   } catch (error) {
     console.error(error);
 

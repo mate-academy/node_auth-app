@@ -1,50 +1,47 @@
-const bcrypt = require('bcrypt');
 const { db } = require('../utils/db');
-const { generateAccessToken, generateRefreshToken } = require('../utils/jwt');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password required' });
-    }
-
     const user = await db.user.findUnique({ where: { email } });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     if (!user.isActive) {
-      return res.status(403).json({ message: 'Account is not activated' });
+      return res.status(403).json({ message: 'Please activate your email' });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const validPassword = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    // eslint-disable-next-line no-unused-vars
+    const accessToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' },
+    );
 
-    await db.token.deleteMany({ where: { userId: user.id } });
+    const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
 
     await db.token.create({
-      data: {
-        userId: user.id,
-        refresh: refreshToken,
-      },
+      data: { refresh: refreshToken, userId: user.id },
     });
 
-    return res.status(200).json({
-      message: 'Login successful',
-      user: { id: user.id, email: user.email },
-      accessToken,
-      refreshToken,
-    });
+    return res.redirect(process.env.CLIENT_URL + '/profile');
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Login error:', error);
+
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
