@@ -16,10 +16,12 @@ Implement an application that allows user to:
   - Show email sent page
   - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
   - Show Success page with a link to login
+
 - Profile page (only authenticated)
   - You can change a name
   - It allows to change a password (require an old one, `new password` and `confirmation`)
   - To change an email you should type the password, confirm the new email and notify the old email about the change
+
 - 404 for all the other pages
 
 ## (Optional) Advanced tasks
