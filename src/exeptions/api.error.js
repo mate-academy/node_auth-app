@@ -12,11 +12,7 @@ class ApiError extends Error {
       errors,
       status: 400,
     });
-  }
-
-  static unauthorized(errors) {
-    return new ApiError({
-      message: 'unathorized user',
+ 
       errors,
       status: 401,
     });
