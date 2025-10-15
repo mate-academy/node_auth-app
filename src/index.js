@@ -1,1 +1,39 @@
+/* eslint-disable no-console */
 'use strict';
+
+import express from 'express';
+import 'dotenv/config';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { authRouter } from './routes/auth.route';
+import { userRouter } from './routes/user.route';
+import { errorMiddleware } from './middlewares/error.middleware';
+import { notFoundMiddleware } from './middlewares/notFound.middleware';
+
+const PORT = process.env.PORT || 3005;
+
+const app = express();
+
+app.use(express.json());
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_HOST,
+    credentials: true,
+  }),
+);
+
+app.use(authRouter);
+app.use('/users', userRouter);
+
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
+
+app.use(errorMiddleware);
+app.use(notFoundMiddleware);
+
+app.listen(PORT, () => {
+  console.log('Server is runnning');
+});
