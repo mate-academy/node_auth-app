@@ -32,7 +32,13 @@ function validatePassword(value) {
 }
 
 const register = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
+
+  if (!name || name.trim().length < 2) {
+    throw ApiError.badRequest(
+      'Name is required and should be at least 2 characters',
+    );
+  }
 
   const errors = {
     email: validateEmail(email),
@@ -45,7 +51,7 @@ const register = async (req, res, next) => {
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await userService.register({ email, hashedPass });
+  await userService.register({ name, email, password: hashedPass });
 
   res.send({ message: 'OK' });
 };
@@ -63,7 +69,7 @@ const activate = async (req, res) => {
   user.activationToken = null;
   await user.save();
 
-  res.send(user);
+  res.redirect(`${process.env.CLIENT_HOST}/profile`);
 };
 
 const login = async (req, res) => {
@@ -73,6 +79,10 @@ const login = async (req, res) => {
 
   if (!user) {
     throw ApiError.badRequest('No such user exists');
+  }
+
+  if (user.activationToken !== null) {
+    throw ApiError.badRequest('Please activate your email before logging in');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);

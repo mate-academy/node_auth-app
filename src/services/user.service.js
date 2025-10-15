@@ -1,5 +1,5 @@
 import { ApiError } from '../exceptions/api.error.js';
-import { User } from '../models/User';
+import { User } from '../models/User.js';
 import { emailService } from '../services/email.service.js';
 import { v4 as uuidv4 } from 'uuid';
 

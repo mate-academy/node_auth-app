@@ -10,6 +10,20 @@ const getAllActivated = async (req, res) => {
   res.send(users.map(userService.normalize));
 };
 
+const getProfile = async (req, res) => {
+  const userId = req.user.id;
+
+  const user = await User.findByPk(userId);
+
+  if (!user) {
+    return res.status(404).send({ message: 'User not found' });
+  }
+
+  const normalizedUser = userService.normalize(user);
+
+  res.send(normalizedUser);
+};
+
 const changeName = async (req, res) => {
   const { name } = req.body;
   const userId = req.user.id;
@@ -81,6 +95,7 @@ const changeEmail = async (req, res) => {
 
 export const userController = {
   getAllActivated,
+  getProfile,
   changeName,
   changePassword,
   changeEmail,

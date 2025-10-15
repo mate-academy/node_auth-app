@@ -5,10 +5,13 @@ import express from 'express';
 import 'dotenv/config';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { authRouter } from './routes/auth.route';
-import { userRouter } from './routes/user.route';
-import { errorMiddleware } from './middlewares/error.middleware';
-import { notFoundMiddleware } from './middlewares/notFound.middleware';
+import { authRouter } from './routes/auth.route.js';
+import { userRouter } from './routes/user.route.js';
+import { errorMiddleware } from './middlewares/error.middleware.js';
+import { notFoundMiddleware } from './middlewares/notFound.middleware.js';
+import { client } from './utils/db.js';
+
+await client.sync();
 
 const PORT = process.env.PORT || 3005;
 

@@ -6,6 +6,9 @@ import { catchError } from '../utils/catchError.js';
 export const userRouter = new express.Router();
 
 userRouter.get('/', authMiddleware, catchError(userController.getAllActivated));
+
+userRouter.get('/me', authMiddleware, catchError(userController.getProfile));
+
 userRouter.put('/name', authMiddleware, catchError(userController.changeName));
 
 userRouter.put(
