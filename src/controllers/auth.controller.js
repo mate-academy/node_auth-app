@@ -108,9 +108,6 @@ const register = async (req, res) => {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const hashedPass = await bcrypt.hash(password, 10);
-
-  await userService.register(name, email, hashedPass);
   res.send({ message: 'OK' });
 };
 
