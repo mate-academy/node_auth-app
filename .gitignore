@@ -1,13 +1,16 @@
 # IDE
 .idea
 .vscode
+.env
 
 # Node
 node_modules
 
 # MacOS
 .DS_Store
-
-# env files
-*.env
-.env*
+node_modules/
+npm-debug.log*
+dev.db
+*.db-journal
+coverage/
+dist/
