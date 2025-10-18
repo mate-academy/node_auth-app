@@ -1,15 +1,15 @@
-// src/middlewares/auth.js
-const jwt = require('jsonwebtoken');
+// src/middleware/guest.js
+const { verifyAccessToken } = require('../services/tokenService');
 
-module.exports = function auth(req, res, next) {
-  const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
+module.exports = function guest(req, res, next) {
+  const bearer = req.header('Authorization')?.replace('Bearer ', '');
+  const cookieToken = req.cookies?.accessToken;
+  const token = bearer || cookieToken;
+  if (!token) return next();
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: payload.sub };
-    return next();
+    verifyAccessToken(token);
+    return res.status(403).json({ error: 'Already authenticated' });
   } catch {
-    return res.status(401).json({ error: 'Invalid token' });
+    return next();
   }
 };

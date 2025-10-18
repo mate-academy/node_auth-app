@@ -1,12 +1,13 @@
-// src/middlewares/auth.js
-const jwt = require('jsonwebtoken');
+// src/middleware/auth.js
+const { verifyAccessToken } = require('../services/tokenService');
 
 module.exports = function auth(req, res, next) {
-  const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
+  const bearer = req.header('Authorization')?.replace('Bearer ', '');
+  const cookieToken = req.cookies?.accessToken;
+  const token = bearer || cookieToken;
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = verifyAccessToken(token);
     req.user = { id: payload.sub };
     return next();
   } catch {

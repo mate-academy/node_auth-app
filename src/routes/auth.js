@@ -1,33 +1,29 @@
-// src/routes/auth.js
 const { Router } = require('express');
 const prisma = require('../services/prisma');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { randomBytes } = require('crypto');
+const { sendPasswordResetEmail } = require('../services/email');
+const { issueAccessToken, issueRefreshToken, rotateRefreshToken, pruneExpired } = require('../services/tokenService');
 const guest = require('../middleware/guest');
 const auth = require('../middleware/auth');
 
 const router = Router();
 
-// POST /auth/register (guest-only)
+// REGISTER (guest-only)
 router.post('/register', guest, async (req, res) => {
   const { name, email, password } = req.body;
   const activationToken = randomBytes(32).toString('hex');
-  const activationTokenExpires = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
-
+  const activationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
   const passwordHash = await bcrypt.hash(password, 10);
 
-  const user = await prisma.user.create({
+  await prisma.user.create({
     data: { name, email, passwordHash, activationToken, activationTokenExpires },
   });
 
-  // TODO: enviar e-mail com activationToken (omisso; log para dev)
-  console.log('Activation link token:', activationToken);
-
-  return res.status(201).json({ id: user.id });
+  return res.status(201).json({ ok: true });
 });
 
-// POST /auth/activate (guest-only) ?token=...
+// ACTIVATE (guest-only, redirect -> /profile)
 router.post('/activate', guest, async (req, res) => {
   const { token } = req.query;
   if (!token) return res.status(400).json({ error: 'Token required' });
@@ -39,18 +35,13 @@ router.post('/activate', guest, async (req, res) => {
 
   await prisma.user.update({
     where: { id: user.id },
-    data: {
-      isActive: true,
-      activationToken: null,
-      activationTokenExpires: null,
-    },
+    data: { isActive: true, activationToken: null, activationTokenExpires: null },
   });
 
-  // Redirecionar para Profile (exigência do spec)
   return res.redirect(302, '/profile');
 });
 
-// POST /auth/login (guest-only)
+// LOGIN (guest-only, redirect -> /profile)
 router.post('/login', guest, async (req, res) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
@@ -59,49 +50,75 @@ router.post('/login', guest, async (req, res) => {
   const ok = await bcrypt.compare(password, user.passwordHash);
   if (!ok) return res.status(400).json({ error: 'Invalid credentials' });
 
-  const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const access = issueAccessToken(user.id);
+  const refresh = await issueRefreshToken(user.id);
 
-  // Enviar em cookie httpOnly (ou bearer)
-  res.cookie('token', token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+  res.cookie('accessToken', access, {
+    httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 15 * 60 * 1000,
+  });
+  res.cookie('refreshToken', refresh.token, {
+    httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  // Redirecionar para Profile (exigência do spec)
   return res.redirect(302, '/profile');
 });
 
-// POST /auth/logout (auth-only)
-router.post('/logout', auth, async (_req, res) => {
-  res.clearCookie('token');
-  // Redirecionar para Login (exigência do spec)
+// REFRESH (guest-only — o usuário pode não estar com access válido)
+router.post('/refresh', guest, async (req, res) => {
+  try {
+    await pruneExpired();
+    const old = req.cookies?.refreshToken || req.body?.refreshToken;
+    if (!old) return res.status(400).json({ error: 'Refresh token required' });
+
+    const { userId, token: newRT } = await rotateRefreshToken(old);
+    const newAT = issueAccessToken(userId);
+
+    res.cookie('accessToken', newAT, {
+      httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 15 * 60 * 1000,
+    });
+    res.cookie('refreshToken', newRT, {
+      httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production', maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ ok: true });
+  } catch (e) {
+    return res.status(401).json({ error: 'Invalid or expired refresh token' });
+  }
+});
+
+// LOGOUT (auth-only, redirect -> /login)
+router.post('/logout', auth, async (req, res) => {
+  const rt = req.cookies?.refreshToken;
+  if (rt) {
+    await prisma.refreshToken.updateMany({
+      where: { token: rt, revokedAt: null },
+      data: { revokedAt: new Date() },
+    });
+  }
+  res.clearCookie('accessToken');
+  res.clearCookie('refreshToken');
   return res.redirect(302, '/login');
 });
 
-// Password reset: request (guest-only)
+// PASSWORD RESET — request (guest-only)
 router.post('/password-reset', guest, async (req, res) => {
   const { email } = req.body;
   const user = await prisma.user.findUnique({ where: { email } });
 
-  // resposta 202 mesmo se user inexistente (para não vazar existência)
   if (user) {
     const token = randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 30); // 30 min
-
-    await prisma.passwordReset.create({
-      data: { token, userId: user.id, expiresAt },
-    });
-
-    // TODO: enviar e-mail com link contendo token; log p/ dev
-    console.log('Password reset token:', token);
+    const expiresAt = new Date(Date.now() + 30 * 60 * 1000); // 30 min
+    await prisma.passwordReset.create({ data: { token, userId: user.id, expiresAt } });
+    try {
+      await sendPasswordResetEmail(user.email, token);
+    } catch (err) {
+      console.error('sendPasswordResetEmail failed:', err.message);
+    }
   }
-
   return res.status(202).json({ ok: true });
 });
 
-// Password reset: confirm (guest-only)
+// PASSWORD RESET — confirm (guest-only)
 router.post('/password-reset/confirm', guest, async (req, res) => {
   const { token, newPassword } = req.body;
   if (!token || !newPassword) return res.status(400).json({ error: 'Invalid payload' });

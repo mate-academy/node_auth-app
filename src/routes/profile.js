@@ -4,6 +4,7 @@ const prisma = require('../services/prisma');
 const bcrypt = require('bcryptjs');
 const { randomBytes } = require('crypto');
 const auth = require('../middleware/auth');
+const { sendEmailChangeNotice } = require('../services/email');
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.get('/', auth, async (req, res) => {
 // PATCH /profile/name (auth-only)
 router.patch('/name', auth, async (req, res) => {
   const { name } = req.body;
+  if (!name) return res.status(400).json({ error: 'name required' });
   const user = await prisma.user.update({ where: { id: req.user.id }, data: { name } });
   return res.json({ id: user.id, name: user.name });
 });
@@ -29,7 +31,6 @@ router.patch('/password', auth, async (req, res) => {
   if (!oldPassword || !newPassword || newPassword !== confirmPassword) {
     return res.status(400).json({ error: 'Invalid payload' });
   }
-
   const user = await prisma.user.findUnique({ where: { id: req.user.id } });
   const ok = await bcrypt.compare(oldPassword, user.passwordHash);
   if (!ok) return res.status(400).json({ error: 'Old password is incorrect' });
@@ -39,29 +40,35 @@ router.patch('/password', auth, async (req, res) => {
   return res.json({ ok: true });
 });
 
-// PATCH /profile/email (auth-only; inicia fluxo com verificação + notifica e-mail antigo)
+// ✅ PATCH /profile/email (auth-only; inicia verificação + notifica e-mail antigo)
 router.patch('/email', auth, async (req, res) => {
   const { newEmail } = req.body;
   if (!newEmail) return res.status(400).json({ error: 'newEmail required' });
 
   const emailChangeToken = randomBytes(32).toString('hex');
-  const emailChangeTokenExpires = new Date(Date.now() + 1000 * 60 * 60); // 1h
+  const emailChangeTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1h
 
   const user = await prisma.user.update({
     where: { id: req.user.id },
     data: { pendingEmail: newEmail, emailChangeToken, emailChangeTokenExpires },
-    select: { email: true, pendingEmail: true, emailChangeToken: true },
+    select: { id: true, email: true, pendingEmail: true, emailChangeToken: true }
   });
 
-  // Notificar e-mail antigo (placeholder: log para dev)
-  console.log(`Notify old email ${user.email}: request to change to ${user.pendingEmail}`);
-  // Enviar link de verificação ao novo e-mail (placeholder: log)
+  // Notifica o e-mail antigo (obrigatório no review). Se NO_EMAIL=1, vira log.
+  try {
+    await sendEmailChangeNotice(user.email, user.pendingEmail);
+  } catch (e) {
+    console.error('sendEmailChangeNotice failed:', e.message);
+  }
+
+  // Envio do link de verificação p/ o novo e-mail: se você quiser enviar de fato,
+  // crie uma função sendEmailChangeVerification. Por enquanto, logamos o link:
   console.log('Email change token:', user.emailChangeToken);
 
   return res.status(202).json({ ok: true });
 });
 
-// POST /profile/email/confirm (guest ou auth; confirmando via link)
+// ✅ POST /profile/email/confirm (confirma via token)
 router.post('/email/confirm', async (req, res) => {
   const { token } = req.body;
   if (!token) return res.status(400).json({ error: 'Token required' });
@@ -70,7 +77,6 @@ router.post('/email/confirm', async (req, res) => {
   if (!user || !user.emailChangeTokenExpires || user.emailChangeTokenExpires < new Date()) {
     return res.status(400).json({ error: 'Invalid or expired token' });
   }
-
   if (!user.pendingEmail) {
     return res.status(400).json({ error: 'No pending email change' });
   }

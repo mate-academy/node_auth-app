@@ -1,45 +1,55 @@
+// src/services/tokenService.js
 const jwt = require('jsonwebtoken');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { randomBytes } = require('crypto');
+const prisma = require('./prisma');
 
-function signAccessToken(payload) {
-  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
-}
+const ACCESS_SECRET  = process.env.JWT_SECRET || process.env.JWT_ACCESS_SECRET || 'dev-secret';
+const REFRESH_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7d
 
-function signRefreshToken(payload) {
-  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' });
-}
+exports.issueAccessToken = (userId) => {
+  return jwt.sign({ sub: userId }, ACCESS_SECRET, { expiresIn: '15m' });
+};
 
-async function saveRefreshToken(userId, refresh, expiresAt) {
-  // um token ativo por usuário (opcional, mas recomendável)
-  await prisma.token.deleteMany({ where: { userId } });
-  return prisma.token.create({
-    data: { userId, refresh, expiresAt },
-  });
-}
+exports.verifyAccessToken = (token) => {
+  return jwt.verify(token, ACCESS_SECRET);
+};
 
-async function removeRefreshToken(refresh) {
-  await prisma.token.deleteMany({ where: { refresh } });
-}
+exports.issueRefreshToken = async (userId) => {
+  const token = randomBytes(48).toString('hex');
+  const expiresAt = new Date(Date.now() + REFRESH_TTL_MS);
+  await prisma.refreshToken.create({ data: { token, userId, expiresAt } });
+  return { token, expiresAt };
+};
 
-async function findRefreshToken(refresh) {
-  return prisma.token.findUnique({ where: { refresh } });
-}
+exports.rotateRefreshToken = async (oldToken) => {
+  // 1) encontrar e validar expiry
+  const rt = await prisma.refreshToken.findUnique({ where: { token: oldToken } });
+  if (!rt || rt.revokedAt || rt.expiresAt < new Date()) {
+    // segurança: se encontrado expirado, apague
+    if (rt && rt.expiresAt < new Date()) {
+      await prisma.refreshToken.delete({ where: { token: oldToken } });
+    }
+    throw new Error('Invalid or expired refresh token');
+  }
 
-function verifyAccessToken(token) {
-  return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-}
+  // 2) revogar o antigo e emitir novo (rotação)
+  const newToken = randomBytes(48).toString('hex');
+  const newExp = new Date(Date.now() + REFRESH_TTL_MS);
 
-function verifyRefreshToken(token) {
-  return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-}
+  await prisma.$transaction([
+    prisma.refreshToken.update({
+      where: { token: oldToken },
+      data: { revokedAt: new Date() },
+    }),
+    prisma.refreshToken.create({
+      data: { token: newToken, userId: rt.userId, expiresAt: newExp },
+    }),
+  ]);
 
-module.exports = {
-  signAccessToken,
-  signRefreshToken,
-  saveRefreshToken,
-  removeRefreshToken,
-  findRefreshToken,
-  verifyAccessToken,
-  verifyRefreshToken,
+  return { userId: rt.userId, token: newToken, expiresAt: newExp };
+};
+
+// limpeza simples
+exports.pruneExpired = async () => {
+  await prisma.refreshToken.deleteMany({ where: { expiresAt: { lt: new Date() } } });
 };
