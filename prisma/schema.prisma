@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"              // mantenha sqlite (ou troque p/ postgresql se quiser)
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -17,7 +17,7 @@ model User {
   // Ativação
   isActive                Boolean  @default(false)
   activationToken         String?  @unique
-  activationTokenExpires  DateTime?
+  activationTokenExpires  DateTime?  // <= garantir presença
 
   // Troca de e-mail
   pendingEmail            String?
@@ -26,9 +26,9 @@ model User {
 
   // Auditoria
   createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
+  updatedAt               DateTime @updatedAt   // <= auto-update
 
-  // Relations
+  // Relações
   passwordResets          PasswordReset[]
   refreshTokens           RefreshToken[]
 
@@ -44,9 +44,11 @@ model PasswordReset {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt  DateTime
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt            // <= solicitado no review
 
   @@index([userId])
-  @@index([token])
+  @@index([expiresAt])                       // <= p/ pruning eficiente
+  // (não precisamos de @@index([token]) pois já é @unique)
 }
 
 model RefreshToken {
@@ -57,8 +59,8 @@ model RefreshToken {
   expiresAt  DateTime
   revokedAt  DateTime?
   createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt            // manter consistente
 
   @@index([userId])
-  @@index([token])
   @@index([expiresAt])
 }

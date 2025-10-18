@@ -1,15 +1,33 @@
 // src/middleware/guest.js
 const { verifyAccessToken } = require('../services/tokenService');
+const prisma = require('../services/prisma');
 
-module.exports = function guest(req, res, next) {
-  const bearer = req.header('Authorization')?.replace('Bearer ', '');
-  const cookieToken = req.cookies?.accessToken;
-  const token = bearer || cookieToken;
-  if (!token) return next();
+/**
+ * Guest middleware:
+ * - Bloqueia se houver access token válido
+ * - OU se houver refresh cookie válido e não expirado no DB
+ */
+module.exports = async function guest(req, res, next) {
   try {
-    verifyAccessToken(token);
-    return res.status(403).json({ error: 'Already authenticated' });
-  } catch {
+    const bearer = req.header('Authorization')?.replace('Bearer ', '');
+    const cookieAT = req.cookies?.accessToken;
+    const token = bearer || cookieAT;
+
+    if (token) {
+      verifyAccessToken(token);
+      return res.status(403).json({ error: 'Already authenticated' });
+    }
+
+    const rt = req.cookies?.refreshToken;
+    if (rt) {
+      const found = await prisma.refreshToken.findUnique({ where: { token: rt } });
+      if (found && !found.revokedAt && found.expiresAt >= new Date()) {
+        return res.status(403).json({ error: 'Already authenticated' });
+      }
+    }
+
     return next();
+  } catch {
+    return next(); // se access quebrado, trata como guest
   }
 };

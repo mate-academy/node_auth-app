@@ -7,7 +7,7 @@ let transporter = null;
 if (!NO_EMAIL) {
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'localhost',
-    port: Number(process.env.SMTP_PORT || 1025), // MailHog/Mailpit
+    port: Number(process.env.SMTP_PORT || 1025),
     secure: false,
     auth: process.env.SMTP_USER
       ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
@@ -24,17 +24,23 @@ async function send(to, subject, text) {
     from: process.env.MAIL_FROM || 'no-reply@example.com',
     to,
     subject,
-    text, // plaintext alternativo OK
+    text, // plaintext
   });
 }
 
+exports.sendActivationEmail = async (to, token) => {
+  const url = `${process.env.CLIENT_URL || 'http://localhost:5173'}/activate?token=${token}`;
+  const text = `Activate your account:\n\n${url}\n\nIf you didn't request this, ignore.`;
+  await send(to, 'Activate your account', text);
+};
+
 exports.sendPasswordResetEmail = async (to, token) => {
   const url = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password?token=${token}`;
-  const text = `Reset your password:\n\n${url}\n\nIf you did not request it, ignore this email.`;
+  const text = `Reset your password:\n\n${url}\n\nIf you didn't request this, ignore.`;
   await send(to, 'Password reset', text);
 };
 
 exports.sendEmailChangeNotice = async (oldEmail, newEmail) => {
-  const text = `Your account requested to change email to ${newEmail}. If it wasn't you, contact support.`;
+  const text = `We received a request to change your email to ${newEmail}. If this wasn't you, contact support.`;
   await send(oldEmail, 'Email change notice', text);
 };
