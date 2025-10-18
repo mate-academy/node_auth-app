@@ -1,3 +1,4 @@
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,23 +9,41 @@ datasource db {
 }
 
 model User {
-  id              String    @id @default(uuid())
-  email           String    @unique
-  passwordHash    String
-  name            String
-  isActive        Boolean   @default(false)
-  activationToken String?   @unique
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id                      String   @id @default(cuid())
+  name                    String
+  email                   String   @unique
+  passwordHash            String
 
-  tokens Token[]
+  // Ativação de conta
+  isActive                Boolean  @default(false)
+  activationToken         String?  @unique
+  activationTokenExpires  DateTime?
+
+  // Troca de e-mail (verificação + aviso ao e-mail antigo)
+  pendingEmail            String?
+  emailChangeToken        String?  @unique
+  emailChangeTokenExpires DateTime?
+
+  // Auditoria
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  // Relacionamentos
+  passwordResets          PasswordReset[]
+
+  @@index([email])
+  @@index([activationTokenExpires])
+  @@index([emailChangeTokenExpires])
 }
 
-model Token {
-  id        String   @id @default(uuid())
-  userId    String
-  refresh   String   @unique
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model PasswordReset {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
 }

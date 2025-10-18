@@ -2,6 +2,7 @@
 .idea
 .vscode
 .env
+.env.test
 
 # Node
 node_modules
