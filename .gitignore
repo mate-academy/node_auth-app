@@ -1,13 +1,21 @@
 # IDE
 .idea
 .vscode
+.env
+.env.test
 
 # Node
 node_modules
 
-# MacOS
+# macOS
 .DS_Store
+npm-debug.log*
+dev.db
+*.db-journal
+coverage/
+dist/
 
-# env files
-*.env
-.env*
+# lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

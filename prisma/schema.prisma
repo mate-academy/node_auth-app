@@ -1,0 +1,66 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String   @id @default(cuid())
+  name                    String
+  email                   String   @unique
+  passwordHash            String
+
+  // Ativação
+  isActive                Boolean  @default(false)
+  activationToken         String?  @unique
+  activationTokenExpires  DateTime?  // <= garantir presença
+
+  // Troca de e-mail
+  pendingEmail            String?
+  emailChangeToken        String?  @unique
+  emailChangeTokenExpires DateTime?
+
+  // Auditoria
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt   // <= auto-update
+
+  // Relações
+  passwordResets          PasswordReset[]
+  refreshTokens           RefreshToken[]
+
+  @@index([email])
+  @@index([activationTokenExpires])
+  @@index([emailChangeTokenExpires])
+}
+
+model PasswordReset {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt            // <= solicitado no review
+
+  @@index([userId])
+  @@index([expiresAt])                       // <= p/ pruning eficiente
+  // (não precisamos de @@index([token]) pois já é @unique)
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt            // manter consistente
+
+  @@index([userId])
+  @@index([expiresAt])
+}
