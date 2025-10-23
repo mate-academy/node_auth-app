@@ -61,7 +61,7 @@ async function sendPasswordResetEmail(email, passwordResetToken) {
     </p>
   `;
 
-  await send(email, 'Email change', html);
+  await send(email, 'Password reset', html);
 }
 
 export const mailer = {

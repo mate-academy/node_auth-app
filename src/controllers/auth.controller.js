@@ -29,7 +29,7 @@ const register = async (req, res) => {
   const existingUser = await userService.findUserByEmail(email);
 
   if (existingUser) {
-    throw ApiError.badRequest('User already exists', {
+    throw ApiError.badRequest('Bad request', {
       email: 'User already exists',
     });
   }
@@ -51,7 +51,7 @@ const activate = async (req, res) => {
   const user = await User.findOne({ where: { email, activationToken } });
 
   if (!user) {
-    throw ApiError.badRequest({
+    throw ApiError.badRequest('Bad request', {
       email: 'User does not exist or have been already activated',
     });
   }
@@ -80,7 +80,9 @@ const login = async (req, res) => {
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw ApiError.badRequest('Wrong password');
+    throw ApiError.badRequest('Bad request', {
+      password: 'Wrong password',
+    });
   }
 
   if (user.activationToken) {
@@ -99,7 +101,9 @@ const refresh = async (req, res) => {
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
-    throw ApiError.unauthorized();
+    throw ApiError.unauthorized({
+      error: 'Unauthorized',
+    });
   }
 
   const user = await userService.findUserByEmail(userData.email);
@@ -219,7 +223,7 @@ const changeName = async (req, res) => {
   const user = await User.findOne({ where: { id: req.user.id } });
 
   if (!user) {
-    throw ApiError.notFound('Not found', {
+    throw ApiError.notFound({
       user: 'User not found',
     });
   }
@@ -242,7 +246,7 @@ const changeEmail = async (req, res) => {
   const user = await User.findOne({ where: { id: req.user.id } });
 
   if (!user) {
-    throw ApiError.notFound('Not found', {
+    throw ApiError.notFound({
       user: 'User not found',
     });
   }
@@ -308,7 +312,7 @@ const resetPassword = async (req, res) => {
   const user = await userService.findUserByEmail(email);
 
   if (!user) {
-    throw ApiError.notFound('Not found', {
+    throw ApiError.notFound({
       user: 'User not found',
     });
   }
