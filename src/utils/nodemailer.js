@@ -4,8 +4,8 @@ import 'dotenv/config';
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'ie.panasovskyi@gmail.com',
-    pass: 'cfrb sawq kdft dqob',
+    user: process.env.MAILER_AUTH_USER,
+    pass: process.env.MAILER_AUTH_PASS,
   },
 });
 
@@ -32,7 +32,7 @@ async function sendPasswordChangeEmail(email, passwordChangeToken) {
   const link = `${process.env.CLIENT_HOST}/auth/passChange/${email}/${passwordChangeToken}`;
   const html = `
     <h1>Confirm password change</h1>
-    <p>To change your current passport please click following link:
+    <p>To change your current password please click following link:
       <a href="${link}">${link}</a>
     </p>
   `;
@@ -52,8 +52,21 @@ async function sendEmailChangeLetter(email, emailChangeToken) {
   await send(email, 'Email change', html);
 }
 
+async function sendPasswordResetEmail(email, passwordResetToken) {
+  const link = `${process.env.CLIENT_HOST}/auth/setNewPass/${email}/${passwordResetToken}`;
+  const html = `
+    <h1>Confirm password reset</h1>
+    <p>To set a new password please click following link:
+      <a href="${link}">${link}</a>
+    </p>
+  `;
+
+  await send(email, 'Email change', html);
+}
+
 export const mailer = {
   sendActivationEmail,
   sendEmailChangeLetter,
   sendPasswordChangeEmail,
+  sendPasswordResetEmail,
 };

@@ -128,10 +128,6 @@ const generateTokens = async (res, user) => {
 const logout = async (req, res) => {
   const user = req.user;
 
-  if (user) {
-    throw ApiError.forbidden();
-  }
-
   await tokenService.removeToken(user.id);
 
   res.sendStatus(204);
@@ -144,8 +140,7 @@ const changePassword = async (req, res) => {
     throw ApiError.forbidden();
   }
 
-  const userId = req.user.id;
-  const user = await User.findOne({ where: { userId } });
+  const user = await User.findOne({ where: { id: req.user.id } });
 
   if (!user) {
     throw ApiError.badRequest('Bad request', {
@@ -224,7 +219,9 @@ const changeName = async (req, res) => {
   const user = await User.findOne({ where: { id: req.user.id } });
 
   if (!user) {
-    throw ApiError.notFound();
+    throw ApiError.notFound('Not found', {
+      user: 'User not found',
+    });
   }
 
   user.name = name;
@@ -306,6 +303,64 @@ const confirmEmailChange = async (req, res) => {
   res.redirect(`${process.env.CLIENT_HOST}/email-changed-successfully`);
 };
 
+const resetPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await userService.findUserByEmail(email);
+
+  if (!user) {
+    throw ApiError.notFound('Not found', {
+      user: 'User not found',
+    });
+  }
+
+  const passwordResetToken = uuidv4();
+
+  user.passwordResetToken = passwordResetToken;
+  await user.save();
+
+  mailer.sendPasswordResetEmail(email, passwordResetToken);
+
+  res.status(200).json({
+    message: 'To set a new password please check your email',
+  });
+};
+
+const setNewPassword = async (req, res) => {
+  const { email, passwordResetToken } = req.params;
+  const { newPassword, confirmedNewPassword } = req.body;
+  const user = await User.findOne({ where: { email, passwordResetToken } });
+
+  if (!user) {
+    throw ApiError.badRequest('Bad request', {
+      email: 'Invalid or expired link',
+    });
+  }
+
+  const passwordError = await validation.validatePassword(newPassword);
+
+  if (passwordError) {
+    throw ApiError.badRequest('Bad request', {
+      password: passwordError,
+    });
+  }
+
+  if (newPassword !== confirmedNewPassword) {
+    throw ApiError.badRequest('Bad request', {
+      password: 'Passwords do not match',
+    });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  user.passwordResetToken = null;
+  await user.save();
+
+  res.status(200).json({
+    message: 'New password has been successfully set',
+  });
+};
+
 export const authController = {
   register,
   activate,
@@ -317,4 +372,6 @@ export const authController = {
   changeName,
   changeEmail,
   confirmEmailChange,
+  resetPassword,
+  setNewPassword,
 };

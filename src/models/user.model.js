@@ -33,6 +33,10 @@ export const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    passwordResetToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
 
     emailChangeToken: {
       type: DataTypes.STRING,

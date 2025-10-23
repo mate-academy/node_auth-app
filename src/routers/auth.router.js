@@ -26,6 +26,13 @@ authRouter.get(
   catchError(authController.confirmPasswordChange),
 );
 
+authRouter.patch('/passReset', catchError(authController.resetPassword));
+
+authRouter.patch(
+  '/setNewPass/:email/:passwordResetToken',
+  catchError(authController.setNewPassword),
+);
+
 authRouter.patch(
   '/nameChange',
   authMiddleware,

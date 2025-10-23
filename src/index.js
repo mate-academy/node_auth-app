@@ -6,6 +6,7 @@ import cors from 'cors';
 import { authRouter } from './routers/auth.router.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
 import cookieParser from 'cookie-parser';
+import { ApiError } from './exceptions/api.error.js';
 
 const PORT = process.env.PORT || 8080;
 
@@ -22,6 +23,11 @@ app.use(
 );
 
 app.use('/auth', authRouter);
+
+app.use((req, res, next) => {
+  next(ApiError.notFound({ route: req.originalUrl }));
+});
+
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {});
