@@ -42,7 +42,7 @@ async function sendEmailChange(email, newEmail) {
   }
 
   user.activationEmailToken = activationEmailToken;
-  user.save();
+  await user.save();
 
   await emailService.sendChangeEmailNotification(
     newEmail,

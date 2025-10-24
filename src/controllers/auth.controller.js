@@ -25,8 +25,18 @@ function validatePassword(value) {
   }
 
   if (value.length < 6) {
-    return 'At least 6 characters';
+    return 'Password must be at least 6 characters long';
   }
+
+  if (!/[A-Za-z]/.test(value)) {
+    return 'Password must contain at least one letter';
+  }
+
+  if (!/\d/.test(value)) {
+    return 'Password must contain at least one number';
+  }
+
+  return null;
 }
 
 const validateName = (value) => {

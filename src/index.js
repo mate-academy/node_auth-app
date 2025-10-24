@@ -23,6 +23,10 @@ app.use(cookieParser());
 app.use(authRouter);
 app.use('/user', userRouter);
 
+app.use((req, res, nest) => {
+  res.status(404).json({ message: 'Not Found' });
+});
+
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {

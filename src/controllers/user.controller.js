@@ -47,21 +47,31 @@ const validateName = (value) => {
 };
 
 const updateUserName = async (req, res) => {
-  const { email, name } = req.body;
+  const currentEmail = req.user?.email;
+
+  const { name } = req.body;
+
+  if (!currentEmail) {
+    throw ApiError.unauthorized();
+  }
 
   const errors = {
     name: validateName(name),
-    email: validateEmail(email),
+    email: validateEmail(currentEmail),
   };
 
   if (errors.name || errors.email) {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const user = await userService.findByEmail(email);
+  const user = await userService.findByEmail(currentEmail);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
 
   user.name = name;
-  user.save();
+  await user.save();
 
   res.status(200).json({
     message: 'Name was changed',
@@ -69,9 +79,22 @@ const updateUserName = async (req, res) => {
 };
 
 const updateUserPassword = async (req, res) => {
-  const { email, oldPassword, password, confirmation } = req.body;
+  const currentEmail = req.user?.email;
+  const { oldPassword, password, confirmation } = req.body;
 
-  const user = await userService.findByEmail(email);
+  if (!currentEmail) {
+    throw ApiError.unauthorized();
+  }
+
+  const user = await userService.findByEmail(currentEmail);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  if (!oldPassword) {
+    throw ApiError.badRequest('Old password is required');
+  }
 
   const isValidOldPassword = await bcrypt.compare(oldPassword, user.password);
 
@@ -88,13 +111,13 @@ const updateUserPassword = async (req, res) => {
   }
 
   if (password !== confirmation) {
-    throw ApiError.badRequest('Passwords is not equal');
+    throw ApiError.badRequest('Passwords are not equal');
   }
 
   const hashedPass = await bcrypt.hash(password, 10);
 
   user.password = hashedPass;
-  user.save();
+  await user.save();
 
   res.status(200).json({
     message: 'Password was changed',
@@ -102,9 +125,34 @@ const updateUserPassword = async (req, res) => {
 };
 
 const sendNotificationEmail = async (req, res) => {
-  const { email, newEmail, password } = req.body;
+  const currentEmail = req.user?.email;
+  const { newEmail, password } = req.body;
 
-  const user = await userService.findByEmail(email);
+  if (!currentEmail) {
+    throw ApiError.unauthorized();
+  }
+
+  if (!newEmail) {
+    throw ApiError.badRequest('New email is required', {
+      email: 'New email is required',
+    });
+  }
+
+  const emailError = validateEmail(newEmail);
+
+  if (emailError) {
+    throw ApiError.badRequest('Bad request', { email: emailError });
+  }
+
+  const user = await userService.findByEmail(currentEmail);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  if (!password) {
+    throw ApiError.badRequest('Password is required to confirm change');
+  }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -120,7 +168,7 @@ const sendNotificationEmail = async (req, res) => {
     });
   }
 
-  await userService.sendEmailChange(email, newEmail);
+  await userService.sendEmailChange(currentEmail, newEmail);
 
   res.status(200).json({
     message: 'Email send',
@@ -129,6 +177,16 @@ const sendNotificationEmail = async (req, res) => {
 
 const updateUserEmail = async (req, res) => {
   const { newEmail, activationEmailToken } = req.params;
+
+  if (!newEmail || !activationEmailToken) {
+    return res.sendStatus(400);
+  }
+
+  const tokenError = validateEmail(newEmail);
+
+  if (tokenError) {
+    throw ApiError.badRequest('Bad request', { email: tokenError });
+  }
 
   const user = await User.findOne({ where: { activationEmailToken } });
 
@@ -142,7 +200,7 @@ const updateUserEmail = async (req, res) => {
 
   user.activationEmailToken = null;
   user.email = newEmail;
-  user.save();
+  await user.save();
 
   await emailService.sendEmailNotification(oldEmail, newEmail);
 
