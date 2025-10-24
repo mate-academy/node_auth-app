@@ -1,7 +1,7 @@
-import { ApiError } from '../exeptions/api.error.js';
-import { User } from '../models/user.js';
-import { emailService } from '../services/email.service.js';
-import { v4 as uuidv4 } from 'uuid';
+const { ApiError } = require('../exeptions/api.error.js');
+const { User } = require('../models/user.js');
+const { emailService } = require('../services/email.service.js');
+const { v4: uuidv4 } = require('uuid');
 
 function getAllActivated() {
   return User.findAll({
@@ -34,7 +34,12 @@ async function register(username, email, password) {
     });
   }
 
-  await User.create({ username, email, password, activationToken });
+  await User.create({
+    username,
+    email,
+    password,
+    activationToken,
+  });
   await emailService.sendActivationEmail(email, activationToken);
 }
 
@@ -49,6 +54,7 @@ async function saveResetToken(userId, token, expiry) {
   user.resetTokenExpiry = expiry;
 
   await user.save();
+
   return user;
 }
 
@@ -68,22 +74,35 @@ async function updatePassword(userId, hashedPass) {
   user.resetTokenExpiry = null;
 
   await user.save();
+
   return user;
 }
 
 async function updateProfile(userId, { username, email, password }) {
   const user = await User.findByPk(userId);
-  if (!user) throw ApiError.notFound('User not found');
 
-  if (username) user.username = username;
-  if (email) user.email = email;
-  if (password) user.password = password;
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
+
+  if (username) {
+    user.username = username;
+  }
+
+  if (email) {
+    user.email = email;
+  }
+
+  if (password) {
+    user.password = password;
+  }
 
   await user.save();
+
   return user;
 }
 
-export const userService = {
+exports.userService = {
   getAllActivated,
   normalize,
   findByEmail,

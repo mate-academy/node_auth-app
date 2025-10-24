@@ -2,7 +2,7 @@
   "name": "node_auth-app",
   "version": "1.0.0",
   "description": "Auth app",
-  "type": "module",
+  "type": "commonjs",
   "main": "src/index.js",
   "scripts": {
     "init": "mate-scripts init",

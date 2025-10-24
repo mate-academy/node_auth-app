@@ -1,4 +1,4 @@
-export const catchError = (action) => {
+exports.catchError = (action) => {
   return async function (req, res, next) {
     try {
       await action(req, res, next);

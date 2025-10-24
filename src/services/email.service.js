@@ -1,6 +1,6 @@
-import 'dotenv/config';
+require('dotenv/config');
 
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -33,7 +33,7 @@ function sendActivationEmail(email, token) {
   });
 }
 
-export const emailService = {
+exports.emailService = {
   sendActivationEmail,
   send,
 };

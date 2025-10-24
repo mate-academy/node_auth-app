@@ -1,11 +1,11 @@
-import { User } from '../models/user.js';
-import { userService } from '../services/user.service.js';
-import { jwtService } from '../services/jwt.service.js';
-import { validate } from '../services/validate.service.js';
-import { ApiError } from '../exeptions/api.error.js';
-import bcrypt from 'bcrypt';
-import { tokenService } from '../services/token.service.js';
-import { v4 as uuidv4 } from 'uuid';
+const { User } = require('../models/user.js');
+const { userService } = require('../services/user.service.js');
+const { jwtService } = require('../services/jwt.service.js');
+const { validate } = require('../services/validate.service.js');
+const { ApiError } = require('../exeptions/api.error.js');
+const bcrypt = require('bcrypt');
+const { tokenService } = require('../services/token.service.js');
+const { v4: uuidv4 } = require('uuid');
 
 const registration = async (req, res) => {
   const { username, email, password } = req.body;
@@ -32,6 +32,7 @@ const activate = async (req, res) => {
 
   if (!user) {
     res.sendStatus(404);
+
     return;
   }
   user.activationToken = null;
@@ -73,6 +74,7 @@ const refresh = async (req, res) => {
   }
 
   const user = await userService.findByEmail(userData.email);
+
   await generateTokens(res, user);
 };
 
@@ -112,11 +114,13 @@ const forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   const emailError = validate.validateEmail(email);
+
   if (emailError) {
     throw ApiError.badRequest('Bad request', { email: emailError });
   }
 
   const user = await userService.findByEmail(email);
+
   if (!user) {
     throw ApiError.notFound('No such user');
   }
@@ -138,11 +142,13 @@ const resetPassword = async (req, res) => {
   }
 
   const passwordError = validate.validatePassword(password);
+
   if (passwordError) {
     throw ApiError.badRequest('Bad request', { password: passwordError });
   }
 
   const user = await userService.findByResetToken(token);
+
   if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < Date.now()) {
     throw ApiError.badRequest('Invalid or expired reset token');
   }
@@ -155,7 +161,7 @@ const resetPassword = async (req, res) => {
   res.send({ messaage: 'Password successfully updated' });
 };
 
-export const authController = {
+exports.authController = {
   registration,
   activate,
   login,

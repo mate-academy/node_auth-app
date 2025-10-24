@@ -1,10 +1,11 @@
-import { Token } from '../models/token.js';
+const { Token } = require('../models/token.js');
 
 async function save(userId, newToken) {
   const token = await Token.findOne({ where: { userId } });
 
   if (!token) {
     await Token.create({ userId, refreshToken: newToken });
+
     return;
   }
 

@@ -1,8 +1,8 @@
-import { ApiError } from '../exeptions/api.error.js';
-import { jwtService } from '../services/jwt.service.js';
-import { userService } from '../services/user.service.js';
-import { validate } from '../services/validate.service.js';
-import bcrypt from 'bcrypt';
+const { ApiError } = require('../exeptions/api.error.js');
+const { jwtService } = require('../services/jwt.service.js');
+const { userService } = require('../services/user.service.js');
+const { validate } = require('../services/validate.service.js');
+const bcrypt = require('bcrypt');
 
 const getAllActivated = async (req, res) => {
   const users = await userService.getAllActivated();
@@ -14,13 +14,18 @@ const getProfile = async (req, res) => {
   const authorization = req.headers['authorization'] || '';
   const [, token] = authorization.split(' ');
 
-  if (!token) throw ApiError.unauthorized();
+  if (!token) {
+    throw ApiError.unauthorized();
+  }
 
   const userData = jwtService.verify(token);
 
-  if (!userData) throw ApiError.unauthorized();
+  if (!userData) {
+    throw ApiError.unauthorized();
+  }
 
   const user = await userService.findById(userData.id);
+
   res.send({
     username: user.username,
     email: user.email,
@@ -31,14 +36,21 @@ const updateProfile = async (req, res) => {
   const authorization = req.headers['authorization'] || '';
   const [, token] = authorization.split(' ');
 
-  if (!token) throw ApiError.unauthorized();
+  if (!token) {
+    throw ApiError.unauthorized();
+  }
 
   const userData = jwtService.verify(token);
 
-  if (!userData) throw ApiError.unauthorized();
+  if (!userData) {
+    throw ApiError.unauthorized();
+  }
 
   const { userId, username, email, password, currentPassword } = req.body;
-  if (!userId) throw ApiError.badRequest('User ID is required');
+
+  if (!userId) {
+    throw ApiError.badRequest('User ID is required');
+  }
 
   const user = await userService.findById(userId);
 
@@ -46,7 +58,10 @@ const updateProfile = async (req, res) => {
 
   if (username) {
     const usernameError = validate.validateUsername(username);
-    if (usernameError) errors.username = usernameError;
+
+    if (usernameError) {
+      errors.username = usernameError;
+    }
   }
 
   if (email) {
@@ -57,16 +72,21 @@ const updateProfile = async (req, res) => {
         currentPassword,
         user.password,
       );
+
       if (!isPasswordValid) {
         errors.currentPassword = 'Current passwrod is incorrect';
       }
     }
 
     const emailError = validate.validateEmail(email);
-    if (emailError) errors.email = emailError;
+
+    if (emailError) {
+      errors.email = emailError;
+    }
   }
 
   let hashedPassword;
+
   if (password) {
     if (!currentPassword) {
       errors.currentPassword =
@@ -76,13 +96,17 @@ const updateProfile = async (req, res) => {
         currentPassword,
         user.password,
       );
+
       if (!isPasswordValid) {
         errors.currentPassword = 'Current password is incorrect';
       }
     }
 
     const passwordError = validate.validatePassword(password);
-    if (passwordError) errors.password = passwordError;
+
+    if (passwordError) {
+      errors.password = passwordError;
+    }
 
     hashedPassword = await bcrypt.hash(password, 10);
   }
@@ -98,13 +122,14 @@ const updateProfile = async (req, res) => {
   });
 
   res.status(200);
+
   res.send({
     username: updatedUser.username,
     email: updatedUser.email,
   });
 };
 
-export const userController = {
+exports.userController = {
   getAllActivated,
   updateProfile,
   getProfile,

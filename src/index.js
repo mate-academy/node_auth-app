@@ -1,24 +1,21 @@
-import 'dotenv/config';
-import '../setup.js';
-import express from 'express';
-import { authRouter } from './routes/auth.route.js';
-import cors from 'cors';
-import { userRouter } from './routes/user.route.js';
-import { errorMiddleware } from './middlewares/errorMiddleware.js';
-import cookieParser from 'cookie-parser';
+require('dotenv/config');
+require('../setup.js');
+
+const express = require('express');
+const { authRouter } = require('./routes/auth.route.js');
+const cors = require('cors');
+const { userRouter } = require('./routes/user.route.js');
+const { errorMiddleware } = require('./middlewares/errorMiddleware.js');
+const cookieParser = require('cookie-parser');
 
 const PORT = process.env.PORT || 3005;
 
 const app = express();
+
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_HOST,
-    credentials: true,
-  }),
-);
+app.use(cors({ origin: process.env.CLIENT_HOST, credentials: true }));
 
 app.use(authRouter);
 app.use('/users', userRouter);
@@ -30,5 +27,5 @@ app.get('/', (req, res) => {
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
-  console.log(`server is running http://localhost:${PORT}`);
+  // console.log(`server is running http://localhost:${PORT}`);
 });
