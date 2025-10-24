@@ -34,11 +34,12 @@ function sendActivationEmail(email, token) {
   });
 }
 
-function sendResetPasswordEmail(email) {
-  const href = `${process.env.CLIENT_HOST}/reset-password/${email}`;
+function sendResetPasswordEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${token}`;
 
   const html = `
     <h1>Reset account password</h1>
+    <p>Click the link below to reset your password (valid for 10 minutes):</p>
     <a href="${href}">${href}</a>
   `;
 
@@ -53,7 +54,7 @@ function sendChangeEmailNotification(email, token) {
   const href = `${process.env.CLIENT_HOST}/activate-email/${email}/${token}`;
 
   const html = `
-    <h1>Ghange email address</h1>
+    <h1>Change email address</h1>
     <a href="${href}">${href}</a>
   `;
 

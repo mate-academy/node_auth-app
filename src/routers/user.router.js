@@ -25,6 +25,5 @@ userRouter.post(
 
 userRouter.post(
   '/activation_email/:newEmail/:activationEmailToken',
-  authMiddleware,
   catchError(userController.updateUserEmail),
 );

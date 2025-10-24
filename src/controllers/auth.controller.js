@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
 import { userService } from '../services/user.service.js';
-import { emailService } from '../services/email.srvice.js';
 import { User } from '../models/user.js';
+import { Op } from 'sequelize';
 import { ApiError } from '../exeptions/api.error.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
+import { v4 as uuidv4 } from 'uuid';
 
 function validateEmail(value) {
   const EMAIL_PATTERN = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
@@ -80,35 +81,63 @@ const activation = async (req, res) => {
 const emailSend = async (req, res) => {
   const { email } = req.body;
 
-  const isEmailValid = validateEmail(email);
+  const user = await userService.findByEmail(email);
 
-  if (isEmailValid) {
-    throw ApiError.badRequest('Bad request', isEmailValid);
+  if (!user) {
+    return res.status(200).json({
+      message: 'If the email exists, we sent a reset link',
+    });
   }
 
-  await emailService.sendResetPasswordEmail(email);
+  const resetToken = uuidv4();
+  const hashedToken = await bcrypt.hash(resetToken, 10);
+
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+  await user.save();
+
+  await userService.sendEmailResetPassword(email, resetToken);
 
   res.status(200).json({
-    message: 'Email was send',
+    message: 'If the email exists, we sent a reset link',
   });
 };
 
 const resetPassword = async (req, res) => {
-  const { email, password, confirmation } = req.body;
+  const { resetPasswordToken, password, confirmation } = req.body;
 
   if (password !== confirmation) {
     throw ApiError.badRequest('Passwords is not equal');
   }
 
-  const user = await userService.findByEmail(email);
+  const user = await User.findOne({
+    where: {
+      resetPasswordExpires: { [Op.gt]: Date.now() },
+    },
+  });
+
+  if (!user) {
+    throw ApiError.badRequest('Token is invalid or has expired');
+  }
+
+  const isTokenValid = await bcrypt.compare(
+    resetPasswordToken,
+    user.resetPasswordToken,
+  );
+
+  if (!isTokenValid) {
+    throw ApiError.badRequest('Token is invalid or has expired');
+  }
 
   const hashedPass = await bcrypt.hash(password, 10);
 
   user.password = hashedPass;
+  user.resetPasswordToken = null;
+  user.resetPasswordExpires = null;
   user.save();
 
   res.status(200).json({
-    message: 'Password was changed',
+    message: 'Password was changed successfully',
   });
 };
 
@@ -118,8 +147,7 @@ const login = async (req, res) => {
   const user = await userService.findByEmail(email);
 
   if (!user) {
-    // eslint-disable-next-line new-cap
-    throw new ApiError.badRequest('No such user');
+    throw ApiError.badRequest('No such user');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);

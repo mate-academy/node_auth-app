@@ -1,5 +1,5 @@
 import { ApiError } from '../exeptions/api.error.js';
-import { emailService } from '../services/email.srvice.js';
+import { emailService } from './email.service.js';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../models/user.js';
 
@@ -37,6 +37,10 @@ async function sendEmailChange(email, newEmail) {
 
   const user = await findByEmail(email);
 
+  if (!user) {
+    throw ApiError.badRequest('User not found');
+  }
+
   user.activationEmailToken = activationEmailToken;
   user.save();
 
@@ -46,9 +50,14 @@ async function sendEmailChange(email, newEmail) {
   );
 }
 
+async function sendEmailResetPassword(email, resetPasswordToken) {
+  await emailService.sendResetPasswordEmail(email, resetPasswordToken);
+}
+
 export const userService = {
   register,
   findByEmail,
   normalize,
   sendEmailChange,
+  sendEmailResetPassword,
 };

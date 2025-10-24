@@ -1,7 +1,7 @@
 import { userService } from '../services/user.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
-import { emailService } from '../services/email.srvice.js';
+import { emailService } from '../services/email.service.js';
 import { User } from '../models/user.js';
 
 function validateEmail(value) {
@@ -16,15 +16,25 @@ function validateEmail(value) {
   }
 }
 
-// function validatePassword(value) {
-//   if (!value) {
-//     return 'Password is required';
-//   }
+function validatePassword(value) {
+  if (!value) {
+    return 'Password is required';
+  }
 
-//   if (value.length < 6) {
-//     return 'At least 6 characters';
-//   }
-// }
+  if (value.length < 6) {
+    return 'Password must be at least 6 characters long';
+  }
+
+  if (!/[A-Za-z]/.test(value)) {
+    return 'Password must contain at least one letter';
+  }
+
+  if (!/\d/.test(value)) {
+    return 'Password must contain at least one number';
+  }
+
+  return null;
+}
 
 const validateName = (value) => {
   if (!value) {
@@ -69,6 +79,14 @@ const updateUserPassword = async (req, res) => {
     throw ApiError.badRequest('Wrong password');
   }
 
+  const errors = {
+    password: validatePassword(password),
+  };
+
+  if (errors.password) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
   if (password !== confirmation) {
     throw ApiError.badRequest('Passwords is not equal');
   }
@@ -84,35 +102,29 @@ const updateUserPassword = async (req, res) => {
 };
 
 const sendNotificationEmail = async (req, res) => {
-  try {
-    const { email, newEmail, password } = req.body;
+  const { email, newEmail, password } = req.body;
 
-    const user = await userService.findByEmail(email);
+  const user = await userService.findByEmail(email);
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
-    if (!isPasswordValid) {
-      throw ApiError.badRequest('Wrong Password');
-    }
-
-    const existUser = await userService.findByEmail(newEmail);
-
-    if (existUser) {
-      throw ApiError.badRequest('User already exist', {
-        email: 'User already exist',
-      });
-    }
-
-    await userService.sendEmailChange(email, newEmail);
-
-    res.status(200).json({
-      message: 'Email send',
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'Internal Server Error', error: error.message });
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong Password');
   }
+
+  const existUser = await userService.findByEmail(newEmail);
+
+  if (existUser) {
+    throw ApiError.badRequest('User already exist', {
+      email: 'User already exist',
+    });
+  }
+
+  await userService.sendEmailChange(email, newEmail);
+
+  res.status(200).json({
+    message: 'Email send',
+  });
 };
 
 const updateUserEmail = async (req, res) => {

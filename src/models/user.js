@@ -21,4 +21,10 @@ export const User = client.define('user', {
   activationEmailToken: {
     type: DataTypes.STRING,
   },
+  resetPasswordToken: {
+    type: DataTypes.STRING,
+  },
+  resetPasswordExpires: {
+    type: DataTypes.DATE,
+  },
 });
