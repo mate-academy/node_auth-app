@@ -1,6 +1,16 @@
 import 'dotenv/config';
-// import { user } from './src/models/user';
+import { User } from './src/models/user.js';
 
 import { client } from './src/utils/db.js';
 
-await client.sync({ alter: true });
+(async () => {
+  try {
+    await client.authenticate();
+    console.log('✅ Database connected');
+
+    await client.sync({ alter: true });
+    console.log('✅ Tables synchronized');
+  } catch (error) {
+    console.error('❌ Error:', error);
+  }
+})();

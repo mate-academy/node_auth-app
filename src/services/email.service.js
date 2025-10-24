@@ -16,22 +16,24 @@ export function send({ email, subject, html }) {
     to: email,
     subject,
     html,
-  })
+  });
 }
 
 function sendActivationEmail(email, token) {
-  const href = `${process.env.CLIENT_HOST}/activate/${token}`;
+  const href = `${process.env.CLIENT_HOST}/activation/${token}`;
   const html = `
   <h1>Activate account</h1>
   <a href="${href}">${href}</a>
   `;
 
   return send({
-    email, html, subject: 'Activate'
-  })
+    email,
+    html,
+    subject: 'Activate',
+  });
 }
 
 export const emailService = {
   sendActivationEmail,
   send,
-}
+};

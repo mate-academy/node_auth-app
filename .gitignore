@@ -2,8 +2,10 @@
 .idea
 .vscode
 
+
 # Node
 node_modules
+.env
 
 # MacOS
 .DS_Store
