@@ -83,7 +83,7 @@ const activation = async (req, res) => {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 
   await generateTokens(res, user);
 };
@@ -144,7 +144,7 @@ const resetPassword = async (req, res) => {
   user.password = hashedPass;
   user.resetPasswordToken = null;
   user.resetPasswordExpires = null;
-  user.save();
+  await user.save();
 
   res.status(200).json({
     message: 'Password was changed successfully',
@@ -198,7 +198,7 @@ async function generateTokens(res, user) {
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
-  const userData = await jwtService.verifyRefresh(refreshToken);
+  const userData = jwtService.verifyRefresh(refreshToken);
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
@@ -206,6 +206,10 @@ const refresh = async (req, res) => {
   }
 
   const user = await userService.findByEmail(userData.email);
+
+  if (!user) {
+    throw ApiError.notFound('User is not found');
+  }
 
   await generateTokens(res, user);
 };
