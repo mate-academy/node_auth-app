@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
-function sing(user) {
+function sign(user) {
   const token = jwt.sign(user, process.env.JWT_KEY, { expiresIn: '1h' });
 
   return token;
@@ -15,4 +15,4 @@ function verify(token) {
   }
 }
 
-export const jwtService = { sing, verify };
+export const jwtService = { sign, verify };

@@ -7,7 +7,7 @@ const getAllActivated = async (req, res) => {
     return res.status(404).send({ message: 'No activated users found' });
   }
 
-  res.send(users.maop(userService.normalize));
+  res.send(users.map(userService.normalize));
 };
 
 export const userController = { getAllActivated };
