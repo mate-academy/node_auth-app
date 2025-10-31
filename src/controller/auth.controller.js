@@ -33,6 +33,7 @@ const register = async (req, res) => {
     }
 
     const existingUser = await userService.findByEmail(email);
+
     if (existingUser) {
       return res.status(409).send({ message: 'Email already exists' });
     }
@@ -44,8 +45,7 @@ const register = async (req, res) => {
     await emailService.sendActivationEmail(email, activationToken);
 
     res.status(201).send({
-      message:
-        'User registered successfully. Check your email to activate your account.',
+      message: 'User registered successfully. Check your email.',
     });
   } catch (err) {
     res.status(500).send({ message: 'Server error', error: err.message });
@@ -60,7 +60,11 @@ const activate = async (req, res) => {
     return res.status(404).send({ message: 'Invalid activation token' });
   }
 
-  await user.update({ activationToken: null });
+  user.isActivated = true;
+  user.activationToken = null;
+  await user.save();
+
+  res.redirect('/login');
 
   res.status(200).send({ message: 'Account activated successfully' });
 };
@@ -74,6 +78,7 @@ const login = async (req, res) => {
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
+
   if (!isPasswordValid) {
     return res.status(401).send({ message: 'Invalid email or password' });
   }
@@ -90,8 +95,67 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
   res.clearCookie('token');
-
+  res.redirect('/login');
   res.send({ message: 'Logged out successfully' });
+};
+
+const requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    return res
+      .status(200)
+      .send({ message: 'If email exists, reset link sent' });
+  }
+
+  const resetToken = uuidv4();
+
+  user.resetToken = resetToken;
+  await user.save();
+
+  const resetLink = `${process.env.CLIENT_HOST}/reset-password/${resetToken}`;
+
+  const html = `
+    <h1>Password Reset</h1>
+    <p>Please click the link below to reset your password:</p>
+    <a href="${resetLink}">${resetLink}</a>
+  `;
+
+  await emailService.sendEmail(email, 'Password Reset', html);
+
+  res.send({ message: 'Reset email sent' });
+};
+
+const verifyResetToken = async (req, res) => {
+  const { token } = req.params;
+  const user = await User.findOne({ where: { resetToken: token } });
+
+  if (!user) {
+    return res.status(400).send({ message: 'Invalid or expired token' });
+  }
+  res.send({ message: 'Valid token' });
+};
+
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.status(400).send({ message: 'Passwords do not match' });
+  }
+
+  const user = await User.findOne({ where: { resetToken: token } });
+
+  if (!user) {
+    return res.status(400).send({ message: 'Invalid token' });
+  }
+
+  user.password = await bcrypt.hash(password, 10);
+  user.resetToken = null;
+  await user.save();
+
+  res.send({ message: 'Password successfully reset' });
 };
 
 export const authController = {
@@ -99,4 +163,7 @@ export const authController = {
   activate,
   login,
   logout,
+  requestPasswordReset,
+  verifyResetToken,
+  resetPassword,
 };
