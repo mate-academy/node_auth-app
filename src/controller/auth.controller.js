@@ -11,12 +11,12 @@ const validatePassword = (password) =>
 
 const register = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || !name) {
       return res
         .status(400)
-        .send({ message: 'Email and password are required' });
+        .send({ message: 'Name, email and password are required' });
     }
 
     const isEmailValid = validateEmail(email);
@@ -41,7 +41,12 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const activationToken = uuidv4();
 
-    await User.create({ email, password: hashedPassword, activationToken });
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      activationToken,
+    });
     await emailService.sendActivationEmail(email, activationToken);
 
     res.status(201).send({
@@ -64,9 +69,7 @@ const activate = async (req, res) => {
   user.activationToken = null;
   await user.save();
 
-  res.redirect('/login');
-
-  res.status(200).send({ message: 'Account activated successfully' });
+  res.redirect('/profile');
 };
 
 const login = async (req, res) => {
@@ -90,13 +93,18 @@ const login = async (req, res) => {
   const normalizedUser = userService.normalize(user);
   const accessToken = jwtService.sign(normalizedUser);
 
-  res.status(200).send({ user: normalizedUser, accessToken });
+  res.cookie('token', accessToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'Strict',
+  });
+
+  res.redirect('/profile');
 };
 
 const logout = (req, res) => {
   res.clearCookie('token');
   res.redirect('/login');
-  res.send({ message: 'Logged out successfully' });
 };
 
 const requestPasswordReset = async (req, res) => {
