@@ -2,7 +2,10 @@ import express from 'express';
 import { authController } from '../controllers/auth.controller.js';
 import { catchError } from '../utils/catchError.js';
 import { dataValidate } from '../middlewares/dataValidateMiddleware.js';
-import { guestMiddleware } from '../middlewares/authMiddleware.js';
+import {
+  authMiddleware,
+  guestMiddleware,
+} from '../middlewares/authMiddleware.js';
 export const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -48,5 +51,5 @@ router.post(
   dataValidate.setPassword,
   catchError(authController.setPassword),
 );
-router.get('/logout', catchError(authController.logout));
+router.get('/logout', authMiddleware, catchError(authController.logout));
 router.get('/refresh', catchError(authController.refresh));

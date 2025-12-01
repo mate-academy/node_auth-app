@@ -12,7 +12,7 @@ export const authMiddleware = async (req, res, next) => {
   const userToken = jwtService.verify(token);
 
   if (!userToken) {
-    throw ApiError.notFound();
+    throw ApiError.unauthorized();
   }
 
   next();

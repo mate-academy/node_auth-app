@@ -19,13 +19,21 @@ const activate = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  await userService.login(res, { email, password });
+  const user = await userService.login({ email, password });
+
+  await userService.generateTokens(res, user);
+
+  res.redirect('/profile');
 };
 
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
-  await userService.refresh(res, refreshToken);
+  const user = await userService.refresh(refreshToken);
+
+  const data = await userService.generateTokens(res, user);
+
+  return res.send(data);
 };
 
 const logout = async (req, res) => {

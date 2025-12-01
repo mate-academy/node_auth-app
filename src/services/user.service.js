@@ -51,7 +51,7 @@ async function register({ name, email, password }) {
   await emailService.sendActivationMail(email, activationToken);
 }
 
-async function login(res, { email, password }) {
+async function login({ email, password }) {
   const user = await findByEmail(email);
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -70,14 +70,16 @@ async function login(res, { email, password }) {
     throw ApiError.unauthorized({ email: 'Activate your email first' });
   }
 
-  await generateTokens(res, user);
+  return user;
 }
 
 async function activate(activationToken) {
   const isValidJwt = jwtService.verify(activationToken);
 
   if (!isValidJwt) {
-    throw ApiError.badRequest({ activationToken: 'Token invalid or expired' });
+    throw ApiError.badRequest('Token invalid', {
+      activationToken: 'Token invalid or expired',
+    });
   }
 
   const tokenData = await tokenService.findTokenWithUser(
@@ -92,7 +94,7 @@ async function activate(activationToken) {
   await tokenService.markAsUsed(tokenData.id);
 }
 
-async function refresh(res, refreshToken) {
+async function refresh(refreshToken) {
   const userData = jwtService.verifyRefresh(refreshToken);
 
   if (!userData) {
@@ -118,7 +120,8 @@ async function refresh(res, refreshToken) {
   }
 
   await tokenService.markAsUsed(tokenData.id);
-  await generateTokens(res, user);
+
+  return user;
 }
 
 async function sendResetPassword(email) {
@@ -234,10 +237,10 @@ async function generateTokens(res, user) {
     secure: true,
   });
 
-  res.send({
+  return {
     user: normalizeUser,
     accessToken,
-  });
+  };
 }
 
 async function getProfile(refreshToken) {

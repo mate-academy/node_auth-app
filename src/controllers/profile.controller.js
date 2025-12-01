@@ -42,7 +42,7 @@ const passwordUpdate = async (req, res) => {
     confirmPassword,
   });
 
-  res.send(200);
+  res.sendStatus(200);
 };
 
 export const profileController = {

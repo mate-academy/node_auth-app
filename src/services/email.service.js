@@ -20,7 +20,7 @@ async function sendActivationMail(email, token) {
   const activationLink = `${process.env.CLIENT_HOST}/activation/${token}`;
   const html = `
   <h1>Activation link</h1>
-  <a href=${activationLink}>${activationLink}</a>
+  <a href="${activationLink}">${activationLink}</a>
   `;
 
   return send({
