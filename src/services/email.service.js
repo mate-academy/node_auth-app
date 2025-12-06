@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
 import 'dotenv/config';
@@ -8,7 +10,7 @@ async function createTransporter() {
   const oauth2Client = new OAuth2(
     process.env.CLIENT_ID,
     process.env.CLIENT_SECRET,
-    process.env.REDIRECT_URI
+    process.env.REDIRECT_URI,
   );
 
   oauth2Client.setCredentials({
@@ -34,6 +36,7 @@ async function createTransporter() {
 
 async function send({ email, subject, html }) {
   const transporter = await createTransporter();
+
   return transporter.sendMail({
     to: email,
     subject,
@@ -59,5 +62,5 @@ async function sendActivationEmail(email, activationToken) {
 
 export const emailService = {
   send,
-  sendActivationEmail
-}
+  sendActivationEmail,
+};

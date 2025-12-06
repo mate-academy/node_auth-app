@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import 'dotenv/config';
 import express from 'express';
 import { authRouter } from './routes/auth.route.js';
@@ -14,7 +15,7 @@ const app = express();
 const oauth2Client = new google.auth.OAuth2(
   process.env.CLIENT_ID,
   process.env.CLIENT_SECRET,
-  process.env.REDIRECT_URI
+  process.env.REDIRECT_URI,
 );
 
 const SCOPES = ['https://mail.google.com/'];
@@ -26,6 +27,7 @@ app.get('/auth', (req, res) => {
     scope: SCOPES,
     prompt: 'consent', // важливо, щоб видати refresh_token
   });
+
   res.redirect(url);
 });
 
@@ -33,17 +35,18 @@ app.get('/auth', (req, res) => {
 app.get('/oauth2callback', async (req, res) => {
   const { code } = req.query;
   const { tokens } = await oauth2Client.getToken(code);
+
   console.log('✅ ACCESS TOKEN:', tokens.access_token);
   console.log('✅ REFRESH TOKEN:', tokens.refresh_token);
   res.send('Authorization successful! Check your console for tokens.');
 });
 
-
-
-app.use(cors({
-  origin: process.env.CLIENT_HOST,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_HOST,
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -52,12 +55,11 @@ app.use('/', authRouter);
 app.use('/users', userRouter);
 
 app.get('/', (req, res) => {
-  res.end('hello')
+  res.end('hello');
 });
 
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
-})
-
+});

@@ -7,17 +7,26 @@ import { ApiError } from '../exceptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/tokenService.js';
 
-
 function validateEmail(value) {
   const EMAIL_PATTERN = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
-  if (!value) return 'Email is required';
-  if (!EMAIL_PATTERN.test(value)) return 'Email is not valid';
+  if (!value) {
+    return 'Email is required';
+  }
+
+  if (!EMAIL_PATTERN.test(value)) {
+    return 'Email is not valid';
+  }
 }
 
 const validatePassword = (value) => {
-  if (!value) return 'Password is required';
-  if (value.length < 6) return 'At least 6 characters';
+  if (!value) {
+    return 'Password is required';
+  }
+
+  if (value.length < 6) {
+    return 'At least 6 characters';
+  }
 };
 
 const register = async (req, res) => {
@@ -25,24 +34,25 @@ const register = async (req, res) => {
 
   const errors = {
     email: validateEmail(email),
-    password: validatePassword(password)
-  }
-
-  if (errors.email || errors.password) {
-    throw ApiError.badRequest('Bad request', errors)
+    password: validatePassword(password),
   };
 
-  const existingUser = await db.user.findUnique({
-    where: {
-      email
-    }
-  }) || null;
+  if (errors.email || errors.password) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  const existingUser =
+    (await db.user.findUnique({
+      where: {
+        email,
+      },
+    })) || null;
 
   if (existingUser) {
     throw ApiError.badRequest('User already exist', {
-      email: 'User already exist'
-    })
-  };
+      email: 'User already exist',
+    });
+  }
 
   const activationToken = uuidv4();
 
@@ -52,11 +62,11 @@ const register = async (req, res) => {
     data: {
       email,
       password: hashedPass,
-      activationToken
-    }
+      activationToken,
+    },
   });
 
-  await emailService.sendActivationEmail(email, activationToken); // await + try/catch можна додатково
+  await emailService.sendActivationEmail(email, activationToken);
 
   res.status(201).json(userService.normalize(newUser));
 };
@@ -67,26 +77,27 @@ const activate = async (req, res) => {
   const existingUser = await db.user.findFirst({
     where: {
       email,
-      activationToken
-    }
-  })
+      activationToken,
+    },
+  });
 
   if (!existingUser) {
     res.sendStatus(404);
+
     return;
   }
 
   const user = await db.user.update({
     where: {
-      id: existingUser.id
+      id: existingUser.id,
     },
     data: {
       activationToken: null,
-    }
+    },
   });
 
   res.send(userService.normalize(user));
-}
+};
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -108,7 +119,7 @@ const login = async (req, res) => {
   }
 
   generateTokens(res, user);
-}
+};
 
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
@@ -121,35 +132,34 @@ const logout = async (req, res) => {
   await tokenService.remove(userData.id);
 
   res.sendStatus(204);
-}
+};
 
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
   const userData = jwtService.verifyRefresh(refreshToken);
-  const token = await tokenService.getByToken(refreshToken)
+  const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
     throw ApiError.unauthorized();
   }
 
   const user = await userService.findByEmail(userData.email);
+
   await generateTokens(res, user);
-}
+};
 
 const resetPassword = async (req, res) => {
   const { email } = req.body;
 
   const errors = {
-    email: validateEmail(email)
-  }
+    email: validateEmail(email),
+  };
 
   if (errors) {
     throw ApiError.badRequest('Wrong email', errors);
   }
-
-
-}
+};
 
 const generateTokens = async (res, user) => {
   const normalizedUser = userService.normalize(user);
@@ -161,14 +171,14 @@ const generateTokens = async (res, user) => {
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
-    HttpOnly: true
-  })
+    HttpOnly: true,
+  });
 
   res.send({
     user: normalizedUser,
-    accessToken
+    accessToken,
   });
-}
+};
 
 export const authController = {
   register,
@@ -176,5 +186,5 @@ export const authController = {
   login,
   logout,
   refresh,
-  resetPassword
-}
+  resetPassword,
+};
