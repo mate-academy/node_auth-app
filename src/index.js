@@ -52,7 +52,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/', authRouter);
-app.use('/users', userRouter);
+app.use('/', userRouter);
 
 app.get('/', (req, res) => {
   res.end('hello');

@@ -3,6 +3,7 @@
 import nodemailer from 'nodemailer';
 import { google } from 'googleapis';
 import 'dotenv/config';
+import { ApiError } from '../exceptions/api.error.js';
 
 const OAuth2 = google.auth.OAuth2;
 
@@ -57,10 +58,43 @@ async function sendActivationEmail(email, activationToken) {
     console.log('✅ Activation email sent to', email);
   } catch (error) {
     console.error('Error sending email:', error.message);
+    throw ApiError.badRequest('Server problem', error);
+  }
+}
+
+async function sendResetPasswordEmail(email, resetPasswordToken) {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${email}/${resetPasswordToken}`;
+  const subject = 'Reset your password';
+  const html = `
+    <h1>Reset your password</h1>
+    <a href="${href}">${href}</a>
+  `;
+
+  try {
+    await send({ email, subject, html });
+    console.log('✅ Reset password email sent to', email);
+  } catch (error) {
+    console.error('Error sending email:', error.message);
+  }
+}
+
+async function sendChangedEmail(email) {
+  const subject = 'Email changed';
+  const html = `
+    <h1>Your email has been change to ${email}</h1>
+  `;
+
+  try {
+    await send({ email, subject, html });
+    console.log('✅ Reset password email sent to', email);
+  } catch (error) {
+    console.error('Error sending email:', error.message);
   }
 }
 
 export const emailService = {
   send,
   sendActivationEmail,
+  sendResetPasswordEmail,
+  sendChangedEmail,
 };

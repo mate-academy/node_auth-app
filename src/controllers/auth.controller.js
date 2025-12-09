@@ -149,16 +149,89 @@ const refresh = async (req, res) => {
   await generateTokens(res, user);
 };
 
-const resetPassword = async (req, res) => {
-  const { email } = req.body;
+const resetPasswordToken = async (req, res) => {
+  const { email } = req.params;
 
   const errors = {
     email: validateEmail(email),
   };
 
-  if (errors) {
+  if (errors.email) {
     throw ApiError.badRequest('Wrong email', errors);
   }
+
+  const resetPassToken = uuidv4();
+
+  const user = await db.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  if (!user) {
+    throw ApiError.badRequest('Unknown email', errors);
+  }
+
+  const isResetPasswordToken = await db.token.upsert({
+    where: {
+      userId: user.id,
+    },
+    update: {
+      resetPasswordToken: resetPassToken,
+    },
+    create: {
+      userId: user.id,
+      resetPasswordToken: resetPassToken,
+    },
+  });
+
+  if (!isResetPasswordToken) {
+    throw ApiError.badRequest('Something went wrong', errors);
+  }
+
+  await emailService.sendResetPasswordEmail(email, resetPassToken);
+
+  res.sendStatus(200);
+};
+
+const resetPassword = async (req, res) => {
+  const { email, resetToken } = req.params;
+  const { password } = req.body;
+
+  if (!email || !resetToken) {
+    throw ApiError.badRequest('wrong email or token');
+  }
+
+  const user = await db.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  const tokens = await db.token.findFirst({
+    where: {
+      userId: user.id,
+    },
+  });
+
+  if (!tokens || tokens.resetPasswordToken !== resetToken) {
+    throw ApiError.badRequest('Bad token');
+  }
+
+  const hashedPass = await bcrypt.hash(password, 10);
+
+  const updatedUser = await db.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      password: hashedPass,
+    },
+  });
+
+  res.send(userService.normalize(updatedUser));
 };
 
 const generateTokens = async (res, user) => {
@@ -186,5 +259,6 @@ export const authController = {
   login,
   logout,
   refresh,
+  resetPasswordToken,
   resetPassword,
 };

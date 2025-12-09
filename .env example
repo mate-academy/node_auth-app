@@ -1,0 +1,10 @@
+PORT=3005
+DB_URL=postgres://postgres:32103210@localhost:5432/postgres?schema=public
+CLIENT_HOST=http://localhost:5173
+JWT_KEY=hello
+JWT_REFRESH_KEY=refresh
+
+CLIENT_ID=
+CLIENT_SECRET=
+REDIRECT_URI=http://localhost:3005/oauth2callback
+REFRESH_TOKEN=
