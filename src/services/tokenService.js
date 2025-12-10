@@ -1,26 +1,17 @@
 import { db } from '../utils/db.js';
 
-async function save(userId, newToken) {
-  const token = await db.token.findFirst({
-    where: { userId },
-  });
-
-  if (!token) {
-    await db.token.create({
-      data: {
-        userId,
-        refreshToken: newToken,
-      },
-    });
-
-    return;
-  }
-
-  await db.token.update({
+function save(userId, newToken) {
+  return db.token.upsert({
+    create: {
+      userId,
+      refreshToken: newToken,
+    },
+    update: {
+      refreshToken: newToken,
+    },
     where: {
       userId,
     },
-    data: { refreshToken: newToken },
   });
 }
 

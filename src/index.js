@@ -1,4 +1,5 @@
-/* eslint-disable no-console */
+/*eslint-disable no-console*/
+
 import 'dotenv/config';
 import express from 'express';
 import { authRouter } from './routes/auth.route.js';
@@ -20,18 +21,16 @@ const oauth2Client = new google.auth.OAuth2(
 
 const SCOPES = ['https://mail.google.com/'];
 
-// 1️⃣ Крок: редірект на Google для авторизації http://localhost:3005/auth
 app.get('/auth', (req, res) => {
   const url = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
-    prompt: 'consent', // важливо, щоб видати refresh_token
+    prompt: 'consent',
   });
 
   res.redirect(url);
 });
 
-// 2️⃣ Крок: обробка редіректу від Google
 app.get('/oauth2callback', async (req, res) => {
   const { code } = req.query;
   const { tokens } = await oauth2Client.getToken(code);

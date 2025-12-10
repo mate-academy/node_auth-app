@@ -30,9 +30,27 @@ const verifyRefresh = (token) => {
   }
 };
 
+const signActivation = (email) => {
+  const token = jwt.sign(email, process.env.JWT_KEY, {
+    expiresIn: '1d',
+  });
+
+  return token;
+};
+
+const verifyActivation = (token) => {
+  try {
+    return jwt.verify(token, process.env.JWT_KEY);
+  } catch (e) {
+    return null;
+  }
+};
+
 export const jwtService = {
   sign,
   verify,
   signRefresh,
   verifyRefresh,
+  signActivation,
+  verifyActivation,
 };

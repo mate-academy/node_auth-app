@@ -6,35 +6,15 @@ import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/tokenService.js';
-
-function validateEmail(value) {
-  const EMAIL_PATTERN = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!value) {
-    return 'Email is required';
-  }
-
-  if (!EMAIL_PATTERN.test(value)) {
-    return 'Email is not valid';
-  }
-}
-
-const validatePassword = (value) => {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-};
+import { errorHandlers } from '../errorHandlers/errorHandlers.js';
+import { tokenConfig } from '../config/token.config.js';
 
 const register = async (req, res) => {
   const { email, password } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    email: errorHandlers.validateEmail(email),
+    password: errorHandlers.validatePassword(password),
   };
 
   if (errors.email || errors.password) {
@@ -54,9 +34,8 @@ const register = async (req, res) => {
     });
   }
 
-  const activationToken = uuidv4();
-
   const hashedPass = await bcrypt.hash(password, 10);
+  const activationToken = jwtService.signActivation({ email });
 
   const newUser = await db.user.create({
     data: {
@@ -72,7 +51,13 @@ const register = async (req, res) => {
 };
 
 const activate = async (req, res) => {
-  const { email, activationToken } = req.params;
+  const activationToken = req.query.token;
+
+  if (!activationToken) {
+    throw ApiError.badRequest('Wrong activation link');
+  }
+
+  const { email } = jwtService.verifyActivation(activationToken);
 
   const existingUser = await db.user.findFirst({
     where: {
@@ -118,7 +103,7 @@ const login = async (req, res) => {
     throw ApiError.badRequest('Wrong password');
   }
 
-  generateTokens(res, user);
+  await tokenConfig.generateTokens(res, user);
 };
 
 const logout = async (req, res) => {
@@ -146,14 +131,14 @@ const refresh = async (req, res) => {
 
   const user = await userService.findByEmail(userData.email);
 
-  await generateTokens(res, user);
+  await tokenConfig.generateTokens(res, user);
 };
 
 const resetPasswordToken = async (req, res) => {
   const { email } = req.params;
 
   const errors = {
-    email: validateEmail(email),
+    email: errorHandlers.validateEmail(email),
   };
 
   if (errors.email) {
@@ -232,25 +217,6 @@ const resetPassword = async (req, res) => {
   });
 
   res.send(userService.normalize(updatedUser));
-};
-
-const generateTokens = async (res, user) => {
-  const normalizedUser = userService.normalize(user);
-
-  const accessToken = jwtService.sign(normalizedUser);
-  const refreshToken = jwtService.signRefresh(normalizedUser);
-
-  await tokenService.save(normalizedUser.id, refreshToken);
-
-  res.cookie('refreshToken', refreshToken, {
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-    HttpOnly: true,
-  });
-
-  res.send({
-    user: normalizedUser,
-    accessToken,
-  });
 };
 
 export const authController = {
