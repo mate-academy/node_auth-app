@@ -1,13 +1,15 @@
 # IDE
 .idea
 .vscode
+.github
+generated
+client_secret_34091956953-rqvsh774o9j6ccoq038pkhhdhndgni23.apps.googleusercontent.com.json
+package-lock.json
+.env
 
 # Node
 node_modules
+.eslintrc.cjs
 
 # MacOS
 .DS_Store
-
-# env files
-*.env
-.env*
