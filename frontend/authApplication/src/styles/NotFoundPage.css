@@ -1,0 +1,76 @@
+.notfound-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  padding: 2rem;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.notfound-content {
+  text-align: center;
+  max-width: 600px;
+  color: #fff;
+}
+
+.notfound-title {
+  font-size: 6rem;
+  font-weight: bold;
+  color: #00fff0;
+  margin: 0;
+  text-shadow: 0 0 20px #00fff0;
+}
+
+.notfound-subtitle {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #00d6f7;
+  margin: 0.5rem 0 1rem;
+  text-shadow: 0 0 8px #00d6f7;
+}
+
+.notfound-text {
+  font-size: 1.125rem;
+  color: #a0a0a0;
+  margin-bottom: 2rem;
+}
+
+.notfound-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.notfound-button {
+  padding: 0.75rem 1.5rem;
+  background-color: #00fff0;
+  color: #1a1a2e;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 0 10px #00fff0;
+  transition: 0.3s;
+}
+
+.notfound-button:hover {
+  background-color: #00d6f7;
+  box-shadow: 0 0 15px #00d6f7;
+}
+
+.notfound-button-secondary {
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: #00fff0;
+  text-decoration: none;
+  border: 1px solid #00fff0;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.notfound-button-secondary:hover {
+  background-color: rgba(0,255,255,0.1);
+  box-shadow: 0 0 10px #00fff0;
+}
