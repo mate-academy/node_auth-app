@@ -1,0 +1,109 @@
+.register-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.register-card {
+  background-color: #1a1a2e;
+  padding: 2.5rem;
+  border-radius: 12px;
+  border: 1px solid #00fff0;
+  box-shadow: 0 0 20px rgba(0,255,255,0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+.register-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #00fff0;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 8px #00fff0;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.register-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.register-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #00d6f7;
+}
+
+.register-input {
+  padding: 0.75rem;
+  border: 1px solid #00fff0;
+  border-radius: 6px;
+  background-color: #0f0f1f;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: 0.3s;
+}
+
+.register-input:focus {
+  border-color: #00d6f7;
+  box-shadow: 0 0 10px #00d6f7;
+}
+
+.register-button {
+  padding: 0.75rem;
+  background-color: #00fff0;
+  color: #1a1a2e;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.3s;
+  box-shadow: 0 0 10px #00fff0;
+}
+
+.register-button:hover {
+  background-color: #00d6f7;
+}
+
+.register-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.register-error {
+  background-color: rgba(255,0,50,0.1);
+  color: #ff0033;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.register-link-container {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.register-link {
+  color: #00fff0;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.register-link:hover {
+  text-shadow: 0 0 8px #00fff0;
+}
