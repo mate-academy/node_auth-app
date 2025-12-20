@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', 'DM Sans', system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.glass {
+  @apply bg-white/80 backdrop-blur shadow-lg border border-white/60;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition-colors;
+}
+
+.btn-primary {
+  @apply btn bg-primary text-white hover:bg-primary-dark disabled:opacity-70 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply btn bg-white text-slate-800 border border-slate-200 hover:border-slate-300;
+}
