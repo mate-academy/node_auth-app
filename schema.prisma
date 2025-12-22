@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  token     String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  userId    Int   @map("user_id") @unique
+  users     User?   @relation(fields: [userId], references: [id])
+
+    @@map("tokens")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique @db.VarChar(255)
+  userName        String   @db.VarChar(50)
+  password        String   @db.VarChar(255)
+  activationToken String?  @unique @db.Uuid
+  tokenActivationExpires DateTime? @db.Timestamptz(6)
+  pendingEmail   String?   @unique @db.VarChar(255)
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(6)
+  tokens          Token[]
+  resetToken     ResetToken?   @relation("UserReset")
+
+
+   @@map("users")
+}
+
+
+model ResetToken {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  resetTokenHash String?  @db.VarChar(255)
+  resetExpires DateTime? @db.Timestamptz(6)
+  resetInterval DateTime? @db.Timestamptz(6)
+
+  userId    Int   @map("user_id") @unique
+   user      User   @relation("UserReset", fields: [userId], references: [id])
+
+
+    @@map("reset_tokens")
+}

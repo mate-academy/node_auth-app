@@ -8,6 +8,12 @@ node_modules
 # MacOS
 .DS_Store
 
-# env files
-*.env
-.env*
+/src/generated/prisma
+
+# ENV
+.env
+
+
+# Prisma artifacts
+prisma/dev.db
+prisma/dev.db-journal
