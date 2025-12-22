@@ -45,7 +45,7 @@ async function sendEmail({ email, type, token = null, id = null }) {
       subject = 'Update';
 
       html = `
-  <h1>Instructions for changing email have been sent to the new email address.</h1>
+  <h1>A request was made to change the email for your account. If you did not authorize this, please contact support immediately.</h1>
 `;
       break;
     default:

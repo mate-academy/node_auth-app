@@ -25,6 +25,10 @@ app.use('/users', userRouter);
 
 app.use('/reset', resetRouter);
 
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
 const server = app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Server start at http://localhost:${PORT}`);

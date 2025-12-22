@@ -23,17 +23,7 @@ function getByUserId(userId) {
 }
 
 async function deleteByUserId(userId) {
-  const token = await db.token.findFirst({
-    where: {
-      userId,
-    },
-  });
-
-  if (!token) {
-    return null;
-  }
-
-  return db.token.delete({
+  return db.token.deleteMany({
     where: {
       userId,
     },

@@ -2,7 +2,7 @@ import { userService } from '../services/user.service.js';
 import bcrypt from 'bcrypt';
 import { validate } from '../utils/validation.js';
 import { v4 as uuidv4 } from 'uuid';
-import { emailService } from './email.service.js';
+import { emailService } from '../services/email.service.js';
 
 const getAll = async (req, res) => {
   try {
@@ -18,17 +18,11 @@ const getAll = async (req, res) => {
 };
 
 const updateNameOrPassword = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.id;
   const { userName, pwd, newPwd, confrm } = req.body;
 
   const updateData = {};
   let isPasswordValid = false;
-
-  if (!userId) {
-    return res.status(400).send({
-      message: 'not found require params',
-    });
-  }
 
   const userData = await userService.getByUserId(userId);
 
@@ -52,7 +46,10 @@ const updateNameOrPassword = async (req, res) => {
     }
   }
 
-  if (pwd) {
+  if (pwd && newPwd && confrm) {
+    const passwordVaildError = validate.password(newPwd);
+    const isComare = newPwd === confrm;
+
     isPasswordValid = await bcrypt.compare(pwd, userData.password);
 
     if (!isPasswordValid) {
@@ -60,11 +57,6 @@ const updateNameOrPassword = async (req, res) => {
         message: 'need current password',
       });
     }
-  }
-
-  if (pwd && newPwd && confrm) {
-    const passwordVaildError = validate.password(newPwd);
-    const isComare = newPwd === confrm;
 
     if (passwordVaildError || !isComare) {
       return res.status(400).send({
@@ -100,10 +92,10 @@ const updateNameOrPassword = async (req, res) => {
 };
 
 const updateEmail = async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.id;
   const { pwd, newEmail } = req.body;
 
-  if (!userId || !pwd || !newEmail) {
+  if (!pwd || !newEmail) {
     return res.status(400).send({
       message: 'not found require params',
     });

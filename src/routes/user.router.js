@@ -1,14 +1,14 @@
 import { Router } from 'express';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 import { userController } from '../controllers/user.controller.js';
-import { authMiddleware } from '../midlleware/auth.middleware.js';
 
 export const userRouter = Router();
 
 userRouter.get('/', authMiddleware, userController.getAll);
 
 userRouter.patch(
-  '/:userId/settings',
+  '/settings',
   authMiddleware,
   userController.updateNameOrPassword,
 );
-userRouter.patch('/:userId/email', authMiddleware, userController.updateEmail);
+userRouter.patch('/email', authMiddleware, userController.updateEmail);

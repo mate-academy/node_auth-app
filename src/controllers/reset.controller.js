@@ -14,7 +14,7 @@ const reset = async (req, res) => {
     });
   }
 
-  const userData = await userService.findBy(email);
+  const userData = await userService.findByEmail(email);
 
   if (!userData) {
     return res.status(200).send({

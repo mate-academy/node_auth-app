@@ -86,7 +86,6 @@ async function checkPassword(token, hashToken) {
 
   if (!isValid) {
     throw new Error('Invalid reset token');
-  } else {
   }
 }
 

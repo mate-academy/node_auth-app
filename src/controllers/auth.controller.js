@@ -57,6 +57,12 @@ const login = async (req, res) => {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
+  if (user.activationToken !== null) {
+    return res.status(401).json({
+      message: 'User is not active, please activate email',
+    });
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
@@ -70,7 +76,7 @@ const refresh = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken || '';
 
   const userData = jwt.validateRefreshToken(refreshToken);
-  const user = await userService.findBy(userData?.email || '');
+  const user = await userService.findByEmail(userData?.email || '');
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token || !user || token.userId !== user.id) {

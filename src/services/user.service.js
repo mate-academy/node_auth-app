@@ -80,8 +80,8 @@ async function activate(activationToken) {
   });
 }
 
-function normalize({ id, email }) {
-  return { id, email };
+function normalize({ id, email, userName }) {
+  return { id, email, userName };
 }
 
 function update(userId, data) {
