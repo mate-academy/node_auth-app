@@ -1,0 +1,194 @@
+// Переменные
+$primary-color: #4f46e5;
+$primary-hover: #4338ca;
+$text-main: #111827;
+$text-muted: #6b7280;
+$bg-light: #f9fafb;
+$border-color: #d1d5db;
+$success-color: #16a34a;
+$white: #ffffff;
+
+.auth-card {
+  margin: 0 auto;
+  max-width: 448px;
+  width: 100%;
+  background-color: $white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  &__header {
+    margin-bottom: 32px;
+  }
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: $text-main;
+    margin-bottom: 8px;
+  }
+
+  &__subtitle {
+    color: $text-muted;
+    font-size: 14px;
+  }
+
+  &__footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 14px;
+    color: $text-muted;
+  }
+
+  &__link {
+    color: $primary-color;
+    font-weight: 500;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.auth-form {
+  &__field {
+    margin-bottom: 16px;
+  }
+
+  &__label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #374151;
+  }
+
+  &__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 8px 40px;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+    }
+  }
+
+  &__icon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+    display: flex;
+    pointer-events: none;
+  }
+
+  &__password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    &:hover {
+      color: $text-main;
+    }
+  }
+
+  &__submit-btn {
+    width: 100%;
+    max-height: 35px;
+    padding: 10px;
+    background-color: $primary-color;
+    color: $white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: $primary-hover;
+    }
+
+    &:disabled {
+      background-color: #a5b4fc; // indigo-300
+      cursor: not-allowed;
+    }
+  }
+
+  &__loader {
+    animation: 1s spin-loader linear infinite;
+  }
+}
+
+// Стили требований к паролю
+.password-requirements {
+  background-color: $bg-light;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 1px solid #f3f4f6;
+
+  &__title {
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  &__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    font-size: 12px;
+    color: #9ca3af; // по умолчанию серый
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+
+    &--valid {
+      color: $success-color;
+
+      .password-requirements__icon {
+        background-color: $success-color;
+      }
+    }
+  }
+
+  &__icon {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #d1d5db;
+    display: inline-block;
+  }
+}
+
+@keyframes spin-loader {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

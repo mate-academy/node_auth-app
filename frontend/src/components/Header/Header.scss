@@ -1,0 +1,138 @@
+// Переменные
+$primary-color: #4f46e5; // Indigo 600
+$primary-hover: #4338ca; // Indigo 700
+$text-main: #111827; // Gray 900
+$text-muted: #6b7280; // Gray 500
+$border-color: #e5e7eb; // Gray 200
+$bg-white: #ffffff;
+
+.header {
+  background-color: $bg-white;
+  border-bottom: 1px solid $border-color;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 64px;
+  display: flex;
+  align-items: center;
+
+  &__container {
+    max-width: 1280px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+
+    &-icon {
+      background-color: $primary-color;
+      color: white;
+      padding: 6px;
+      border-radius: 8px;
+      display: flex;
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    &-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: $text-main;
+
+      &--accent {
+        color: $primary-color;
+      }
+    }
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    &-info {
+      text-align: right;
+      @media (max-width: 640px) {
+        display: none; // Скрываем на мобилках как в оригинале
+      }
+    }
+
+    &-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    &-email {
+      font-size: 0.75rem;
+      color: $text-muted;
+      margin: 0;
+    }
+  }
+
+  &__avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #eef2ff; // indigo 100
+    color: $primary-color;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border: 2px solid white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  &__auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+// Общие стили кнопок
+.btn-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  color: $text-muted;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $primary-color;
+  }
+}
+
+.btn-primary {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background-color: $primary-color;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: $primary-hover;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+}

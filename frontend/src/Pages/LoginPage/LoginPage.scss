@@ -1,0 +1,164 @@
+$login-primary: #4f46e5;
+$login-text: #1f2937;
+$login-gray: #6b7280;
+$login-border: #d1d5db;
+$login-bg: #f9fafb;
+
+.login-card {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+  &__header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  &__logo {
+    color: $login-primary;
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: $login-text;
+  }
+
+  &__description {
+    color: $login-gray;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  &__footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 14px;
+    color: $login-gray;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 24px;
+  }
+
+  &__footer-link {
+    background: none;
+    border: none;
+    color: $login-primary;
+    font-weight: 600;
+    margin-left: 6px;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.login-error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.login-form {
+  &__group {
+    margin-bottom: 20px;
+  }
+
+  &__label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  &__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+  }
+
+  &__forgot-link {
+    background: none;
+    border: none;
+    color: $login-primary;
+    font-size: 13px;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__input-control {
+    position: relative;
+  }
+
+  &__input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+  }
+
+  &__input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid $login-border;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $login-primary;
+      box-shadow: 0 0 0 4px rgba($login-primary, 0.1);
+    }
+  }
+
+  &__submit {
+    width: 100%;
+    background-color: $login-primary;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+
+    &:hover {
+      background-color: darken($login-primary, 5%);
+    }
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
+  &__spinner {
+    animation: login-spin 1s linear infinite;
+  }
+}
+
+@keyframes login-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
