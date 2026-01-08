@@ -96,7 +96,7 @@ const updatePassword = async (req, res) => {
 };
 
 const updateEmail = async (req, res) => {
-  const { newEmail, password } = req.body;
+  const { newEmail, confirmation, password } = req.body;
   const userId = req.session.userId;
 
   try {
@@ -112,6 +112,13 @@ const updateEmail = async (req, res) => {
       return res.render('profile', {
         user,
         error: 'Incorrect password. Email was not changed',
+      });
+    }
+
+    if (newEmail !== confirmation) {
+      return res.render('profile', {
+        user,
+        error: 'Email confirmation does not match',
       });
     }
 
@@ -282,9 +289,8 @@ const requestPasswordReset = async (req, res) => {
       console.log(
         `RESET LINK: http://localhost:3000/reset-password/${resetToken}`,
       );
-
-      res.render('resetEmailSent');
     }
+    res.render('resetEmailSent');
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);

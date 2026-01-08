@@ -50,7 +50,7 @@ router.post(
   authController.resetPassword,
 );
 
-router.post('/profile/name', requireAuth, authController.updadeName);
+router.post('/profile/name', requireAuth, authController.updateName);
 router.post('/profile/password', requireAuth, authController.updatePassword);
 router.post('/profile/email', requireAuth, authController.updateEmail);
 

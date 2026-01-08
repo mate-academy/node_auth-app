@@ -1,74 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Your Profile</title>
   <style>
-    .section { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-    .error { color: red; }
-    .success { color: green; }
+    .section {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .success {
+      color: green;
+    }
   </style>
 </head>
+
 <body>
-  <h1>Profile: <%= user.name %></h1>
-  <p>Logged in as: <strong><%= user.email %></strong></p>
+  <h1>Profile: <%= user.name %>
+  </h1>
+  <p>Logged in as: <strong>
+      <%= user.email %>
+    </strong></p>
 
-  <% if (typeof error !== 'undefined') { %>
-    <p class="error"><%= error %></p>
-  <% } %>
-  <% if (typeof message !== 'undefined') { %>
-    <p class="success"><%= message %></p>
-  <% } %>
+  <% if (typeof error !=='undefined' ) { %>
+    <p class="error">
+      <%= error %>
+    </p>
+    <% } %>
+      <% if (typeof message !=='undefined' ) { %>
+        <p class="success">
+          <%= message %>
+        </p>
+        <% } %>
 
-  <div class="section">
-    <h3>Change Name</h3>
-    <form action="/profile/name" method="POST">
-      <div>
-        <label>New Name:</label>
-        <input type="text" name="name" value="<%= user.name %>" required>
-      </div>
-      <button type="submit">Update Name</button>
-    </form>
-  </div>
+          <div class="section">
+            <h3>Change Name</h3>
+            <form action="/profile/name" method="POST">
+              <div>
+                <label>New Name:</label>
+                <input type="text" name="name" value="<%= user.name %>" required>
+              </div>
+              <button type="submit">Update Name</button>
+            </form>
+          </div>
 
-  <div class="section">
-    <h3>Change Password</h3>
-    <form action="/profile/password" method="POST">
-      <div>
-        <label>Old Password:</label>
-        <input type="password" name="oldPassword" required>
-      </div>
-      <div>
-        <label>New Password:</label>
-        <input type="password" name="newPassword" required>
-        <small>Min 6 chars</small>
-      </div>
-      <div>
-        <label>Confirm New Password:</label>
-        <input type="password" name="confirmation" required>
-      </div>
-      <button type="submit">Update Password</button>
-    </form>
-  </div>
+          <div class="section">
+            <h3>Change Password</h3>
+            <form action="/profile/password" method="POST">
+              <div>
+                <label>Old Password:</label>
+                <input type="password" name="oldPassword" required>
+              </div>
+              <div>
+                <label>New Password:</label>
+                <input type="password" name="newPassword" required>
+                <small>Min 6 chars</small>
+              </div>
+              <div>
+                <label>Confirm New Password:</label>
+                <input type="password" name="confirmation" required>
+              </div>
+              <button type="submit">Update Password</button>
+            </form>
+          </div>
 
-  <div class="section">
-    <h3>Change Email</h3>
-    <p><em>Note: We will notify your old email address if you change this.</em></p>
-    <form action="/profile/email" method="POST">
-      <div>
-        <label>New Email:</label>
-        <input type="email" name="newEmail" required>
-      </div>
-      <div>
-        <label>Current Password (for security):</label>
-        <input type="password" name="password" required>
-      </div>
-      <button type="submit">Update Email</button>
-    </form>
-  </div>
+          <div class="section">
+            <h3>Change Email</h3>
+            <p><em>Note: We will notify your old email address if you change this.</em></p>
+            <form action="/profile/email" method="POST">
+              <div>
+                <label>New Email:</label>
+                <input type="email" name="newEmail" required>
+              </div>
 
-  <form action="/logout" method="POST">
-    <button type="submit" style="background-color: #ffcccc;">Logout</button>
-  </form>
+              <div>
+                <label>Confirm New Email:</label>
+                <input type="email" name="confirmation" required>
+              </div>
+              <div>
+                <label>Current Password (for security):</label>
+                <input type="password" name="password" required>
+              </div>
+              <button type="submit">Update Email</button>
+            </form>
+          </div>
+
+          <form action="/logout" method="POST">
+            <button type="submit" style="background-color: #ffcccc;">Logout</button>
+          </form>
 </body>
+
 </html>
