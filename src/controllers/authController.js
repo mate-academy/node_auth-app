@@ -20,7 +20,7 @@ const getResetPasswordPage = async (req, res) => {
   const { token } = req.params;
 
   try {
-    const user = models.User.findOne({ where: { resetToken: token } });
+    const user = await models.User.findOne({ where: { resetToken: token } });
 
     if (!user) {
       return res.render('requestReset', {
@@ -35,7 +35,7 @@ const getResetPasswordPage = async (req, res) => {
   }
 };
 
-const updadeName = async (req, res) => {
+const updateName = async (req, res) => {
   const { name } = req.body;
   const userId = req.session.userId;
 
@@ -126,7 +126,7 @@ const updateEmail = async (req, res) => {
       });
     }
 
-    const oldEmail = user.mail;
+    const oldEmail = user.email;
 
     user.email = newEmail;
     await user.save();
@@ -206,7 +206,9 @@ const activateAcount = async (req, res) => {
     });
 
     if (!user) {
-      res.render('register', { error: 'Invalid or expired activation link' });
+      return res.render('register', {
+        error: 'Invalid or expired activation link',
+      });
     }
 
     user.isActive = true;
@@ -230,14 +232,14 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.render('/login', { error: 'Please provide email and password' });
+    return res.render('login', { error: 'Please provide email and password' });
   }
 
   try {
     const user = await models.User.findOne({ where: { email } });
 
     if (!user) {
-      return res.render('/login', { error: 'Invalid password or email' });
+      return res.render('login', { error: 'Invalid password or email' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -257,7 +259,7 @@ const login = async (req, res) => {
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
-    res.render('/login', { message: 'Something went wrong' });
+    res.render('login', { message: 'Something went wrong' });
   }
 };
 
@@ -341,7 +343,7 @@ module.exports = {
   requestPasswordReset,
   getResetPasswordPage,
   resetPassword,
-  updadeName,
+  updateName,
   updatePassword,
   updateEmail,
 };

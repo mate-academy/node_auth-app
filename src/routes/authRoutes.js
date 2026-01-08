@@ -8,7 +8,7 @@ const { requireAuth, requireGuest } = require('../middleware/authMiddleware');
 router.get('/register', requireGuest, authController.getRegisterPage);
 router.post('/register', requireGuest, authController.register);
 
-router.get('/activate/:token', authController.activateAcount);
+router.get('/activate/:token', requireGuest, authController.activateAcount);
 
 router.get('/profile', requireAuth, async (req, res) => {
   const { models } = require('../models');
