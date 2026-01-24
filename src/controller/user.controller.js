@@ -1,6 +1,6 @@
 'use strict';
 
-const serviceUser = require('./../service/users.service');
+const serviceUser = require('./../service/users.service.js');
 const bcrypt = require('bcrypt');
 const { mailer } = require('./../util/mailer.js');
 
@@ -67,7 +67,7 @@ const updateUserPassword = async (req, res) => {
     if (passwordError) {
       return res.status(400).json({
         errors: { password: passwordError },
-        maeesage: 'Validation error',
+        message: 'Validation error',
       });
     }
 
@@ -87,7 +87,7 @@ const updateUserPassword = async (req, res) => {
     const isValid = await bcrypt.compare(oldPassword, user.password);
 
     if (!isValid) {
-      return res.status(401).send('Confirmation do not match');
+      return res.status(401).send('Incorrect old password');
     }
 
     user.password = bcrypt.hashSync(newPassword, 10);
@@ -103,35 +103,39 @@ const updateUserPassword = async (req, res) => {
 };
 
 const updateUserEmail = async (req, res) => {
-  const { password, newEmail, confirmation } = req.body;
-  const id = Number(req.user.userId);
+  try {
+    const { password, newEmail, confirmation } = req.body;
+    const id = Number(req.user.userId);
 
-  if (!newEmail || !confirmation) {
-    return res.status(400).send('Data is required');
+    if (!newEmail || !confirmation) {
+      return res.status(400).send('Data is required');
+    }
+
+    if (newEmail !== confirmation) {
+      return res.status(400).send('Confirmation do not match');
+    }
+
+    const user = await serviceUser.getUserById(id);
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
+    if (!isValidPassword) {
+      return res.status(401).send('Wrong password');
+    }
+
+    const oldEmail = user.email;
+
+    user.email = newEmail;
+
+    await serviceUser.updateUserEmail(id, newEmail);
+
+    const updatedUser = await serviceUser.getUserById(id);
+
+    await mailer.sendChangeEmailNotification(oldEmail, newEmail);
+
+    return res.status(200).send(updatedUser);
+  } catch (err) {
+    return res.status(500).send({ error: 'Internal server error' });
   }
-
-  if (newEmail !== confirmation) {
-    return res.status(400).send('Confirmation do not match');
-  }
-
-  const user = await serviceUser.getUserById(id);
-  const isValidPassword = await bcrypt.compare(password, user.password);
-
-  if (!isValidPassword) {
-    return res.status(401).send('Wrong passsword');
-  }
-
-  const oldEmail = user.email;
-
-  user.email = newEmail;
-
-  await serviceUser.updateUserEmail(id, newEmail);
-
-  const updatedUser = await serviceUser.getUserById(id);
-
-  await mailer.sendChangeEmailNotification(oldEmail, newEmail);
-
-  return res.status(200).send(updatedUser);
 };
 
 module.exports = {

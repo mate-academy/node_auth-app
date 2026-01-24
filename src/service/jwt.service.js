@@ -27,9 +27,11 @@ function validateRefreshToken(token) {
   }
 }
 
-export const jwt = {
-  generateAccessToken,
-  generateRefreshToken,
-  validateAccessToken,
-  validateRefreshToken,
+module.exports = {
+  jwt: {
+    generateAccessToken,
+    generateRefreshToken,
+    validateAccessToken,
+    validateRefreshToken,
+  },
 };

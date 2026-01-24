@@ -8,7 +8,7 @@ const Token = sequelize.define(
   'Token',
   {
     refreshToken: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
@@ -19,9 +19,9 @@ const Token = sequelize.define(
   },
 );
 
-Token.belongsTo(this.User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Token.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 User.hasOne(Token, { foreignKey: 'user_id' });
 
 module.exports = {
-  User,
+  Token,
 };

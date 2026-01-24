@@ -36,7 +36,7 @@ const findUser = async (email) => {
 };
 
 const findUserById = async (userId) => {
-  const user = User.findOne({
+  const user = await User.findOne({
     where: { userId },
   });
 

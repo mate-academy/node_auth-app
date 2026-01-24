@@ -51,9 +51,11 @@ async function sendChangeEmailNotification(oldEmail, newEmail) {
   });
 }
 
-export const mailer = {
-  send,
-  sendActivationLink,
-  sendResetPasswordNotification,
-  sendChangeEmailNotification,
+module.exports = {
+  mailer: {
+    send,
+    sendActivationLink,
+    sendResetPasswordNotification,
+    sendChangeEmailNotification,
+  },
 };

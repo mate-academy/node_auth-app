@@ -77,10 +77,10 @@ const activate = async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
-  user.accessToken = null;
+  user.activationToken = null;
   await user.save();
 
-  res.redirect('/profile');
+  // res.redirect('/profile');
 };
 
 const loginUser = async (req, res) => {
@@ -106,7 +106,7 @@ const loginUser = async (req, res) => {
 };
 
 const refresh = (req, res) => {
-  const { refreshToken } = req.cookies.refreshToken;
+  const refreshToken = req.cookies.refreshToken;
 
   if (!jwt.validateRefreshToken(refreshToken)) {
     return res.status(401);
@@ -168,7 +168,7 @@ const resetPassword = async (req, res) => {
   user.password = bcrypt.hashSync(password, 10);
   user.resetToken = null;
 
-  await userService.updateUserPassword(user.id, user.password);
+  await userService.updateUserPassword(user.userId, user.password);
 
   res.send({ message: 'Password was changed' });
 };

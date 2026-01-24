@@ -1,7 +1,7 @@
 // const { Request, Response, NextFunction } = require('express');
 const { jwt } = require('./../service/jwt.service.js');
 
-export function authMiddleware(req, res, next) {
+function authMiddleware(req, res, next) {
   const authHeader = req.headers['authorization'] || '';
   const [, accessToken] = authHeader.split(' ');
 
@@ -19,4 +19,8 @@ export function authMiddleware(req, res, next) {
 
   req.user = userData;
   next();
+}
+
+module.exports = {
+  authMiddleware,
 }
