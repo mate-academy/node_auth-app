@@ -9,7 +9,6 @@ async function sendAuthentification(res, user) {
   const userData = userService.normalizeUser(user);
   const accessToken = jwt.generateAccessToken(userData);
   const refreshToken = jwt.generateRefreshToken(userData);
-  const normalizedUser = userService.normalizeUser(user);
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
@@ -17,10 +16,7 @@ async function sendAuthentification(res, user) {
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });
 
-  res.send({
-    user: normalizedUser,
-    accessToken,
-  });
+  return accessToken;
 }
 
 const register = async (req, res) => {
@@ -49,7 +45,7 @@ const register = async (req, res) => {
       });
     }
 
-    const activationToken = bcrypt.genSaltSync(10);
+    const activationToken = uuid();
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await userService.registerUser(
       name,
@@ -80,7 +76,10 @@ const activate = async (req, res) => {
   user.activationToken = null;
   await user.save();
 
-  // res.redirect('/profile');
+  res.redirect('/login?activated=true');
+  // res.status(200).json({
+  //   message: 'Account activated',
+  // });
 };
 
 const loginUser = async (req, res) => {
@@ -168,7 +167,7 @@ const resetPassword = async (req, res) => {
   user.password = bcrypt.hashSync(password, 10);
   user.resetToken = null;
 
-  await userService.updateUserPassword(user.userId, user.password);
+  await user.save();
 
   res.send({ message: 'Password was changed' });
 };

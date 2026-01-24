@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export function send(email, subject, html) {
+function send(email, subject, html) {
   return transporter.sendMail({
     from: 'Auth API',
     to: email,
@@ -19,7 +19,7 @@ export function send(email, subject, html) {
   });
 }
 
-export function sendActivationLink(email, activationToken) {
+function sendActivationLink(email, activationToken) {
   const link = `${process.env.CLIENT_HOST}/activate/${activationToken}`;
   const html = `
     <h1>Account activation</h1>

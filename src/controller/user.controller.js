@@ -1,6 +1,6 @@
 'use strict';
 
-const serviceUser = require('./../service/users.service.js');
+const serviceUser = require('./../service/user.service.js');
 const bcrypt = require('bcrypt');
 const { mailer } = require('./../util/mailer.js');
 
