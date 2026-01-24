@@ -19,5 +19,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm test
+    - name: Install backend dependencies
+      working-directory: ./backend
+      run: npm install
+    - name: Run backend tests
+      working-directory: ./backend
+      run: npm test
