@@ -5,10 +5,6 @@
   "main": "src/index.js",
   "type": "module",
 
-  "eslintConfig": {
-    "extends": "./.eslintrc.cjs"
-  },
-
   "scripts": {
     "init": "mate-scripts init",
     "start": "node src/index.js",
