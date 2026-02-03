@@ -1,39 +1,38 @@
 // ./routes/auth.js (FIXED & PRODUCTION-READY)
-import express from "express";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import crypto from "crypto";
-import pool from "../db.js";
-import authMiddleware from "../middleware/auth.middleware.js";
+import express from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import pool from '../db.js';
+import authMiddleware from '../middleware/auth.middleware.js';
 
 import {
   sendActivationEmail,
   sendResetPasswordEmail,
   sendChangePasswordEmail,
   sendChangeEmailEmail,
-} from "../services/email.services.js";
+} from '../services/email.services.js';
 
 const router = express.Router();
 
 /* =========================
    SIGN UP
 ========================= */
-router.post("/signup", async (req, res) => {
+router.post('/signup', async (req, res) => {
   try {
     const { email, password } = req.body;
     const emailClean = email.trim().toLowerCase();
-    const username = emailClean.split("@")[0];
+    const username = emailClean.split('@')[0];
 
     if (!username || !email || !password) {
-      return res.status(400).json({ message: "Усі поля обовʼязкові" });
+      return res.status(400).json({ message: 'Усі поля обовʼязкові' });
     }
 
-    const userExists = await pool.query("SELECT id FROM users WHERE email=$1", [
+    const userExists = await pool.query('SELECT id FROM users WHERE email=$1', [
       email,
     ]);
 
     if (userExists.rows.length > 0) {
-      return res.status(400).json({ message: "Електронна пошта вже існує" });
+      return res.status(400).json({ message: 'Електронна пошта вже існує' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -47,27 +46,26 @@ router.post("/signup", async (req, res) => {
 
     await sendActivationEmail(email, activationToken);
 
-    res.status(201).json({ message: "Перевірте пошту для активації акаунту" });
+    res.status(201).json({ message: 'Перевірте пошту для активації акаунту' });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 /* =========================
    ACTIVATE ACCOUNT
 ========================= */
-router.get("/activate/:token", async (req, res) => {
+router.get('/activate/:token', async (req, res) => {
   try {
     const { token } = req.params;
 
     const result = await pool.query(
-      "SELECT id FROM users WHERE activation_token=$1",
+      'SELECT id FROM users WHERE activation_token=$1',
       [token],
     );
 
     if (result.rows.length === 0) {
-      return res.status(400).json({ message: "Invalid token" });
+      return res.status(400).json({ message: 'Invalid token' });
     }
 
     await pool.query(
@@ -77,47 +75,47 @@ router.get("/activate/:token", async (req, res) => {
       [token],
     );
 
-    res.json({ message: "Account activated" });
+    res.json({ message: 'Account activated' });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 /* =========================
    LOGIN
 ========================= */
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Усі поля обовʼязкові" });
+      return res.status(400).json({ message: 'Усі поля обовʼязкові' });
     }
 
-    const result = await pool.query("SELECT * FROM users WHERE email=$1", [
+    const result = await pool.query('SELECT * FROM users WHERE email=$1', [
       email,
     ]);
 
     if (result.rows.length === 0) {
-      return res.status(400).json({ message: "EMAIL_NOT_FOUND" });
+      return res.status(400).json({ message: 'EMAIL_NOT_FOUND' });
     }
 
     const user = result.rows[0];
 
     if (!user.is_activated) {
-      return res.status(403).json({ message: "Активуйте акаунт через email" });
+      return res.status(403).json({ message: 'Активуйте акаунт через email' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-      return res.status(400).json({ message: "WRONG_PASSWORD" });
+      return res.status(400).json({ message: 'WRONG_PASSWORD' });
     }
 
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-      issuer: "your-app",
-      audience: "your-app-users",
+      expiresIn: '7d',
+      issuer: 'your-app',
+      audience: 'your-app-users',
     });
 
     res.json({
@@ -129,25 +127,24 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 /* =========================
    FORGOT PASSWORD
 ========================= */
-router.post("/forgot-password", async (req, res) => {
+router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
 
-    const result = await pool.query("SELECT id FROM users WHERE email = $1", [
+    const result = await pool.query('SELECT id FROM users WHERE email = $1', [
       email,
     ]);
 
     // 🔴 ЯВНО кажемо, що пошти нема
     if (result.rows.length === 0) {
-      return res.status(400).json({ message: "EMAIL_NOT_FOUND" });
+      return res.status(400).json({ message: 'EMAIL_NOT_FOUND' });
     }
 
     const token = crypto.randomUUID();
@@ -163,23 +160,22 @@ router.post("/forgot-password", async (req, res) => {
 
     await sendResetPasswordEmail(email, token);
 
-    res.json({ message: "EMAIL_SENT" });
+    res.json({ message: 'EMAIL_SENT' });
   } catch (e) {
-    console.error("FORGOT PASSWORD ERROR:", e);
-    res.status(500).json({ message: "SERVER_ERROR" });
+    res.status(500).json({ message: 'SERVER_ERROR' });
   }
 });
 
 /* =========================
    RESET PASSWORD
 ========================= */
-router.post("/reset-password/:token", async (req, res) => {
+router.post('/reset-password/:token', async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
 
     if (!password) {
-      return res.status(400).json({ message: "Пароль обовʼязковий" });
+      return res.status(400).json({ message: 'Пароль обовʼязковий' });
     }
 
     const result = await pool.query(
@@ -192,7 +188,7 @@ router.post("/reset-password/:token", async (req, res) => {
     if (result.rows.length === 0) {
       return res
         .status(400)
-        .json({ message: "Посилання недійсне або застаріле" });
+        .json({ message: 'Посилання недійсне або застаріле' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -206,17 +202,16 @@ router.post("/reset-password/:token", async (req, res) => {
       [hashedPassword, result.rows[0].id],
     );
 
-    res.json({ message: "Пароль успішно змінено" });
+    res.json({ message: 'Пароль успішно змінено' });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
 /* =========================
    GET PROFILE
 ========================= */
-router.get("/profile", authMiddleware, async (req, res) => {
+router.get('/profile', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, username, email, first_name, last_name, phone, address,
@@ -228,24 +223,17 @@ router.get("/profile", authMiddleware, async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
-}); 
+});
 
 /* =========================
    UPDATE PROFILE
 ========================= */
-router.put("/profile", authMiddleware, async (req, res) => {
+router.put('/profile', authMiddleware, async (req, res) => {
   try {
-    const {
-      first_name,
-      last_name,
-      phone,
-      address,
-      birth_date,
-      gender,
-    } = req.body;
+    const { first_name, last_name, phone, address, birth_date, gender } =
+      req.body;
 
     const result = await pool.query(
       `UPDATE users
@@ -258,43 +246,34 @@ router.put("/profile", authMiddleware, async (req, res) => {
        WHERE id = $7
        RETURNING id, first_name, last_name, email, phone, address,
                  TO_CHAR(birth_date, 'YYYY-MM-DD') AS birth_date, gender`,
-      [
-        first_name,
-        last_name,
-        phone,
-        address,
-        birth_date,
-        gender,
-        req.user.id,
-      ],
+      [first_name, last_name, phone, address, birth_date, gender, req.user.id],
     );
 
     res.json(result.rows[0]);
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
-
 
 /* =========================
    CHANGE PASSWORD (EMAIL CONFIRM FLOW — FIXED)
 ========================= */
-router.post("/request-change-password", authMiddleware, async (req, res) => {
+router.post('/request-change-password', authMiddleware, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     const userId = req.user.id;
 
     const result = await pool.query(
-      "SELECT email, password FROM users WHERE id = $1",
+      'SELECT email, password FROM users WHERE id = $1',
       [userId],
     );
 
     const user = result.rows[0];
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
+
     if (!isMatch) {
-      return res.status(400).json({ message: "Невірний поточний пароль" });
+      return res.status(400).json({ message: 'Невірний поточний пароль' });
     }
 
     const token = crypto.randomUUID();
@@ -313,14 +292,13 @@ router.post("/request-change-password", authMiddleware, async (req, res) => {
 
     await sendChangePasswordEmail(user.email, token);
 
-    res.json({ message: "Підтвердження надіслано на пошту" });
+    res.json({ message: 'Підтвердження надіслано на пошту' });
   } catch (e) {
-    console.error(e);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-router.get("/confirm-change-password/:token", async (req, res) => {
+router.get('/confirm-change-password/:token', async (req, res) => {
   try {
     const { token } = req.params;
 
@@ -349,7 +327,6 @@ router.get("/confirm-change-password/:token", async (req, res) => {
 
     res.redirect(`${process.env.CLIENT_HOST}/password-changed-success`);
   } catch (e) {
-    console.error(e);
     res.redirect(`${process.env.CLIENT_HOST}/password-changed-invalid`);
   }
 });
@@ -357,57 +334,54 @@ router.get("/confirm-change-password/:token", async (req, res) => {
 /* =========================
    CHANGE EMAIL (EMAIL CONFIRM FLOW)
 ========================= */
-router.post("/request-change-email", authMiddleware, async (req, res) => {
+router.post('/request-change-email', authMiddleware, async (req, res) => {
   try {
-    console.log("REQ.USER:", req.user);
-    console.log("REQ.BODY:", req.body);
-
-    const { newEmail, confirmEmail, password } = req.body;   // 🔥 ДОДАЛИ ПАРОЛЬ
+    const { newEmail, confirmEmail, password } = req.body; // 🔥 ДОДАЛИ ПАРОЛЬ
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ message: "Неавторизовано" });
+      return res.status(401).json({ message: 'Неавторизовано' });
     }
 
     // 🔹 Перевірка наявності полів
     if (!password) {
-      return res.status(400).json({ message: "Введіть пароль" });
+      return res.status(400).json({ message: 'Введіть пароль' });
     }
 
     if (!newEmail || !confirmEmail) {
-      return res.status(400).json({ message: "Заповніть всі поля" });
+      return res.status(400).json({ message: 'Заповніть всі поля' });
     }
 
     if (newEmail !== confirmEmail) {
-      return res.status(400).json({ message: "Пошти не співпадають" });
+      return res.status(400).json({ message: 'Пошти не співпадають' });
     }
 
     // 🔹 Отримуємо користувача з БД
     const userResult = await pool.query(
-      "SELECT id, email, password FROM users WHERE id = $1",
+      'SELECT id, email, password FROM users WHERE id = $1',
       [userId],
     );
 
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ message: "Користувача не знайдено" });
+      return res.status(404).json({ message: 'Користувача не знайдено' });
     }
 
     const user = userResult.rows[0];
 
     // 🔐 ПЕРЕВІРКА ПАРОЛЯ
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
-      return res.status(400).json({ message: "Невірний пароль" });
+      return res.status(400).json({ message: 'Невірний пароль' });
     }
 
     // 🔹 Перевірка, чи нова пошта вже зайнята
-    const exists = await pool.query(
-      "SELECT id FROM users WHERE email = $1",
-      [newEmail],
-    );
+    const exists = await pool.query('SELECT id FROM users WHERE email = $1', [
+      newEmail,
+    ]);
 
     if (exists.rows.length > 0) {
-      return res.status(400).json({ message: "Ця пошта вже використовується" });
+      return res.status(400).json({ message: 'Ця пошта вже використовується' });
     }
 
     // 🔹 Генеруємо токен підтвердження
@@ -429,18 +403,16 @@ router.post("/request-change-email", authMiddleware, async (req, res) => {
     // Надіслати лист на СТАРУ пошту, що хтось намагається змінити email
     // await sendOldEmailNotification(user.email);
 
-    res.json({ message: "EMAIL_SENT" });
+    res.json({ message: 'EMAIL_SENT' });
   } catch (e) {
-    console.error("CHANGE EMAIL ERROR:", e);
-    res.status(500).json({ message: "Server error" });
-  } 
+    res.status(500).json({ message: 'Server error' });
+  }
 });
-
 
 /* =========================
    CHECK RESET TOKEN (PRECHECK)
 ========================= */
-router.get("/check-reset-token/:token", async (req, res) => {
+router.get('/check-reset-token/:token', async (req, res) => {
   try {
     const { token } = req.params;
 
@@ -457,7 +429,6 @@ router.get("/check-reset-token/:token", async (req, res) => {
 
     res.json({ valid: true });
   } catch (e) {
-    console.error("CHECK RESET TOKEN ERROR:", e);
     res.status(500).json({ valid: false });
   }
 });
@@ -465,7 +436,7 @@ router.get("/check-reset-token/:token", async (req, res) => {
 /* =========================
    ЗМІНА ПОШТИ
 ========================= */
-router.get("/confirm-change-email/:token", async (req, res) => {
+router.get('/confirm-change-email/:token', async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, pending_email FROM users
@@ -493,7 +464,6 @@ router.get("/confirm-change-email/:token", async (req, res) => {
     // 🔥 КОРЕКТНИЙ REDIRECT
     res.redirect(`${process.env.CLIENT_HOST}/email-changed-success`);
   } catch (e) {
-    console.error(e);
     res.redirect(`${process.env.CLIENT_HOST}/email-changed-invalid`);
   }
 });

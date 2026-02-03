@@ -1,8 +1,8 @@
 // ./services/email.services.js
-import nodemailer from "nodemailer";
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
@@ -28,8 +28,8 @@ export function sendActivationEmail(email, token) {
 
   return send({
     to: email,
-    subject: "🔐 Активація акаунту",
-html: `
+    subject: '🔐 Активація акаунту',
+    html: `
     <div style="
       background-color:#f9fafb;
       padding:40px 0;
@@ -104,8 +104,8 @@ export function sendResetPasswordEmail(email, token) {
 
   return send({
     to: email,
-    subject: "🔑 Відновлення пароля",
-html: `
+    subject: '🔑 Відновлення пароля',
+    html: `
     <div style="
       background-color:#f9fafb;
       padding:40px 0;
@@ -178,13 +178,14 @@ html: `
   `,
   });
 }
+
 export const sendChangePasswordEmail = async (email, token) => {
   const link = `${process.env.SERVER_HOST}/api/auth/confirm-change-password/${token}`;
 
   return send({
     to: email,
-    subject: "🔐 Підтвердження зміни пароля",
-html: `
+    subject: '🔐 Підтвердження зміни пароля',
+    html: `
     <div style="
       background-color:#f9fafb;
       padding:40px 0;
@@ -263,7 +264,7 @@ export const sendChangeEmailEmail = async (email, token) => {
 
   return send({
     to: email,
-    subject: "📨 Підтвердження зміни електронної пошти",
+    subject: '📨 Підтвердження зміни електронної пошти',
     html: `
     <div style="
       background-color:#f9fafb;
