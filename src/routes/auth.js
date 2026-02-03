@@ -232,21 +232,27 @@ router.get('/profile', authMiddleware, async (req, res) => {
 ========================= */
 router.put('/profile', authMiddleware, async (req, res) => {
   try {
-    const { first_name, last_name, phone, address, birth_date, gender } =
-      req.body;
+    const {
+      first_name: firstName,
+      last_name: lastName,
+      phone,
+      address,
+      birth_date: birthDate,
+      gender,
+    } = req.body;
 
     const result = await pool.query(
       `UPDATE users
-       SET first_name = $1,
-           last_name  = $2,
-           phone      = $3,
-           address    = $4,
-           birth_date = $5,
-           gender     = $6
-       WHERE id = $7
-       RETURNING id, first_name, last_name, email, phone, address,
-                 TO_CHAR(birth_date, 'YYYY-MM-DD') AS birth_date, gender`,
-      [first_name, last_name, phone, address, birth_date, gender, req.user.id],
+   SET first_name = $1,
+       last_name  = $2,
+       phone      = $3,
+       address    = $4,
+       birth_date = $5,
+       gender     = $6
+   WHERE id = $7
+   RETURNING id, first_name, last_name, email, phone, address,
+             TO_CHAR(birth_date, 'YYYY-MM-DD') AS birth_date, gender`,
+      [firstName, lastName, phone, address, birthDate, gender, req.user.id],
     );
 
     res.json(result.rows[0]);
