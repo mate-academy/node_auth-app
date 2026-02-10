@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile</title>
+</head>
+<body>
+  <h1>Profile</h1>
+  <p>Welcome, <%= user.name %>!</p>
+  <% if (errors.length > 0) { %>
+    <ul>
+      <% errors.forEach(error => { %>
+        <li><%= error %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+
+  <h2>Change Name</h2>
+  <form action="/profile/name" method="post">
+    <label>Name: <input type="text" name="name" value="<%= user.name %>" required></label><br>
+    <button type="submit">Update Name</button>
+  </form>
+
+  <h2>Change Password</h2>
+  <form action="/profile/password" method="post">
+    <label>Old Password: <input type="password" name="oldPassword" required></label><br>
+    <label>New Password: <input type="password" name="newPassword" required></label><br>
+    <label>Confirm New Password: <input type="password" name="confirmPassword" required></label><br>
+    <button type="submit">Update Password</button>
+  </form>
+
+  <h2>Change Email</h2>
+  <form action="/profile/email" method="post">
+    <label>Password: <input type="password" name="password" required></label><br>
+    <label>New Email: <input type="email" name="newEmail" required></label><br>
+    <label>Confirm New Email: <input type="email" name="confirmEmail" required></label><br>
+    <button type="submit">Update Email</button>
+  </form>
+
+  <form action="/logout" method="post">
+    <button type="submit">Logout</button>
+  </form>
+</body>
+</html>

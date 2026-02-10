@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+</head>
+<body>
+  <h1>Register</h1>
+  <% if (errors.length > 0) { %>
+    <ul>
+      <% errors.forEach(error => { %>
+        <li><%= error %></li>
+      <% }) %>
+    </ul>
+  <% } %>
+  <form action="/register" method="post">
+    <label>Name: <input type="text" name="name" required></label><br>
+    <label>Email: <input type="email" name="email" required></label><br>
+    <label>Password: <input type="password" name="password" required></label><br>
+    <label>Confirm Password: <input type="password" name="confirmPassword" required></label><br>
+    <button type="submit">Register</button>
+  </form>
+  <p>Already have an account? <a href="/login">Login</a></p>
+</body>
+</html>
