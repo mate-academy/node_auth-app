@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reset Password</title>
+</head>
+<body>
+  <h1>Reset Password</h1>
+  <% if (error) { %>
+    <p><%= error %></p>
+  <% } %>
+  <% if (token) { %>
+    <form action="/reset/<%= token %>" method="post">
+      <label>New Password: <input type="password" name="password" required></label><br>
+      <label>Confirm Password: <input type="password" name="confirmPassword" required></label><br>
+      <button type="submit">Reset Password</button>
+    </form>
+  <% } %>
+</body>
+</html>
