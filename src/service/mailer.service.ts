@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_SERVER,
-  port: process.env.SMTP_PORT,
+  port: parseInt(process.env.SMTP_PORT || '587', 10),
   secure: false, // Use true for port 465, false for port 587
   auth: {
     user: process.env.SMTP_USER,
@@ -25,7 +25,4 @@ const sendMail = async (
   });
 };
 
-
-export {
-  sendMail
-}
+export { sendMail };
