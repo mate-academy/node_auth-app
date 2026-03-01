@@ -8,10 +8,14 @@ import { errorMiddleware } from './middlewares/errorMiddleware.ts';
 export function createServer() {
   const app = express();
 
-  app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
-  }));
+  const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+
+  app.use(
+    cors({
+      origin: allowedOrigin,
+      credentials: true,
+    }),
+  );
   app.use(express.json());
   app.use(cookieParser());
   app.use('/', usersRouter);
