@@ -18,7 +18,6 @@ export function createServer() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   };
 
-  app.options('*', cors(corsOptions));
   app.use(cors(corsOptions));
   app.use(express.json());
   app.use(cookieParser());
