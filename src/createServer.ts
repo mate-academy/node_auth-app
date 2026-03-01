@@ -11,12 +11,15 @@ export function createServer() {
 
   const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
 
-  app.use(
-    cors({
-      origin: allowedOrigin,
-      credentials: true,
-    }),
-  );
+  const corsOptions = {
+    origin: allowedOrigin,
+    credentials: true,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
+
+  app.options('*', cors(corsOptions));
+  app.use(cors(corsOptions));
   app.use(express.json());
   app.use(cookieParser());
   app.use('/', usersRouter);
