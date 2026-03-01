@@ -12,7 +12,5 @@ export const errorMiddleware = (error: Error, req: Request, res: Response, next:
   res.statusCode = 500;
   res.send({ errors: [{
     message: 'Internal server error'
-  }]})
-
-  next();
+  }]});
 }

@@ -1,5 +1,7 @@
 import { createServer } from "./createServer.ts";
 
-createServer().listen(3005, () => {
-  console.log('Server works');
+const PORT = process.env.PORT || 3005;
+
+createServer().listen(PORT, () => {
+  console.log(`Server works on port ${PORT}`);
 })
