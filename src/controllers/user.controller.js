@@ -75,7 +75,11 @@ export const changePassword = async (req, res) => {
   }
 
   const hashedPassword = await passwordUtils.getHashedPassword(newPassword);
-  await userService.updateUser(user.id, { password: hashedPassword });
+  await userService.updateUser(user.id, {
+    password: hashedPassword,
+    passwordChangedAt: new Date(),
+  });
+  await tokenService.deleteByToken(user.id);
 
   res.sendStatus(204);
 };

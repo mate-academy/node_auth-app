@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { User } from '../models/User.model.js';
 
 const validateEmail = (email) => {
@@ -52,10 +51,6 @@ const validateUserName = (name) => {
   if (name.length < 2) {
     return 'User name must be at least 2 characters';
   }
-};
-
-const generateToken = () => {
-  return uuidv4();
 };
 
 const getActiveUsers = async () => {
@@ -130,5 +125,4 @@ export const userService = {
   activate,
   createUser,
   updateUser,
-  generateToken,
 };
