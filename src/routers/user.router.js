@@ -19,4 +19,11 @@ router.post(
   userController.changePassword,
 );
 
+router.patch(
+  '/:id/change-email',
+  authMiddleware,
+  requireOwnershipMiddleware,
+  userController.changeEmail,
+);
+
 export const userRouter = router;

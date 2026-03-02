@@ -46,7 +46,7 @@ export class ApiError extends Error {
     });
   }
 
-  static tooManyRequests(message = DEFAULT_ERRORS.TOO_MANY_REQUESTS) {
+  static tooManyRequests(message = DEFAULT_ERRORS.TOO_MANY_REQUESTS, errors) {
     return new ApiError({
       message,
       errors,

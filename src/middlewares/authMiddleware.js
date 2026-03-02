@@ -19,10 +19,11 @@ export const authMiddleware = async (req, res, next) => {
     }
 
     if (user.passwordChangedAt) {
-      const now = Date.now();
-      const passwordChangedTime = new Date(user.passwordChangedAt).getTime();
+      const passwordChangedAtInSeconds = Math.floor(
+        new Date(user.passwordChangedAt).getTime() / 1000,
+      );
 
-      if (passwordChangedTime > now) {
+      if (passwordChangedAtInSeconds > userData.iat) {
         throw ApiError.unauthorized('Token invalid. Password was changed');
       }
     }
@@ -30,6 +31,10 @@ export const authMiddleware = async (req, res, next) => {
     req.user = userData;
     next();
   } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
     throw ApiError.unauthorized('Invalid or expired token');
   }
 };

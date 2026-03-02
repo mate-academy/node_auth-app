@@ -38,8 +38,18 @@ export function sendResetPasswordLink(email, resetPasswordToken) {
   return send(email, 'Reset password', html);
 }
 
+export function confirmationOfEmailChange(oldEmail, newEmail) {
+  const html = `
+    <h1>Your email has been changed successfully.</h1>
+    <h3>Your email has been changed from current to ${newEmail}. Navigate to the new email and activate your account.</h3>
+  `;
+
+  return send(oldEmail, 'Your email has been changed successfully', html);
+}
+
 export const mailer = {
   send,
   sendActivationLink,
   sendResetPasswordLink,
+  confirmationOfEmailChange,
 };

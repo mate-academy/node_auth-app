@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { User } from '../models/User.model.js';
 
 const validateEmail = (email) => {
@@ -11,14 +12,35 @@ const validateEmail = (email) => {
     return 'Email is not valid';
   }
 };
-
 const validatePassword = (password) => {
   if (!password) {
     return 'Password is required';
   }
 
-  if (password.length < 6) {
-    return 'At least 6 characters';
+  const errors = [];
+
+  if (password.length < 8) {
+    errors.push('At least 8 characters');
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    errors.push('At least one uppercase letter');
+  }
+
+  if (!/[a-z]/.test(password)) {
+    errors.push('At least one lowercase letter');
+  }
+
+  if (!/[0-9]/.test(password)) {
+    errors.push('At least one number');
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('At least one special character');
+  }
+
+  if (errors.length > 0) {
+    return errors.join(', ');
   }
 };
 
@@ -32,10 +54,14 @@ const validateUserName = (name) => {
   }
 };
 
+const generateToken = () => {
+  return uuidv4();
+};
+
 const getActiveUsers = async () => {
   const users = await User.findAll({ where: { activationToken: null } });
 
-  return users;
+  return users.map((user) => user.get({ plain: true }));
 };
 
 const getUserById = async (id) => {
@@ -104,4 +130,5 @@ export const userService = {
   activate,
   createUser,
   updateUser,
+  generateToken,
 };

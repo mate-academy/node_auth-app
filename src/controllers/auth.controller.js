@@ -212,7 +212,7 @@ const passwordResetRequest = async (req, res) => {
 };
 
 const passwordReset = async (req, res) => {
-  const { token, newPassword } = req.body || {};
+  const { token, newPassword, confirmPassword } = req.body || {};
 
   const errors = {
     password: userService.validatePassword(newPassword),
@@ -222,6 +222,12 @@ const passwordReset = async (req, res) => {
 
   if (isErrorExists) {
     throw ApiError.badRequest('Validation error', errors);
+  }
+
+  if (newPassword !== confirmPassword) {
+    throw ApiError.badRequest('Validation error', {
+      passwords: 'Passwords do not match',
+    });
   }
 
   const user = await userService.getUserByResetPasswordToken(token);
