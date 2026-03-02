@@ -79,7 +79,7 @@ export const changePassword = async (req, res) => {
     password: hashedPassword,
     passwordChangedAt: new Date(),
   });
-  await tokenService.deleteByToken(user.id);
+  await tokenService.deleteByUserId(user.id);
 
   res.sendStatus(204);
 };
