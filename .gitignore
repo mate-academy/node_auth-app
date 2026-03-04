@@ -4,10 +4,16 @@
 
 # Node
 node_modules
+dist
 
 # MacOS
 .DS_Store
 
-# env files
-*.env
-.env*
+# .env
+.env
+
+# myStuff
+guide.md
+cheatsheet.ts
+
+/src/generated/prisma
