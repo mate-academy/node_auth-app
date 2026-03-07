@@ -15,7 +15,7 @@ function findByEmail(email) {
   return User.findOne({ where: { email } });
 }
 
-async function register({ email, password }) {
+async function register({ email, password, name }) {
   const activationToken = uuidv4();
 
   const existUser = await findByEmail(email);
@@ -26,7 +26,12 @@ async function register({ email, password }) {
     });
   }
 
-  await User.create({ email, password, activationToken });
+  await User.create({
+    email,
+    password,
+    name,
+    activationToken,
+  });
 
   await emailService.sendActivationEmail(email, activationToken);
 }

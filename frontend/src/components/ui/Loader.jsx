@@ -1,7 +1,7 @@
 export const Loader = ({ centered }) => {
   return (
     <div className={centered ? 'flex justify-center py-10' : 'inline-flex'}>
-      <sv
+      <svg
         className="animate-spin h-6 w-6 text-blue-600"
         viewBox="0 0 24 24"
         fill="none"
@@ -19,7 +19,7 @@ export const Loader = ({ centered }) => {
           fill="currentColor"
           d="M4 12a8 8 0 018-8v8z"
         />
-      </sv>
+      </svg>
     </div>
   );
 };

@@ -30,7 +30,7 @@ function validatePassword(value) {
 }
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
   const errors = {
     email: validateEmail(email),
@@ -43,7 +43,7 @@ const register = async (req, res) => {
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await userService.register({ email, password: hashedPass });
+  await userService.register({ email, password: hashedPass, name });
   res.send({ message: 'OK' });
 };
 
