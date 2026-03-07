@@ -27,6 +27,11 @@ const changePassword = async (req, res) => {
   const { id } = req.user;
 
   const user = await User.findByPk(id);
+
+  if (!user.password) {
+    throw ApiError.badRequest('У вас немає пароля — ви увійшли через Google');
+  }
+
   const isValid = await bcrypt.compare(password, user.password);
 
   if (!isValid) {

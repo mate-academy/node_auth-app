@@ -21,4 +21,7 @@ export const User = client.define('user', {
   resetToken: {
     type: Sequelize.STRING,
   },
+  googleId: {
+    type: Sequelize.STRING,
+  },
 });

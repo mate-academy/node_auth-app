@@ -1,5 +1,6 @@
-import { sequelize } from './src/utils/db.js';
-import './src/models/user.js';
-import './src/models/token.js';
+import 'dotenv/config';
+import { client } from './backend/src/utils/db.js';
+import './backend/src/models/user.js';
+import './backend/src/models/token.js';
 
-await sequelize.sync({ alter: true });
+await client.sync({ alter: true });
