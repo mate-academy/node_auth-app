@@ -1,7 +1,7 @@
-import prisma from '../prisma/prismaClient.js';
 import {
   registerUser,
   loginUser,
+  activateUser,
   requestPasswordReset,
   confirmPasswordReset,
 } from '../services/auth.service.js';
@@ -20,24 +20,9 @@ export async function activate(req, res, next) {
   try {
     const { token } = req.params;
 
-    const activationToken = await prisma.token.findUnique({
-      where: { token },
-    });
+    const result = await activateUser(token);
 
-    if (!activationToken) {
-      return res.status(404).json({ message: 'Invalid activation token' });
-    }
-
-    await prisma.user.update({
-      where: { id: activationToken.userId },
-      data: { isActive: true },
-    });
-
-    await prisma.token.delete({
-      where: { id: activationToken.id },
-    });
-
-    res.json({ message: 'Account activated successfully' });
+    res.json(result);
   } catch (error) {
     next(error);
   }

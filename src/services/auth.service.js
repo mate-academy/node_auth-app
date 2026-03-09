@@ -203,3 +203,26 @@ export async function confirmPasswordReset(token, password) {
     message: 'Password reset successful',
   };
 }
+
+export async function activateUser(token) {
+  const activationToken = await prisma.token.findUnique({
+    where: { token },
+  });
+
+  if (!activationToken) {
+    throw createError(404, 'Invalid activation token');
+  }
+
+  await prisma.user.update({
+    where: { id: activationToken.userId },
+    data: { isActive: true },
+  });
+
+  await prisma.token.delete({
+    where: { id: activationToken.id },
+  });
+
+  return {
+    message: 'Account activated successfully',
+  };
+}
