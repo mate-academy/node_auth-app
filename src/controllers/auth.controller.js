@@ -43,7 +43,12 @@ const register = async (req, res) => {
 
   await sendActivationEmail(email, activationToken);
 
-  res.status(201).send(user);
+  res
+    .status(201)
+    .send(
+      'Registration successful. Please check your email ' +
+        'for the activation link.',
+    );
 };
 
 const activate = (req, res) => {
@@ -111,17 +116,18 @@ const requestPasswordReset = async (req, res) => {
 
   const user = users.find((u) => u.email === email);
 
-  if (!user) {
-    return res.status(404).send('User not found');
+  if (user) {
+    const resetToken = uuid();
+
+    user.resetToken = resetToken;
+
+    await sendResetPasswordEmail(email, resetToken);
   }
 
-  const resetToken = uuid();
-
-  user.resetToken = resetToken;
-
-  await sendResetPasswordEmail(email, resetToken);
-
-  res.send('Reset email sent');
+  res.send({
+    message: 'If the email exists, a password reset link has been sent.',
+    page: 'emailSent',
+  });
 };
 
 const resetPassword = async (req, res) => {
@@ -145,7 +151,7 @@ const resetPassword = async (req, res) => {
   user.password = await bcrypt.hash(password, 10);
   delete user.resetToken;
 
-  res.send('Password updated');
+  res.send({ message: 'Password updated', page: 'resetSuccess' });
 };
 
 const updateProfileName = (req, res) => {
