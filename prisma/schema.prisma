@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                String   @id @default(dbgenerated("gen_random_uuid()"))
+  name              String
+  email             String   @unique
+  pendingEmail      String?  @unique
+  password          String
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  activationToken   String?  @map("activation_token")
+
+  resetToken        String?  @map("reset_token")
+  resetTokenExpires DateTime? @map("reset_token_expires")
+
+  token             Token?
+
+  @@map("users")
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique @map("user_id")
+  token     String
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("tokens")
+}
