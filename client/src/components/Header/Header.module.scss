@@ -1,0 +1,17 @@
+.header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.navLinks {
+  display: flex;
+  list-style: none;
+  gap: 8px;
+}
+
+.userInfo {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
