@@ -24,7 +24,7 @@ export interface CustomSelectProps<T> {
   placeholder?: string;
 }
 
-const CustomSelect2 = <T,>({
+export const CustomSelect = <T,>({
   options,
   currentValue,
   placeholder = 'Select...',
@@ -185,5 +185,3 @@ const CustomSelect2 = <T,>({
     </div>
   );
 };
-
-export default CustomSelect2;

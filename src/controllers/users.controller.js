@@ -50,7 +50,7 @@ const updateName = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   try {
-    const { oldPassword, newPassword, confirmPassword } = req.body;
+    const { newPassword, confirmPassword } = req.body;
     const userId = req.user.id; // Отримано з authenticate middleware
 
     // 1. Шукаємо користувача в базі
@@ -58,18 +58,6 @@ const updatePassword = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: 'Користувача не знайдено' });
-    }
-
-    // 2. Перевіряємо старий пароль
-    const isOldPasswordCorrect = await bcrypt.compare(
-      oldPassword,
-      user.password,
-    );
-
-    if (!isOldPasswordCorrect) {
-      return res
-        .status(400)
-        .json({ message: 'Поточний пароль вказано невірно' });
     }
 
     // 3. Перевіряємо новий пароль за допомогою Regex
@@ -113,6 +101,13 @@ const updateEmail = async (req, res) => {
       return res.status(404).json({ message: 'Користувача не знайдено' });
     }
 
+    // 2. Перевірка пароля (ОБОВ'ЯЗКОВО перед зміною пошти)
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Невірний поточний пароль' });
+    }
+
     if (newEmail !== confirmEmail) {
       return res.status(400).json({ message: 'Email-адреси не збігаються' });
     }
@@ -126,22 +121,14 @@ const updateEmail = async (req, res) => {
         .json({ message: 'Цей email вже використовується' });
     }
 
-    // Перевірка пароля перед важливою дією
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Невірний пароль' });
-    }
-
     const newActivationToken = uuidv4();
     const oldEmail = user.email;
 
-    // Оновлюємо дані користувача
-    await usersRepository.update(userId, {
-      email: newEmail,
-      isActivated: false, // Тепер акаунт треба знову активувати
-      activationToken: newActivationToken,
-    });
+    // 4. Оновлюємо через той самий .save(), що й в імені
+    user.email = newEmail;
+    user.isActivated = false;
+    user.activationToken = newActivationToken;
+    await user.save();
 
     // Шлемо листи
     await emailService.sendActivationEmail(newEmail, newActivationToken); // На нову пошту

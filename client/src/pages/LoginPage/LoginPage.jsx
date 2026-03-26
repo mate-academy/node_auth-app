@@ -74,6 +74,10 @@ export const LoginPage = () => {
       </form>
 
       <p>
+        Забули пароль? <Link to="/forgot-password">Відновлення пароля</Link>
+      </p>
+
+      <p>
         Немає акаунта? <Link to="/registration">Зареєструватися</Link>
       </p>
 

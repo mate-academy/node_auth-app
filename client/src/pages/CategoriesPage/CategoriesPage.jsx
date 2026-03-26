@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect, useContext } from 'react';
+import api from '../../api/api';
 import './CategoriesPage.module.scss';
+import { AuthContext } from '../../context/AuthContext';
 
 const CategoriesPage = () => {
   const [categories, setCategories] = useState([]);
@@ -9,21 +10,27 @@ const CategoriesPage = () => {
   const [editName, setEditName] = useState('');
   const [error, setError] = useState('');
 
+  const { isReady, user } = useContext(AuthContext);
+
   // 1. Завантаження категорій
   useEffect(() => {
-    // Оголошуємо функцію всередині, щоб уникнути проблем із залежностями
-  const loadCategories = async () => {
-    try {
-      const response = await axios.get('http://localhost:5700/categories');
-      // setState викликається ТІЛЬКИ після отримання відповіді (асинхронно)
-      setCategories(response.data);
-    } catch (err) {
-      console.error('Помилка завантаження:', err);
-    }
-  };
+    if (!isReady || !user) return;
 
-  loadCategories();
-  }, []);
+    // Оголошуємо функцію всередині, щоб уникнути проблем із залежностями
+    const loadCategories = async () => {
+      try {
+        const response = await api.get('/categories');
+
+        // setState викликається ТІЛЬКИ після отримання відповіді (асинхронно)
+        setCategories(response.data);
+      } catch (err) {
+        console.error('Помилка завантаження:', err);
+        setError('Не вдалося завантажити категорії');
+      }
+    };
+
+    loadCategories();
+  }, [isReady, user]);
 
   // 2. Створення категорії
   const handleCreate = async (e) => {
@@ -31,7 +38,8 @@ const CategoriesPage = () => {
     if (!newName.trim()) return;
 
     try {
-      const response = await axios.post('http://localhost:5700/categories', { name: newName });
+      const response = await api.post('/categories', { name: newName });
+
       setCategories([...categories, response.data]);
       setNewName('');
     } catch (err) {
@@ -41,32 +49,34 @@ const CategoriesPage = () => {
 
   // 3. Видалення
   const handleDelete = async (id) => {
-    if (!window.confirm('Ви впевнені? Це може вплинути на пов’язані витрати!')) return;
+    if (!window.confirm('Ви впевнені? Це може вплинути на пов’язані витрати!'))
+      return;
 
     try {
-      await axios.delete(`http://localhost:5700/categories/${id}`);
-      setCategories(categories.filter(c => c.id !== id));
+      await api.delete(`/categories/${id}`);
+
+      setCategories(categories.filter((c) => c.id !== id));
+      setError('');
     } catch (err) {
       setError('Не вдалося видалити категорію');
     }
   };
 
   // 4. Оновлення (редагування)
-  const handleUpdate = async (id, newName) => {
+  const handleUpdate = async (id, updatedName) => {
     try {
-      const response = await axios.patch(`http://localhost:5700/categories/${id}`, {
-        name: newName,
-      });
+      const response = await api.patch(`/categories/${id}`, { name: updatedName });
 
-      setCategories(prev =>
-        prev.map(cat => cat.id === id ? response.data : cat)
+      setCategories((prev) =>
+        prev.map((cat) => (cat.id === id ? response.data : cat)),
       );
 
       setEditingId(null);
+      setError('');
     } catch (err) {
-      console.error("Помилка при оновленні категорії:", err);
+      console.error('Помилка при оновленні категорії:', err);
       setError('Помилка при оновленні');
-      alert("Не вдалося оновити категорію");
+      alert('Не вдалося оновити категорію');
     }
   };
 
@@ -74,7 +84,7 @@ const CategoriesPage = () => {
     <div className="categories-container">
       <h1>Мої категорії</h1>
 
-      {error && <p className="error">{error}</p>}
+      {error && <p className="error" style={{ color: 'red' }}>{error}</p>}
 
       <form onSubmit={handleCreate} className="category-form">
         <input
@@ -87,7 +97,7 @@ const CategoriesPage = () => {
       </form>
 
       <ul className="categories-list">
-        {categories.map(category => (
+        {categories.map((category) => (
           <li key={category.id} className="category-item">
             {editingId === category.id ? (
               <>
@@ -95,18 +105,29 @@ const CategoriesPage = () => {
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                 />
-                <button onClick={() => handleUpdate(category.id, editName)}>Зберегти</button>
+                <button onClick={() => handleUpdate(category.id, editName)}>
+                  Зберегти
+                </button>
                 <button onClick={() => setEditingId(null)}>Скасувати</button>
               </>
             ) : (
               <>
                 <span>{category.name}</span>
                 <div className="actions">
-                  <button onClick={() => {
-                    setEditingId(category.id);
-                    setEditName(category.name);
-                  }}>Редагувати</button>
-                  <button onClick={() => handleDelete(category.id)} className="danger">Видалити</button>
+                  <button
+                    onClick={() => {
+                      setEditingId(category.id);
+                      setEditName(category.name);
+                    }}
+                  >
+                    Редагувати
+                  </button>
+                  <button
+                    onClick={() => handleDelete(category.id)}
+                    className="danger"
+                  >
+                    Видалити
+                  </button>
                 </div>
               </>
             )}

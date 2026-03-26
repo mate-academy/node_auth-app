@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import styles from './Header.module.scss';
 
-const Header = () => {
+export const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -11,6 +11,8 @@ const Header = () => {
     await logout();
     navigate('/login');
   };
+
+  console.log('user in header is:', user);
 
   if (!user) return null; // Не показуємо хедер, якщо не залогінені
 
@@ -30,5 +32,3 @@ const Header = () => {
     </nav>
   );
 };
-
-export default Header;

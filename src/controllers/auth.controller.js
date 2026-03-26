@@ -81,11 +81,58 @@ const activate = async (req, res) => {
     // Оновлюємо статус
     user.isActivated = true;
     user.activationToken = null; // Токен одноразовий
+
+    const payload = { id: user.id, email: user.email };
+
+    const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
+      expiresIn: '15m',
+    });
+
+    const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
+      expiresIn: '30d',
+    });
+
+    user.refreshToken = refreshToken;
     await user.save();
 
-    // Можна відправити успішну відповідь або редирект на фронтенд
-    res.send({ message: 'Account activated successfully!' });
+    res.cookie('accessToken', accessToken, {
+      maxAge: 15 * 60 * 1000,
+      httpOnly: true,
+      secure: false, // true для продакшну
+      sameSite: 'lax',
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: false, // змінити на true для продакшну
+      sameSite: 'lax',
+    });
+
+    res.send({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+    });
+
+    // res.send({
+    //   message: 'Account activated successfully!',
+    //   accessToken, // відправляємо accessToken у тілі відповіді
+    //   user: {
+    //     id: user.id,
+    //     email: user.email,
+    //     name: user.name,
+    //   },
+    // });
+
+    // Редіректимо на фронтенд (наприклад, на профілі або категорії)
+    // res.redirect(`${process.env.CLIENT_URL}/profile`);
+
+    // res.redirect('http://localhost:5173/categories');
   } catch (error) {
+    console.error('Activation Error:', error);
     res.status(500).send({ message: 'Activation failed' });
   }
 };
@@ -135,7 +182,7 @@ const login = async (req, res) => {
       maxAge: 15 * 60 * 1000, // 15 хвилин
       httpOnly: true,
       secure: false, // true для продакшну (HTTPS)
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     // Кука для Refresh Token (довгоживуча)
@@ -144,7 +191,7 @@ const login = async (req, res) => {
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 днів
       httpOnly: true, // Забороняє доступ до куки через JS (захист від XSS)
       secure: false, // ТількичерезHTTPS(для локальної розробкиможнаfalse)
-      sameSite: 'strict',
+      sameSite: 'lax',
     });
 
     // 5. Відправляємо відповідь (дані юзера без пароля)

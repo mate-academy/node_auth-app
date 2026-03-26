@@ -42,7 +42,11 @@ const sendActivationEmail = async (to, token) => {
 const sendResetPasswordEmail = async (to, resetToken) => {
   console.log('DEBUG: SMTP_USER is', process.env.SMTP_USER);
 
-  const resetLink = `${process.env.CLIENT_URL}/auth/reset-password?token=${resetToken}`;
+  // const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+
+  const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+  // http://localhost:5173/reset-password/${resetToken}
 
   // Додаємо try/catch саме для відправки пошти,
   // щоб побачити реальну помилку в консолі

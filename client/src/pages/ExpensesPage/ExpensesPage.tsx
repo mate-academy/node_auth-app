@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import CustomSelect, { CustomSelectOption } from '../../components/CustomSelect/CustomSelect';
+import { CustomSelect } from '../../components/CustomSelect/CustomSelect';
+import { CustomSelectOption } from '../../components/CustomSelect/CustomSelect';
 import { Modal } from '../../components/Modal/Modal';
 import styles from './ExpensesPage.module.scss';
 

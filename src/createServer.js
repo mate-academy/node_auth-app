@@ -1,8 +1,6 @@
 /* eslint-disable max-len */
 'use strict';
 
-require('./src/models/index');
-
 const express = require('express');
 const cors = require('cors');
 
@@ -11,6 +9,8 @@ const { expensesRouter } = require('./api/expenses.router');
 const { categoriesRouter } = require('./api/categories.router');
 const { authRouter } = require('./api/auth.router');
 const cookieParser = require('cookie-parser');
+
+require('./models/models');
 
 const createServer = () => {
   const app = express();
