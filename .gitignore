@@ -5,9 +5,10 @@
 # Node
 node_modules
 
+# Environment variables (senhas e chaves secretas)
+.env
+.env.*
+!.env.example
+
 # MacOS
 .DS_Store
-
-# env files
-*.env
-.env*
