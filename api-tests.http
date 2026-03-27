@@ -1,0 +1,35 @@
+### Налаштування змінних (необов'язково, але зручно)
+@baseUrl = http://localhost:5700
+
+
+### Створити нового користувача
+POST {{baseUrl}}/auth/registration
+Content-Type: application/json
+
+{
+  "name": "Victor5",
+  "email": "Llacon86241@3dkai.com",
+  "password": "3SafePassword123"
+}
+
+### Отримати всіх користувачів
+GET {{baseUrl}}/users
+
+### Отримати одного користувача
+GET {{baseUrl}}/users/15
+
+### Створити витрату для користувача (ID має бути числом, як ми виправили)
+POST {{baseUrl}}/expenses
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "spentAt": "2026-03-04T12:00:00Z",
+  "title": "Pizza",
+  "amount": 15,
+  "category": "Food",
+  "note": "Lunch with team"
+}
+
+### Отримати витрати з фільтром (те, що ми додавали в контролер)
+GET {{baseUrl}}/expenses?userId=1&categories=Food

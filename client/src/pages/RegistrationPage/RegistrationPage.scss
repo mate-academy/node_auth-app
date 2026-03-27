@@ -1,0 +1,42 @@
+.auth-form {
+  width: 100%;
+  max-width: 400px;
+  background-color: #2a2a2a;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+
+  .field {
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #ccc;
+    }
+
+    input {
+      padding: 0.8rem;
+      border-radius: 6px;
+      border: 1px solid #444;
+      background-color: #1a1a1a;
+      color: white;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #646cff; // Твій основний колір з App.css
+      }
+    }
+  }
+
+  button {
+    width: 100%;
+    margin-top: 1rem;
+    // Стилі для кнопок підтягнуться з твого глобального App.css
+  }
+}
