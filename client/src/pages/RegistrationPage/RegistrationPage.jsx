@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { ValidationPassword } from '../../components/ValidationPassword/';
 
 export const RegistrationPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [message, setMessage] = useState('');
+  const [password, setPassword] = useState('');
+  const [isValid, setIsValid] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,13 +50,18 @@ export const RegistrationPage = () => {
           <input
           type="password"
           placeholder="Пароль"
-          onChange={e => setFormData({...formData, password: e.target.value})}
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setFormData({...formData, password: e.target.value})
+          }}
           required
         />
         </div>
 
+        <ValidationPassword password={password} setValid={setIsValid} />
 
-        <button type="submit">Зареєструватися</button>
+        <button type="submit" disabled={!isValid}>Зареєструватися</button>
       </form>
       {message && <p>{message}</p>}
       <p>Вже є акаунт? <Link to="/login">Увійти</Link></p>

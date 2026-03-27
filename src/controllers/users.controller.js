@@ -50,7 +50,7 @@ const updateName = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   try {
-    const { newPassword, confirmPassword } = req.body;
+    const { oldPassword, newPassword, confirmPassword } = req.body;
     const userId = req.user.id; // Отримано з authenticate middleware
 
     // 1. Шукаємо користувача в базі
@@ -58,6 +58,13 @@ const updatePassword = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: 'Користувача не знайдено' });
+    }
+
+    // 2. Перевірка пароля (ОБОВ'ЯЗКОВО перед зміною пошти)
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Невірний поточний пароль' });
     }
 
     // 3. Перевіряємо новий пароль за допомогою Regex

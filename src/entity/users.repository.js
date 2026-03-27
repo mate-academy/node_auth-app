@@ -23,6 +23,11 @@ const getByActivationToken = (activationToken) => {
   return User.findOne({ where: { activationToken } });
 };
 
+const getByRefreshToken = async (refreshToken) => {
+  // Шукаємо користувача, у якого в полі refreshToken лежить саме цей токен
+  return User.findOne({ where: { refreshToken } });
+};
+
 const getByToken = (token) => {
   return User.findOne({
     where: { activationToken: token },
@@ -41,6 +46,7 @@ module.exports = {
   getById,
   getByEmail,
   getByActivationToken,
+  getByRefreshToken,
   getByToken,
   update,
 };

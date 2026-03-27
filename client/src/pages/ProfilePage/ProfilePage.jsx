@@ -11,7 +11,7 @@ const ProfilePage = () => {
 
   // Стейт для форм
   const [name, setName] = useState(user?.name || '');
-  // const [passwords, setPasswords] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwords, setPasswords] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
   const [emails, setEmails] = useState({ password: '', newEmail: '', confirmEmail: '' });
 
   const [message, setMessage] = useState({ text: '', type: '' }); // для фідбеку
@@ -34,16 +34,16 @@ const ProfilePage = () => {
   };
 
   // 2. Зміна пароля
-  // const handleUpdatePassword = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     await axios.put('http://localhost:5700/users/me/password', passwords);
-  //     setPasswords({ oldPassword: '', newPassword: '', confirmPassword: '' });
-  //     showMessage('Пароль успішно змінено');
-  //   } catch (err) {
-  //     showMessage(err.response?.data?.message || 'Помилка зміни пароля', 'error');
-  //   }
-  // };
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put('http://localhost:5700/users/me/password', passwords);
+      setPasswords({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      showMessage('Пароль успішно змінено');
+    } catch (err) {
+      showMessage(err.response?.data?.message || 'Помилка зміни пароля', 'error');
+    }
+  };
 
   // 3. Зміна Email (важлива дія)
   const handleUpdateEmail = async (e) => {
@@ -85,7 +85,7 @@ const ProfilePage = () => {
       <hr />
 
       {/* Секція пароля */}
-      {/* <section className="profile-section">
+      <section className="profile-section">
         <h3>Зміна пароля</h3>
         <form onSubmit={handleUpdatePassword}>
           <input
@@ -108,9 +108,9 @@ const ProfilePage = () => {
           />
           <button type="submit">Змінити пароль</button>
         </form>
-      </section> */}
+      </section>
 
-      {/* <hr /> */}
+      <hr />
 
       {/* Секція Email */}
       <section className="profile-section">

@@ -116,21 +116,6 @@ const activate = async (req, res) => {
         name: user.name,
       },
     });
-
-    // res.send({
-    //   message: 'Account activated successfully!',
-    //   accessToken, // відправляємо accessToken у тілі відповіді
-    //   user: {
-    //     id: user.id,
-    //     email: user.email,
-    //     name: user.name,
-    //   },
-    // });
-
-    // Редіректимо на фронтенд (наприклад, на профілі або категорії)
-    // res.redirect(`${process.env.CLIENT_URL}/profile`);
-
-    // res.redirect('http://localhost:5173/categories');
   } catch (error) {
     console.error('Activation Error:', error);
     res.status(500).send({ message: 'Activation failed' });
@@ -251,11 +236,12 @@ const logout = async (req, res) => {
       return;
     }
 
-    const user = await usersRepository.getByToken(refreshToken);
+    const user = await usersRepository.getByRefreshToken(refreshToken);
 
     if (user) {
       user.refreshToken = null;
       await user.save();
+      console.log(`Сесію користувача ${user.name} закрито в БД`);
     }
 
     // Очищуємо куку 'accessToken'
