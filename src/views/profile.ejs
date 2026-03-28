@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User profile</title>
+</head>
+<body>
+<h1>Profile</h1>
+  <p>Welcome, <b><%= user.name || 'User' %></b>!</p>
+  <p>Current Email: <%= user.email %></p>
+
+  <% if (error) { %>
+    <p style="color: red;"><b>Error:</b> <%= error %></p>
+  <% } %>
+
+  <hr>
+
+  <h3>Change Name</h3>
+  <form action="/user/profile/name" method="POST">
+    <label>New Name:</label>
+    <input type="text" name="name" required>
+    <button type="submit">Update Name</button>
+  </form>
+
+  <hr>
+
+  <h3>Change Password</h3>
+  <form action="/user/profile/password" method="POST">
+    <label>Old Password:</label>
+    <input type="password" name="oldPassword" required><br><br>
+
+    <label>New Password:</label>
+    <input type="password" name="newPassword" required><br><br>
+
+    <label>Confirm New Password:</label>
+    <input type="password" name="confirmation" required><br><br>
+
+    <button type="submit">Update Password</button>
+  </form>
+
+  <hr>
+
+  <h3>Change Email</h3>
+  <form action="/user/profile/email" method="POST">
+    <label>Current Password (for security):</label>
+    <input type="password" name="password" required><br><br>
+
+    <label>New Email:</label>
+    <input type="email" name="newEmail" required><br><br>
+
+    <button type="submit">Update Email</button>
+  </form>
+
+  <hr>
+
+  <form action="/auth/logout" method="POST">
+    <button type="submit">Logout</button>
+  </form>
+</body>
+</html>

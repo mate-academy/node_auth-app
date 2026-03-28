@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+</head>
+<body>
+<h1>Sign in</h1>
+
+  <% if (error) { %>
+    <p style="color: red;"><b>Error:</b> <%= error %></p>
+  <% } %>
+
+  <form action="/auth/register" method="POST">
+    <div>
+      <label>Email:</label>
+      <input type="email" name="email" required>
+    </div>
+    <br>
+    <div>
+      <label>Password:</label>
+      <input type="password" name="password" required>
+      <input type="text" name="name" required>
+    </div>
+    <br>
+    <button type="submit">Register</button>
+  </form>
+
+  <br>
+  <a href="/auth/register">Don't have an account? Sign up</a>
+  <br>
+  <a href="/auth/reset-password">Forgot password?</a>
+</body>
+</html>
