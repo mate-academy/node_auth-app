@@ -34,8 +34,7 @@ export const register = async ({ name, email, password }) => {
   try {
     await emailService.sendActivation(email, activationToken);
   } catch (emailErr) {
-    console.error('Failed to send activation email:', emailErr.message);
-    console.info(`Activation token for ${email}: ${activationToken}`);
+    throw new Error(emailErr.message);
   }
 
   return user;
@@ -95,8 +94,7 @@ export const requestPasswordReset = async (email) => {
   try {
     await emailService.sendPasswordReset(email, resetToken);
   } catch (emailErr) {
-    console.error('Failed to send password reset email:', emailErr.message);
-    console.info(`Password reset token for ${email}: ${resetToken}`);
+    throw new Error(emailErr.message);
   }
 };
 

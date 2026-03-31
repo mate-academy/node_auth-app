@@ -93,8 +93,7 @@ export const changeEmail = async (userId, { password, newEmail }) => {
     await emailService.sendActivation(newEmail, emailChangeToken);
     await emailService.sendEmailChangeNotice(user.email);
   } catch (emailErr) {
-    console.error('Failed to send email change notification:', emailErr.message);
-    console.info(`Email change token for ${newEmail}: ${emailChangeToken}`);
+    throw new Error(emailErr.message);
   }
 };
 
@@ -115,7 +114,7 @@ export const confirmEmailChange = async (token) => {
   try {
     await emailService.sendEmailChangeNotice(oldEmail);
   } catch (emailErr) {
-    console.error('Failed to send email change notice:', emailErr.message);
+    throw new Error(emailErr.message);
   }
 
   return user;

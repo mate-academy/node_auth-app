@@ -28,11 +28,8 @@ app.use((req, res) => {
 
 initDb()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-    });
+    app.listen(PORT);
   })
-  .catch((err) => {
-    console.error('Failed to initialize database:', err);
+  .catch(() => {
     process.exit(1);
   });
