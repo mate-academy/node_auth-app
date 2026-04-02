@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="./css/styles.css" rel="stylesheet">
+
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <p class="eyebrow">Create account</p>
+    <h1>Welcome <em>aboard</em></h1>
+  </div>
+
+  <form id="registerForm">
+    <div class="field">
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" placeholder="John Doe" autocomplete="name" required>
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="new-password" required>
+    </div>
+
+    <button type="submit" id="submitBtn">
+      <span class="btn-text">Create account</span>
+      <span class="spinner"></span>
+    </button>
+  </form>
+
+  <div class="message" id="message"></div>
+
+  <div class="footer">
+    Already have an account? <a href="#">Sign in</a>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('registerForm');
+  const btn  = document.getElementById('submitBtn');
+  const msg  = document.getElementById('message');
+
+  function showMessage(text, type) {
+    msg.textContent = text;
+    msg.className = `message ${type} show`;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.classList.add('loading');
+    btn.disabled = true;
+    msg.className = 'message';
+
+    const formData = new FormData(e.target);
+
+    try {
+      const response = await fetch('http://localhost:3005/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(formData)),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        showMessage(data.error || 'Something went wrong', 'error');
+      } else {
+        showMessage('Check your email to activate your account ✓', 'success');
+        form.reset();
+      }
+    } catch (err) {
+      showMessage('Could not connect to the server', 'error');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auth App</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/axios@1.6.2/dist/axios.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const API = 'http://localhost:3004';
+
+    function App() {
+      const [view, setView] = useState('login');
+      const [user, setUser] = useState(null);
+      const [token, setToken] = useState(localStorage.getItem('token') || '');
+      
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+      const [message, setMessage] = useState('');
+
+      useEffect(() => {
+        if (token) {
+          axios.get(`${API}/profile`, { 
+            headers: { Authorization: `Bearer ${token}` } 
+          })
+          .then(({ data }) => {
+            setUser(data);
+            setView('profile');
+          })
+          .catch(() => {
+            localStorage.removeItem('token');
+            setToken('');
+          });
+        }
+      }, []);
+
+      const handleRegister = async (e) => {
+        e.preventDefault();
+        setError('');
+        setMessage('');
+        try {
+          await axios.post(`${API}/register`, { name, email, password });
+          setMessage('✅ Check your email for activation link!');
+          setName('');
+          setEmail('');
+          setPassword('');
+        } catch (err) {
+          setError(err.response?.data?.message || 'Registration failed');
+        }
+      };
+
+      const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+        try {
+          const { data } = await axios.post(`${API}/login`, { email, password }, {
+            withCredentials: true
+          });
+          setToken(data.accessToken);
+          setUser(data.user);
+          localStorage.setItem('token', data.accessToken);
+          setView('profile');
+          setEmail('');
+          setPassword('');
+        } catch (err) {
+          setError(err.response?.data?.message || 'Login failed');
+        }
+      };
+
+      const handleLogout = async () => {
+        try {
+          await axios.post(`${API}/logout`, {}, { withCredentials: true });
+        } catch {}
+        setToken('');
+        setUser(null);
+        localStorage.removeItem('token');
+        setView('login');
+      };
+
+      const handleUpdateName = async () => {
+        setError('');
+        setMessage('');
+        try {
+          await axios.patch(`${API}/profile/name`, { name }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUser({ ...user, name });
+          setMessage('✅ Name updated!');
+          setName('');
+        } catch (err) {
+          setError(err.response?.data?.message || 'Update failed');
+        }
+      };
+
+      const styles = {
+        container: { padding: '20px', maxWidth: '400px', margin: '50px auto', fontFamily: 'Arial' },
+        input: { width: '100%', padding: '10px', marginBottom: '10px', boxSizing: 'border-box' },
+        button: { padding: '10px 20px', marginRight: '10px', cursor: 'pointer' },
+        buttonDanger: { padding: '10px 20px', background: 'red', color: 'white', border: 'none', cursor: 'pointer' },
+        error: { color: 'red', marginTop: '10px' },
+        success: { color: 'green', marginTop: '10px' },
+        link: { background: 'none', border: 'none', color: 'blue', cursor: 'pointer', textDecoration: 'underline' }
+      };
+
+      if (view === 'register') {
+        return (
+          <div style={styles.container}>
+            <h1>📝 Register</h1>
+            <form onSubmit={handleRegister}>
+              <input
+                style={styles.input}
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+              <input
+                style={styles.input}
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                style={styles.input}
+                type="password"
+                placeholder="Password (min 6 chars)"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+              />
+              <button style={styles.button} type="submit">Register</button>
+            </form>
+            {error && <p style={styles.error}>❌ {error}</p>}
+            {message && <p style={styles.success}>{message}</p>}
+            <p>
+              Already have account? <button style={styles.link} onClick={() => setView('login')}>Login</button>
+            </p>
+          </div>
+        );
+      }
+
+      if (view === 'login') {
+        return (
+          <div style={styles.container}>
+            <h1>🔐 Login</h1>
+            <form onSubmit={handleLogin}>
+              <input
+                style={styles.input}
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                style={styles.input}
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button style={styles.button} type="submit">Login</button>
+            </form>
+            {error && <p style={styles.error}>❌ {error}</p>}
+            <p>
+              No account? <button style={styles.link} onClick={() => setView('register')}>Register</button>
+            </p>
+          </div>
+        );
+      }
+
+      return (
+        <div style={styles.container}>
+          <h1>👤 Profile</h1>
+          <p><strong>Email:</strong> {user?.email}</p>
+          <p><strong>Name:</strong> {user?.name || 'Not set'}</p>
+          
+          <hr />
+          
+          <h3>Update Name</h3>
+          <input
+            style={styles.input}
+            type="text"
+            placeholder="New name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <button style={styles.button} onClick={handleUpdateName}>Update</button>
+
+          {error && <p style={styles.error}>❌ {error}</p>}
+          {message && <p style={styles.success}>{message}</p>}
+
+          <hr />
+
+          <button style={styles.buttonDanger} onClick={handleLogout}>Logout</button>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
