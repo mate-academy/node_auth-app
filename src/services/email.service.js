@@ -35,7 +35,7 @@ const sendActivationEmail = (email, token) => {
 };
 
 const sendForgotEmail = (email, token) => {
-  const href = `http://localhost:5173/activation/${token}`;
+  const href = `http://localhost:5173/reset-password/${token}`;
   const html = `
         <h1>Change a password</h1>
         You asked for changing your password you need to click <a href="${href}">here</a> !

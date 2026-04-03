@@ -10,8 +10,8 @@ authRouter.get('/activation/:activationToken', catchError(authController.activat
 authRouter.post('/login', catchError(authController.login));
 authRouter.post('/refresh', catchError(authController.refresh));
 authRouter.post('/logout', catchError(authController.logout));
-authRouter.post('/forgot-password', authController.forgotPassword);
-authRouter.post('/reset-password', authController.resetPassword); 
+authRouter.post('/forgot-password', catchError(authController.forgotPassword));
+authRouter.post('/reset-password', catchError(authController.resetPassword)); 
 authRouter.post('/update-name', authMiddleware, catchError(authController.updatedName));
 authRouter.post('/update-password', authMiddleware, catchError(authController.updatePassword));
 authRouter.post('/update-email', authMiddleware, catchError(authController.updateEmail));

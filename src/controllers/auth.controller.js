@@ -63,7 +63,7 @@ const activate = async (req, res) => {
   user.activationToken = null;
   await user.save();
 
-  res.send(user);
+  res.send(usersService.normalize(user));
 };
 
 
