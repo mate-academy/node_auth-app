@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { pool } from '../db.js';
 import jwt from 'jsonwebtoken';
-import { sendActivationMail } from '../utils/mailService.js';
+import { sendMail } from '../utils/mailService.js';
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -41,13 +41,19 @@ export const register = async (req, res) => {
 
     await pool.query(query, values);
 
-    res.status(201).json({
-      message:
-        'Registration successful! ' +
-        'Please check your email to activate your account.',
-    });
+    const activationLink = `http://localhost:3000/api/activate/${activationToken}`;
+
+    await sendMail(
+      email,
+      'Account activation',
+      `Please activate your account by clicking: <a href="${activationLink}">${activationLink}</a>`,
+    );
+
+    res
+      .status(201)
+      .json({ message: 'Registration successful! Please check your email.' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error during registration.' });
+    res.status(500).json({ message: 'Internal server error.' });
   }
 };
 
@@ -149,7 +155,18 @@ export const forgotPassword = async (req, res) => {
 
     const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
 
-    await sendActivationMail(email, resetLink);
+    await sendMail(
+      email,
+      'Password Reset Request',
+      `
+      <div>
+        <h1>Password Reset</h1>
+        <p>To reset your password, please click the link below:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>If you didn't request this, just ignore this email.</p>
+      </div>
+      `,
+    );
 
     res.json({ message: 'Password reset link sent to your email.' });
   } catch (error) {
@@ -251,6 +268,7 @@ export const updateEmail = async (req, res) => {
       [userId],
     );
     const user = result.rows[0];
+    const oldEmail = user.email;
 
     const isMatch = await bcrypt.compare(password, user.password_hash);
 
@@ -268,7 +286,17 @@ export const updateEmail = async (req, res) => {
 
     const link = `http://localhost:3000/api/activate/${activationToken}`;
 
-    await sendActivationMail(newEmail, link);
+    await sendMail(
+      newEmail,
+      'Confirm your new email',
+      `Activate here: ${link}`,
+    );
+
+    await sendMail(
+      oldEmail,
+      'Your email has been changed',
+      `The email address for your account was recently changed to ${newEmail}. If you didn't do this, please contact support.`,
+    );
 
     res.json({
       message: 'Email updated! Please check your new email to activate it.',

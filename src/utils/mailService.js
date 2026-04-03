@@ -13,17 +13,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendActivationMail = async (to, link) => {
+export const sendMail = async (to, subject, html) => {
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to,
-    subject: 'Account activation on our service',
-    text: '',
-    html: `
-      <div>
-        <h1>To activate your account, please follow the link.</h1>
-        <a href="${link}">${link}</a>
-      </div>
-    `,
+    subject,
+    html,
   });
 };
