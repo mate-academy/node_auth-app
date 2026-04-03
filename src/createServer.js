@@ -26,6 +26,10 @@ const createServer = () => {
   app.get('/', (req, res) => {
     res.send('Hello');
   });
+  
+  app.use((req, res) => {
+    res.sendStatus(404);
+  });
 
   app.use(errorMiddleware);
   return app;

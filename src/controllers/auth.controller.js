@@ -61,7 +61,7 @@ const activate = async (req, res) => {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 
   res.send(user);
 };
@@ -158,8 +158,12 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { token, password } = req.body;
-
+  const { token, password, confirmation } = req.body;
+  
+  if (password !== confirmation) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+  
   const user = await User.findOne({
     where: { resetPasswordToken: token }
   });
