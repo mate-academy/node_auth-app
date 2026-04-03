@@ -21,7 +21,7 @@ const send = ({ email, subject, html }) => {
 };
 
 const sendActivationEmail = (email, token) => {
-  const href = `http://127.0.0.1:3005/activation/${token}`;
+  const href = `${process.env.API_HOST}/activation/${token}`;
   const html = `
         <h1>Activate acount</h1>
         <a href="${href}">${href}</a>
@@ -35,7 +35,7 @@ const sendActivationEmail = (email, token) => {
 };
 
 const sendForgotEmail = (email, token) => {
-  const href = `http://localhost:5173/reset-password/${token}`;
+  const href = `${process.env.CLIENT_HOST}/reset-password/${token}`;
   const html = `
         <h1>Change a password</h1>
         You asked for changing your password you need to click <a href="${href}">here</a> !
@@ -49,7 +49,7 @@ const sendForgotEmail = (email, token) => {
 };
 
 const sendUpdateEmail = (email, token) => {
-  const href = `http://localhost:3005/update-email/${token}`;
+  const href = `${process.env.API_HOST}/update-email/${token}`;
   const html = `
         <h1>Change an email</h1>
         You asked for changing your email you need to click <a href="${href}">here</a> !

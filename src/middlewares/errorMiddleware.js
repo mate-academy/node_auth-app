@@ -1,5 +1,4 @@
 /* eslint-disable */
-const jwtService = require('../services/jwt.service.js')
 const { ApiError } = require('../controllers/exeptions/api.error');
 
 const errorMiddleware = (error, req, res, next) => {
@@ -15,7 +14,6 @@ const errorMiddleware = (error, req, res, next) => {
         message: 'Server error'
     })
 
-   next();
 }
 
 module.exports = {
