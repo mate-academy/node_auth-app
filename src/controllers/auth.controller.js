@@ -292,7 +292,7 @@ const updateName = async (req, res) => {
 };
 
 const updatePassword = async (req, res) => {
-  const { oldPassword, newPassword, confirmPassword } = req.body;
+  const { oldPassword, newPassword, confirmation } = req.body;
 
   const user = await userService.findById(req.user.id);
 
@@ -316,7 +316,7 @@ const updatePassword = async (req, res) => {
     });
   }
 
-  if (newPassword !== confirmPassword) {
+  if (newPassword !== confirmation) {
     throw ApiError.badRequest('Bad request', {
       confirmPassword: 'Passwords do not match',
     });
@@ -331,7 +331,19 @@ const updatePassword = async (req, res) => {
 };
 
 const updateEmail = async (req, res) => {
-  const { newEmail, password } = req.body;
+  const { newEmail, confirmation, password } = req.body;
+
+  if (!newEmail) {
+    throw ApiError.badRequest('Bad request', {
+      newEmail: 'New email is required',
+    });
+  }
+
+  if (newEmail !== confirmation) {
+    throw ApiError.badRequest('Bad request', {
+      confirmation: 'Emails do not match',
+    });
+  }
 
   const emailError = validateEmail(newEmail);
 
