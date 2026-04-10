@@ -11,7 +11,18 @@ authRouter.post(
   guestMiddleware,
   catchError(authController.register),
 );
+
 authRouter.post('/login', guestMiddleware, catchError(authController.login));
+
+authRouter.get(
+  '/activate/:activationToken',
+  guestMiddleware,
+  catchError(authController.activate),
+);
+
+authRouter.get('/refresh', catchError(authController.refresh));
+
+authRouter.post('/logout', authMiddleware, catchError(authController.logout));
 
 authRouter.post(
   '/forgot-password',
@@ -28,18 +39,6 @@ authRouter.get(
 authRouter.post(
   '/reset-password/:resetToken',
   guestMiddleware,
-  catchError(authController.resetPassword),
-);
-
-authRouter.post('/forgot-password', catchError(authController.forgotPassword));
-
-authRouter.get(
-  '/reset-password/:resetToken',
-  catchError(authController.checkResetToken),
-);
-
-authRouter.post(
-  '/reset-password/:resetToken',
   catchError(authController.resetPassword),
 );
 

@@ -214,7 +214,7 @@ const checkResetToken = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   const { resetToken } = req.params;
-  const { password, confirmPassword } = req.body;
+  const { password, confirmation } = req.body;
 
   const passwordError = validatePassword(password);
 
@@ -224,9 +224,9 @@ const resetPassword = async (req, res) => {
     });
   }
 
-  if (password !== confirmPassword) {
+  if (password !== confirmation) {
     throw ApiError.badRequest('Bad request', {
-      confirmPassword: 'Passwords do not match',
+      confirmation: 'Passwords do not match',
     });
   }
 
@@ -318,7 +318,7 @@ const updatePassword = async (req, res) => {
 
   if (newPassword !== confirmation) {
     throw ApiError.badRequest('Bad request', {
-      confirmPassword: 'Passwords do not match',
+      confirmation: 'Passwords do not match',
     });
   }
 
