@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Auth App</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="container">
+      <a href="/" class="logo">Auth App</a>
+      <div class="nav-links">
+        <% if (typeof userId !== 'undefined') { %>
+          <form action="/auth/logout" method="POST" class="inline-form">
+            <button type="submit" class="btn btn-link">Logout</button>
+          </form>
+        <% } else { %>
+          <a href="/auth/login" class="nav-link">Login</a>
+          <a href="/auth/register" class="nav-link">Register</a>
+        <% } %>
+      </div>
+    </div>
+  </nav>
+  <main class="container">
