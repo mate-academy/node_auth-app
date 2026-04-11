@@ -18,6 +18,10 @@ const PASSWORD_RULES = [
 ];
 
 function validatePassword(password) {
+  if (!password) {
+    return ['Password is required'];
+  }
+
   const errors = [];
 
   if (password.length < 8) {
@@ -200,10 +204,7 @@ router.get('/activate/:token', guest, (req, res) => {
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  res.render('auth/activate', {
-    title: 'Account Activated',
-    success: true,
-  });
+  res.redirect('/profile');
 });
 
 module.exports = { router, validatePassword, PASSWORD_RULES };

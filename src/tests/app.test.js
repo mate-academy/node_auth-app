@@ -168,8 +168,8 @@ describe('Auth Routes', () => {
 
       const res = await request(app).get(`/auth/activate/${activationToken}`);
 
-      expect(res.status).toBe(200);
-      expect(res.text).toContain('activated successfully');
+      expect(res.status).toBe(302);
+      expect(res.header.location).toBe('/profile');
     });
 
     it('should reject invalid activation token', async () => {
