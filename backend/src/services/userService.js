@@ -116,13 +116,15 @@ async function changeEmail(userId, password, newEmail) {
     });
   }
 
-  const activationToken = uuidv4();
+  const confirmationToken = uuidv4();
+  const oldEmail = user.email;
 
-  user.email = newEmail;
-  user.activationToken = activationToken;
+  user.newEmail = newEmail;
+  user.activationToken = confirmationToken;
   await user.save();
 
-  await emailService.sendActivationLink(newEmail, activationToken);
+  await emailService.sendEmailChangeConfirmation(newEmail, confirmationToken);
+  await emailService.sendEmailChangeNotification(oldEmail, newEmail);
 }
 
 export const userService = {

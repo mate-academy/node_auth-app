@@ -47,8 +47,36 @@ export function sendPasswordResetLink(email, token) {
   });
 }
 
+export function sendEmailChangeConfirmation(newEmail, token) {
+  const link = `${process.env.CLIENT_URL}/activate/${token}`;
+
+  return send({
+    email: newEmail,
+    subject: 'Confirm your new email address',
+    html: `
+      <h1>Confirm email change</h1>
+      <p>Click the link below to confirm your new email address:</p>
+      <a href="${link}">${link}</a>
+    `,
+  });
+}
+
+export function sendEmailChangeNotification(oldEmail, newEmail) {
+  return send({
+    email: oldEmail,
+    subject: 'Your email address has been changed',
+    html: `
+      <h1>Email address change requested</h1>
+      <p>A request was made to change your account email to <strong>${newEmail}</strong>.</p>
+      <p>If you did not request this change, please contact support immediately.</p>
+    `,
+  });
+}
+
 export const emailService = {
   send,
   sendActivationLink,
   sendPasswordResetLink,
+  sendEmailChangeConfirmation,
+  sendEmailChangeNotification,
 };

@@ -21,4 +21,7 @@ export const User = sequelize.define('user', {
   passwordResetToken: {
     type: DataTypes.STRING,
   },
+  newEmail: {
+    type: DataTypes.STRING,
+  },
 });

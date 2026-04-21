@@ -64,6 +64,11 @@ async function activate(req, res, next) {
     return;
   }
 
+  if (user.newEmail) {
+    user.email = user.newEmail;
+    user.newEmail = null;
+  }
+
   user.activationToken = null;
   await user.save();
 

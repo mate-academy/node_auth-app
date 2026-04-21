@@ -21,6 +21,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(authRouter);
 app.use('/users', userRouter);
+app.use((req, res) => res.status(404).send({ message: 'Not found' }));
 app.use(errorMiddleware);
 
 app.listen(PORT);

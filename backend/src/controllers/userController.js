@@ -1,6 +1,18 @@
 import { ApiError } from '../exceptions/ApiError.js';
 import { userService } from '../services/userService.js';
 
+const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
+
+function validateEmail(value) {
+  if (!value) {
+    return 'Email is required';
+  }
+
+  if (!emailPattern.test(value)) {
+    return 'Email is not valid';
+  }
+}
+
 async function getAll(req, res) {
   const users = await userService.getAllActive();
 
@@ -33,12 +45,13 @@ async function changePassword(req, res) {
   const { oldPassword, newPassword, confirmation } = req.body;
 
   const errors = {
+    oldPassword: !oldPassword ? 'Old password is required' : undefined,
     newPassword: validatePassword(newPassword),
     confirmation:
       newPassword !== confirmation ? 'Passwords do not match' : undefined,
   };
 
-  if (errors.newPassword || errors.confirmation) {
+  if (errors.oldPassword || errors.newPassword || errors.confirmation) {
     throw ApiError.BadRequest('Validation error', errors);
   }
 
@@ -48,23 +61,26 @@ async function changePassword(req, res) {
 }
 
 async function changeEmail(req, res) {
-  const { password, email } = req.body;
+  const { password, email, emailConfirmation } = req.body;
 
-  if (!email) {
-    throw ApiError.BadRequest('Validation error', {
-      email: 'Email is required',
-    });
+  const errors = {
+    password: !password ? 'Password is required' : undefined,
+    email: validateEmail(email),
+    emailConfirmation:
+      !emailConfirmation
+        ? 'Email confirmation is required'
+        : email !== emailConfirmation
+          ? 'Emails do not match'
+          : undefined,
+  };
+
+  if (errors.password || errors.email || errors.emailConfirmation) {
+    throw ApiError.BadRequest('Validation error', errors);
   }
 
-  if (!password) {
-    throw ApiError.BadRequest('Validation error', {
-      password: 'Password is required',
-    });
-  }
+  await userService.changeEmail(req.user.id, password, email);
 
-  const user = await userService.changeEmail(req.user.id, password, email);
-
-  res.send(user);
+  res.send({ message: 'Check your new email for the confirmation link' });
 }
 
 export const userController = {
