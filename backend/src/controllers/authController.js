@@ -28,19 +28,26 @@ function validatePassword(value) {
   }
 }
 
+function validateName(value) {
+  if (!value) {
+    return 'Name is required';
+  }
+}
+
 async function register(req, res, next) {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   const errors = {
+    name: validateName(name),
     email: validateEmail(email),
     password: validatePassword(password),
   };
 
-  if (errors.email || errors.password) {
+  if (errors.name || errors.email || errors.password) {
     throw ApiError.BadRequest('Validation error', errors);
   }
 
-  await userService.register({ email, password });
+  await userService.register({ name, email, password });
 
   res.send({ message: 'OK' });
 }

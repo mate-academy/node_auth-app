@@ -18,11 +18,11 @@ function getByEmail(email) {
   });
 }
 
-function normalize({ id, email }) {
-  return { id, email };
+function normalize({ id, name, email }) {
+  return { id, name, email };
 }
 
-async function register({ email, password }) {
+async function register({ name, email, password }) {
   const existingUser = await getByEmail(email);
 
   if (existingUser) {
@@ -35,6 +35,7 @@ async function register({ email, password }) {
   const hash = await bcrypt.hash(password, 10);
 
   await User.create({
+    name,
     email,
     password: hash,
     activationToken,

@@ -9,6 +9,7 @@ import { AuthContext } from './components/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { RegistrationPage } from './pages/RegistrationPage';
 import { RequireAuth } from './components/RequireAuth';
+import { RequireNonAuth } from './components/RequireNonAuth';
 import { UsersPage } from './pages/UsersPage';
 import { Loader } from './components/Loader.jsx';
 import { HomePage } from './pages/HomePage.jsx';
@@ -88,7 +89,9 @@ function App() {
         <section className="section">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="sign-up" element={<RegistrationPage />} />
+            <Route path="/" element={<RequireNonAuth />}>
+              <Route path="sign-up" element={<RegistrationPage />} />
+            </Route>
             <Route
               path="activate/:activationToken"
               element={<AccountActivationPage />}
