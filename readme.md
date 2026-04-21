@@ -3,7 +3,7 @@ Implement an application that allows user to:
 - Register using name, email and password (only non authenticated)
   - Inform the users about the rules for a password and check them
   - send and activation email
-- Actvation page (only non authenticated)
+- Activation page (only non authenticated)
   - the user should be activated only after email confirmation
   - redirect to Profile after the activation
 - Login with valid credentials (email and password) (only non authenticated)
