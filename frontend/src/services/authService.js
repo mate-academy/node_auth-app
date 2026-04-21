@@ -1,4 +1,5 @@
 import { authClient } from '../http/authClient.js';
+import { httpClient } from '../http/httpClient.js';
 
 function register({ name, email, password }) {
   return authClient.post('/registration', { name, email, password });
@@ -9,7 +10,7 @@ function login({ email, password }) {
 }
 
 function logout() {
-  return authClient.post('/logout');
+  return httpClient.post('/logout');
 }
 
 function activate(activationToken) {

@@ -55,6 +55,10 @@ async function register(req, res, next) {
 async function activate(req, res, next) {
   const { activationToken } = req.params;
 
+  if (!activationToken) {
+    throw ApiError.BadRequest('Activation token is required');
+  }
+
   const user = await User.findOne({
     where: { activationToken },
   });
@@ -121,9 +125,9 @@ async function logout(req, res, next) {
 
   res.clearCookie('refreshToken');
 
-  if (userData) {
-    await tokenService.remove(userData.id);
-  }
+  const userId = userData?.id ?? req.user.id;
+
+  await tokenService.remove(userId);
 
   res.sendStatus(204);
 }
@@ -163,6 +167,11 @@ async function requestPasswordReset(req, res) {
 
 async function resetPassword(req, res) {
   const { passwordResetToken } = req.params;
+
+  if (!passwordResetToken) {
+    throw ApiError.BadRequest('Password reset token is required');
+  }
+
   const { password, confirmation } = req.body;
 
   const errors = {

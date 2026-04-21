@@ -149,16 +149,21 @@ export const ProfilePage = () => {
 
         {openForm === 'email' && (
           <Formik
-            initialValues={{ password: '', email: '' }}
+            initialValues={{ password: '', email: '', emailConfirmation: '' }}
             validateOnMount={true}
-            onSubmit={({ password, email }, formikHelpers) => {
+            onSubmit={(
+              { password, email, emailConfirmation },
+              formikHelpers,
+            ) => {
               formikHelpers.setSubmitting(true);
 
               userService
-                .changeEmail(password, email)
+                .changeEmail(password, email, emailConfirmation)
                 .then(() => {
                   formikHelpers.resetForm();
-                  setEmailSuccess('We sent you an activation email');
+                  setEmailSuccess(
+                    'Check your new email for a confirmation link',
+                  );
                   setOpenForm(null);
                 })
                 .catch(error => {
@@ -166,6 +171,10 @@ export const ProfilePage = () => {
 
                   formikHelpers.setFieldError('password', errors?.password);
                   formikHelpers.setFieldError('email', errors?.email);
+                  formikHelpers.setFieldError(
+                    'emailConfirmation',
+                    errors?.emailConfirmation,
+                  );
 
                   if (message) {
                     setEmailError(message);
@@ -174,7 +183,7 @@ export const ProfilePage = () => {
                 .finally(() => formikHelpers.setSubmitting(false));
             }}
           >
-            {({ touched, errors, isSubmitting }) => (
+            {({ touched, errors, isSubmitting, values }) => (
               <Form className="mt-4">
                 <div className="field">
                   <label htmlFor="emailPassword" className="label">
@@ -229,6 +238,38 @@ export const ProfilePage = () => {
                   )}
                 </div>
 
+                <div className="field">
+                  <label htmlFor="emailConfirmation" className="label">
+                    Confirm new email
+                  </label>
+
+                  <div className="control has-icons-left">
+                    <Field
+                      validate={value =>
+                        value !== values.email
+                          ? 'Emails do not match'
+                          : undefined
+                      }
+                      name="emailConfirmation"
+                      type="email"
+                      id="emailConfirmation"
+                      placeholder="e.g. bobsmith@gmail.com"
+                      className={cn('input', {
+                        'is-danger':
+                          touched.emailConfirmation && errors.emailConfirmation,
+                      })}
+                    />
+
+                    <span className="icon is-small is-left">
+                      <i className="fa fa-envelope"></i>
+                    </span>
+                  </div>
+
+                  {touched.emailConfirmation && errors.emailConfirmation && (
+                    <p className="help is-danger">{errors.emailConfirmation}</p>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   className={cn(
@@ -237,7 +278,9 @@ export const ProfilePage = () => {
                       'is-loading': isSubmitting,
                     },
                   )}
-                  disabled={isSubmitting || !!errors.email}
+                  disabled={
+                    isSubmitting || !!errors.email || !!errors.emailConfirmation
+                  }
                 >
                   Save
                 </button>

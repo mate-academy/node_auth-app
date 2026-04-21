@@ -16,8 +16,8 @@ function changePassword(oldPassword, newPassword, confirmation) {
   });
 }
 
-function changeEmail(password, email) {
-  return httpClient.patch('/users/email', { password, email });
+function changeEmail(password, email, emailConfirmation) {
+  return httpClient.patch('/users/email', { password, email, emailConfirmation });
 }
 
 export const userService = { getAll, changeName, changePassword, changeEmail };

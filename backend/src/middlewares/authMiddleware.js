@@ -8,9 +8,9 @@ export function authMiddleware(req, res, next) {
     throw ApiError.Unauthorized();
   }
 
-  const [, accessToken] = authHeader.split(' ');
+  const [scheme, accessToken] = authHeader.split(' ');
 
-  if (!accessToken) {
+  if (scheme !== 'Bearer' || !accessToken) {
     throw ApiError.Unauthorized();
   }
 
