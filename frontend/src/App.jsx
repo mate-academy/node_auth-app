@@ -11,6 +11,7 @@ import { RegistrationPage } from './pages/RegistrationPage';
 import { RequireAuth } from './components/RequireAuth';
 import { RequireNonAuth } from './components/RequireNonAuth';
 import { UsersPage } from './pages/UsersPage';
+import { ProfilePage } from './pages/ProfilePage.jsx';
 import { Loader } from './components/Loader.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { usePageError } from './hooks/usePageError.js';
@@ -91,15 +92,16 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/" element={<RequireNonAuth />}>
               <Route path="sign-up" element={<RegistrationPage />} />
+              <Route
+                path="activate/:activationToken"
+                element={<AccountActivationPage />}
+              />
+              <Route path="login" element={<LoginPage />} />
             </Route>
-            <Route
-              path="activate/:activationToken"
-              element={<AccountActivationPage />}
-            />
-            <Route path="login" element={<LoginPage />} />
 
             <Route path="/" element={<RequireAuth />}>
               <Route path="users" element={<UsersPage />} />
+              <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Routes>
         </section>
