@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import cn from 'classnames';
 
@@ -30,7 +30,6 @@ function validatePassword(value) {
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [error, setError] = usePageError('');
   const { login } = useContext(AuthContext);
@@ -46,7 +45,7 @@ export const LoginPage = () => {
         onSubmit={({ email, password }) => {
           return login({ email, password })
             .then(() => {
-              navigate(location.state?.from?.pathname || '/');
+              navigate('/profile');
             })
             .catch(error => {
               setError(error.response?.data?.message);
@@ -134,6 +133,8 @@ export const LoginPage = () => {
               </button>
             </div>
             Do not have an account? <Link to="/sign-up">Sign up</Link>
+            <br />
+            Forgot password? <Link to="/password-reset">Reset password</Link>
           </Form>
         )}
       </Formik>

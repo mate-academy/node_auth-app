@@ -33,4 +33,17 @@ export function sendActivationLink(email, token) {
   });
 }
 
-export const emailService = { send, sendActivationLink };
+export function sendPasswordResetLink(email, token) {
+  const link = `${process.env.CLIENT_URL}/password-reset/${token}`;
+
+  return send({
+    email,
+    subject: 'Password reset',
+    html: `
+      <h1>Password reset</h1>
+      <a href="${link}">${link}</a>
+    `,
+  });
+}
+
+export const emailService = { send, sendActivationLink, sendPasswordResetLink };

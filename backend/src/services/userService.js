@@ -44,11 +44,38 @@ async function register({ name, email, password }) {
   await emailService.sendActivationLink(email, activationToken);
 }
 
+async function requestPasswordReset(email) {
+  const user = await getByEmail(email);
+
+  if (!user) {
+    throw ApiError.BadRequest('User with this email does not exist');
+  }
+
+  const passwordResetToken = uuidv4();
+
+  user.passwordResetToken = passwordResetToken;
+  await user.save();
+
+  await emailService.sendPasswordResetLink(email, passwordResetToken);
+}
+
+async function resetPassword(passwordResetToken, password) {
+  const user = await User.findOne({ where: { passwordResetToken } });
+
+  if (!user) {
+    throw ApiError.BadRequest('Invalid or expired reset link');
+  }
+
+  user.password = await bcrypt.hash(password, 10);
+  user.passwordResetToken = null;
+  await user.save();
+}
+
 export const userService = {
   getAllActive,
   normalize,
   getByEmail,
   register,
+  requestPasswordReset,
+  resetPassword,
 };
-
-uuidv4();

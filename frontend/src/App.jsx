@@ -12,6 +12,8 @@ import { RequireAuth } from './components/RequireAuth';
 import { RequireNonAuth } from './components/RequireNonAuth';
 import { UsersPage } from './pages/UsersPage';
 import { ProfilePage } from './pages/ProfilePage.jsx';
+import { PasswordResetRequestPage } from './pages/PasswordResetRequestPage.jsx';
+import { PasswordResetPage } from './pages/PasswordResetPage.jsx';
 import { Loader } from './components/Loader.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { usePageError } from './hooks/usePageError.js';
@@ -44,6 +46,12 @@ function App() {
           <NavLink to="/users" className="navbar-item">
             Users
           </NavLink>
+
+          {user && (
+            <NavLink to="/profile" className="navbar-item">
+              Profile
+            </NavLink>
+          )}
         </div>
 
         <div className="navbar-end">
@@ -55,7 +63,7 @@ function App() {
                   onClick={() => {
                     logout()
                       .then(() => {
-                        navigate('/');
+                        navigate('/login');
                       })
                       .catch(error => {
                         setError(error.response?.data?.message);
@@ -97,6 +105,14 @@ function App() {
                 element={<AccountActivationPage />}
               />
               <Route path="login" element={<LoginPage />} />
+              <Route
+                path="password-reset"
+                element={<PasswordResetRequestPage />}
+              />
+              <Route
+                path="password-reset/:passwordResetToken"
+                element={<PasswordResetPage />}
+              />
             </Route>
 
             <Route path="/" element={<RequireAuth />}>

@@ -78,6 +78,10 @@ async function login(req, res, next) {
     throw ApiError.BadRequest('User with this email does not exist');
   }
 
+  if (user.activationToken) {
+    throw ApiError.BadRequest('Please activate your account via email');
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
@@ -139,10 +143,43 @@ async function sendAuthentication(res, user) {
   });
 }
 
+async function requestPasswordReset(req, res) {
+  const { email } = req.body;
+  const emailError = validateEmail(email);
+
+  if (emailError) {
+    throw ApiError.BadRequest('Validation error', { email: emailError });
+  }
+
+  await userService.requestPasswordReset(email);
+
+  res.send({ message: 'Check your email for the reset link' });
+}
+
+async function resetPassword(req, res) {
+  const { passwordResetToken } = req.params;
+  const { password, confirmation } = req.body;
+
+  const errors = {
+    password: validatePassword(password),
+    confirmation: password !== confirmation ? 'Passwords do not match' : undefined,
+  };
+
+  if (errors.password || errors.confirmation) {
+    throw ApiError.BadRequest('Validation error', errors);
+  }
+
+  await userService.resetPassword(passwordResetToken, password);
+
+  res.send({ message: 'Password has been reset' });
+}
+
 export const authController = {
   register,
   activate,
   login,
   logout,
   refresh,
+  requestPasswordReset,
+  resetPassword,
 };
