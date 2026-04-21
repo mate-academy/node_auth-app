@@ -18,6 +18,10 @@ function getByEmail(email) {
   });
 }
 
+function getById(id) {
+  return User.findByPk(id);
+}
+
 function normalize({ id, name, email }) {
   return { id, name, email };
 }
@@ -71,11 +75,65 @@ async function resetPassword(passwordResetToken, password) {
   await user.save();
 }
 
+async function changeName(userId, name) {
+  const user = await User.findByPk(userId);
+
+  user.name = name;
+  await user.save();
+
+  return normalize(user);
+}
+
+async function changePassword(userId, oldPassword, newPassword) {
+  const user = await User.findByPk(userId);
+  const isValid = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isValid) {
+    throw ApiError.BadRequest('Validation error', {
+      oldPassword: 'Wrong password',
+    });
+  }
+
+  user.password = await bcrypt.hash(newPassword, 10);
+  await user.save();
+}
+
+async function changeEmail(userId, password, newEmail) {
+  const user = await User.findByPk(userId);
+  const isValid = await bcrypt.compare(password, user.password);
+
+  if (!isValid) {
+    throw ApiError.BadRequest('Validation error', {
+      password: 'Wrong password',
+    });
+  }
+
+  const existing = await getByEmail(newEmail);
+
+  if (existing) {
+    throw ApiError.BadRequest('Validation error', {
+      email: 'Email is already taken',
+    });
+  }
+
+  const activationToken = uuidv4();
+
+  user.email = newEmail;
+  user.activationToken = activationToken;
+  await user.save();
+
+  await emailService.sendActivationLink(newEmail, activationToken);
+}
+
 export const userService = {
   getAllActive,
   normalize,
   getByEmail,
+  getById,
   register,
   requestPasswordReset,
   resetPassword,
+  changeName,
+  changePassword,
+  changeEmail,
 };

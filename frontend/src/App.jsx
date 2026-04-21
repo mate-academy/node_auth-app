@@ -16,6 +16,7 @@ import { PasswordResetRequestPage } from './pages/PasswordResetRequestPage.jsx';
 import { PasswordResetPage } from './pages/PasswordResetPage.jsx';
 import { Loader } from './components/Loader.jsx';
 import { HomePage } from './pages/HomePage.jsx';
+import { NotFoundPage } from './pages/NotFoundPage.jsx';
 import { usePageError } from './hooks/usePageError.js';
 
 function App() {
@@ -119,6 +120,8 @@ function App() {
               <Route path="users" element={<UsersPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
+
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </section>
 

@@ -10,3 +10,21 @@ userRouter.get(
   catchError(authMiddleware),
   catchError(userController.getAll),
 );
+
+userRouter.patch(
+  '/name',
+  catchError(authMiddleware),
+  catchError(userController.changeName),
+);
+
+userRouter.patch(
+  '/password',
+  catchError(authMiddleware),
+  catchError(userController.changePassword),
+);
+
+userRouter.patch(
+  '/email',
+  catchError(authMiddleware),
+  catchError(userController.changeEmail),
+);

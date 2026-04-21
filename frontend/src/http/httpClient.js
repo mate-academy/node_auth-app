@@ -34,7 +34,7 @@ async function onResponseError(error) {
     accessTokenService.save(accessToken);
 
     return httpClient.request(originalRequest);
-  } catch (error) {
+  } catch {
     throw error;
   }
 }

@@ -105,7 +105,7 @@ async function refresh(req, res, next) {
     throw ApiError.Unauthorized();
   }
 
-  const user = await userService.getByEmail(userData.email);
+  const user = await userService.getById(userData.id);
 
   await sendAuthentication(res, user);
 }
@@ -133,8 +133,8 @@ async function sendAuthentication(res, user) {
   res.cookie('refreshToken', refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: 'none',
-    secure: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: process.env.NODE_ENV === 'production',
   });
 
   res.send({

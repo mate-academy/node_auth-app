@@ -33,6 +33,7 @@ export function sendActivationLink(email, token) {
   });
 }
 
+
 export function sendPasswordResetLink(email, token) {
   const link = `${process.env.CLIENT_URL}/password-reset/${token}`;
 
@@ -46,4 +47,8 @@ export function sendPasswordResetLink(email, token) {
   });
 }
 
-export const emailService = { send, sendActivationLink, sendPasswordResetLink };
+export const emailService = {
+  send,
+  sendActivationLink,
+  sendPasswordResetLink,
+};

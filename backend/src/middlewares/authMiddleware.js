@@ -20,5 +20,6 @@ export function authMiddleware(req, res, next) {
     throw ApiError.Unauthorized();
   }
 
+  req.user = userData;
   next();
 }
