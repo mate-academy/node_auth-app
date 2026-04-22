@@ -1,0 +1,95 @@
+html,
+body,
+#root,
+button,
+input,
+select,
+textarea {
+  font-family: "Exo 2", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+}
+
+.status-page {
+  box-sizing: border-box;
+  max-width: 480px;
+  margin: 60px auto;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.status-page__eyebrow {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.status-page__title {
+  margin: 0 0 12px;
+}
+
+.status-page__text {
+  margin: 0 0 24px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.app-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  color: #111;
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid #111;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+}
+
+.app-button:hover {
+  background: #111;
+  color: #fff;
+}
+
+.app-button--danger {
+  color: #b42318;
+  border-color: #b42318;
+}
+
+.app-button--danger:hover {
+  background: #b42318;
+  border-color: #b42318;
+  color: #fff;
+}
+
+.app-button--danger:focus-visible {
+  outline: 3px solid rgba(180, 35, 24, 0.25);
+  outline-offset: 2px;
+}
+
+.app-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.app-button__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.app-button__icon {
+  display: block;
+  flex-shrink: 0;
+}
