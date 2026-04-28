@@ -1,6 +1,7 @@
 {
   "name": "node_auth-app",
   "version": "1.0.0",
+  "type": "module",
   "description": "Auth app",
   "main": "src/index.js",
   "scripts": {
@@ -26,5 +27,19 @@
   },
   "mateAcademy": {
     "projectType": "javascript"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.7",
+    "pg": "^8.20.0",
+    "sequelize": "^6.37.8",
+    "uuid": "^14.0.0"
   }
 }
