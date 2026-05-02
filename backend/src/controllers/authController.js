@@ -7,13 +7,25 @@ import { v4 as uuidv4 } from 'uuid';
 import { sendActivationEmail } from '../services/emailService.js';
 
 const validatePassword = (password) => {
-  if (!password) throw new Error('Password is required');
+  if (!password) {
+    throw new Error('Password is required');
+  }
 
-  if (password.length < 8) throw new Error('Minimum 8 characters');
+  if (password.length < 6) {
+    throw new Error('Password must be at least 6 characters');
+  }
 
-  if (!/[A-Z]/.test(password)) throw new Error('Must contain uppercase letter');
+  if (!/[A-Z]/.test(password)) {
+    throw new Error('Password must contain uppercase letter');
+  }
 
-  if (!/[0-9]/.test(password)) throw new Error('Must contain a number');
+  if (!/[0-9]/.test(password)) {
+    throw new Error('Password must contain a number');
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    throw new Error('Password must contain a special character');
+  }
 };
 
 // REGISTER
