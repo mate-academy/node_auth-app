@@ -1,34 +1,52 @@
+/* eslint-disable curly */
 /* eslint-disable no-console */
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User.js';
 import { v4 as uuidv4 } from 'uuid';
+import { sendActivationEmail } from '../services/emailService.js';
+
+const validatePassword = (password) => {
+  if (!password) throw new Error('Password is required');
+
+  if (password.length < 8) throw new Error('Minimum 8 characters');
+
+  if (!/[A-Z]/.test(password)) throw new Error('Must contain uppercase letter');
+
+  if (!/[0-9]/.test(password)) throw new Error('Must contain a number');
+};
 
 // REGISTER
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
-  const hash = await bcrypt.hash(password, 10);
+  try {
+    validatePassword(password);
 
-  const user = await User.create({
-    name,
-    email,
-    password: hash,
-    activationToken: uuidv4(),
-    isActive: false,
-  });
+    const hash = await bcrypt.hash(password, 10);
 
-  console.log(`Activate: /auth/activate/${user.email}/${user.activationToken}`);
+    const user = await User.create({
+      name,
+      email,
+      password: hash,
+      activationToken: uuidv4(),
+      isActive: false,
+    });
 
-  res.json({ message: 'Check email' });
+    await sendActivationEmail(user);
+
+    res.json({ message: 'Check email' });
+  } catch (e) {
+    res.status(400).json({ message: e.message });
+  }
 };
 
 // ACTIVATE
 export const activate = async (req, res) => {
-  const { email, token } = req.params;
+  const { token } = req.params;
 
   const user = await User.findOne({
-    where: { email, activationToken: token },
+    where: { activationToken: token },
   });
 
   if (!user) {
@@ -36,9 +54,22 @@ export const activate = async (req, res) => {
   }
 
   user.isActive = true;
+  user.activationToken = null;
+
   await user.save();
 
-  res.json({ message: 'Activated' });
+  const accessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    expiresIn: '15m',
+  });
+
+  res.json({
+    accessToken,
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    },
+  });
 };
 
 // LOGIN
@@ -108,4 +139,42 @@ export const logout = async (req, res) => {
   res.clearCookie('refreshToken');
 
   res.json({ message: 'Logged out' });
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    return res.status(400).json({ message: 'User not found' });
+  }
+
+  user.resetToken = uuidv4();
+  await user.save();
+
+  console.log(`Reset: /reset-password/${user.resetToken}`);
+
+  res.json({ message: 'Email sent' });
+};
+
+export const resetPassword = async (req, res) => {
+  const { token, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({ message: 'Passwords do not match' });
+  }
+
+  const user = await User.findOne({ where: { resetToken: token } });
+
+  if (!user) {
+    return res.status(400).json({ message: 'Invalid token' });
+  }
+
+  user.password = await bcrypt.hash(password, 10);
+  user.resetToken = null;
+
+  await user.save();
+
+  res.json({ message: 'Password changed' });
 };
