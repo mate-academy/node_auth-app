@@ -1,0 +1,25 @@
+name: node_auth
+
+services:
+  db:
+    image: postgres:18
+    container_name: node_auth-db
+    restart: unless-stopped
+    ports:
+      - '${POSTGRES_PORT:-5433}:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - node_auth_pg_data:/var/lib/postgresql
+    networks:
+      - node_auth_network
+
+volumes:
+  node_auth_pg_data:
+    name: node_auth_pg_data
+
+networks:
+  node_auth_network:
+    name: node_auth_network

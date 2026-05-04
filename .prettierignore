@@ -1,2 +1,5 @@
 /node_modules
 /dist
+
+src/client/build
+src/client/dist
