@@ -36,7 +36,7 @@ export const register = async (req, res) => {
       isActive: false,
     });
 
-    await mailService.sendActivationMail(email, activationToken)
+    await mailService.sendActivationMail(email, activationToken);
 
     res.status(201).json({
       message: 'Користувача зареєстровано. Перевірте пошту для активації.',
@@ -127,7 +127,7 @@ export const forgotPassword = async (req, res) => {
     }
 
     user.resetPasswordToken = uuidv4();
-    await mailService.sendPasswordResetMail(email, user.resetPasswordToken)
+    await mailService.sendPasswordResetMail(email, user.resetPasswordToken);
 
     const expires = new Date(Date.now() + 3600000);
 

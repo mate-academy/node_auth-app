@@ -18,7 +18,6 @@ router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPasswordConfirmation);
 
-
 router.post('/logout', isAuthenticated, logOut);
 router.put('/profile/name', isAuthenticated, resetName);
 router.put('/profile/email', isAuthenticated, changeEmail);

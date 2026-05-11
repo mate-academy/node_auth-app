@@ -1,6 +1,10 @@
 import { User } from '../models/User';
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  sendActivationMail,
+  sendEmailChangeNotification,
+} from '../services/mailService';
 
 export const resetName = async (req, res) => {
   try {
@@ -54,18 +58,17 @@ export const changeEmail = async (req, res) => {
     }
 
     const oldEmail = user.email;
+
     user.email = newEmail;
     user.isActive = false;
     user.activationToken = uuidv4();
     await user.save();
 
     try {
-      await mailService.sendEmailChangeNotification(oldEmail, newEmail);
+      await sendEmailChangeNotification(oldEmail, newEmail);
 
-      await mailService.sendActivationMail(newEmail, user.activationToken);
-    } catch (mailError) {
-      console.error('Помилка відправки пошти:', mailError);
-    }
+      await sendActivationMail(newEmail, user.activationToken);
+    } catch (mailError) {}
 
     return res.status(200).json({
       message: 'Email змінено. Будь ласка, активуйте нову пошту.',

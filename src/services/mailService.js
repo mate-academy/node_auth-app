@@ -1,14 +1,14 @@
-import { createTransport } from "nodemailer";
+import { createTransport } from 'nodemailer';
+
 const transporter = createTransport({
-  host: "test.smtp.mailtrap.io",
+  host: 'test.smtp.mailtrap.io',
   port: 2525,
   secure: false,
   auth: {
     user: process.env.SMTP_USERID,
-    pass: process.env.SMTP_PASSWORD
-  }
+    pass: process.env.SMTP_PASSWORD,
+  },
 });
-
 
 export const sendActivationMail = async (to, token) => {
   try {
@@ -38,11 +38,10 @@ export const sendActivationMail = async (to, token) => {
         </div>
       `,
     });
-  } catch {
-  }
-}
+  } catch {}
+};
 
-export const sendPasswordResetMail = async(to, token) => {
+export const sendPasswordResetMail = async (to, token) => {
   try {
     const url = `http://localhost:5000/auth/reset-password/${token}`;
 
@@ -53,9 +52,8 @@ export const sendPasswordResetMail = async(to, token) => {
       text: `Для скидання пароля перейдіть за посиланням:`,
       html: `<p>Для скидання пароля перейдіть за посиланням: <a href="${url}">${url}</a></p>`,
     });
-  } catch {
-  }
-}
+  } catch {}
+};
 
 export const sendEmailChangeNotification = async (oldEmail, newEmail) => {
   try {
@@ -65,6 +63,5 @@ export const sendEmailChangeNotification = async (oldEmail, newEmail) => {
       subject: 'Ваш email було змінено',
       text: `Ваш email змінено з ${oldEmail} на ${newEmail}. Якщо це зробили не ви, зверніться в підтримку.`,
     });
-  } catch {
-  }
-}
+  } catch {}
+};
