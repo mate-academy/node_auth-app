@@ -2,9 +2,10 @@ import bcrypt from 'bcrypt';
 import { User } from '../models/User';
 import { v4 as uuidv4 } from 'uuid';
 import { Op } from 'sequelize';
+import * as mailService from '../services/mailService';
 
 export const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
   try {
@@ -28,11 +29,15 @@ export const register = async (req, res) => {
     const activationToken = uuidv4();
 
     await User.create({
+      name,
       email,
       password: hashedPassword,
       activationToken,
-      isActive: false, 
+      isActive: false,
     });
+
+    await mailService.sendActivationMail(email, activationToken)
+
     res.status(201).json({
       message: 'Користувача зареєстровано. Перевірте пошту для активації.',
     });
@@ -122,6 +127,7 @@ export const forgotPassword = async (req, res) => {
     }
 
     user.resetPasswordToken = uuidv4();
+    await mailService.sendPasswordResetMail(email, user.resetPasswordToken)
 
     const expires = new Date(Date.now() + 3600000);
 
@@ -141,7 +147,7 @@ export const resetPasswordConfirmation = async (req, res) => {
     const { confirmation, password } = req.body;
 
     if (password !== confirmation) {
-      res.status(400).json({ message: 'Пароль не співпадає' });
+      return res.status(400).json({ message: 'Пароль не співпадає' });
     }
 
     const user = await User.findOne({
