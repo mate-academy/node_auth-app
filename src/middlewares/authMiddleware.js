@@ -22,5 +22,9 @@ export const isAuthenticated = async (req, res, next) => {
     req.user = user;
 
     return next();
-  } catch {}
+  } catch {
+    return res.status(500).json({
+      message: 'Внутрішня помилка сервера при спробі авторизації',
+    });
+  }
 };

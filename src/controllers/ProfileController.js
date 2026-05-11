@@ -77,3 +77,43 @@ export const changeEmail = async (req, res) => {
     res.status(500).json({ message: 'Помилка на сервері під час реєстрації' });
   }
 };
+
+export const passwordChange = async (req, res) => {
+  try {
+    const { newPassword, confirmation } = req.body;
+    const userId = req.session.userId;
+
+    if (newPassword !== confirmation) {
+      return res.send(400);
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          'Новий пароль занадто слабкий: мінімум 8 символів,' +
+          ' велика літера та цифра.',
+      });
+    }
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Користувача не знайдено' });
+    }
+
+    const comparePasswords = await bcrypt.compare(newPassword, user.password);
+
+    if (!comparePasswords) {
+      return res.send(400);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ message: 'Пароль успішно змінено' });
+  } catch {}
+};

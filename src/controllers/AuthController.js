@@ -167,6 +167,7 @@ export const resetPasswordConfirmation = async (req, res) => {
 
     user.password = hashedPassword;
     user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
 
     await user.save();
 
