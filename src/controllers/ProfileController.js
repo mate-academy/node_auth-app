@@ -68,7 +68,9 @@ export const changeEmail = async (req, res) => {
       await sendEmailChangeNotification(oldEmail, newEmail);
 
       await sendActivationMail(newEmail, user.activationToken);
-    } catch (mailError) {}
+    } catch (mailError) {
+      res.status(500);
+    }
 
     return res.status(200).json({
       message: 'Email змінено. Будь ласка, активуйте нову пошту.',
@@ -80,8 +82,14 @@ export const changeEmail = async (req, res) => {
 
 export const passwordChange = async (req, res) => {
   try {
-    const { newPassword, confirmation } = req.body;
+    const { oldPassword, newPassword, confirmation } = req.body;
     const userId = req.session.userId;
+
+    if (!oldPassword || !newPassword || !confirmation) {
+      return res
+        .status(400)
+        .json({ message: 'Усі поля обов’язкові для заповнення' });
+    }
 
     if (newPassword !== confirmation) {
       return res.send(400);
@@ -99,11 +107,18 @@ export const passwordChange = async (req, res) => {
 
     const user = await User.findByPk(userId);
 
+    if (!user.isActive) {
+      return res.status(400).json({
+        message: 'Будь ласка, активуйте свій email',
+        email: user.email,
+      });
+    }
+
     if (!user) {
       return res.status(404).json({ message: 'Користувача не знайдено' });
     }
 
-    const comparePasswords = await bcrypt.compare(newPassword, user.password);
+    const comparePasswords = await bcrypt.compare(oldPassword, user.password);
 
     if (!comparePasswords) {
       return res.send(400);
@@ -115,5 +130,7 @@ export const passwordChange = async (req, res) => {
     await user.save();
 
     return res.status(200).json({ message: 'Пароль успішно змінено' });
-  } catch {}
+  } catch {
+    res.status(500);
+  }
 };

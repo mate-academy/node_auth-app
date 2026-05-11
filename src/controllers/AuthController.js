@@ -79,7 +79,7 @@ export const login = async (req, res) => {
     if (user.isActive === false) {
       return res
         .status(400)
-        .json({ message: 'Будь ласка, активуйте свій email' });
+        .json({ message: 'Будь ласка, активуйте свій email', email });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);

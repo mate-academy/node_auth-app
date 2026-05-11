@@ -25,12 +25,14 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Сторінку не знайдено' });
 });
 
-const start = async () => {
+const start = async (req, res) => {
   try {
     await sequelize.sync({ alter: true });
 
     app.listen(PORT, () => {});
-  } catch (error) {}
+  } catch (error) {
+    res.status(500);
+  }
 };
 
 start();
