@@ -42,8 +42,12 @@ const updatePassword = async (req, res) => {
 };
 
 const updateEmail = async (req, res) => {
-  const { password, newEmail } = req.body;
+  const { password, newEmail, newEmailConfirmation } = req.body;
   const user = await userService.findById(req.userId);
+
+  if (newEmail !== newEmailConfirmation) {
+    throw ApiError.badRequest('New emails do not match');
+  }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 

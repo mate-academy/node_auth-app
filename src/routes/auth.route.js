@@ -16,7 +16,7 @@ authRouter.get('/refresh', catchError(authController.refresh));
 authRouter.post('/logout', authMiddleware, catchError(authController.logout));
 
 authRouter.post(
-  '/password-rest',
+  '/password-reset',
   catchError(authController.requestPasswordReset),
 );
 

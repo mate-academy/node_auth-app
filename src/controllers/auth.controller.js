@@ -25,8 +25,10 @@ function validatePassword(value) {
   }
 
   if (value.length < 6) {
-    return 'At least 6 characters required';
+    return 'Password must be at least 6 characters long';
   }
+
+  return null;
 }
 
 async function generateTokens(res, user) {
@@ -147,7 +149,7 @@ const requestPasswordReset = async (req, res) => {
     await emailService.sendResetPasswordEmail(email, resetToken);
   }
 
-  res.send({ message: 'Reset link sent if email exosts' });
+  res.send({ message: 'Reset link sent if email exists' });
 };
 
 const resetPasswordConfirm = async (req, res) => {

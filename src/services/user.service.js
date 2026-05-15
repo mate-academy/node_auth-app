@@ -40,7 +40,7 @@ async function register(name, email, hashedPassword) {
     activationToken,
   });
 
-  await emailService.sendActivationEmail({ email, activationToken });
+  await emailService.sendActivationEmail(email, activationToken);
 
   return user;
 }
