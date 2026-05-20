@@ -1,8 +1,8 @@
+import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 import { ApiError } from '../exceptions/api.error.js';
 import { User } from '../models/user.js';
-import { v4 as uuidv4 } from 'uuid';
 import { emailService } from '../services/email.service.js';
-import bcrypt from 'bcrypt';
 
 export async function getAllActivated() {
   return User.findAll({
