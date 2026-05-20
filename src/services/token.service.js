@@ -1,10 +1,10 @@
 import { Token } from '../models/token';
 
 async function save(userId, newToken) {
-  const token = await Token.findOne({ where: { userId } });
+  let token = await Token.findOne({ where: { userId } });
 
   if (!token) {
-    await Token.create({ userId, refreshToken: newToken });
+    token = await Token.create({ userId, refreshToken: newToken });
   }
 
   token.refreshToken = newToken;
