@@ -1,0 +1,31 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String   @id @default(dbgenerated("gen_random_uuid()"))
+  email           String   @unique
+  name            String
+  password        String
+  activationToken String?  @map("activation_token")
+  resetToken      String?  @map("reset_token")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  token           Token?
+
+  @@map("users")
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique @map("user_id")
+  token     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("tokens")
+}
