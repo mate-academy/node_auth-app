@@ -10,6 +10,7 @@ import { usePageError } from './hooks/usePageError';
 import { Loader } from './components/Loader';
 import { HomePage } from './pages/HomePage';
 import { RegistrationPage } from './pages/RegistrationPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { AccountActivationPage } from './pages/AccountActivationPage';
 import { LoginPage } from './pages/LoginPage';
 import { RequireAuth } from './components/RequireAuth';
@@ -103,6 +104,7 @@ export function App() {
             <Route path="/" element={<RequireAuth />}>
               <Route path="users" element={<UsersPage />} />
             </Route>
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </section>
 
