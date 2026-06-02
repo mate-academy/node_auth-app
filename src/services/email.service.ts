@@ -4,18 +4,34 @@ import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
+  port: Number(process.env.SMTP_PORT),
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
   },
 } as SMTPTransport.Options);
 
-export function sendActivationEmail(email: string) {
+function send(email: string, subject: string, html: string) {
   return transporter.sendMail({
+    from: 'Auth API',
     to: email,
-    subject: 'Activate account',
-    text: 'Hello!! Your account has been activated.',
-    html: '<b>Hello. Your account has been activated.</b>',
+    subject,
+    html,
   });
 }
+
+function sendActivationLink(email: string, activationToken: string) {
+  const link = `${process.env.CLIENT_URL}/auth/activation/${email}/${encodeURIComponent(activationToken)}`;
+  const html = `
+    <h1>Account activation</h1>
+    <a href="${link}">${link}</a>
+  `;
+
+  return send(email, 'Account activation', html);
+}
+
+export const mailer = {
+  send,
+  sendActivationLink,
+};
+
