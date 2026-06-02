@@ -5,7 +5,11 @@ import { guestMiddleware } from '../middlewares/guestMiddleware.js';
 
 export const authRouter = express.Router();
 
-authRouter.post('/registration', catchError(authController.register));
+authRouter.post(
+  '/registration',
+  guestMiddleware,
+  catchError(authController.register),
+);
 
 authRouter.get(
   '/activation/:activationToken',
@@ -14,11 +18,7 @@ authRouter.get(
 );
 authRouter.post('/login', guestMiddleware, catchError(authController.login));
 
-authRouter.post(
-  '/refresh',
-  guestMiddleware,
-  catchError(authController.refresh),
-);
+authRouter.post('/refresh', catchError(authController.refresh));
 
 authRouter.post(
   '/password/reset',

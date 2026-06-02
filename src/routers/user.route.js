@@ -31,6 +31,7 @@ userRouter.patch(
 
 userRouter.get(
   '/profile/email/change/activation/:emailChangeToken',
+  authMiddleware,
   catchError(userController.activateChangedEmail),
 );
 
