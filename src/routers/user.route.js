@@ -33,3 +33,5 @@ userRouter.get(
   '/profile/email/change/activation/:emailChangeToken',
   catchError(userController.activateChangedEmail),
 );
+
+userRouter.post('/logout', authMiddleware, catchError(userController.logout));

@@ -1,4 +1,5 @@
 import { ApiError } from '../exceptions/api.error.js';
+import { tokenService } from '../services/token.service.js';
 import { userService } from '../services/user.service.js';
 import { validateEmail, validatePassword } from './auth.controller.js';
 import bcrypt from 'bcrypt';
@@ -123,10 +124,21 @@ const activateChangedEmail = async (req, res, next) => {
   });
 };
 
+const logout = async (req, res, next) => {
+  res.clearCookie('refreshToken');
+
+  await tokenService.remove(req.user.id);
+
+  res.send({
+    message: 'OK',
+  });
+};
+
 export const userController = {
   getOneActivated,
   changeName,
   changeEmail,
   changePasswordAuthenticated,
   activateChangedEmail,
+  logout,
 };

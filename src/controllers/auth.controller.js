@@ -118,16 +118,6 @@ const generateTokens = async (res, user) => {
   });
 };
 
-const logout = async (req, res, next) => {
-  res.clearCookie('refreshToken');
-
-  await tokenService.remove(req.user.id);
-
-  res.send({
-    message: 'OK',
-  });
-};
-
 const sendResetMessage = async (req, res, next) => {
   const { email } = req.body;
 
@@ -177,7 +167,6 @@ export const authController = {
   activate,
   login,
   refresh,
-  logout,
   sendResetMessage,
   resetPassword,
 };
