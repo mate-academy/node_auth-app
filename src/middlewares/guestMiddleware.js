@@ -1,5 +1,5 @@
-import { ApiError } from '../exceptions/api.error';
-import { jwtService } from '../services/jwt.service';
+import { ApiError } from '../exceptions/api.error.js';
+import { jwtService } from '../services/jwt.service.js';
 
 export const guestMiddleware = (req, res, next) => {
   const authorization = req.headers.authorization;

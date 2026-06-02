@@ -2,6 +2,7 @@ import express from 'express';
 import { userController } from '../controllers/user.controller.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { catchError } from '../utils/catchError.js';
+import { guestMiddleware } from '../middlewares/guestMiddleware.js';
 
 export const userRouter = express.Router();
 
@@ -31,7 +32,7 @@ userRouter.patch(
 
 userRouter.get(
   '/profile/email/change/activation/:emailChangeToken',
-  authMiddleware,
+  guestMiddleware,
   catchError(userController.activateChangedEmail),
 );
 
