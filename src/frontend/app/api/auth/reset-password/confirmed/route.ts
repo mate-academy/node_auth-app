@@ -1,0 +1,50 @@
+import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+  const base = process.env.SERVER_PATH;
+  const url = `${base}/auth/reset-password/confirmed`;
+  const body = await request.json();
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : 'Failed to reach backend';
+    return NextResponse.json(
+      { message: `Backend fetch failed (${url}): ${message}` },
+      { status: 502 },
+    );
+  }
+
+  const raw = await res.text();
+  let payload: Record<string, unknown> = {};
+  if (raw) {
+    try {
+      payload = JSON.parse(raw) as Record<string, unknown>;
+    } catch {
+      payload = { message: raw };
+    }
+  }
+
+  if (!res.ok) {
+    const backendMessage =
+      typeof payload.message === 'string' ? payload.message : undefined;
+    return NextResponse.json(
+      {
+        message: backendMessage ?? 'Could not reset password',
+        code:
+          typeof payload.code === 'string'
+            ? payload.code
+            : 'RESET_PASSWORD_FAILED',
+      },
+      { status: res.status },
+    );
+  }
+
+  return NextResponse.json(payload, { status: res.status });
+}
