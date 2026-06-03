@@ -1,5 +1,10 @@
 import { User } from '@prisma/client';
 
+export type NormalizedUser = {
+  id: string;
+  email: string;
+};
+
 function normalize({ id, email }: User) {
   return { id, email };
 }

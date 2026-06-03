@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import { usersRepository } from "../entity/users.repository";
 import { mailer } from "../services/email.service";
 import { userService } from "../services/user.service";
+import { jwt } from "../utils/jwt";
 
 const register: RequestHandler = async (req, res) => {
   const { email, password } = req.body;
@@ -37,8 +38,9 @@ const activate: RequestHandler = async (req, res) => {
   }
 
   const activatedUser = await usersRepository.activate(decodedEmail);
+  const normalizedUser = userService.normalize(activatedUser);
 
-  res.json({ user: userService.normalize(activatedUser) });
+  res.json({ user: normalizedUser, accessToken: jwt.generateAccessToken(normalizedUser) });
 };
 
 const login: RequestHandler = async (req, res) => {
@@ -51,7 +53,7 @@ const login: RequestHandler = async (req, res) => {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
-  res.json({ user: userService.normalize(user) });
+  res.json({ user: userService.normalize(user), accessToken: jwt.generateAccessToken(userService.normalize(user)) });
 };
 
 const logout: RequestHandler = async (req, res) => {
