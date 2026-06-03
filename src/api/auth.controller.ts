@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import bcrypt from 'bcrypt';
 import { usersRepository } from "../entity/users.repository";
 import { mailer } from "../services/email.service";
+import { userService } from "../services/user.service";
 
 const register: RequestHandler = async (req, res) => {
   const { email, password } = req.body;
@@ -15,31 +16,54 @@ const register: RequestHandler = async (req, res) => {
   }
   await mailer.sendActivationLink(email, activationToken);
 
-  res.json({ user });
+  res.json({ user: userService.normalize(user) });
 };
 
 const getUsers: RequestHandler = async (req, res) => {
   const users = await usersRepository.getAll();
-  res.json(users);
+  res.json(users.map(userService.normalize));
 };
 
 const activate: RequestHandler = async (req, res) => {
   const { email, activationToken } = req.params;
 
-  const user = await usersRepository.getByEmail(email as string);
+  const decodedEmail = decodeURIComponent(email as string);
+  const decodedActivationToken = decodeURIComponent(activationToken as string);
 
-  if (!user || user.activationToken !== activationToken) {
+  const user = await usersRepository.getByEmail(decodedEmail);
+
+  if (!user || user.activationToken !== decodedActivationToken) {
     return res.status(400).json({ message: 'Wrong activation link' });
   }
 
-  const activatedUser = await usersRepository.activate(email as string);
+  const activatedUser = await usersRepository.activate(decodedEmail);
 
-  res.json({ user: activatedUser });
+  res.json({ user: userService.normalize(activatedUser) });
 };
 
+const login: RequestHandler = async (req, res) => {
+  const { email, password } = req.body;
+
+  const user = await usersRepository.getByEmail(email);
+  const isPasswordValid = await bcrypt.compare(password, user?.password || '');
+
+  if (!user || !isPasswordValid) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  res.json({ user: userService.normalize(user) });
+};
+
+const logout: RequestHandler = async (req, res) => {
+  res.clearCookie('refreshToken');
+  res.sendStatus(204);
+}
+
 export const authController = {
+  login,
   register,
   getUsers,
   activate,
+  logout,
 };
 

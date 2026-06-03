@@ -12,7 +12,9 @@ export const authService = {
   },
 
   activate: (email: string, token: string): Promise<AuthData> => {
-    return client.get(`/activation/${email}/${token}`);
+    return client.get(
+      `/activation/${encodeURIComponent(email)}/${encodeURIComponent(token)}`
+    );
   },
 
   login: (email: string, password: string): Promise<AuthData> => {
