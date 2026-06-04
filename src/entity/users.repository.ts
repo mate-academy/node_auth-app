@@ -26,9 +26,16 @@ function getAll() {
   return client.user.findMany();
 }
 
+function getAllActive() {
+  return client.user.findMany({
+    where: { activationToken: null },
+  });
+}
+
 export const usersRepository = {
   create,
   getAll,
   getByEmail,
   activate,
+  getAllActive,
 };
