@@ -47,13 +47,36 @@ const login: RequestHandler = async (req, res) => {
   const { email, password } = req.body;
 
   const user = await usersRepository.getByEmail(email);
-  const isPasswordValid = await bcrypt.compare(password, user?.password || '');
 
-  if (!user || !isPasswordValid) {
+  if (!user) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
-  res.json({ user: userService.normalize(user), accessToken: jwt.generateAccessToken(userService.normalize(user)) });
+  const normalizedUser = userService.normalize(user);
+
+  const refreshToken = jwt.generateRefreshToken(normalizedUser);
+  const isPasswordValid = await bcrypt.compare(password, user?.password || '');
+
+  if (!isPasswordValid) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+
+  // res.cookie('refreshToken', refreshToken, {
+  //   maxAge: 30 * 24 * 60 * 60 * 1000,
+  //   httpOnly: true,
+  //   sameSite: 'none',
+  //   secure: true,
+  // });
+
+  // For development purposes, we set secure to false and sameSite to lax. In production, these should be set to true and none respectively.
+  res.cookie('refreshToken', refreshToken, {
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: false,
+});
+
+  res.json({ user: normalizedUser, accessToken: jwt.generateAccessToken(normalizedUser) });
 };
 
 const logout: RequestHandler = async (req, res) => {
