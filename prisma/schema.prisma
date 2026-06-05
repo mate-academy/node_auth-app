@@ -13,6 +13,17 @@ model User {
   activationToken String?  @map("activation_token")
   isActivated     Boolean  @default(false) @map("is_activated")
   createdAt       DateTime @default(now()) @map("created_at")
-
+  tokens          Token?
+  
   @@map("users")
+}
+
+model Token {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @map("user_id") @unique
+  token     String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("tokens")
 }
