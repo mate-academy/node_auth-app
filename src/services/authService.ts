@@ -7,8 +7,8 @@ interface AuthData {
 }
 
 export const authService = {
-  register: (email: string, password: string) => {
-    return client.post('/registration', { email, password });
+  register: (name: string, email: string, password: string) => {
+    return client.post('/registration', { name, email, password });
   },
 
   activate: (email: string, token: string): Promise<AuthData> => {

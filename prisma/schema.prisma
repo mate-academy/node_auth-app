@@ -8,13 +8,14 @@ datasource db {
 
 model User {
   id              String   @id @default(dbgenerated("gen_random_uuid()"))
+  name            String
   email           String   @unique
   password        String
   activationToken String?  @map("activation_token")
   isActivated     Boolean  @default(false) @map("is_activated")
   createdAt       DateTime @default(now()) @map("created_at")
   tokens          Token?
-  
+
   @@map("users")
 }
 

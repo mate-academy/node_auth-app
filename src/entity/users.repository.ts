@@ -1,8 +1,8 @@
 import { client } from '../utils/db';
 
-function create(email: string, password: string, activationToken?: string) {
+function create(name: string, email: string, password: string, activationToken?: string) {
   return client.user.create({
-    data: { email, password, activationToken },
+    data: { name, email, password, activationToken },
   });
 }
 

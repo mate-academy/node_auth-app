@@ -20,6 +20,11 @@ function validateEmail(value: string) {
   if (!EMAIL_PATTERN.test(value)) return 'Email is not valid';
 }
 
+function validateName(value: string) {
+  if (!value.trim()) return 'Name is required';
+  if (value.trim().length < 2) return 'Name must be at least 2 characters';
+}
+
 const validatePassword = (value: string) => {
   if (!value) return 'Password is required';
   if (value.length < 6) return 'At least 6 characters';
@@ -48,15 +53,16 @@ export const RegistrationPage = () => {
     <>
       <Formik
         initialValues={{
+          name : '',
           email: '',
           password: '',
         }}
         validateOnMount={true}
-        onSubmit={({ email, password }, formikHelpers) => {
+        onSubmit={({ name, email, password }, formikHelpers) => {
           formikHelpers.setSubmitting(true);
 
           authService
-            .register(email, password)
+            .register(name, email, password)
             .then(() => setRegistered(true))
             .catch((error: RegistrationError) => {
               if (error.message) setError(error.message);
@@ -75,6 +81,38 @@ export const RegistrationPage = () => {
         {({ touched, errors, isSubmitting }) => (
           <Form className="box">
             <h1 className="title">Sign up</h1>
+              <div className="field">
+              <label htmlFor="name" className="label">
+                Name
+              </label>
+
+              <div className="control has-icons-left has-icons-right">
+                <Field
+                  validate={validateName}
+                  name="name"
+                  type="name"
+                  id="name"
+                  placeholder="e.g. Bob"
+                  className={cn('input', {
+                    'is-danger': touched.name && errors.name,
+                  })}
+                />
+
+                <span className="icon is-small is-left">
+                  <i className="fa fa-user"></i>
+                </span>
+
+                {touched.name && errors.name && (
+                  <span className="icon is-small is-right has-text-danger">
+                    <i className="fas fa-exclamation-triangle"></i>
+                  </span>
+                )}
+              </div>
+
+              {touched.name && errors.name && (
+                <p className="help is-danger">{errors.name}</p>
+              )}
+            </div>
             <div className="field">
               <label htmlFor="email" className="label">
                 Email
@@ -147,7 +185,7 @@ export const RegistrationPage = () => {
                 className={cn('button is-success has-text-weight-bold', {
                   'is-loading': isSubmitting,
                 })}
-                disabled={isSubmitting || !!errors.email || !!errors.password}
+                disabled={isSubmitting ||  !!errors.name || !!errors.email || !!errors.password}
               >
                 Sign up
               </button>

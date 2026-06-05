@@ -13,7 +13,7 @@ function getByToken(token: string) {
 }
 
 function deleteByUserId(userId: string) {
-  return client .token.delete({
+  return client.token.deleteMany({
     where: { userId },
   });
 }

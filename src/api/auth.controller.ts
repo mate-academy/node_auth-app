@@ -34,11 +34,11 @@ async function sendAuthentication(res: Response, user: User) {
 }
 
 const register: RequestHandler = async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   const activationToken = bcrypt.genSaltSync(1);
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await usersRepository.create(email, hashedPassword, activationToken);
+  const user = await usersRepository.create(name, email, hashedPassword, activationToken);
 
   if (!user.activationToken) {
     return res.status(500).json({ error: "Activation token missing" });
