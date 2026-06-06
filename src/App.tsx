@@ -16,6 +16,11 @@ import { LoginPage } from './pages/LoginPage';
 import { RequireAuth } from './components/RequireAuth';
 import { UsersPage } from './pages/UsersPage';
 import { AxiosError } from 'axios';
+import { ResetPasswordSuccessPage } from './pages/ResetPasswordSuccessPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { PasswordResetEmailSentPage } from './pages/PasswordResetEmailSentPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+
 
 export function App() {
   const navigate = useNavigate();
@@ -104,6 +109,12 @@ export function App() {
             <Route path="/" element={<RequireAuth />}>
               <Route path="users" element={<UsersPage />} />
             </Route>
+
+            <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="forgot-password/sent" element={<PasswordResetEmailSentPage />} />
+            <Route path="reset-password/:resetToken" element={<ResetPasswordPage />} />
+            <Route path="reset-password/success" element={<ResetPasswordSuccessPage />} />
+
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </section>

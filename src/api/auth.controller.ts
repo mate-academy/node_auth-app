@@ -6,6 +6,7 @@ import { mailer } from "../services/email.service";
 import { userService } from "../services/user.service";
 import { jwt } from "../utils/jwt";
 import { tokensRepository } from '../entity/tokens.repository';
+import crypto from 'crypto';
 
 type NormalizedUser = {
   id: string;
@@ -115,6 +116,66 @@ const refresh: RequestHandler = async (req, res) => {
   await sendAuthentication(res, user);
 }
 
+const requestPasswordReset: RequestHandler = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await usersRepository.getByEmail(email);
+
+  if (!user) {
+    return res.json({ message: 'If this email exists, reset link was sent' });
+  }
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  const resetPasswordExpires = new Date(Date.now() + 1000 * 60 * 60);
+  // 1 година
+
+  await usersRepository.setResetPasswordToken(
+    email,
+    resetToken,
+    resetPasswordExpires,
+  );
+
+  await mailer.sendPasswordResetLink(email, resetToken);
+
+  res.json({ message: 'Password reset email was sent' });
+};
+
+const resetPassword: RequestHandler = async (req, res) => {
+  const resetToken = req.params.resetToken as string;
+  const { password, confirmation } = req.body;
+
+  if (!password || !confirmation) {
+    return res.status(400).json({ message: 'Password and confirmation are required' });
+  }
+
+  if (password !== confirmation) {
+    return res.status(400).json({ message: 'Passwords do not match' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ message: 'At least 6 characters' });
+  }
+
+  const decodedResetToken = decodeURIComponent(resetToken);
+
+  const user = await usersRepository.getByResetPasswordToken(decodedResetToken);
+
+  if (!user || !user.resetPasswordExpires) {
+    return res.status(400).json({ message: 'Wrong reset password link' });
+  }
+
+  if (user.resetPasswordExpires < new Date()) {
+    return res.status(400).json({ message: 'Reset password link expired' });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await usersRepository.updatePassword(user.id, hashedPassword);
+
+  res.json({ message: 'Password was changed successfully' });
+};
+
 export const authController = {
   refresh,
   login,
@@ -122,5 +183,7 @@ export const authController = {
   getUsers,
   activate,
   logout,
+  resetPassword,
+  requestPasswordReset,
 };
 

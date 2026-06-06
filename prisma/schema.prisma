@@ -14,6 +14,8 @@ model User {
   activationToken String?  @map("activation_token")
   isActivated     Boolean  @default(false) @map("is_activated")
   createdAt       DateTime @default(now()) @map("created_at")
+  resetPasswordToken   String?   @map("reset_password_token")
+  resetPasswordExpires DateTime? @map("reset_password_expires")
   tokens          Token?
 
   @@map("users")

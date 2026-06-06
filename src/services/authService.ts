@@ -24,4 +24,19 @@ export const authService = {
   logout: () => client.post('/logout'),
 
   refresh: (): Promise<AuthData> => client.get('/refresh'),
+
+  requestPasswordReset: (email: string) => {
+    return client.post('/password-reset', { email });
+  },
+
+  resetPassword: (
+    resetToken: string,
+    password: string,
+    confirmation: string,
+  ) => {
+    return client.post(`/password-reset/${encodeURIComponent(resetToken)}`, {
+      password,
+      confirmation,
+    });
+  },
 };

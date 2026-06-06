@@ -10,5 +10,7 @@ authRouter.get('/activation/:email/:activationToken', authController.activate);
 authRouter.post('/login', authController.login);
 authRouter.post('/logout', authController.logout);
 authRouter.get('/refresh', cookieParser(), authController.refresh);
+authRouter.post('/password-reset', authController.requestPasswordReset);
+authRouter.post('/password-reset/:resetToken', authController.resetPassword);
 
 export default authRouter;

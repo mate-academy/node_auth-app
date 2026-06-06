@@ -128,6 +128,7 @@ export const LoginPage = () => {
                 Log in
               </button>
             </div>
+            <Link to="/forgot-password">Forgot password?</Link><br/>
             Do not have an account? <Link to="/sign-up">Sign up</Link>
           </Form>
         )}

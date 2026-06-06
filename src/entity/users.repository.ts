@@ -32,10 +32,44 @@ function getAllActive() {
   });
 }
 
+function setResetPasswordToken(
+  email: string,
+  resetPasswordToken: string,
+  resetPasswordExpires: Date,
+) {
+  return client.user.update({
+    where: { email },
+    data: {
+      resetPasswordToken,
+      resetPasswordExpires,
+    },
+  });
+}
+
+function getByResetPasswordToken(resetPasswordToken: string) {
+  return client.user.findFirst({
+    where: { resetPasswordToken },
+  });
+}
+
+function updatePassword(userId: string, password: string) {
+  return client.user.update({
+    where: { id: userId },
+    data: {
+      password,
+      resetPasswordToken: null,
+      resetPasswordExpires: null,
+    },
+  });
+}
+
 export const usersRepository = {
   create,
   getAll,
   getByEmail,
   activate,
+  setResetPasswordToken,
+  getByResetPasswordToken,
+  updatePassword,
   getAllActive,
 };
