@@ -20,6 +20,7 @@ import { ResetPasswordSuccessPage } from './pages/ResetPasswordSuccessPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { PasswordResetEmailSentPage } from './pages/PasswordResetEmailSentPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 
 export function App() {
@@ -67,12 +68,18 @@ export function App() {
           <div className="navbar-item">
             <div className="buttons">
               {currentUser ? (
+                <><Link
+                  to="/profile"
+                  className="button is-success has-text-weight-bold"
+                >
+                  Profile
+                </Link>
                 <button
                   className="button is-light has-text-weight-bold"
                   onClick={handleLogout}
                 >
-                  Log out
-                </button>
+                    Log out
+                  </button></>
               ) : (
                 <>
                   <Link
@@ -114,6 +121,11 @@ export function App() {
             <Route path="forgot-password/sent" element={<PasswordResetEmailSentPage />} />
             <Route path="reset-password/:resetToken" element={<ResetPasswordPage />} />
             <Route path="reset-password/success" element={<ResetPasswordSuccessPage />} />
+
+            <Route path="/" element={<RequireAuth />}>
+              <Route path="users" element={<UsersPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
 
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

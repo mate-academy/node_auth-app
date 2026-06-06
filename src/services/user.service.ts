@@ -2,11 +2,12 @@ import { User } from '@prisma/client';
 
 export type NormalizedUser = {
   id: string;
+  name: string;
   email: string;
 };
 
-function normalize({ id, email }: User) {
-  return { id, email };
+function normalize({ id, name, email }: User) {
+  return { id, name, email };
 }
 
 function validateEmail(email: string) {

@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import authRouter from './routes/auth.route.ts';
 import { usersRouter } from './routes/users.route.ts';
+import profileRouter from './routes/profile.route.ts';
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/profile', profileRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

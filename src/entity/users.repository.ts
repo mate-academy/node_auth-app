@@ -63,6 +63,26 @@ function updatePassword(userId: string, password: string) {
   });
 }
 
+function updateEmail(id: string, email: string) {
+  return client.user.update({
+    where: { id },
+    data: { email },
+  });
+}
+
+function getById(id: string) {
+  return client.user.findUnique({
+    where: { id },
+  });
+}
+
+function updateName(id: string, name: string) {
+  return client.user.update({
+    where: { id },
+    data: { name },
+  });
+}
+
 export const usersRepository = {
   create,
   getAll,
@@ -72,4 +92,7 @@ export const usersRepository = {
   getByResetPasswordToken,
   updatePassword,
   getAllActive,
+  updateEmail,
+  getById,
+  updateName,
 };
