@@ -25,6 +25,7 @@
     "formik": "^2.4.6",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^8.0.10",
+    "passport": "^0.7.0",
     "pg": "^8.21.0",
     "prisma": "^7.8.0",
     "react": "^18.3.1",
