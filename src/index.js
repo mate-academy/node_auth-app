@@ -5,6 +5,8 @@ import cors from 'cors';
 import authRouter from './routes/auth.route.ts';
 import { usersRouter } from './routes/users.route.ts';
 import profileRouter from './routes/profile.route.ts';
+import passport from 'passport';
+import './config/passport';
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -14,6 +16,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(passport.initialize());
 
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);

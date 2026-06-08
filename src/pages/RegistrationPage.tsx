@@ -190,6 +190,15 @@ export const RegistrationPage = () => {
                 Sign up
               </button>
             </div>
+            <a
+              className="button is-light"
+              href="http://localhost:3000/auth/google"
+            >
+              <span className="icon">
+                <i className="fab fa-google"></i>
+              </span>
+              <span>Continue with Google</span>
+            </a> <br/>
             Already have an account? <Link to="/login">Log in</Link>
           </Form>
         )}

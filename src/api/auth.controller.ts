@@ -176,6 +176,26 @@ const resetPassword: RequestHandler = async (req, res) => {
   res.json({ message: 'Password was changed successfully' });
 };
 
+const oauthCallback: RequestHandler = async (req, res) => {
+  const user = req.user as User;
+
+  const userData = userService.normalize(user);
+  const accessToken = jwt.generateAccessToken(userData);
+  const refreshToken = jwt.generateRefreshToken(userData);
+
+  await tokensRepository.deleteByUserId(user.id);
+  await tokensRepository.create(user.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  res.redirect(`${process.env.CLIENT_URL}/profile?accessToken=${accessToken}`);
+};
+
 export const authController = {
   refresh,
   login,
@@ -185,5 +205,6 @@ export const authController = {
   logout,
   resetPassword,
   requestPasswordReset,
+  oauthCallback
 };
 

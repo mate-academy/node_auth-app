@@ -83,6 +83,35 @@ function updateName(id: string, name: string) {
   });
 }
 
+function findOrCreateOAuthUser(data: {
+  email: string;
+  name?: string;
+  googleId?: string;
+  facebookId?: string;
+  githubId?: string;
+}) {
+  return client.user.upsert({
+    where: { email: data.email },
+    update: {
+      googleId: data.googleId,
+      facebookId: data.facebookId,
+      githubId: data.githubId,
+      isActivated: true,
+      activationToken: null,
+    },
+    create: {
+      email: data.email,
+      name: data.name || data.email,
+      password: null,
+      googleId: data.googleId,
+      facebookId: data.facebookId,
+      githubId: data.githubId,
+      isActivated: true,
+      activationToken: null,
+    },
+  });
+}
+
 export const usersRepository = {
   create,
   getAll,
@@ -95,4 +124,5 @@ export const usersRepository = {
   updateEmail,
   getById,
   updateName,
+  findOrCreateOAuthUser
 };
