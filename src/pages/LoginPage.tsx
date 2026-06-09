@@ -40,8 +40,7 @@ export const LoginPage = () => {
         onSubmit={({ email, password }) => {
           return login(email, password)
             .then(() => {
-              const state = location.state as { from?: Location };
-              navigate(state.from?.pathname ?? '/');
+              navigate('/profile');
             })
             .catch((error: AxiosError<{ message?: string }>) => {
               setError(error.response?.data?.message ?? '');

@@ -28,7 +28,7 @@ function getAll() {
 
 function getAllActive() {
   return client.user.findMany({
-    where: { activationToken: null },
+    where: { isActivated: true },
   });
 }
 

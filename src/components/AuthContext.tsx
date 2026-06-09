@@ -16,7 +16,7 @@ const AuthContext = React.createContext({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isChecked, setChecked] = useState(true);
+  const [isChecked, setChecked] = useState(false);
 
   async function activate(email: string, token: string) {
     const { accessToken, user } = await authService.activate(email, token);
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       accessTokenService.save(accessToken);
       setCurrentUser(user);
     } catch (error) {
-      console.log('User is not authentincated');
+      console.log('User is not authenticated');
     } finally {
       setChecked(true);
     }

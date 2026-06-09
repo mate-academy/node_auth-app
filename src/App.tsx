@@ -40,7 +40,7 @@ export function App() {
   const handleLogout = () => {
     logout()
       .then(() => {
-        navigate('/');
+        navigate('/login');
       })
       .catch((error: AxiosError<{ message?: string }>) => {
         setError(error.response?.data?.message ?? '');
@@ -112,10 +112,6 @@ export function App() {
               element={<AccountActivationPage />}
             />
             <Route path="login" element={<LoginPage />} />
-
-            <Route path="/" element={<RequireAuth />}>
-              <Route path="users" element={<UsersPage />} />
-            </Route>
 
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
             <Route path="forgot-password/sent" element={<PasswordResetEmailSentPage />} />

@@ -10,6 +10,7 @@ import crypto from 'crypto';
 
 type NormalizedUser = {
   id: string;
+  name: string;
   email: string;
 };
 
@@ -80,13 +81,19 @@ const login: RequestHandler = async (req, res) => {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
+  if (!user.isActivated) {
+    return res.status(403).json({
+      message: 'Please activate your account',
+    });
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user?.password || '');
 
   if (!isPasswordValid) {
     return res.status(401).json({ message: 'Invalid credentials' });
   }
 
-  sendAuthentication(res, user);
+  return sendAuthentication(res, user);
 };
 
 const logout: RequestHandler = async (req, res) => {

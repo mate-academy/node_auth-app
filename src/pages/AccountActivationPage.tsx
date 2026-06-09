@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { useAuth } from '../components/AuthContext';
 import { Loader } from '../components/Loader';
@@ -11,6 +11,7 @@ export const AccountActivationPage = () => {
 
   const { activate } = useAuth();
   const { activationToken = '', email = '' } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!activationToken || !email) {
@@ -21,6 +22,9 @@ export const AccountActivationPage = () => {
     }
 
     activate(email, activationToken)
+      .then(() => {
+        navigate('/profile');
+      })
       .catch((error: AxiosError<{ message?: string }>) => {
         setError(error.response?.data?.message ?? `Wrong activation link`);
       })

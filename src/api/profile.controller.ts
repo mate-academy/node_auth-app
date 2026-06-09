@@ -48,6 +48,12 @@ const updatePassword: RequestHandler = async (req, res) => {
     return res.status(404).json({ message: 'User not found' });
   }
 
+  if (!user.password) {
+    return res.status(400).json({
+      message: 'Password login is not available for this account',
+    });
+  }
+
   const isOldPasswordValid = await bcrypt.compare(oldPassword, user.password);
 
   if (!isOldPasswordValid) {
@@ -82,6 +88,18 @@ const updateEmail: RequestHandler = async (req, res) => {
 
   if (!user) {
     return res.status(404).json({ message: 'User not found' });
+  }
+
+  if (!user.isActivated) {
+    return res.status(403).json({
+      message: 'Please activate your account',
+    });
+  }
+
+  if (!user.password) {
+    return res.status(400).json({
+      message: 'Password login is not available for this account',
+    });
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
