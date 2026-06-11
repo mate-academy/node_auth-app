@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+
+<div class="form-card">
+  <h1>Registration Successful</h1>
+  <div class="alert alert-success">
+    <p>Your account has been created!</p>
+    <p>We sent an activation email to <strong><%= email %></strong>.</p>
+    <p>Please check your inbox and click the activation link.</p>
+  </div>
+  <p class="text-center">
+    <a href="/auth/login" class="btn btn-primary">Go to Login</a>
+  </p>
+</div>
+
+<%- include('../partials/footer') %>

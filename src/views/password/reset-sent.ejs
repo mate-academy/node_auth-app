@@ -1,0 +1,14 @@
+<%- include('../partials/header') %>
+
+<div class="form-card">
+  <h1>Email Sent</h1>
+  <div class="alert alert-success">
+    <p>If an account with <strong><%= email %></strong> exists, a password reset link has been sent.</p>
+    <p>Please check your inbox.</p>
+  </div>
+  <p class="text-center">
+    <a href="/auth/login" class="btn btn-primary">Back to Login</a>
+  </p>
+</div>
+
+<%- include('../partials/footer') %>
