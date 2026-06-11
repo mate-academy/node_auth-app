@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db_for_myFullStackApp
+    environment:
+      POSTGRES_USER: vladok
+      POSTGRES_PASSWORD: mytestdbpass
+      POSTGRES_DB: mainTestDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vladok -d mainTestDB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "3001:3001"
+    environment:
+      # Change these to your own values:
+      PORT: 3001
+      HOST: localhost
+      CLIENT_HOST: localhost
+      CLIENT_PORT: 5173
+      DATABASE_URL: postgresql://vladok:mytestdbpass@postgres:5432/mainTestDB?schema=sample
+      SMTP_USER: your_email@gmail.com
+      SMTP_PASS: your_gmail_app_password
+      JWT_KEY: your_jwt_secret
+      JWT_REFRESH_KEY: your_jwt_refresh_secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      # Map to 5173 so CORS config in backend stays unchanged
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local

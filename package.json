@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "init": "mate-scripts init",
-    "start": "node src/index.js",
+    "start": "cd src/backend && npm run dev",
     "lint": "npm run format && mate-scripts lint",
     "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
     "test:only": "mate-scripts test",
@@ -26,5 +26,13 @@
   },
   "mateAcademy": {
     "projectType": "javascript"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14",
+    "pg": "^8.20.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.8"
   }
 }
