@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+
+<div class="form-card">
+  <h1>Account Activation</h1>
+
+  <% if (success) { %>
+    <div class="alert alert-success">
+      <p>Your account has been activated successfully!</p>
+      <p>Redirecting to your profile...</p>
+    </div>
+    <script>
+      setTimeout(function() {
+        window.location.href = '/profile';
+      }, 2000);
+    </script>
+    <p class="text-center">
+      <a href="/profile" class="btn btn-primary">Go to Profile</a>
+    </p>
+  <% } else { %>
+    <div class="alert alert-error">
+      <p>Activation failed. The link may be invalid or expired.</p>
+    </div>
+    <p class="text-center">
+      <a href="/auth/login" class="btn btn-primary">Go to Login</a>
+    </p>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

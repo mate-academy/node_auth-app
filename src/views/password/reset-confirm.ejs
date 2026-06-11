@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+
+<div class="form-card">
+  <h1>Set New Password</h1>
+
+  <%- include('../partials/messages', { errors: errors }) %>
+
+  <form action="/password/reset/<%= token %>" method="POST">
+    <div class="form-group">
+      <label for="password">New Password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <div class="form-group">
+      <label for="confirmation">Confirm Password</label>
+      <input type="password" id="confirmation" name="confirmation" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Reset Password</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>
