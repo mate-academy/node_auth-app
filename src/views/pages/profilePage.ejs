@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles/styles.css" />
+    <title>Profile</title>
+  </head>
+  <body>
+    <%- include('../components/header.ejs', {isAuthorize}) %>
+    <main class="profile__main">
+
+      <% if (user.activationToken) { %>
+        <div  class="profile-banner">
+          <h2 class="profile-banner__title">Email not verified</h2>
+          <p class="profile-banner__text">
+            Please check your inbox and click the verification link to activate your account.
+          </p>
+        </div>
+      <% } %>
+
+      <h1 class="profile__title">
+        Profile😁
+      </h1>
+
+      <div class="user-info">
+        <div class="user-info__field">
+          <p><span>Name: </span> <%= user.name %> </p>
+
+          <button id="change-name-button" class="profile-info__button">Change name</button>
+
+          <form hidden class="profile-form" id="name-form">
+            <div class="profile-form__wrapper">
+              <input autocomplete="given-name" class="form-input profile-form__input" name="name" type="text"/>
+
+              <div class="profile-form__buttons">
+                <button class="form-button profile-form__button" type="submit">Change</button>
+                <button class="form-button profile-form__button cancel-button" type="reset">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="user-info__field">
+          <p><span>Email: </span> <%= user.email %> </p>
+
+          <button id="change-email-button" class="profile-info__button">Change email</button>
+
+          <form hidden class="profile-form" id="email-form">
+            <div class="profile-form__wrapper">
+              <div class="form-field">
+                <label for="password" class="profile-form__label">Password</label>
+
+                <input id="password"
+                  autocomplete="current-password"
+                  class="form-input profile-form__input"
+                  name="password"
+                  type="password"
+                  required
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="email" class="profile-form__label">New email</label>
+
+                <input id="email"
+                  autocomplete="username"
+                  class="form-input profile-form__input"
+                  name="email"
+                  type="email"
+                  required
+                />
+              </div>
+
+              <div class="profile-form__buttons">
+                <button class="form-button profile-form__button" type="submit">Change</button>
+                <button class="form-button profile-form__button cancel-button" type="reset">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="user-info__field">
+          <button id="change-password-button" class="profile-info__button profile-info__button--change-password"> Change password</button>
+
+          <form hidden class="profile-form" id="password-form">
+            <input
+              type="email"
+              name="email"
+              value="<%= user.email %>"
+              autocomplete="username"
+              hidden
+            >
+
+            <div class="profile-form__wrapper">
+              <div class="form-field">
+                <label for="current-password" class="profile-form__label">Current password</label>
+
+                <input id="current-password"
+                  autocomplete="current-password"
+                  class="form-input profile-form__input"
+                  name="current"
+                  type="password"
+                  required
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="new-password" class="profile-form__label">New password</label>
+
+                <input id="new-password"
+                  autocomplete="new-password"
+                  class="form-input profile-form__input"
+                  name="new"
+                  type="password"
+                  required
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="confirm-password" class="profile-form__label">Confirm password</label>
+
+                <input id="confirm-password"
+                  autocomplete="new-password"
+                  class="form-input profile-form__input"
+                  name="confirm"
+                  type="password"
+                  required
+                />
+              </div>
+
+              <div class="profile-form__buttons">
+                <button class="form-button profile-form__button" type="submit">Change</button>
+                <button class="form-button profile-form__button cancel-button" type="reset">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/scripts/pages/profile.mjs"></script>
+  </body>
+</html>

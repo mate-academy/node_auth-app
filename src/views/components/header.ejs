@@ -1,0 +1,30 @@
+<header>
+  <div class="header_flex-wrap">
+    <a href="<%= process.env.CLIENT_HOST%>" class="header-text">Auth APP</a>
+
+    <div class="header_button-wrap">
+      <% if (isAuthorize) { %>
+        <a
+          href="/profile/logout"
+          class="heade_auth-button log-out-button"
+        >
+          Log out
+        </a>
+      <% } else { %>
+        <a
+          href="/auth/login"
+          class="heade_auth-button sign-in-button"
+        >
+          Sign in
+        </a>
+
+        <a
+          href="/auth/register"
+          class="heade_auth-button sign-up-button"
+        >
+          Sign up
+        </a>
+      <% } %>
+    </div>
+  </div>
+</header>

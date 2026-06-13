@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles/styles.css" />
+    <title>Message</title>
+  </head>
+  <body>
+    <%- include('../components/header.ejs', {isAuthorize}) %>
+    <main>
+      <h1 style="padding-top: 20px;">
+        <%- message %>
+      </h1>
+    </main>
+  </body>
+</html>

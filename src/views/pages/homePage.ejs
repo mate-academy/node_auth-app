@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles/styles.css" />
+    <title>Auth App</title>
+  </head>
+  <body>
+    <%- include('../components/header.ejs', {isAuthorize}) %>
+    <main>
+      <h1 style="padding-top: 20px;">
+        Choose action:
+        <a style="color: #ea8436; text-decoration: none;" href="/auth/login">
+          authorization
+        </a>
+        ,
+        <a style="color: #ea8436; text-decoration: none;" href="/auth/register">
+          registration
+        </a>
+        or
+        <a style="color: #ea8436; text-decoration: none;" href="/profile">
+          go to profile
+        </a>
+      </h1>
+    </main>
+  </body>
+</html>
