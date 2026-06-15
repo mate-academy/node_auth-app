@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  email               String               @unique
+  password            String
+  activationToken     String?              @unique @map("activation_token")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  resetPasswordTokens ResetPasswordToken[]
+  changeEmailToken    ChangeEmailToken[]
+
+  @@map("users")
+}
+
+model ResetPasswordToken {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tokenHash String @unique
+  userId    String @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("reset_password_tokens")
+}
+
+model ChangeEmailToken {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  token String @unique
+  newEmail  String @unique
+  userId    String @db.Uuid
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("change_email_tokens")
+}

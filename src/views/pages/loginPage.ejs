@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/styles/styles.css" />
+    <title>Login</title>
+  </head>
+  <body>
+    <%- include('../components/header.ejs', {isAuthorize}) %>
+    <main class="form-main">
+      <form class="form">
+        <h2 class="form-title">Sign in</h2>
+
+        <div class="wrapper-inputs">
+          <div class="form-field">
+            <label class="form-label" for="registerEmail">Email</label>
+            <input
+              class="form-input"
+              id="registerEmail"
+              name="email"
+              type="email"
+              autocomplete="username"
+            />
+          </div>
+
+          <div class="form-field">
+            <label class="form-label" for="registerPassword">Password </label>
+
+            <input
+              class="form-input"
+              id="registerPassword"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+            />
+
+            <a href="/auth/login/forgot-password" class="form-reset-password">
+              Reset password
+            </a>
+          </div>
+        </div>
+
+        <button class="form-button">Login</button>
+      </form>
+    </main>
+
+    <script type="module" src="/scripts/pages/login.mjs"></script>
+  </body>
+</html>
