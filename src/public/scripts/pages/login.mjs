@@ -13,11 +13,13 @@ form.addEventListener('submit', async (e) => {
   const loginData = Object.fromEntries(formData);
   const respons = await authApi.login(loginData);
 
+  if (respons.status === 403) {
+    return (window.location.href = '/auth/activate');
+  }
+
   if (!respons.ok) {
     return formInputs.classList.add('bad-login');
   }
 
-  const newUrl = `${window.location.origin}/profile`;
-
-  window.location.replace(newUrl);
+  window.location.replace('/profile');
 });

@@ -30,5 +30,5 @@ module.exports = {
   getByEmail,
   updateUser,
   changePassword,
-  getById
+  getById,
 };

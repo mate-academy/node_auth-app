@@ -55,13 +55,6 @@ const loginPage = (req, res) => {
 };
 
 const actvationPage = (req, res) => {
-  const url = req.headers?.referer || process.env.CLIENT_HOST;
-  const pathname = new URL(url).pathname.split('/')[2] || null;
-
-  if (!pathname || pathname !== 'register') {
-    return res.redirect(process.env.CLIENT_HOST);
-  }
-
   res.render('showMessage', {
     isAuthorize: false,
     message: 'A confirmation code has been dispatched to your email.',
@@ -99,7 +92,11 @@ const login = async (req, res) => {
   const isValidPassword = await bcrypt.compare(password, user?.password || '');
 
   if (!user || !isValidPassword) {
-    return res.status(403).send('Invalid email or password');
+    return res.status(401).send('Invalid email or password');
+  }
+
+  if (user.activationToken) {
+    return res.status(403).json({ message: 'Account is not activated' });
   }
 
   const normalizeUser = userRepository.normalize(user);
@@ -146,7 +143,7 @@ const forgotPassword = async (req, res) => {
   res.sendStatus(205);
 };
 
-const restPasswordPage = async (req, res) => {
+const resetPasswordPage = async (req, res) => {
   const { accessToken } = req.cookies;
   const { token } = req.params;
   const isAuthorize = Boolean(jwt.verifyAccessToken(accessToken));
@@ -164,9 +161,6 @@ const resetPassword = async (req, res) => {
   const data = req.body;
   const newPassword = data['new-password'];
   const confirmPassword = data['confirm-password'];
-
-  console.log('here');
-
 
   const errors = {
     message: 'Wrong fields',
@@ -224,6 +218,6 @@ module.exports = {
   loginPage,
   forgotPasswordPage,
   forgotPassword,
-  restPasswordPage,
+  resetPasswordPage,
   resetPassword,
 };

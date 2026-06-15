@@ -9,16 +9,6 @@
   <body>
     <%- include('../components/header.ejs', {isAuthorize}) %>
     <main class="profile__main">
-
-      <% if (user.activationToken) { %>
-        <div  class="profile-banner">
-          <h2 class="profile-banner__title">Email not verified</h2>
-          <p class="profile-banner__text">
-            Please check your inbox and click the verification link to activate your account.
-          </p>
-        </div>
-      <% } %>
-
       <h1 class="profile__title">
         Profile😁
       </h1>

@@ -1,11 +1,12 @@
 'use strict';
 require('dotenv').config();
 
-const jwt = require('./utils/jwt.js');
-
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const jwt = require('./utils/jwt.js');
+const { isGuest } = require('./middleware/isGuestMiddleware.js');
+const { isAuthorize } = require('./middleware/isAuthorizeMiddleware.js');
 const { authRouter } = require('./routes/authRoute.js');
 const { profileRouter } = require('./routes/profileRoute.js');
 const { pagesRouter } = require('./routes/pagesRouter.js');
@@ -23,14 +24,14 @@ app.use(
 );
 
 app.use('/', pagesRouter);
-app.use('/auth', authRouter);
-app.use('/profile', profileRouter);
+app.use('/auth', isGuest, authRouter);
+app.use('/profile', isAuthorize, profileRouter);
 
 app.use('/', (req, res) => {
   const { accessToken } = req.cookies;
-  const isAuthorize = Boolean(jwt.verifyAccessToken(accessToken));
+  const isAuth = Boolean(jwt.verifyAccessToken(accessToken));
 
-  res.render('notFoundPage', { isAuthorize });
+  res.render('notFoundPage', { isAuthorize: isAuth });
 });
 
 app.listen(3000, () => {
