@@ -1,0 +1,73 @@
+<%- include('../partials/header') %>
+<div class="container">
+  <h1>Profile</h1>
+  <p style="margin-bottom:20px; color:#555;">Welcome, <strong><%= user.name %></strong>!</p>
+
+  <% if (success) { %>
+    <div class="success"><%= success %></div>
+  <% } %>
+  <% if (errors.length > 0) { %>
+    <div class="errors-list">
+      <% errors.forEach(e => { %>
+        <div class="error"><%= e.msg %></div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <h3 style="margin-bottom:10px;">Change Name</h3>
+  <form method="POST" action="/profile/name">
+    <div class="form-group">
+      <label>New Name</label>
+      <input type="text" name="name" value="<%= user.name %>">
+    </div>
+    <button type="submit">Update Name</button>
+  </form>
+
+  <hr style="margin: 25px 0;">
+
+  <h3 style="margin-bottom:10px;">Change Password</h3>
+  <form method="POST" action="/profile/password">
+    <div class="form-group">
+      <label>Old Password</label>
+      <input type="password" name="oldPassword">
+    </div>
+    <div class="form-group">
+      <label>New Password</label>
+      <input type="password" name="newPassword">
+    </div>
+    <div class="form-group">
+      <label>Confirm New Password</label>
+      <input type="password" name="confirmation">
+    </div>
+    <button type="submit">Update Password</button>
+  </form>
+
+  <hr style="margin: 25px 0;">
+
+<h3 style="margin-bottom:10px;">Change Email</h3>
+<form method="POST" action="/profile/email">
+  <div class="form-group">
+    <label>Current Email: <strong><%= user.email %></strong></label>
+  </div>
+  <div class="form-group">
+    <label>New Email</label>
+    <input type="email" name="newEmail">
+  </div>
+  <div class="form-group">
+    <label>Confirm New Email</label>
+    <input type="email" name="newEmailConfirmation">
+  </div>
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <input type="password" name="password">
+  </div>
+  <button type="submit">Update Email</button>
+</form>
+
+  <hr style="margin: 25px 0;">
+
+  <form method="POST" action="/logout">
+    <button type="submit" style="background:#e53935;">Logout</button>
+  </form>
+</div>
+</body></html>

@@ -1,0 +1,10 @@
+<%- include('../partials/header') %>
+<div class="container">
+  <h1>Account Activation</h1>
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="success">Your account has been activated! <a href="/login">Login</a></div>
+  <% } else { %>
+    <div class="errors-list"><div class="error">Invalid or expired activation link.</div></div>
+  <% } %>
+</div>
+</body></html>

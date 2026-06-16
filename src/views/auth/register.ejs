@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+<div class="container">
+  <h1>Register</h1>
+  <% if (errors.length > 0) { %>
+    <div class="errors-list">
+      <% errors.forEach(e => { %>
+        <div class="error"><%= e.msg %></div>
+      <% }) %>
+    </div>
+  <% } %>
+  <form method="POST" action="/register">
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" name="name" value="<%= values.name || '' %>">
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" name="email" value="<%= values.email || '' %>">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" name="password">
+      <small>Min 8 chars, 1 uppercase, 1 number, 1 special character</small>
+    </div>
+    <button type="submit">Register</button>
+  </form>
+  <div class="link"><a href="/login">Already have an account? Login</a></div>
+</div>
+</body></html>
+ 
