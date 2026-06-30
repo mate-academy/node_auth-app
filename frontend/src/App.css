@@ -1,0 +1,109 @@
+:root {
+  /* Теми за замовчуванням (Світла) */
+  --bg-color: #ffffff;
+  --card-bg: #f5f5f5;
+  --text-primary: #1a1a1a;
+  --text-secondary: #666666;
+  --accent: #000000;
+  --btn-text: #ffffff;
+  --danger: #d93025;
+  --success: #188038;
+  --border: #cccccc;
+}
+
+[data-theme='dark'] {
+  --bg-color: #0a0a0a;
+  --card-bg: #141414;
+  --text-primary: #e0e0e0;
+  --text-secondary: #888888;
+  --accent: #ffffff;
+  --btn-text: #000000;
+  --border: #333333;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.6;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Фікс накладання: додаємо gap для контейнерів */
+.page-container {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Запобігає прилипанню елементів */
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.auth-card {
+  background: var(--card-bg);
+  padding: 2.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Відступи всередині картки */
+}
+
+/* Навігація: додаємо flex-wrap, щоб меню не наїжджало на лого при вузькому екрані */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.navbar-menu {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+input {
+  width: 100%;
+  padding: 0.8rem;
+  background: transparent; /* Адаптується під тему */
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+button {
+  cursor: pointer;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--btn-text);
+}
