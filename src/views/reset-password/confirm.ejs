@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Встановлення нового пароля</title>
+</head>
+<body style="text-align: center; margin-top: 50px; font-family: sans-serif;">
+    <h1>Новий пароль</h1>
+
+    <form action="/password/reset/<%= token %>" method="POST" style="display: flex; flex-direction: column; width: 300px; margin: 0 auto;">
+        <input type="password" name="password" placeholder="Новий пароль" required style="margin-bottom: 15px; padding: 10px;">
+        <input type="password" name="confirmation" placeholder="Підтвердження пароля" required style="margin-bottom: 15px; padding: 10px;">
+        <button type="submit" style="padding: 10px; cursor: pointer;">Зберегти пароль</button>
+    </form>
+</body>
+</html>

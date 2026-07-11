@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Відновлення пароля</title>
+</head>
+<body style="text-align: center; margin-top: 50px; font-family: sans-serif;">
+    <h1>Забули пароль?</h1>
+    <p>Введіть свій email, і ми надішлемо посилання для відновлення.</p>
+
+    <form action="/password/reset" method="POST" style="display: flex; flex-direction: column; width: 300px; margin: 0 auto;">
+        <input type="email" name="email" placeholder="Ваш Email" required style="margin-bottom: 15px; padding: 10px;">
+        <button type="submit" style="padding: 10px; cursor: pointer;">Надіслати лист</button>
+    </form>
+</body>
+</html>
