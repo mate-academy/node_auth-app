@@ -3,9 +3,19 @@ const { v4: uuidv4 } = require('uuid');
 const User = require('../models/User');
 const { sendActivationMail } = require('../services/mailer');
 
+exports.getRegisterPage = (req, res) => {
+  res.render('register');
+};
+
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+
+    if (!password || password.length < 8) {
+      return res
+        .status(400)
+        .send('Пароль має містити щонайменше 8 символів. Спробуйте ще раз.');
+    }
 
     // 1. Перевіряємо, чи є вже такий юзер
     const existingUser = await User.findOne({ where: { email } });
@@ -55,6 +65,7 @@ exports.activateUser = async (req, res) => {
     user.isActive = true;
     user.activationToken = null;
     await user.save(); // Зберігаємо зміни в базу
+    req.session.userId = user.id;
 
     // 3. Перенаправляємо на сторінку профілю
     res.redirect('/profile');

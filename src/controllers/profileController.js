@@ -42,6 +42,12 @@ exports.updatePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword, confirmNewPassword } = req.body;
 
+    if (!newPassword || newPassword.length < 8) {
+      return res
+        .status(400)
+        .send('Новий пароль має містити щонайменше 8 символів.');
+    }
+
     // Перевіряємо, чи збігаються нові паролі
     if (newPassword !== confirmNewPassword) {
       return res.status(400).send('Нові паролі не збігаються');
@@ -80,9 +86,13 @@ exports.updatePassword = async (req, res) => {
 // Оновлюємо email
 exports.updateEmail = async (req, res) => {
   try {
-    const { newEmail, password } = req.body;
+    const { newEmail, confirmNewEmail, password } = req.body;
 
     const user = await User.findByPk(req.session.userId);
+
+    if (newEmail !== confirmNewEmail) {
+      return res.status(400).send('Адреси email не збігаються');
+    }
 
     if (!user) {
       return res.status(404).send('Користувача не знайдено');

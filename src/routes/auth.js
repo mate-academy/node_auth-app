@@ -9,6 +9,7 @@ const router = express.Router();
 router.get('/login', isNotAuthenticated, authController.getLoginPage);
 router.post('/login', isNotAuthenticated, authController.loginUser);
 router.post('/register', isNotAuthenticated, authController.registerUser);
+router.get('/register', isNotAuthenticated, authController.getRegisterPage);
 router.get('/activate/:token', isNotAuthenticated, authController.activateUser);
 
 // Захищені роути (доступні тільки авторизованим)

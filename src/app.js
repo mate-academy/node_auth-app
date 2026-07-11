@@ -40,10 +40,5 @@ app.use((req, res) => {
   res.status(404).render('404');
 });
 
-// 4. Тимчасовий тестовий роут, щоб перевірити, що все ок
-app.get('/', (req, res) => {
-  res.send('<h1>Сервер працює! EJS та Express налаштовані. 🚀</h1>');
-});
-
 // Експортуємо налаштований app
 module.exports = app;

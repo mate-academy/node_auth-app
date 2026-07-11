@@ -26,7 +26,7 @@ exports.sendResetLink = async (req, res) => {
 
     // Зберігаємо в базу
     user.resetToken = resetToken;
-    user.resetExpires = expireTime;
+    user.resetTokenExpires = expireTime;
     await user.save();
 
     // Відправляємо лист
@@ -49,7 +49,7 @@ exports.getResetPage = async (req, res) => {
     // Шукаємо юзера за токеном
     const user = await User.findOne({ where: { resetToken: token } });
 
-    if (!user || user.resetExpires < new Date()) {
+    if (!user || user.resetTokenExpires < new Date()) {
       return res
         .status(400)
         .send(
@@ -71,10 +71,16 @@ exports.getResetPage = async (req, res) => {
 exports.updatePassword = async (req, res) => {
   try {
     const { token } = req.params;
-    const { password, confirmPassword } = req.body;
+    const { password, confirmation } = req.body;
+
+    if (!password || password.length < 8) {
+      return res
+        .status(400)
+        .send('Новий пароль має містити щонайменше 8 символів.');
+    }
 
     // Перевіряємо, чи збігаються паролі
-    if (password !== confirmPassword) {
+    if (password !== confirmation) {
       return res.status(400).send('Паролі не збігаються. Спробуйте ще раз.');
     }
 
