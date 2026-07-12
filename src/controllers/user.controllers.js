@@ -1,6 +1,7 @@
 import { ApiError } from '../exeptions/api.error.js';
 import { userService } from '../services/user.service.js';
 import { authController } from './auth.controllers.js';
+import { emailService } from '../services/email.service.js';
 import bcrypt from 'bcrypt';
 
 const getAllActivated = async (req, res) => {
@@ -13,14 +14,12 @@ async function getOne(req, res) {
   const { userId } = req.params;
   const user = await userService.getOne(userId);
 
-  const errors = {
-    user:
-      (user.activationToken ? 'user is not activated' : undefined) ||
-      (!user ? 'user not found' : undefined),
-  };
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
 
-  if (errors.user) {
-    throw ApiError.notFound(errors);
+  if (user.activationToken) {
+    throw ApiError.notFound('User is not activated');
   }
 
   res.send(userService.normalize(user));
@@ -28,8 +27,13 @@ async function getOne(req, res) {
 
 async function update(req, res) {
   const { userId } = req.params;
-  const { name, password, newPwd, confirmNewPwd, email } = req.body;
+  const { name, password, newPwd, confirmNewPwd, email, confirmEmail } =
+    req.body;
   const user = await userService.getOne(userId);
+
+  if (!user) {
+    throw ApiError.notFound('User not found');
+  }
 
   if (email || (newPwd && confirmNewPwd)) {
     const isPwdCorrect = await bcrypt.compare(password, user.password);
@@ -40,18 +44,38 @@ async function update(req, res) {
       });
     }
 
-    const errors = {
-      password:
-        authController.validatePassword(newPwd) ||
-        (newPwd !== confirmNewPwd ? 'Passwords do not match' : undefined),
-    };
+    if (newPwd && confirmNewPwd) {
+      const errors = {
+        password:
+          authController.validatePassword(newPwd) ||
+          (newPwd !== confirmNewPwd ? 'Passwords do not match' : undefined),
+      };
 
-    if (errors.password) {
-      throw ApiError.badRequest('Bad request', errors);
+      if (errors.password) {
+        throw ApiError.badRequest('Bad request', errors);
+      }
+    }
+
+    if (email) {
+      const errors = {
+        email:
+          authController.validateEmail(email) ||
+          (email !== confirmEmail ? 'Emails do not match' : undefined),
+      };
+
+      if (errors.email) {
+        throw ApiError.badRequest('Bad request', errors);
+      }
     }
   }
 
+  const oldEmail = user.email;
+
   await userService.update(userId, name, newPwd, email);
+
+  if (email && email !== oldEmail) {
+    await emailService.sendEmailChangeNotification(oldEmail, email);
+  }
 
   const updatedUser = await userService
     .getOne(userId)

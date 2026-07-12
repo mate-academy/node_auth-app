@@ -74,6 +74,13 @@ const login = async (req, res) => {
   if (!isPasswordValid) {
     throw ApiError.badRequest('Wrong password');
   }
+
+  if (user.activationToken) {
+    throw ApiError.badRequest('User is not activated', {
+      email: 'Please activate your account before logging in',
+    });
+  }
+
   generateToken(res, user);
 };
 
@@ -87,7 +94,11 @@ const refresh = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  const user = await userService.findById(userData.id);
+  const user = await userService.getOne(userData.id);
+
+  if (!user) {
+    throw ApiError.unauthorized();
+  }
 
   generateToken(res, user);
 };
@@ -117,6 +128,7 @@ const logout = async (req, res) => {
   }
 
   await tokenService.remove(userData.id);
+  res.clearCookie('refreshToken');
 
   res.sendStatus(204);
 };
@@ -129,7 +141,7 @@ async function reqPwdReset(req, res) {
     email:
       validateEmail(email) ||
       (!user ? 'Email not found' : undefined) ||
-      (user.activationToken ? 'User not activated' : undefined),
+      (user?.activationToken ? 'User not activated' : undefined),
   };
 
   if (errors.email) {
@@ -161,6 +173,10 @@ async function pwdReset(req, res) {
   const { pwdResetToken } = req.params;
   const { password, confirmPassword } = req.body;
   const user = await User.findOne({ where: { pwdResetToken } });
+
+  if (!user) {
+    throw ApiError.badRequest('Bad request', { token: 'invalid token' });
+  }
 
   const errors = {
     password:

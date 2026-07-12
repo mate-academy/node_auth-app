@@ -26,6 +26,11 @@ app.use('/users', userRouter);
 app.get('/', (req, res) => {
   res.send('Hello');
 });
+
+app.use((req, res) => {
+  res.status(404).json({ message: 'Not found' });
+});
+
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {

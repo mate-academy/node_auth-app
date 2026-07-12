@@ -9,10 +9,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASSWORD,
   },
 });
-// const info = await transporter.sendMail({
-//   from: 'Auth API',
-//   to: 'serado8127@inkight.com',
-// });
 
 export function send(email, subject, html) {
   return transporter.sendMail({
@@ -39,11 +35,22 @@ function sendResetEmail(email, token) {
   <h1>Reset password</h1>
   <p>Password reset requested. Click <a href="${href}">here</a> to reset your password.</p>`;
 
-  send(email, 'Reset password', html);
+  return send(email, 'Reset password', html);
+}
+
+function sendEmailChangeNotification(oldEmail, newEmail) {
+  const html = `
+    <h1>Email changed</h1>
+    <p>Ваш email был изменён на <strong>${newEmail}</strong>.
+    Если это были не вы — срочно обратитесь в поддержку.</p>
+  `;
+
+  return send(oldEmail, 'Email change notification', html);
 }
 
 export const emailService = {
   send,
   sendActivationLink,
   sendResetEmail,
+  sendEmailChangeNotification,
 };

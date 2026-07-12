@@ -1,4 +1,3 @@
-// import nodemailer from 'nodemailer';
 import 'dotenv/config';
 import { User } from '../models/user.js';
 import { ApiError } from '../exeptions/api.error.js';
