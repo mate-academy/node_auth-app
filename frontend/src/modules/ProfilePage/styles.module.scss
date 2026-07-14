@@ -1,0 +1,148 @@
+@use '@/shared/styles' as *;
+
+.container {
+  @include padding-container;
+  min-height: 80vh;
+  padding-bottom: 40px;
+}
+
+.content {
+  margin-top: 30px;
+}
+
+.image {
+  width: 100%;
+}
+
+.formContainer {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @include on-tablet {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    column-gap: 15px;
+  }
+
+  @include on-desktop {
+    column-gap: 30px;
+  }
+}
+.colomn1 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  grid-column: 1;
+}
+
+.colomn2 {
+  display: flex;
+  gap: 20px;
+  flex-direction: column;
+  grid-column: 2;
+}
+
+.input {
+  box-sizing: border-box;
+  border: 1px solid var(--text);
+  height: 2rem;
+  padding: 10px;
+  background-color: transparent;
+  color: var(--h);
+}
+.title {
+  margin-bottom: 10px;
+}
+
+.label {
+  color: var(--h);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.formInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form {
+  height: fit-content;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.185);
+  background-color: var(--bg);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px 25px;
+  border: 1px solid var(--line-and-border);
+}
+
+.button {
+  font-size: 14px;
+  width: fit-content;
+  padding-inline: 30px;
+  margin-top: 10px;
+  height: 2.5rem;
+}
+
+.buttonLogout {
+  font-size: 14px;
+  width: fit-content;
+  font-weight: 600;
+  border: 1px solid rgba(231, 13, 13, 0.897);
+  border-radius: 10px;
+  background-color: transparent;
+  box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.123);
+  color: rgba(231, 13, 13, 0.897);
+  padding-inline: 30px;
+  margin-top: 10px;
+  height: 2.5rem;
+
+  transition: box-shadow $transition;
+
+  &:hover {
+    border: 1px solid rgb(255, 38, 38);
+    color: rgb(255, 38, 38);
+    box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.288);
+  }
+}
+
+.warning {
+  display: flex;
+  padding: 15px;
+  gap: 10px;
+  background-color: color-mix(in srgb, var(--accent2), transparent 90%);
+  color: var(--accent2);
+  border-radius: 5px;
+}
+
+.iconWarning {
+  color: var(--accent);
+}
+
+.fieldError {
+  color: red;
+}
+
+.errorNotification {
+  padding: 15px;
+  gap: 10px;
+  background-color: color-mix(in srgb, red, transparent 90%);
+  color: red;
+  border-radius: 5px;
+}
+
+.successNotification {
+  padding: 15px;
+  gap: 10px;
+  background-color: color-mix(in srgb, green, transparent 90%);
+  color: green;
+  border-radius: 5px;
+}

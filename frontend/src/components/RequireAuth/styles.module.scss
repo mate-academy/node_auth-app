@@ -1,0 +1,13 @@
+@use '@/shared/styles' as *;
+
+.container {
+  @include padding-container;
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image {
+  width: 100%;
+}
