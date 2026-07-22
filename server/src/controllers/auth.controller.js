@@ -113,12 +113,12 @@ const authController = {
   }),
 
   me: asyncHandler(async (req, res) => {
-    const session = await refreshUserSession(req.cookies.refreshToken);
+    const { user, tokens } = await refreshUserSession(req.cookies.refreshToken);
 
-    setAuthCookies(res, session.tokens);
+    setAuthCookies(res, tokens);
 
     res.json({
-      user: session.user.toPublicJSON(),
+      user: user.toPublicJSON(),
     });
   }),
 
