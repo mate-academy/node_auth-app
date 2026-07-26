@@ -1,6 +1,7 @@
 'use strict';
 
-const dotenv = require('dotenv');
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const { router: messageRouter } = require('./routes/messages.route');
@@ -13,8 +14,6 @@ const { errorMiddleware } = require('./middlewares/error.middleware');
 const cookieparser = require('cookie-parser');
 
 require('./utils/dbDependencies');
-
-dotenv.config();
 
 const app = express();
 
