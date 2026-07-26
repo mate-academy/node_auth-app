@@ -17,5 +17,8 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2"
   }
 }
