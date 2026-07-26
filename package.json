@@ -2,11 +2,11 @@
   "name": "node_chat",
   "version": "1.0.0",
   "description": "Chat using Node.js",
-  "main": "src/index.js",
+  "main": "src/server/index.js",
   "scripts": {
     "init": "mate-scripts init",
     "dev": "vite",
-    "start": "node src/index.js",
+    "start": "node src/server/index.js",
     "lint": "npm run format && mate-scripts lint",
     "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
     "test:only": "mate-scripts test",

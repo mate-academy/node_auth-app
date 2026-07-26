@@ -1,5 +1,5 @@
 import { authClient } from '../http/authClient.js';
-import { User } from '../types/User';
+import { User } from '../types/User.js';
 
 interface Credentials {
   email: string;
