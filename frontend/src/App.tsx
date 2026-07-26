@@ -5,20 +5,20 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import './styles.scss';
 import './styles/index.scss';
 
-import { AccountActivationPage } from './pages/AccountActivationPage';
-import { AuthContext } from './components/AuthContext';
-import { LoginPage } from './pages/LoginPage';
-import { RegistrationPage } from './pages/RegistrationPage';
-import { RequireAuth } from './components/RequireAuth';
+import { AccountActivationPage } from './pages/AccountActivationPage.js';
+import { AuthContext } from './components/AuthContext.js';
+import { LoginPage } from './pages/LoginPage.js';
+import { RegistrationPage } from './pages/RegistrationPage.js';
+import { RequireAuth } from './components/RequireAuth.js';
 import { Loader } from './components/Loader.js';
 import { HomePage } from './pages/HomePage.js';
 import { usePageError } from './hooks/usePageError.js';
-import { ChatPage } from './pages/ChatPage';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { EmailConfirmationPage } from './pages/EmailConfirmationPage';
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
-import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { ChatPage } from './pages/ChatPage.js';
+import { NotFoundPage } from './pages/NotFoundPage.js';
+import { ProfilePage } from './pages/ProfilePage.js';
+import { EmailConfirmationPage } from './pages/EmailConfirmationPage.js';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage.js';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.js';
 
 function App() {
   const navigate = useNavigate();
