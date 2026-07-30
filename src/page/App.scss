@@ -1,0 +1,32 @@
+@use './components/sign/signPage';
+@use './components/homepage/home';
+@use './components/registered/registered';
+@use './components/activatepage/activate';
+@use './components/login/loginPage';
+@use './components/profile/profile';
+@use './components/recoverPassword/recoverPage';
+@use './components/changePassword/changePassword';
+@use './components/notFound/notFound';
+@use './utils/mixins';
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  overflow: hidden;
+  font-family: 'Roboto', sans-serif;
+}
+
+.App {
+  height: 100dvh;
+
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}

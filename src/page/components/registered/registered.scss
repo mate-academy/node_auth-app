@@ -1,0 +1,28 @@
+.registered {
+  height: 1060px;
+  width: auto;
+
+  &__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+
+   &__title {
+    color: black;
+    font-size: 32px;
+    margin-top: 150px;
+    margin-bottom: 25px;
+    text-align: center;
+  }
+  &__paragraph {
+     color: black;
+    font-size: 15px;
+    margin-top: 10px;
+    margin-bottom: 65px;
+    text-align: center;
+
+  }
+
+}

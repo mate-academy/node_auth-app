@@ -1,0 +1,130 @@
+@use '../../utils/mixins' as *;
+
+
+.login-page {
+  height: 100dvb;
+  width: auto;
+
+  &__container {
+    @include page-grid;
+  }
+
+&__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 100px;
+    grid-column: -1 / 1;
+
+    @include on-tablets {
+    grid-column: 3 / 5;
+    margin-bottom: 100px;
+    width: 100%;
+
+    }
+     @include on-desktop {
+    grid-column: 2 / 5;
+    width: 100%;
+
+    }
+
+  }
+
+  &__title {
+    color: black;
+    font-size: 32px;
+    margin-top: 150px;
+    margin-bottom: 65px;
+  }
+
+   &__image {
+     height: 800px;
+    width: auto;
+      grid-column: -1 / 1;
+       border-top-right-radius: 60px;
+
+
+    @include on-tablets {
+       border-top-right-radius: 60px;
+    }
+    @include on-desktop {
+    grid-column: 7 / 13;
+    height: 100vh;
+    width: auto;
+       border-top-right-radius: 0;
+
+    }
+
+    display: inline-block;
+    background-image: url('../../../../images/plant.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-bottom-left-radius: 60px;
+
+  }
+
+
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  align-items: flex-start;
+  gap: 14px;
+
+  @include on-tablets {
+  width: 100%;
+  }
+
+  &-label {
+    margin: 0;
+  }
+
+  &-text-name {
+    width: 100%;
+    height: 30px;
+    margin: 0;
+
+    @include on-tablets {
+    align-items: flex-start;
+
+    }
+    @include on-desktop {
+    height: 30px;
+    }
+
+    border: 1px solid #555;
+    border-radius: 8px;
+
+
+  }
+
+  &-button {
+      display: block;
+    background-color: #3A5B22;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    height: 30px;
+
+    @include on-tablets {
+    width: 100%;
+    height: 30px;
+    }
+
+
+
+  }
+
+  &-text-alert {
+    margin: 0;
+    color: red;
+    background-color: rgb(200, 162, 162);
+    width: 100%;
+    height: 20px;
+  }
+
+}
