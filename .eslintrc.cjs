@@ -7,7 +7,7 @@ module.exports = {
     jest: true,
   },
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint'], // 👈 Adiciona o plugin do TypeScript
+  plugins: ['@typescript-eslint'],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -18,6 +18,6 @@ module.exports = {
   rules: {
     'no-proto': 0,
     'no-shadow': 'off',
-    '@typescript-eslint/no-shadow': 'error', // Ativa a versão para TypeScript
+    '@typescript-eslint/no-shadow': 'error',
   },
 };
