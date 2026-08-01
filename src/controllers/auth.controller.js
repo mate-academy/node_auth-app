@@ -1,11 +1,11 @@
-import bcrypt from 'bcrypt';
-import { User } from '../models/user.model.js';
-import { userService } from '../services/user.service.js';
-import { jwtService } from '../services/jwt.service.js';
-import { ApiError } from '../exeptions/api.error.js';
-import { tokenService } from '../services/token.service.js';
-import { emailService } from '../services/email.service.js';
-import { v4 as uuidv4 } from 'uuid';
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
+const { User } = require('../models/User.model.js');
+const { userService } = require('../services/user.service.js');
+const { jwtService } = require('../services/jwt.service.js');
+const { ApiError } = require('../exeptions/api.error.js');
+const { tokenService } = require('../services/token.service.js');
+const { emailService } = require('../services/email.service.js');
 
 function validateEmail(value) {
   if (!value) {
@@ -95,6 +95,10 @@ const login = async (req, res) => {
     throw ApiError.badRequest('Wrong password');
   }
 
+  if (user.activationToken) {
+    throw ApiError.badRequest('Please activate your email first');
+  }
+
   await generateTokens(res, user);
 };
 
@@ -108,7 +112,7 @@ const refresh = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  generateTokens(res, user);
+  await generateTokens(res, user);
 };
 
 const generateTokens = async (res, user) => {
@@ -201,7 +205,7 @@ const processResetPassword = async (req, res) => {
   res.sendStatus(204);
 };
 
-export const authController = {
+const authController = {
   register,
   activate,
   login,
@@ -210,3 +214,5 @@ export const authController = {
   processResetPassword,
   resetPassword,
 };
+
+module.exports = { authController };

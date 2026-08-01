@@ -1,6 +1,9 @@
-import 'dotenv/config';
-import { client } from './src/utils/db.js';
-import './src/models/models.js';
+require('dotenv/config');
+const { client } = require('./src/utils/db.js');
 
-await client.sync({ force: true });
-await client.close();
+require('./src/models/models.js');
+
+(async () => {
+  await client.sync({ force: true });
+  await client.close();
+})();

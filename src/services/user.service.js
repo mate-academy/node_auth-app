@@ -1,8 +1,8 @@
-import bcrypt from 'bcrypt';
-import { User } from '../models/User.model.js';
-import { v4 as uuidv4 } from 'uuid';
-import { ApiError } from '../exeptions/api.error.js';
-import { emailService } from './email.service.js';
+const bcrypt = require('bcrypt');
+const { v4: uuidv4 } = require('uuid');
+const { User } = require('../models/User.model.js');
+const { ApiError } = require('../exeptions/api.error.js');
+const { emailService } = require('./email.service.js');
 
 function getAllActivated() {
   return User.findAll({
@@ -69,6 +69,12 @@ async function updatePassword({
   if (!oldPassword || !newPassword) {
     throw ApiError.badRequest('Validation error', {
       password: 'Password is required',
+    });
+  }
+
+  if (!confirmation) {
+    throw ApiError.badRequest('Validation error', {
+      confirmation: 'Confirmation is required',
     });
   }
 
@@ -164,7 +170,7 @@ function normalize({ id, email, name }) {
   return { id, email, name };
 }
 
-export const userService = {
+const userService = {
   getAllActivated,
   findByEmail,
   register,
@@ -174,3 +180,5 @@ export const userService = {
   requestEmailChange,
   confirmEmailChange,
 };
+
+module.exports = { userService };

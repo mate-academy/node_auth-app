@@ -1,4 +1,4 @@
-import { userService } from '../services/user.service.js';
+const { userService } = require('../services/user.service.js');
 
 const getAllActivated = async (req, res) => {
   const rawUsers = await userService.getAllActivated();
@@ -46,10 +46,12 @@ const confirmEmailChange = async (req, res) => {
   res.send(userService.normalize(user));
 };
 
-export const userController = {
+const userController = {
   getAllActivated,
   updateName,
   updatePassword,
   requestEmailChange,
   confirmEmailChange,
 };
+
+module.exports = { userController };

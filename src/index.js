@@ -1,12 +1,13 @@
-import 'dotenv/config';
-import './models/models.js';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import express from 'express';
-import { authRouter } from './routes/auth.route.js';
-import { userRouter } from './routes/user.route.js';
-import { errorMiddleware } from './middlewares/errorMiddleware.js';
-import { ApiError } from './exeptions/api.error.js';
+require('dotenv/config');
+require('./models/models.js');
+
+const express = require('express');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const { authRouter } = require('./routes/auth.route.js');
+const { userRouter } = require('./routes/user.route.js');
+const { errorMiddleware } = require('./middlewares/errorMiddleware.js');
+const { ApiError } = require('./exeptions/api.error.js');
 
 const PORT = process.env.PORT || 3005;
 
@@ -25,8 +26,8 @@ app.use(
 app.use(authRouter);
 app.use('/users', userRouter);
 
-app.use(() => {
-  throw ApiError.notFound();
+app.use((req, res, next) => {
+  next(ApiError.notFound());
 });
 
 app.use(errorMiddleware);

@@ -1,9 +1,11 @@
-import { client } from '../utils/db.js';
-import { DataTypes } from 'sequelize';
+const { DataTypes } = require('sequelize');
+const { client } = require('../utils/db.js');
 
-export const Token = client.define('Token', {
+const Token = client.define('Token', {
   refreshToken: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 });
+
+module.exports = { Token };

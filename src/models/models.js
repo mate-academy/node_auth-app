@@ -1,7 +1,7 @@
-import { User } from './User.model.js';
-import { Token } from './Token.model.js';
+const { User } = require('./User.model.js');
+const { Token } = require('./Token.model.js');
 
 User.hasOne(Token, { onDelete: 'CASCADE' });
 Token.belongsTo(User);
 
-export { User, Token };
+module.exports = { User, Token };
