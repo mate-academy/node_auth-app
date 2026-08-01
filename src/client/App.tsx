@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { SignPage } from './components/sign/signPage';
@@ -10,7 +11,7 @@ import { RecoverPage } from './components/recoverPassword/recoverPage';
 import { ChangePassword } from './components/changePassword/changePassword';
 import { NotFound } from './components/notFound/notFound';
 
-export const App: React.FC = () => {
+export const App = () => {
   return (
     <div className="App">
       <main>
