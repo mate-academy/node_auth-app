@@ -26,21 +26,21 @@
     "prettier": "^3.3.2"
   },
   "mateAcademy": {
-  "projectType": "javascript"
-},
-"eslintConfig": {
-  "extends": "@mate-academy/eslint-config",
-  "env": {
-    "jest": true
+    "projectType": "javascript"
   },
-  "rules": {
-    "no-proto": 0
+  "eslintConfig": {
+    "extends": "@mate-academy/eslint-config",
+    "env": {
+      "jest": true
+    },
+    "rules": {
+      "no-proto": 0
+    },
+    "plugins": [
+      "jest"
+    ]
   },
-  "plugins": [
-    "jest"
-  ]
-},
-"dependencies": {
+  "dependencies": {
     "acorn": "^8.12.1",
     "acorn-jsx": "^5.3.2",
     "ajv": "^6.12.6",
@@ -86,6 +86,7 @@
     "commander": "^5.1.0",
     "concat-map": "^0.0.1",
     "convert-source-map": "^2.0.0",
+    "cors": "^2.8.6",
     "create-jest": "^29.7.0",
     "cross-env": "^7.0.3",
     "cross-spawn": "^7.0.3",
@@ -257,6 +258,7 @@
     "json-stable-stringify-without-jsonify": "^1.0.1",
     "json5": "^2.2.3",
     "jsonfile": "^6.1.0",
+    "jsonwebtoken": "^9.0.3",
     "just-extend": "^4.2.1",
     "keyv": "^4.5.4",
     "kleur": "^3.0.3",
@@ -283,6 +285,7 @@
     "node-fetch": "^2.7.0",
     "node-int64": "^0.4.0",
     "node-releases": "^2.0.18",
+    "nodemailer": "^9.0.3",
     "nodemon": "^3.1.14",
     "normalize-path": "^3.0.0",
     "npm-run-path": "^4.0.1",
@@ -389,6 +392,7 @@
     "universalify": "^2.0.1",
     "update-browserslist-db": "^1.1.0",
     "uri-js": "^4.4.1",
+    "uuid": "^14.0.1",
     "v8-to-istanbul": "^9.3.0",
     "walker": "^1.0.8",
     "webidl-conversions": "^3.0.1",

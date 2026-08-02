@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { client } from '../utils/db.js';
 
-export const user = client.define('user', {
+export const User = client.define('user', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -10,5 +10,9 @@ export const user = client.define('user', {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  activationToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 });
