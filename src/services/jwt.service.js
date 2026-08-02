@@ -14,7 +14,23 @@ function verify(token) {
   }
 }
 
+function signRefresh(user) {
+  const token = jwt.sign(user, process.env.JWT_REFRESH_KEY);
+
+  return token;
+}
+
+function verifyRefresh(token) {
+  try {
+    return jwt.verify(token, process.env.JWT_REFRESH_KEY);
+  } catch (error) {
+    return null;
+  }
+}
+
 export const jwtService = {
   sign,
   verify,
+  signRefresh,
+  verifyRefresh,
 };
