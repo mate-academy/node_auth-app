@@ -1,4 +1,5 @@
 'use strict';
+
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -33,12 +34,15 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync({ alter: true }); // Створить таблиці, якщо їх немає
+    // eslint-disable-next-line no-console
     console.log('✅ Підключення до бази даних PostgreSQL успішне');
 
     app.listen(PORT, () => {
+      // eslint-disable-next-line no-console
       console.log(`🚀 Сервер запущено на порту ${PORT}`);
     });
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('❌ Помилка підключення до бази даних:', error);
   }
 };

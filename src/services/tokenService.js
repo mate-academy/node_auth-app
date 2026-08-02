@@ -24,13 +24,13 @@ class TokenService {
       where: { userId, type: 'refresh' },
     });
 
-    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 днів
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
     if (tokenData) {
       tokenData.token = refreshToken; // Використовуємо поле 'token'
       tokenData.expiresAt = expiresAt;
 
-      return await tokenData.save();
+      return tokenData.save();
     }
 
     const token = await Token.create({
@@ -46,7 +46,7 @@ class TokenService {
   // 3. Видалення токена з БД (при logout)
   async removeToken(refreshToken) {
     const tokenData = await Token.destroy({
-      where: { token: refreshToken, type: 'refresh' }
+      where: { token: refreshToken, type: 'refresh' },
     });
 
     return tokenData;

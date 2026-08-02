@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const { userService } = require('../services/userService.js');
+const tokenService = require('../services/tokenService.js');
 
 class AuthController {
   // 1. Реєстрація користувача
@@ -7,6 +8,7 @@ class AuthController {
     try {
       // Перевіряємо помилки валідації (з express-validator)
       const errors = validationResult(req);
+
       if (!errors.isEmpty()) {
         return res
           .status(400)
@@ -50,8 +52,15 @@ class AuthController {
   async logout(req, res, next) {
     try {
       const { refreshToken } = req.cookies;
+
+      // 1. Видаляємо токен з БД (якщо він був у куках)
+      if (refreshToken) {
+        await tokenService.removeToken(refreshToken);
+      }
+
       // Очищаємо куку при виході
       res.clearCookie('refreshToken');
+
       return res.json({ message: 'Успішний вихід' });
     } catch (e) {
       next(e);

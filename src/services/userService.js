@@ -35,7 +35,7 @@ class UserService {
 
     await mailService.sendActivationMail(
       email,
-      `${process.env.API_URL}/api/activate/${activationToken}`
+      `${process.env.API_URL}/api/activate/${activationToken}`,
     );
 
     // 5. Формуємо DTO і ґенеруємо токени
