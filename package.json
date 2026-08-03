@@ -30,16 +30,28 @@
     "projectType": "javascript"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.3.1",
+    "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
+    "bulma": "^1.0.4",
+    "classnames": "^2.5.1",
     "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
+    "formik": "^2.4.9",
+    "jsonwebtoken": "^9.0.3",
     "nodemailer": "^9.0.3",
     "pg": "^8.22.0",
     "pg-hstore": "^2.3.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2",
+    "sass": "^1.102.0",
     "sequelize": "^6.37.8",
-    "uuid": "^14.0.1"
+    "uuid": "^14.0.1",
+    "zod": "^4.4.3"
   }
 }

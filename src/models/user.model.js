@@ -1,11 +1,10 @@
 import { DataTypes } from 'sequelize';
-import { sequelize } from '../config/database.js';
+import { client } from '../utils/db.js';
 
-const User = sequelize.define('User', {
+const User = client.define('User', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    allowNull: false,
     autoIncrement: true,
   },
   name: {
@@ -30,6 +29,11 @@ const User = sequelize.define('User', {
   },
   activationToken: {
     type: DataTypes.STRING,
+    allowNull: true,
+  },
+  refreshToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 });
 

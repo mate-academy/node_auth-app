@@ -1,26 +1,33 @@
-/* eslint-disable no-console */
 'use strict';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import express from 'express';
-import { sequelize } from './config/database.js';
-import { router } from './routes/auth.routes.js';
-import './models/user.model.js';
+import { authRouter } from './routes/auth.route.js';
+import cors from 'cors';
+import './setup.js';
+import { userRouter } from './routes/user.route.js';
+import { errorMiddleware } from './middlewares/error.middleware.js';
+import cookieParser from 'cookie-parser';
 
-dotenv.config();
-
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3005;
 
 const app = express();
 
 app.use(express.json());
-app.use(router);
+app.use(cookieParser());
 
-app.get('/', (req, res) => {
-  res.send('hello');
-});
+app.use(
+  cors({
+    origin: process.env.CLIENT_HOST,
+    credentials: true,
+  }),
+);
 
-await sequelize.sync();
+app.use('/auth', authRouter);
+app.use('/users', userRouter);
+
+app.use(errorMiddleware);
 
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log('Server is running!');
 });
