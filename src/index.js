@@ -3,10 +3,15 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
+
 import { authRouter } from './routes/auth.route.js';
 import { userRouter } from './routes/user.route.js';
 import { errorMiddleware } from './middlewares/errorMiddleware.js';
-import cookieParser from 'cookie-parser';
+import { client } from './utils/db.js';
+
+import './models/user.js';
+import './models/token.js';
 
 const PORT = process.env.PORT || 3005;
 
@@ -26,9 +31,24 @@ app.use('/auth', authRouter);
 app.use('/users', userRouter);
 
 app.get('/', (req, res) => {
-  res.send('Hello');
+  res.send({
+    message: 'Auth API is working',
+  });
+});
+
+app.use((req, res) => {
+  res.status(404).send({
+    message: 'Page not found',
+  });
 });
 
 app.use(errorMiddleware);
 
-app.listen(PORT);
+async function startServer() {
+  await client.authenticate();
+  await client.sync({ alter: true });
+
+  app.listen(PORT);
+}
+
+startServer();

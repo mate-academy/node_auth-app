@@ -1,6 +1,6 @@
 import { User } from '../models/user.js';
 import { ApiError } from '../exeptions/api.error.js';
-import { emailService } from '../services/email.service.js';
+import { emailService } from './email.service.js';
 import { v4 as uuidv4 } from 'uuid';
 
 function getAllActivated() {
@@ -11,15 +11,25 @@ function getAllActivated() {
   });
 }
 
-function normalize({ id, email }) {
-  return { id, email };
+function normalize({ id, name, email }) {
+  return {
+    id,
+    name,
+    email,
+  };
 }
 
 function findByEmail(email) {
-  return User.findOne({ where: { email } });
+  return User.findOne({
+    where: { email },
+  });
 }
 
-async function register(email, password) {
+function findById(id) {
+  return User.findByPk(id);
+}
+
+async function register(name, email, password) {
   const activationToken = uuidv4();
 
   const existUser = await findByEmail(email);
@@ -30,7 +40,12 @@ async function register(email, password) {
     });
   }
 
-  await User.create({ email, password, activationToken });
+  await User.create({
+    name,
+    email,
+    password,
+    activationToken,
+  });
 
   await emailService.sendActivationEmail(email, activationToken);
 }
@@ -39,5 +54,6 @@ export const userService = {
   getAllActivated,
   normalize,
   findByEmail,
+  findById,
   register,
 };
