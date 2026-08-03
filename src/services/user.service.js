@@ -29,6 +29,12 @@ function findById(id) {
   return User.findByPk(id);
 }
 
+function findByEmailChangeToken(emailChangeToken) {
+  return User.findOne({
+    where: { emailChangeToken },
+  });
+}
+
 async function register(name, email, password) {
   const activationToken = uuidv4();
 
@@ -55,5 +61,6 @@ export const userService = {
   normalize,
   findByEmail,
   findById,
+  findByEmailChangeToken,
   register,
 };

@@ -2,15 +2,17 @@ import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
+  port: Number(process.env.SMTP_PORT),
+  secure: Number(process.env.SMTP_PORT) === 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
   },
 });
 
-export function send({ email, subject, html }) {
+function send({ email, subject, html }) {
   return transporter.sendMail({
+    from: process.env.SMTP_USER,
     to: email,
     subject,
     html,
@@ -19,15 +21,62 @@ export function send({ email, subject, html }) {
 
 function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_HOST}/activate/${token}`;
-  const html = `
-    <h1>Activate account</h1>
-    <a href="${href}">${href}</a>
-    `;
 
-  return send({ email, html, subject: 'Activate' });
+  const html = `
+    <h1>Activate your account</h1>
+    <p>Click the link below to activate your account:</p>
+    <a href="${href}">${href}</a>
+  `;
+
+  return send({
+    email,
+    subject: 'Activate your account',
+    html,
+  });
+}
+
+function sendEmailChangeConfirmation(newEmail, token) {
+  const href =
+    `${process.env.API_HOST || 'http://localhost:3005'}` +
+    `/users/profile/email/confirm/${token}`;
+
+  const html = `
+    <h1>Confirm your new email</h1>
+    <p>Click the link below to confirm this email address:</p>
+    <a href="${href}">${href}</a>
+    <p>This link is valid for one hour.</p>
+  `;
+
+  return send({
+    email: newEmail,
+    subject: 'Confirm your new email',
+    html,
+  });
+}
+
+function sendOldEmailNotification(oldEmail, newEmail) {
+  const html = `
+    <h1>Your email address was changed</h1>
+    <p>
+      The email address for your account was changed
+      from <strong>${oldEmail}</strong>
+      to <strong>${newEmail}</strong>.
+    </p>
+    <p>
+      If you did not make this change, contact support immediately.
+    </p>
+  `;
+
+  return send({
+    email: oldEmail,
+    subject: 'Your email address was changed',
+    html,
+  });
 }
 
 export const emailService = {
-  sendActivationEmail,
   send,
+  sendActivationEmail,
+  sendEmailChangeConfirmation,
+  sendOldEmailNotification,
 };

@@ -1,11 +1,13 @@
 import { jwtService } from '../services/jwt.service.js';
+import { ApiError } from '../exeptions/api.error.js';
 
 export const authMiddleware = (req, res, next) => {
-  const authorization = req.headers['authorization'] || '';
-  const [, token] = authorization.split(' ');
+  const authorization = req.headers.authorization || '';
 
-  if (!authorization || !token) {
-    res.sendStatus(401);
+  const [type, token] = authorization.split(' ');
+
+  if (type !== 'Bearer' || !token) {
+    next(ApiError.unauthorized());
 
     return;
   }
@@ -13,10 +15,12 @@ export const authMiddleware = (req, res, next) => {
   const userData = jwtService.verify(token);
 
   if (!userData) {
-    res.sendStatus(401);
+    next(ApiError.unauthorized());
 
     return;
   }
+
+  req.user = userData;
 
   next();
 };
