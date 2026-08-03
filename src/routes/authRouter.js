@@ -3,6 +3,7 @@
 const { Router } = require('express');
 const { body } = require('express-validator');
 const { authController } = require('../controllers/authController.js');
+const authGuard = require('../middlewares/authGuard.js');
 
 const authRouter = new Router();
 
@@ -28,14 +29,23 @@ authRouter.post('/logout', authController.logout);
 // 3. Активація облікового запису
 authRouter.get('/activate/:token', authController.activate);
 
-// 4. Скидання пароля (згідно з вимогами тестів)
+// 4. Скидання пароля (з валідацією newPassword та confirmation)
 authRouter.post('/forgot-password', authController.requestPasswordReset);
-authRouter.post('/reset-password/:token', authController.resetPassword);
 
-// eslint-disable-next-line max-len
-// 5. Маршрути управління профілем (згідно з вимогами: зміна імені, пароля та пошти)
-const authGuard = (req, res, next) => next();
+authRouter.post(
+  '/reset-password/:token',
+  [
+    body('newPassword')
+      .isLength({ min: 4, max: 32 })
+      .withMessage('Пароль повинен містити від 4 до 32 символів'),
+    body('confirmation')
+      .custom((value, { req }) => value === req.body.newPassword)
+      .withMessage('Паролі не збігаються'),
+  ],
+  authController.resetPassword,
+);
 
+// 5. Маршрути управління профілем
 authRouter.patch('/profile/name', authGuard, authController.changeName);
 
 authRouter.patch(
@@ -46,6 +56,9 @@ authRouter.patch(
     body('newPassword')
       .isLength({ min: 4, max: 32 })
       .withMessage('Новий пароль повинен містити від 4 до 32 символів'),
+    body('confirmation')
+      .custom((value, { req }) => value === req.body.newPassword)
+      .withMessage('Паролі не збігаються'),
   ],
   authController.changePassword,
 );

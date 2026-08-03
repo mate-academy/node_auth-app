@@ -1,3 +1,5 @@
+'use strict';
+
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const { User, Token } = require('../models');
@@ -108,6 +110,11 @@ class UserService {
       throw new Error('Некоректний або прострочений токен активації');
     }
 
+    // Додаємо захист від використання простроченого токена активації
+    if (tokenData.expiresAt < new Date()) {
+      throw new Error('Activation token expired');
+    }
+
     const user = await User.findByPk(tokenData.userId);
 
     if (!user) {
@@ -152,6 +159,11 @@ class UserService {
 
     if (!tokenData) {
       throw new Error('Некоректний або прострочений токен скидання пароля');
+    }
+
+    // Перевірка терміну дії токена скидання пароля
+    if (tokenData.expiresAt < new Date()) {
+      throw new Error('Reset token expired');
     }
 
     const user = await User.findByPk(tokenData.userId);

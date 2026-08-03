@@ -7,6 +7,7 @@ class MailService {
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
+      secure: false, // true для 465 порту, false для інших
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
@@ -18,11 +19,11 @@ class MailService {
     await this.transporter.sendMail({
       from: process.env.SMTP_USER,
       to,
-      subject: `Активація акаунту на ${process.env.API_URL}`,
+      subject: `Активація акаунта на ${process.env.API_URL}`,
       text: '',
       html: `
         <div>
-          <h1>Для активації акаунту перейдіть за посиланням:</h1>
+          <h1>Для активації перейдіть за посиланням</h1>
           <a href="${link}">${link}</a>
         </div>
       `,
@@ -33,13 +34,28 @@ class MailService {
     await this.transporter.sendMail({
       from: process.env.SMTP_USER,
       to,
-      subject: `Відновлення пароля на ${process.env.API_URL}`,
+      subject: `Скидання пароля на ${process.env.API_URL}`,
       text: '',
       html: `
         <div>
-          <h1>Запит на скидання пароля</h1>
-          <p>Щоб скинути пароль, перейдіть за посиланням нижче:</p>
+          <h1>Для скидання пароля перейдіть за посиланням</h1>
           <a href="${link}">${link}</a>
+        </div>
+      `,
+    });
+  }
+
+  // ДОДАЄМО МЕТОД ДЛЯ ПОВІДОМЛЕННЯ ПРО ЗМІНУ ПОШТИ (вимога ментора)
+  async sendEmailChangeNotification(to, message) {
+    await this.transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to,
+      subject: 'Запит на зміну електронної пошти',
+      text: message,
+      html: `
+        <div>
+          <h1>Сповіщення безпеки</h1>
+          <p>${message}</p>
         </div>
       `,
     });
