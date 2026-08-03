@@ -2,10 +2,13 @@ const authRepository = require('../repositories/auth.repository.js');
 const bcrypt = require('bcrypt');
 const { randomBytes } = require('crypto');
 const emailService = require('./email.service.js');
+const validatePassword = require('../validators/password.validator.js');
 
 const SALT_ROUNDS = 10;
 
 async function registration(userData) {
+  validatePassword(userData.password);
+
   const user = await authRepository.findUserByEmail(userData.email);
 
   if (user) {
@@ -154,12 +157,24 @@ async function validateResetPasswordToken(email, resetPasswordToken) {
   return user;
 }
 
-async function resetPassword({ email, resetPasswordToken, newPassword }) {
-  if (newPassword.length < 6) {
-    throw new Error('Password must be at least 6 characters long.');
+async function resetPassword({
+  email,
+  resetPasswordToken,
+  newPassword,
+  confirmation,
+}) {
+  validatePassword(newPassword);
+
+  if (newPassword !== confirmation) {
+    throw new Error('The confirmation does not match the password.');
   }
 
   const user = await validateResetPasswordToken(email, resetPasswordToken);
+
+  if (await bcrypt.compare(newPassword, user.password)) {
+    throw new Error('The new password must be different from the old one.');
+  }
+
   const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
   const updateUserAfterResetPassword = {
     resetPasswordToken: null,
@@ -190,12 +205,10 @@ async function passwordChange({
   newPassword,
   confirmation,
 }) {
-  if (newPassword.length < 6) {
-    throw new Error('New password must be at least 6 characters long.');
-  }
+  validatePassword(newPassword);
 
   if (newPassword !== confirmation) {
-    throw new Error('The confirmation does not match the password');
+    throw new Error('The confirmation does not match the password.');
   }
 
   if (!(await bcrypt.compare(oldPassword, user.password))) {

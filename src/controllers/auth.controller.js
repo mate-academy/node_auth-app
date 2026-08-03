@@ -104,11 +104,12 @@ async function validateResetPasswordToken(req, res) {
 }
 
 async function resetPassword(req, res) {
-  const { email, resetPasswordToken, newPassword } = req.body;
+  const { email, resetPasswordToken, newPassword, confirmation } = req.body;
   const resetData = {
     email,
     resetPasswordToken,
     newPassword,
+    confirmation,
   };
 
   try {
