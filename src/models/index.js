@@ -1,5 +1,11 @@
-import { sequelize } from '../utils/db.js';
-import { User } from './User.js';
-import { Token } from './Token.js';
+'use strict';
 
-export { sequelize, User, Token };
+const { sequelize } = require('../utils/db.js');
+const { User } = require('./User.js');
+const { Token } = require('./Token.js');
+
+module.exports = {
+  sequelize,
+  User,
+  Token,
+};

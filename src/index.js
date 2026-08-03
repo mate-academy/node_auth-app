@@ -29,11 +29,16 @@ app.get('/', (req, res) => {
   res.send('Auth API Server is running!');
 });
 
+// Обробник 404 для всіх інших неіснуючих сторінок/маршрутів
+app.use((req, res) => {
+  res.status(404).json({ message: 'Сторінку не знайдено' });
+});
+
 // Синхронізація з БД та запуск сервера
 const startServer = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync({ alter: true }); // Створить таблиці, якщо їх немає
+    await sequelize.sync({ force: true });
     // eslint-disable-next-line no-console
     console.log('✅ Підключення до бази даних PostgreSQL успішне');
 

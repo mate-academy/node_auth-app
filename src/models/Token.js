@@ -8,8 +8,16 @@ const Token = sequelize.define('token', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
+  userId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id',
+    },
+  },
   token: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
   },
   type: {
@@ -24,7 +32,7 @@ const Token = sequelize.define('token', {
 
 // Налаштування зв'язку (Token належить User)
 User.hasMany(Token, { onDelete: 'CASCADE' });
-Token.belongsTo(User);
+Token.belongsTo(User, { foreignKey: 'userId' });
 
 module.exports = {
   Token,
