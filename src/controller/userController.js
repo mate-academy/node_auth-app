@@ -1,8 +1,8 @@
-import { userServices } from '../services/userServices.js';
-import { User } from '../models/userModel.js';
-import { ApiError } from '../exeptions/apiError.js';
-import bycrpt from 'bcrypt';
-import { emailServices } from '../services/emailServices.js';
+const { userServices } = require('../services/userServices.js');
+const { User } = require('../models/userModel.js');
+const { ApiError } = require('../exeptions/apiError.js');
+const bycrpt = require('bcrypt');
+const { emailServices } = require('../services/emailServices.js');
 
 const getMe = (request, response) => {
   const { id } = request.params;
@@ -131,7 +131,11 @@ const updateName = async (request, response) => {
   return response.status(200).send(normalizedUser);
 };
 
-export const userController = {
+const userController = {
   getMe,
   updateName,
+};
+
+module.exports = {
+  userController,
 };

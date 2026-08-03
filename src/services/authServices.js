@@ -1,6 +1,6 @@
-import { jwts } from './jwtServices.js';
-import { tokenServices } from './tokenServices.js';
-import { userServices } from './userServices.js';
+const { jwts } = require('./jwtServices.js');
+const { tokenServices } = require('./tokenServices.js');
+const { userServices } = require('./userServices.js');
 
 const validateEmail = (value) => {
   if (!value) {
@@ -58,10 +58,14 @@ const generateTokens = async (response, user) => {
   return { normalizedUser, accessToken };
 };
 
-export const authServices = {
+const authServices = {
   validateEmail,
   validadetPassword,
   validateName,
   validateConfirmationPass,
   generateTokens,
+};
+
+module.exports = {
+  authServices,
 };

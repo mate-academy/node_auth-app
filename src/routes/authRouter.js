@@ -1,6 +1,6 @@
-import express from 'express';
-import { authController } from '../controller/authController.js';
-import { catchError } from '../utills/catchError.js';
+const express = require('express');
+const { authController } = require('../controller/authController.js');
+const { catchError } = require('../utills/catchError.js');
 
 const router = express.Router();
 
@@ -16,4 +16,4 @@ router.post(
 router.get('/refresh', catchError(authController.refresh));
 router.post('/logout', catchError(authController.logout));
 
-export { router };
+module.exports = { router };

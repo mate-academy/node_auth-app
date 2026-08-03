@@ -1,7 +1,7 @@
-import { User } from '../models/userModel.js';
-import { jwts } from '../services/jwtServices.js';
+const { User } = require('../models/userModel.js');
+const { jwts } = require('../services/jwtServices.js');
 
-export const authMiddleware = async (request, response, next) => {
+const authMiddleware = async (request, response, next) => {
   const token = request.cookies.refreshToken;
 
   if (!token) {
@@ -29,4 +29,8 @@ export const authMiddleware = async (request, response, next) => {
 
   request.user = user;
   next();
+};
+
+module.exports = {
+  authMiddleware,
 };

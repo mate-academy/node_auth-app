@@ -1,4 +1,4 @@
-export const catchError = (action) => {
+const catchError = (action) => {
   return async function (request, response, next) {
     try {
       await action(request, response, next);
@@ -6,4 +6,8 @@ export const catchError = (action) => {
       next(error);
     }
   };
+};
+
+module.exports = {
+  catchError,
 };

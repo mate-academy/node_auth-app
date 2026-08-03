@@ -1,8 +1,8 @@
-import { ApiError } from '../exeptions/apiError.js';
-import { User } from '../models/userModel.js';
-import { emailServices } from '../services/emailServices.js';
-import { v4 as uuidv4 } from 'uuid';
-import { Token } from '../models/token.js';
+const { ApiError } = require('../exeptions/apiError.js');
+const { User } = require('../models/userModel.js');
+const { emailServices } = require('../services/emailServices.js');
+const { v4: uuidv4 } = require('uuid');
+const { Token } = require('../models/token.js');
 
 const normalized = ({ id, name, email }) => {
   return { id, name, email };
@@ -67,10 +67,14 @@ const remove = (UserId) => {
   return Token.destroy({ where: { UserId } });
 };
 
-export const userServices = {
+const userServices = {
   normalized,
   findByEmail,
   register,
   recover,
   remove,
+};
+
+module.exports = {
+  userServices,
 };

@@ -1,6 +1,6 @@
-import 'dotenv/config';
+require('dotenv/config');
 
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 // Create a transporter using SMTP
 const transporter = nodemailer.createTransport({
@@ -66,9 +66,13 @@ const sendNotification = (email) => {
   });
 };
 
-export const emailServices = {
+const emailServices = {
   send,
   sendActivation,
   sendRecover,
   sendNotification,
+};
+
+module.exports = {
+  emailServices,
 };

@@ -1,10 +1,10 @@
-import { User } from '../models/userModel.js';
-import { userServices } from '../services/userServices.js';
-import { jwts } from '../services/jwtServices.js';
-import { ApiError } from '../exeptions/apiError.js';
-import { authServices } from '../services/authServices.js';
-import bycrpt from 'bcrypt';
-import { tokenServices } from '../services/tokenServices.js';
+const { User } = require('../models/userModel.js');
+const { userServices } = require('../services/userServices.js');
+const { jwts } = require('../services/jwtServices.js');
+const { ApiError } = require('../exeptions/apiError.js');
+const { authServices } = require('../services/authServices.js');
+const bycrpt = require('bcrypt');
+const { tokenServices } = require('../services/tokenServices.js');
 
 // aa
 
@@ -166,7 +166,7 @@ const logout = async (request, response) => {
   return response.sendStatus(204);
 };
 
-export const authController = {
+const authController = {
   register,
   activate,
   login,
@@ -174,4 +174,8 @@ export const authController = {
   changePassword,
   refresh,
   logout,
+};
+
+module.exports = {
+  authController,
 };

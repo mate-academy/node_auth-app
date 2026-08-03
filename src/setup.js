@@ -1,8 +1,9 @@
-import 'dotenv/config';
+require('dotenv/config');
 
-import { client } from './utills/db.js';
-import './models/userModel.js';
-import './models/token.js';
+const { client } = require('./utills/db.js');
+
+require('./models/userModel.js');
+require('./models/token.js');
 
 /* client.sync({ force: true }); */
 
