@@ -1,44 +1,10 @@
-# --- DEPENDÊNCIAS ---
-node_modules/
-/jspm_packages/
-.pnp
-.pnp.js
-
-# --- PRODUÇÃO E BUILDS ---
-dist/
-build/
-out/
-.next/
-.nuxt/
-# Arquivo gerado pelo compilador TypeScript
-tsconfig.tsbuildinfo
-
-# --- SEGURANÇA E VARIÁVEIS DE AMBIENTE ---
+# IDE
+.idea
+.vscode
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-*.pem
-*.key
 
-# --- LOGS DO SISTEMA ---
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+# Node
+node_modules
 
-# --- ARQUIVOS DO SISTEMA OPERACIONAL ---
+# MacOS
 .DS_Store
-Thumbs.db
-desktop.ini
-
-# --- CONFIGURAÇÕES DE IDEs  ---
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-
