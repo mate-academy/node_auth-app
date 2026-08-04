@@ -21,7 +21,7 @@ function send({ email, subject, html }) {
 function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_HOST || 3005}/activation/${token}`;
   const html = `
-  <h1>Activate accaunt</h1>
+  <h1>Activate account</h1>
   <a href="${href}">${href}</a>
   `;
 

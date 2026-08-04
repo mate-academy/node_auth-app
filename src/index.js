@@ -26,7 +26,7 @@ app.use(
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
 app.use('/profile', profileRouter);
-
+app.use((req, res) => res.sendStatus(404));
 app.use(errorMiddleware);
 
 app.listen(PORT, () => {

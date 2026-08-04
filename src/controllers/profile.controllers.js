@@ -8,7 +8,7 @@ async function changeName(req, res) {
   const { name } = req.body;
   const userId = req.user.id;
 
-  await userService.updatePassword(userId, { name });
+  await userService.updateUser(userId, { name: name });
 
   res.sendStatus(200);
 }

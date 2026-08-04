@@ -64,7 +64,7 @@ const login = async (req, res) => {
   }
 
   if (!user.isActivated) {
-    throw ApiError.BadRequest('User email is not activated');
+    throw ApiError.badRequest('User email is not activated');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
@@ -153,7 +153,7 @@ const passwordResetConfirm = async (req, res) => {
   const savedToken = await tokenService.getResetToken(data.id);
 
   if (!savedToken || savedToken.resetToken !== token) {
-    throw ApiError.BadRequest('Invalid or expired token');
+    throw ApiError.badRequest('Invalid or expired token');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
