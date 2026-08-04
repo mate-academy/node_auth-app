@@ -1,6 +1,7 @@
 import express from 'express';
 
 import { authController } from '../controllers/auth.controller.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { guestMiddleware } from '../middlewares/guestMiddleware.js';
 import { catchError } from '../utils/catchError.js';
 
@@ -34,4 +35,4 @@ authRouter.post(
 
 authRouter.post('/refresh', catchError(authController.refresh));
 
-authRouter.post('/logout', catchError(authController.logout));
+authRouter.post('/logout', authMiddleware, catchError(authController.logout));

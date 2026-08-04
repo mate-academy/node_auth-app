@@ -5,32 +5,12 @@ import { userService } from '../services/user.service.js';
 import { tokenService } from '../services/token.service.js';
 import { emailService } from '../services/email.service.js';
 import { ApiError } from '../exeptions/api.error.js';
-
-function validateEmail(value) {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-
-  return null;
-}
-
-function validatePassword(password) {
-  if (!password) {
-    return 'Password is required';
-  }
-
-  if (password.length < 6) {
-    return 'Password must be at least 6 characters long';
-  }
-
-  return null;
-}
+import {
+  normalizeEmail,
+  validateEmail,
+  validateName,
+  validatePassword,
+} from '../utils/validation.js';
 
 function getRefreshCookieOptions() {
   return {
@@ -39,12 +19,6 @@ function getRefreshCookieOptions() {
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   };
 }
-
-const getAllActivated = async (req, res) => {
-  const users = await userService.getAllActivated();
-
-  res.send(users.map(userService.normalize));
-};
 
 const getProfile = async (req, res) => {
   const user = await userService.findById(req.user.id);
@@ -61,21 +35,11 @@ const getProfile = async (req, res) => {
 const updateName = async (req, res) => {
   const { name } = req.body;
 
-  if (!name || !name.trim()) {
-    throw ApiError.badRequest('Bad request', {
-      name: 'Name is required',
-    });
-  }
+  const nameError = validateName(name);
 
-  if (name.trim().length < 2) {
+  if (nameError) {
     throw ApiError.badRequest('Bad request', {
-      name: 'Name must contain at least 2 characters',
-    });
-  }
-
-  if (name.trim().length > 50) {
-    throw ApiError.badRequest('Bad request', {
-      name: 'Name must contain no more than 50 characters',
+      name: nameError,
     });
   }
 
@@ -118,12 +82,6 @@ const updatePassword = async (req, res) => {
     });
   }
 
-  if (oldPassword === newPassword) {
-    throw ApiError.badRequest('Bad request', {
-      newPassword: 'New password must be different from the old password',
-    });
-  }
-
   const user = await userService.findById(req.user.id);
 
   if (!user) {
@@ -138,15 +96,25 @@ const updatePassword = async (req, res) => {
     });
   }
 
+  const isSamePassword = await bcrypt.compare(newPassword, user.password);
+
+  if (isSamePassword) {
+    throw ApiError.badRequest('Bad request', {
+      newPassword: 'New password must be different from the old password',
+    });
+  }
+
   user.password = await bcrypt.hash(newPassword, 10);
 
   await user.save();
+
   await tokenService.remove(user.id);
 
   res.clearCookie('refreshToken', getRefreshCookieOptions());
 
   res.send({
     message: 'Password was changed successfully. Please log in again.',
+    redirectUrl: '/login',
   });
 };
 
@@ -162,7 +130,7 @@ const requestEmailChange = async (req, res) => {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const normalizedNewEmail = newEmail.trim().toLowerCase();
+  const normalizedNewEmail = normalizeEmail(newEmail);
 
   const user = await userService.findById(req.user.id);
 
@@ -178,7 +146,7 @@ const requestEmailChange = async (req, res) => {
     });
   }
 
-  if (normalizedNewEmail === user.email.toLowerCase()) {
+  if (normalizedNewEmail === normalizeEmail(user.email)) {
     throw ApiError.badRequest('Bad request', {
       newEmail: 'New email must be different from the current email',
     });
@@ -231,7 +199,9 @@ const confirmEmailChange = async (req, res) => {
     );
   }
 
-  if (new Date(user.emailChangeTokenExpiresAt).getTime() < Date.now()) {
+  const tokenExpiresAt = new Date(user.emailChangeTokenExpiresAt).getTime();
+
+  if (tokenExpiresAt < Date.now()) {
     user.pendingEmail = null;
     user.emailChangeToken = null;
     user.emailChangeTokenExpiresAt = null;
@@ -244,6 +214,12 @@ const confirmEmailChange = async (req, res) => {
   const existingUser = await userService.findByEmail(user.pendingEmail);
 
   if (existingUser && existingUser.id !== user.id) {
+    user.pendingEmail = null;
+    user.emailChangeToken = null;
+    user.emailChangeTokenExpiresAt = null;
+
+    await user.save();
+
     throw ApiError.badRequest('This email is already in use');
   }
 
@@ -256,6 +232,7 @@ const confirmEmailChange = async (req, res) => {
   user.emailChangeTokenExpiresAt = null;
 
   await user.save();
+
   await tokenService.remove(user.id);
 
   res.clearCookie('refreshToken', getRefreshCookieOptions());
@@ -265,11 +242,11 @@ const confirmEmailChange = async (req, res) => {
   res.send({
     message: 'Email was changed successfully. Please log in again.',
     user: userService.normalize(user),
+    redirectUrl: '/login',
   });
 };
 
 export const userController = {
-  getAllActivated,
   getProfile,
   updateName,
   updatePassword,

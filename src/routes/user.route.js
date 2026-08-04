@@ -34,5 +34,3 @@ userRouter.post(
   authMiddleware,
   catchError(userController.requestEmailChange),
 );
-
-userRouter.get('/', authMiddleware, catchError(userController.getAllActivated));

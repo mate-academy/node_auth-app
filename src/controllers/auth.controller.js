@@ -8,31 +8,12 @@ import { tokenService } from '../services/token.service.js';
 import { emailService } from '../services/email.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 
-function validateEmail(value) {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-
-  return null;
-}
-
-function validatePassword(value) {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'Password must be at least 6 characters long';
-  }
-
-  return null;
-}
+import {
+  normalizeEmail,
+  validateEmail,
+  validateName,
+  validatePassword,
+} from '../utils/validation.js';
 
 function getRefreshCookieOptions() {
   return {
@@ -46,7 +27,7 @@ const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    name: !name?.trim() ? 'Name is required' : undefined,
+    name: validateName(name),
     email: validateEmail(email),
     password: validatePassword(password),
   };
@@ -55,12 +36,12 @@ const register = async (req, res) => {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const hashedPass = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   await userService.register(
     name.trim(),
-    email.trim().toLowerCase(),
-    hashedPass,
+    normalizeEmail(email),
+    hashedPassword,
   );
 
   res.status(201).send({
@@ -93,7 +74,7 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   const emailError = validateEmail(email);
-  const passwordError = validatePassword(password);
+  const passwordError = !password ? 'Password is required' : undefined;
 
   if (emailError || passwordError) {
     throw ApiError.badRequest('Bad request', {
@@ -102,7 +83,7 @@ const login = async (req, res) => {
     });
   }
 
-  const user = await userService.findByEmail(email.trim().toLowerCase());
+  const user = await userService.findByEmail(normalizeEmail(email));
 
   if (!user) {
     throw ApiError.badRequest('No such user');
@@ -134,8 +115,7 @@ const forgotPassword = async (req, res) => {
     });
   }
 
-  const normalizedEmail = email.trim().toLowerCase();
-
+  const normalizedEmail = normalizeEmail(email);
   const user = await userService.findByEmail(normalizedEmail);
 
   if (user) {
@@ -193,7 +173,9 @@ const resetPassword = async (req, res) => {
     );
   }
 
-  if (new Date(user.resetPasswordTokenExpiresAt).getTime() < Date.now()) {
+  const tokenExpiresAt = new Date(user.resetPasswordTokenExpiresAt).getTime();
+
+  if (tokenExpiresAt < Date.now()) {
     user.resetPasswordToken = null;
     user.resetPasswordTokenExpiresAt = null;
 
@@ -222,6 +204,7 @@ const resetPassword = async (req, res) => {
   res.send({
     message: 'Password was reset successfully.',
     loginUrl: `${process.env.CLIENT_HOST}/login`,
+    redirectUrl: '/login',
   });
 };
 
@@ -273,6 +256,7 @@ const generateTokens = async (res, user, redirectUrl = '/profile') => {
   const normalizedUser = userService.normalize(user);
 
   const accessToken = jwtService.sign(normalizedUser);
+
   const refreshToken = jwtService.signRefresh(normalizedUser);
 
   await tokenService.save(normalizedUser.id, refreshToken);
@@ -292,23 +276,20 @@ const generateTokens = async (res, user, redirectUrl = '/profile') => {
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
 
-  if (!refreshToken) {
-    throw ApiError.unauthorized();
-  }
+  if (refreshToken) {
+    const savedToken = await tokenService.getByToken(refreshToken);
 
-  const userData = jwtService.verifyRefresh(refreshToken);
-
-  if (userData) {
-    await tokenService.remove(userData.id);
+    if (savedToken) {
+      await tokenService.remove(req.user.id);
+    }
   }
 
   res.clearCookie('refreshToken', getRefreshCookieOptions());
 
-  if (!userData) {
-    throw ApiError.unauthorized();
-  }
-
-  res.send({ message: 'Logout successful', redirectUrl: '/login' });
+  res.send({
+    message: 'Logout successful',
+    redirectUrl: '/login',
+  });
 };
 
 export const authController = {
