@@ -18,5 +18,5 @@ module.exports = {
     'no-proto': 0,
   },
 
-  ignorePatterns: ['node_modules/',]
+  ignorePatterns: ['node_modules/'],
 };
