@@ -74,9 +74,27 @@ function sendOldEmailNotification(oldEmail, newEmail) {
   });
 }
 
+function sendResetPasswordEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${token}`;
+
+  const html = `
+    <h1>Reset your password</h1>
+    <p>Click the link below to create a new password:</p>
+    <a href="${href}">${href}</a>
+    <p>This link is valid for one hour.</p>
+  `;
+
+  return send({
+    email,
+    subject: 'Reset your password',
+    html,
+  });
+}
+
 export const emailService = {
   send,
   sendActivationEmail,
   sendEmailChangeConfirmation,
   sendOldEmailNotification,
+  sendResetPasswordEmail,
 };

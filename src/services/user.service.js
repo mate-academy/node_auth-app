@@ -35,6 +35,12 @@ function findByEmailChangeToken(emailChangeToken) {
   });
 }
 
+function findByResetPasswordToken(resetPasswordToken) {
+  return User.findOne({
+    where: { resetPasswordToken },
+  });
+}
+
 async function register(name, email, password) {
   const activationToken = uuidv4();
 
@@ -62,5 +68,6 @@ export const userService = {
   findByEmail,
   findById,
   findByEmailChangeToken,
+  findByResetPasswordToken,
   register,
 };

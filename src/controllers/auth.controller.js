@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 
 import { User } from '../models/user.js';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { tokenService } from '../services/token.service.js';
+import { emailService } from '../services/email.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 
 function validateEmail(value) {
@@ -55,7 +57,11 @@ const register = async (req, res) => {
 
   const hashedPass = await bcrypt.hash(password, 10);
 
-  await userService.register(name.trim(), email, hashedPass);
+  await userService.register(
+    name.trim(),
+    email.trim().toLowerCase(),
+    hashedPass,
+  );
 
   res.status(201).send({
     message:
@@ -80,10 +86,7 @@ const activate = async (req, res) => {
 
   await user.save();
 
-  res.send({
-    message: 'Account activated successfully',
-    user: userService.normalize(user),
-  });
+  await generateTokens(res, user, '/profile');
 };
 
 const login = async (req, res) => {
@@ -99,7 +102,7 @@ const login = async (req, res) => {
     });
   }
 
-  const user = await userService.findByEmail(email);
+  const user = await userService.findByEmail(email.trim().toLowerCase());
 
   if (!user) {
     throw ApiError.badRequest('No such user');
@@ -118,6 +121,108 @@ const login = async (req, res) => {
   }
 
   await generateTokens(res, user);
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const emailError = validateEmail(email);
+
+  if (emailError) {
+    throw ApiError.badRequest('Bad request', {
+      email: emailError,
+    });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const user = await userService.findByEmail(normalizedEmail);
+
+  if (user) {
+    const resetPasswordToken = uuidv4();
+
+    user.resetPasswordToken = resetPasswordToken;
+    user.resetPasswordTokenExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await user.save();
+
+    try {
+      await emailService.sendResetPasswordEmail(user.email, resetPasswordToken);
+    } catch (error) {
+      user.resetPasswordToken = null;
+      user.resetPasswordTokenExpiresAt = null;
+
+      await user.save();
+
+      throw error;
+    }
+  }
+
+  res.send({
+    message: 'If this email exists, a password reset link has been sent.',
+  });
+};
+
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+
+  const { password, passwordConfirmation } = req.body;
+
+  const errors = {
+    password: validatePassword(password),
+    passwordConfirmation: !passwordConfirmation
+      ? 'Password confirmation is required'
+      : undefined,
+  };
+
+  if (errors.password || errors.passwordConfirmation) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  if (password !== passwordConfirmation) {
+    throw ApiError.badRequest('Bad request', {
+      passwordConfirmation: 'Passwords do not match',
+    });
+  }
+
+  const user = await userService.findByResetPasswordToken(token);
+
+  if (!user || !user.resetPasswordTokenExpiresAt) {
+    throw ApiError.badRequest(
+      'Password reset link is invalid or has already been used',
+    );
+  }
+
+  if (new Date(user.resetPasswordTokenExpiresAt).getTime() < Date.now()) {
+    user.resetPasswordToken = null;
+    user.resetPasswordTokenExpiresAt = null;
+
+    await user.save();
+
+    throw ApiError.badRequest('Password reset link has expired');
+  }
+
+  const isSamePassword = await bcrypt.compare(password, user.password);
+
+  if (isSamePassword) {
+    throw ApiError.badRequest('Bad request', {
+      password: 'New password must be different from the current password',
+    });
+  }
+
+  user.password = await bcrypt.hash(password, 10);
+  user.resetPasswordToken = null;
+  user.resetPasswordTokenExpiresAt = null;
+
+  await user.save();
+  await tokenService.remove(user.id);
+
+  res.clearCookie('refreshToken', getRefreshCookieOptions());
+
+  res.send({
+    message: 'Password was reset successfully.',
+    loginUrl: `${process.env.CLIENT_HOST}/login`,
+  });
 };
 
 const refresh = async (req, res) => {
@@ -164,11 +269,10 @@ const refresh = async (req, res) => {
   await generateTokens(res, user);
 };
 
-const generateTokens = async (res, user) => {
+const generateTokens = async (res, user, redirectUrl = '/profile') => {
   const normalizedUser = userService.normalize(user);
 
   const accessToken = jwtService.sign(normalizedUser);
-
   const refreshToken = jwtService.signRefresh(normalizedUser);
 
   await tokenService.save(normalizedUser.id, refreshToken);
@@ -181,6 +285,7 @@ const generateTokens = async (res, user) => {
   res.send({
     user: normalizedUser,
     accessToken,
+    redirectUrl,
   });
 };
 
@@ -203,13 +308,15 @@ const logout = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  res.sendStatus(204);
+  res.send({ message: 'Logout successful', redirectUrl: '/login' });
 };
 
 export const authController = {
   register,
   activate,
   login,
+  forgotPassword,
+  resetPassword,
   refresh,
   logout,
 };

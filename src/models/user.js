@@ -39,4 +39,15 @@ export const User = client.define('user', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+
+  resetPasswordToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
+  },
+
+  resetPasswordTokenExpiresAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 });
