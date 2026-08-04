@@ -10,7 +10,7 @@ function sign(user) {
 
 function verify(token) {
   try {
-    jwt.verify(token, process.env.JWT_KEY);
+    return jwt.verify(token, process.env.JWT_KEY);
   } catch (e) {
     return null;
   }
@@ -30,9 +30,25 @@ function verifyRefresh(token) {
   }
 }
 
+function signReset(user) {
+  const token = jwt.sign(user, process.env.RESET_KEY, { expiresIn: '1h' });
+
+  return token;
+}
+
+function verifyReset(token) {
+  try {
+    return jwt.verify(token, process.env.RESET_KEY);
+  } catch (e) {
+    return null;
+  }
+}
+
 export const jwtService = {
   sign,
   verify,
   signRefresh,
   verifyRefresh,
+  signReset,
+  verifyReset,
 };

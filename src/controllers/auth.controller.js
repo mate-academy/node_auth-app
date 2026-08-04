@@ -4,6 +4,7 @@ import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/token.service.js';
+import { emailService } from '../services/email.service.js';
 
 function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -62,6 +63,10 @@ const login = async (req, res) => {
     throw ApiError.badRequest('No such user');
   }
 
+  if (!user.isActivated) {
+    throw ApiError.BadRequest('User email is not activated');
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
@@ -102,6 +107,26 @@ const generateTokens = async (res, user) => {
   });
 };
 
+const passwordReset = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await userService.findByEmail(email);
+
+  if (!user) {
+    res.sendStatus(200);
+
+    return;
+  }
+
+  const resetToken = jwtService.signReset({ id: user.id });
+
+  await tokenService.saveResetToken(user.id, resetToken);
+
+  await emailService.sendResetPasswordEmail(user.email, resetToken);
+
+  res.sendStatus(200);
+};
+
 const logout = async (req, res) => {
   const { refreshToken } = req.cookies;
 
@@ -116,10 +141,35 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
+const passwordResetConfirm = async (req, res) => {
+  const { token, password } = req.body;
+
+  const data = jwtService.verifyReset(token);
+
+  if (!data) {
+    throw ApiError.badRequest('Invalid or expired token');
+  }
+
+  const savedToken = await tokenService.getResetToken(data.id);
+
+  if (!savedToken || savedToken.resetToken !== token) {
+    throw ApiError.BadRequest('Invalid or expired token');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await userService.updatePassword(data.id, hashedPassword);
+  await tokenService.removeResetToken(data.id);
+
+  res.sendStatus(200);
+};
+
 export const authController = {
   register,
   activate,
   login,
   refresh,
   logout,
+  passwordReset,
+  passwordResetConfirm,
 };

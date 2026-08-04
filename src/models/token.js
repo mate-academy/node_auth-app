@@ -7,6 +7,9 @@ export const Token = client.define('token', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  resetToken: {
+    type: DataTypes.STRING,
+  },
 });
 
 Token.belongsTo(User);

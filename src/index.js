@@ -5,6 +5,7 @@ import { authRouter } from './routes/auth.route.js';
 import cors from 'cors';
 import './setup.js';
 import { userRouter } from './routes/user.route.js';
+import { profileRouter } from './routes/profile.route.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
 import cookieParser from 'cookie-parser';
 
@@ -24,6 +25,7 @@ app.use(
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
+app.use('/profile', profileRouter);
 
 app.use(errorMiddleware);
 
