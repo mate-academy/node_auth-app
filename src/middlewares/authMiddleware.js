@@ -6,7 +6,7 @@ export const authMiddleware = (req, res, next) => {
 
   const [type, token] = authorization.split(' ');
 
-  if (type !== 'Bearer' || !token) {
+  if (!type || type !== 'Bearer' || !token) {
     next(ApiError.unauthorized());
 
     return;
