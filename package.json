@@ -28,19 +28,7 @@
   "mateAcademy": {
     "projectType": "javascript"
   },
-  "eslintConfig": {
-    "extends": "@mate-academy/eslint-config",
-    "env": {
-      "jest": true
-    },
-    "rules": {
-      "no-proto": 0
-    },
-    "plugins": [
-      "jest"
-    ]
-  },
-  "dependencies": {
+    "dependencies": {
     "acorn": "^8.12.1",
     "acorn-jsx": "^5.3.2",
     "ajv": "^6.12.6",
