@@ -132,7 +132,7 @@ async function nameChange(req, res) {
   try {
     await authService.nameChange(userData);
 
-    res.status(200).send({ message: 'Name successfully changed.' });
+    res.status(200).send({ message: 'Name successfully changed' });
   } catch (error) {
     res.status(400).send({ message: error.message });
   }
