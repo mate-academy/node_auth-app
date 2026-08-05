@@ -1,17 +1,20 @@
 import { User } from './User.model.js';
 
-export const getAll = async () => {
+export const getAll = async (filters = {}) => {
   const users = await User.findAll({
-    order: [['id', 'ASC']],
+    order: [['createdAt', 'DESC']],
+    where: filters,
   });
 
   return users;
 };
 
 export const getOne = async (id) => {
-  const user = await User.findOne({ where: { id } });
+  return await User.findOne({ where: { id } });
+};
 
-  return user;
+export const findByEmail = async (email) => {
+  return await User.findOne({ where: { email } });
 };
 
 export const create = async (user) => {
@@ -32,4 +35,18 @@ export const deleteById = async (id) => {
   const deletedUser = await User.destroy({ where: { id } });
 
   return deletedUser;
+};
+
+export const isValidParams = (params) => {
+  if (!params) {
+    return false;
+  }
+
+  const { name, email, password } = params;
+
+  return Boolean(name && email && password);
+};
+
+export const normalize = ({ id, email, name, activationToken }) => {
+  return { id, email, name, activationToken };
 };

@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '../users/User.model.js';
 import { emailService } from '../../services/email.service.js';
+import * as usersService from '../users/users.service.js';
+import { jwtService } from '../../services/jwt.service.js';
 
 export const register = async (req, res) => {
   try {
@@ -25,7 +27,27 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {};
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await usersService.findByEmail(email);
+
+    if (!user || user.password !== password) {
+        return res.sendStatus(401);
+    }
+
+    if (user.activationToken) {
+        return res.status(403).send('User is not activated');
+    }
+
+    const normalizedUser = usersService.normalize(user);
+    const accessToken = jwtService.sign(normalizedUser);
+
+    res.send({
+        user: normalizedUser,
+        accessToken
+    });
+};
 
 export const activate = async (req, res) => {
     const { activationToken } = req.params;
