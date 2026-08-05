@@ -1,9 +1,59 @@
 import { User } from '../users/User.model.js';
 import * as usersService from '../users/users.service.js';
 import { jwtService } from '../../services/jwt.service.js';
+import { ApiError } from '../../exceptions/api.error.js';
+
+const nameValidation = (name) => {
+  if (!name) {
+    return 'Name is required';
+  }
+
+  if (name.length < 1) {
+    return 'At least 1 characters';
+  }
+};
+
+const validateEmail = (email) => {
+  if (!email) {
+    return 'Email is required';
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    return 'Invalid email';
+  }
+};
+
+const validatePassword = (password) => {
+  if (!password) {
+    return 'Password is required';
+  }
+
+  if (password.length < 6) {
+    return 'At least 6 characters';
+  }
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+
+  if (!passwordRegex.test(password)) {
+    return 'Invalid password';
+  }
+};
 
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
+
+  const errors = {
+    name: nameValidation(name),
+    email: validateEmail(email),
+    password: validatePassword(password),
+  };
+
+  if (Object.values(errors).some(Boolean)) {
+    throw ApiError.badRequest('Bad Request', errors);
+  }
 
   await usersService.register({ name, email, password });
 
