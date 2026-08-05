@@ -1,4 +1,6 @@
+import { v4 as uuidv4 } from 'uuid';
 import { User } from '../users/User.model.js';
+import { emailService } from '../../services/email.service.js';
 
 export const register = async (req, res) => {
   try {
@@ -10,9 +12,13 @@ export const register = async (req, res) => {
       return res.sendStatus(409);
     }
 
-    const user = await User.create({ name, email, password });
+    const activationToken = uuidv4();
 
-    res.json(user);
+    const newUser = await User.create({ name, email, password, activationToken });
+
+    await emailService.sendActivationMail({ email, activationToken });
+
+    res.send(newUser);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
@@ -21,5 +27,25 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {};
 
-export const activate = async (req, res) => {};
+export const activate = async (req, res) => {
+    const { activationToken } = req.params;
+
+    const user = await User.findOne({ where: { activationToken } });
+
+    if (!user) {
+        return res.sendStatus(404);
+    }
+
+    user.activationToken = null;
+
+    await user.save();
+
+    res.send(user);
+};
+
+export const authController = {
+    register,
+    login,
+    activate
+}
 
