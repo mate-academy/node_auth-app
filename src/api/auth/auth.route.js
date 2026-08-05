@@ -1,11 +1,13 @@
 import express from 'express';
-const { Router } = express;
 import { authController } from './auth.controller.js';
+import { catchError } from '../../utils/catchError.js';
+
+const { Router } = express;
 
 const auth = Router();
 
-auth.post('/register', authController.register);
-auth.post('/login', authController.login);
-auth.get('/activation/:activationToken', authController.activate);
+auth.post('/register', catchError(authController.register));
+auth.post('/login', catchError(authController.login));
+auth.get('/activation/:activationToken', catchError(authController.activate));
 
 export default auth;

@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
 import 'dotenv/config';
-import { createServer } from './utils/server.js'
+import { createServer } from './utils/server.js';
 
 const PORT = process.env.PORT || 3001;
 

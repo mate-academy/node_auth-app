@@ -11,7 +11,7 @@ export const getAll = async (req, res) => {
   }
 };
 
-export  const getOne = async (req, res) => {
+export const getOne = async (req, res) => {
   try {
     const expense = await expensesService.getOne(req.params.id);
 
@@ -101,7 +101,7 @@ export const update = async (req, res) => {
   }
 };
 
- const isValidParams = (params, isUpdate = false) => {
+const isValidParams = (params, isUpdate = false) => {
   if (!params) {
     return false;
   }

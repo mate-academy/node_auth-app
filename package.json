@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon scr/index.js",
+    "dev": "nodemon src/index.js",
     "lint": "npm run format",
-    "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'"
+    "format": "prettier --ignore-path .prettierignore --write './**/**/*.{js,ts}'"
   },
   "author": "Mate academy",
   "license": "GPL-3.0",

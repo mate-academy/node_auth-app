@@ -36,6 +36,6 @@ const sendActivationMail = ({ email, activationToken }) => {
 };
 
 export const emailService = {
-    send,
-    sendActivationMail
-}
+  send,
+  sendActivationMail,
+};
