@@ -4,6 +4,8 @@ import { jwtService } from '../../services/jwt.service.js';
 import { ApiError } from '../../exceptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../../models/token/token.service.js';
+import { emailService } from '../../services/email.service.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const nameValidation = (name) => {
   if (!name) {
@@ -147,10 +149,79 @@ const generateTokens = async (res, user) => {
   });
 };
 
+export const resetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  const emailError = validateEmail(email);
+
+  if (emailError) {
+    throw ApiError.badRequest('Bad Request', { email: emailError });
+  }
+
+  const user = await usersService.findByEmail(email);
+
+  if (!user || user.activationToken) {
+    throw ApiError.notFound('User not found', { email: 'No existing email' });
+  }
+
+  const resetToken = uuidv4();
+
+  user.resetPasswordToken = resetToken;
+  await user.save();
+
+  await emailService.sendResetPasswordMail({
+    email,
+    resetToken,
+  });
+
+  res.send({ messege: 'OK' });
+};
+
+export const confirmResetPassword = async (req, res) => {
+  const { password } = req.body;
+  const { resetPasswordToken } = req.params;
+
+  const isPasswordValid = validatePassword(password);
+
+  if (isPasswordValid) {
+    throw ApiError.badRequest('Bad Request', { password: isPasswordValid });
+  }
+
+  const user = await usersService.getByResetPasswordToken(resetPasswordToken);
+
+  if (user.resetPasswordToken !== resetPasswordToken) {
+    throw ApiError.badRequest('Link is not valid');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  user.password = hashedPassword;
+  user.resetPasswordToken = null;
+
+  await user.save();
+
+  res.send({ message: 'OK' });
+};
+
+const checkResetToken = async (req, res) => {
+  const { resetPasswordToken } = req.params;
+
+  const user = await usersService.getByResetPasswordToken(resetPasswordToken);
+
+  if (!user || user.resetPasswordToken !== resetPasswordToken) {
+    throw ApiError.notFound('Link is not valid');
+  }
+
+  res.send({ message: 'OK' });
+};
+
 export const authController = {
   register,
   login,
   activate,
   refresh,
   logout,
+  resetPassword,
+  confirmResetPassword,
+  checkResetToken,
 };

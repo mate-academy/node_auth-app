@@ -35,7 +35,23 @@ const sendActivationMail = ({ email, activationToken }) => {
   });
 };
 
+const sendResetPasswordMail = ({ email, resetToken }) => {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${resetToken}`;
+  const html = `
+    <h1>Reset your password</h1>
+    <a href="${href}">${href}</a>
+  `;
+
+  return send({
+    to: email,
+    subject: 'Reset your password',
+    text: 'Reset your password',
+    html,
+  });
+};
+
 export const emailService = {
   send,
   sendActivationMail,
+  sendResetPasswordMail,
 };

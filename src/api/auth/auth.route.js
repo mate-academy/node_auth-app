@@ -12,4 +12,16 @@ auth.get('/activation/:activationToken', catchError(authController.activate));
 auth.get('/refresh', catchError(authController.refresh));
 auth.post('/logout', catchError(authController.logout));
 
+auth.post('/reset-password', catchError(authController.resetPassword));
+
+auth.post(
+  '/reset-password/:resetPasswordToken',
+  catchError(authController.confirmResetPassword),
+);
+
+auth.get(
+  '/reset-password/:resetPasswordToken',
+  catchError(authController.checkResetToken),
+);
+
 export default auth;

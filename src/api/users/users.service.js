@@ -24,6 +24,12 @@ export const findByEmail = async (email) => {
   return user;
 };
 
+export const getByResetPasswordToken = async (token) => {
+  const user = await User.findOne({ where: { resetPasswordToken: token } });
+
+  return user;
+};
+
 export const create = async (user) => {
   const newUser = await User.create(user);
 
