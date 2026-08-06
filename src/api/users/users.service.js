@@ -1,7 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcrypt';
 import { ApiError } from '../../exceptions/api.error.js';
 import { User } from './User.model.js';
 import { emailService } from '../../services/email.service.js';
+
+export const hashPassword = (password) => bcrypt.hash(password, 10);
 
 export const getAll = async (filters = {}) => {
   const users = await User.findAll({
@@ -36,8 +39,12 @@ export const create = async (user) => {
   return newUser;
 };
 
-export const update = async (id, user) => {
-  await User.update(user, { where: { id } });
+export const update = async (id, data) => {
+  if (data.password) {
+    data.password = await hashPassword(data.password);
+  }
+
+  await User.update(data, { where: { id } });
 
   const updatedUser = await User.findOne({ where: { id } });
 

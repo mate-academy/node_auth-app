@@ -52,11 +52,11 @@ export const register = async (req, res) => {
     throw ApiError.badRequest('Bad Request', errors);
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await usersService.hashPassword(password);
 
   await usersService.register({ name, email, password: hashedPassword });
 
-  res.send({ messege: 'OK' });
+  res.send({ message: 'OK' });
 };
 
 export const login = async (req, res) => {
@@ -139,7 +139,7 @@ const generateTokens = async (res, user) => {
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day in ms
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 day in ms
     secure: process.env.APP_ENV !== 'development',
   });
 
@@ -174,7 +174,7 @@ export const resetPassword = async (req, res) => {
     resetToken,
   });
 
-  res.send({ messege: 'OK' });
+  res.send({ message: 'OK' });
 };
 
 export const confirmResetPassword = async (req, res) => {
@@ -193,12 +193,7 @@ export const confirmResetPassword = async (req, res) => {
     throw ApiError.badRequest('Link is not valid');
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  user.password = hashedPassword;
-  user.resetPasswordToken = null;
-
-  await user.save();
+  await usersService.update(user.id, { password, resetPasswordToken: null });
 
   res.send({ message: 'OK' });
 };

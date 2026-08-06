@@ -50,8 +50,23 @@ const sendResetPasswordMail = ({ email, resetToken }) => {
   });
 };
 
+const sendEmailChangedNotification = ({ oldEmail, newEmail }) => {
+  const html = `
+    <h1>Your email was changed</h1>
+    <p>Your email was changed from <b>${oldEmail}</b> to <b>${newEmail}</p>
+  `;
+
+  return send({
+    to: oldEmail,
+    subject: 'Email changed',
+    text: 'Email changed',
+    html,
+  });
+};
+
 export const emailService = {
   send,
   sendActivationMail,
   sendResetPasswordMail,
+  sendEmailChangedNotification,
 };

@@ -19,7 +19,7 @@ export const getOne = async (req, res) => {
 
 export const create = async (req, res) => {
   if (!todosService.isValidParams(req.body)) {
-    throw ApiError.badRequest();
+    throw ApiError.badRequest('Invalid todo params');
   }
 
   const todo = await todosService.create(req.body);

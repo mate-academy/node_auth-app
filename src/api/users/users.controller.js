@@ -1,5 +1,7 @@
+import bcrypt from 'bcrypt';
 import { ApiError } from '../../exceptions/api.error.js';
 import * as usersService from './users.service.js';
+import { emailService } from '../../services/email.service.js';
 
 export const getAll = async (req, res) => {
   // { activationToken: null } - filter only verified users
@@ -20,7 +22,7 @@ export const getOne = async (req, res) => {
 
 export const create = async (req, res) => {
   if (!usersService.isValidParams(req.body)) {
-    throw ApiError.badRequest();
+    throw ApiError.badRequest('Invalid user params');
   }
 
   const user = await usersService.create(req.body);
@@ -47,11 +49,77 @@ export const update = async (req, res) => {
     throw ApiError.notFound('User not found');
   }
 
-  if (!req.body || !usersService.isValidParams(req.body)) {
-    throw ApiError.badRequest();
+  const { name, currentPassword, newPassword, password, newEmail } = req.body;
+  const updates = {};
+  let oldEmail = null;
+
+  // Name change
+  if (name !== undefined) {
+    updates.name = name;
   }
 
-  const updatedUser = await usersService.update(req.params.id, req.body);
+  // Password change (requires current password verification)
+  if (currentPassword && newPassword) {
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw ApiError.badRequest('Wrong password', {
+        currentPassword: 'Wrong password',
+      });
+    }
+
+    if (newPassword.length < 6) {
+      throw ApiError.badRequest('Bad Request', {
+        newPassword: 'At least 6 characters',
+      });
+    }
+
+    updates.password = newPassword; // service auto-hashes
+  }
+
+  // Email change (requires password verification)
+  if (newEmail) {
+    if (!password) {
+      throw ApiError.badRequest('Password is required to change email', {
+        password: 'Password is required',
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw ApiError.badRequest('Wrong password', {
+        password: 'Wrong password',
+      });
+    }
+
+    const existingUser = await usersService.findByEmail(newEmail);
+
+    if (existingUser) {
+      throw ApiError.badRequest('Email already taken', {
+        newEmail: 'Email already taken',
+      });
+    }
+
+    oldEmail = user.email;
+    updates.email = newEmail;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    throw ApiError.badRequest('No valid fields to update');
+  }
+
+  const updatedUser = await usersService.update(req.params.id, updates);
+
+  if (oldEmail) {
+    await emailService.sendEmailChangedNotification({
+      oldEmail,
+      newEmail,
+    });
+  }
 
   res.send(usersService.normalize(updatedUser));
 };
