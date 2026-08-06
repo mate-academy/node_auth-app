@@ -1,3 +1,4 @@
+import { ApiError } from '../../exceptions/api.error.js';
 import * as usersService from './users.service.js';
 
 export const getAll = async (req, res) => {
@@ -11,7 +12,7 @@ export const getOne = async (req, res) => {
   const user = await usersService.getOne(req.params.id);
 
   if (!user) {
-    return res.sendStatus(404);
+    throw ApiError.notFound('User not found');
   }
 
   res.send(usersService.normalize(user));
@@ -19,7 +20,7 @@ export const getOne = async (req, res) => {
 
 export const create = async (req, res) => {
   if (!usersService.isValidParams(req.body)) {
-    return res.sendStatus(400);
+    throw ApiError.badRequest();
   }
 
   const user = await usersService.create(req.body);
@@ -31,7 +32,7 @@ export const deleteOne = async (req, res) => {
   const user = await usersService.getOne(req.params.id);
 
   if (!user) {
-    return res.sendStatus(404);
+    throw ApiError.notFound('User not found');
   }
 
   await usersService.deleteById(req.params.id);
@@ -43,11 +44,11 @@ export const update = async (req, res) => {
   const user = await usersService.getOne(req.params.id);
 
   if (!user) {
-    return res.sendStatus(404);
+    throw ApiError.notFound('User not found');
   }
 
   if (!req.body || !usersService.isValidParams(req.body)) {
-    return res.sendStatus(400);
+    throw ApiError.badRequest();
   }
 
   const updatedUser = await usersService.update(req.params.id, req.body);

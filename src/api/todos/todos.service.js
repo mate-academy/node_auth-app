@@ -33,3 +33,17 @@ export const deleteById = async (id) => {
 
   return deletedTodo;
 };
+
+export const isValidParams = (params, isUpdate = false) => {
+  if (!params) {
+    return false;
+  }
+
+  const { title, completed, status } = params;
+
+  if (isUpdate) {
+    return Boolean(title || completed !== undefined || status);
+  }
+
+  return Boolean(title);
+};

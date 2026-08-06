@@ -1,8 +1,9 @@
 import express from 'express';
-const { Router } = express;
 import * as usersController from './users.controller.js';
 import { authMiddleware } from '../../middlewares/authMiddleware.js';
 import { catchError } from '../../utils/catchError.js';
+
+const { Router } = express;
 
 const users = Router();
 

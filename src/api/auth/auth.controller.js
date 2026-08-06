@@ -90,7 +90,7 @@ export const activate = async (req, res) => {
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
-    return res.sendStatus(404);
+    throw ApiError.notFound('User not found');
   }
 
   user.activationToken = null;

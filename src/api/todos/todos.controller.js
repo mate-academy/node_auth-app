@@ -1,89 +1,56 @@
 import * as todosService from './todos.service.js';
+import { ApiError } from '../../exceptions/api.error.js';
 
 export const getAll = async (req, res) => {
-  try {
-    const todos = await todosService.getAll();
+  const todos = await todosService.getAll();
 
-    res.json(todos);
-  } catch (err) {
-    res.sendStatus(500);
-  }
+  res.json(todos);
 };
 
 export const getOne = async (req, res) => {
-  try {
-    const todo = await todosService.getOne(req.params.id);
+  const todo = await todosService.getOne(req.params.id);
 
-    if (!todo) {
-      return res.sendStatus(404);
-    }
-
-    res.json(todo);
-  } catch (err) {
-    res.sendStatus(500);
+  if (!todo) {
+    throw ApiError.notFound('Todo not found');
   }
+
+  res.json(todo);
 };
 
 export const create = async (req, res) => {
-  if (!isValidParams(req.body)) {
-    return res.sendStatus(400);
+  if (!todosService.isValidParams(req.body)) {
+    throw ApiError.badRequest();
   }
 
-  try {
-    const todo = await todosService.create(req.body);
+  const todo = await todosService.create(req.body);
 
-    res.status(201).json(todo);
-  } catch (err) {
-    res.sendStatus(500);
-  }
+  res.status(201).json(todo);
 };
 
 export const update = async (req, res) => {
-  try {
-    const todo = await todosService.getOne(req.params.id);
+  const todo = await todosService.getOne(req.params.id);
 
-    if (!todo) {
-      return res.sendStatus(404);
-    }
-
-    if (!req.body || !isValidParams(req.body, true)) {
-      return res.sendStatus(400);
-    }
-
-    const updatedTodo = await todosService.update(req.params.id, req.body);
-
-    res.json(updatedTodo);
-  } catch (err) {
-    res.sendStatus(500);
+  if (!todo) {
+    throw ApiError.notFound('Todo not found');
   }
+
+  if (!req.body || !todosService.isValidParams(req.body, true)) {
+    throw ApiError.badRequest('Invalid request');
+  }
+
+  const updatedTodo = await todosService.update(req.params.id, req.body);
+
+  res.send(updatedTodo);
 };
 
 export const deleteById = async (req, res) => {
-  try {
-    const todo = await todosService.getOne(req.params.id);
+  const todo = await todosService.getOne(req.params.id);
 
-    if (!todo) {
-      return res.sendStatus(404);
-    }
-
-    await todosService.deleteById(req.params.id);
-
-    res.sendStatus(204);
-  } catch (err) {
-    res.sendStatus(500);
-  }
-};
-
-const isValidParams = (params, isUpdate = false) => {
-  if (!params) {
-    return false;
+  if (!todo) {
+    throw ApiError.notFound('Todo not found');
   }
 
-  const { title, completed, status } = params;
+  await todosService.deleteById(req.params.id);
 
-  if (isUpdate) {
-    return Boolean(title || completed !== undefined || status);
-  }
-
-  return Boolean(title);
+  res.sendStatus(204);
 };

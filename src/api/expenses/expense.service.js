@@ -61,3 +61,17 @@ export const deleteById = async (id) => {
 
   return deletedExpense;
 };
+
+export const isValidParams = (params, isUpdate = false) => {
+  if (!params) {
+    return false;
+  }
+
+  const { title, amount, category, userId, note, spentAt } = params;
+
+  if (isUpdate) {
+    return Boolean(title || amount || category || userId || note);
+  }
+
+  return Boolean(title && amount && userId && spentAt);
+};
