@@ -49,7 +49,15 @@ export const update = async (req, res) => {
     throw ApiError.notFound('User not found');
   }
 
-  const { name, currentPassword, newPassword, password, newEmail } = req.body;
+  const {
+    name,
+    currentPassword,
+    newPassword,
+    confirmNewPassword,
+    password,
+    newEmail,
+    confirmNewEmail,
+  } = req.body;
   const updates = {};
   let oldEmail = null;
 
@@ -77,6 +85,18 @@ export const update = async (req, res) => {
       });
     }
 
+    if (!confirmNewPassword) {
+      throw ApiError.badRequest('Bad Request', {
+        confirmNewPassword: 'Confirmation is required',
+      });
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      throw ApiError.badRequest('Bad Request', {
+        confirmNewPassword: 'Passwords do not match',
+      });
+    }
+
     updates.password = newPassword; // service auto-hashes
   }
 
@@ -93,6 +113,18 @@ export const update = async (req, res) => {
     if (!isPasswordValid) {
       throw ApiError.badRequest('Wrong password', {
         password: 'Wrong password',
+      });
+    }
+
+    if (!confirmNewEmail) {
+      throw ApiError.badRequest('Bad Request', {
+        confirmNewEmail: 'Email confirmation is required',
+      });
+    }
+
+    if (newEmail !== confirmNewEmail) {
+      throw ApiError.badRequest('Bad Request', {
+        confirmNewEmail: 'Emails do not match',
       });
     }
 

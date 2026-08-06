@@ -8,7 +8,12 @@ const expenses = Router();
 expenses.get('/', authMiddleware, catchError(expensesController.getAll));
 expenses.get('/:id', authMiddleware, catchError(expensesController.getOne));
 expenses.post('/', authMiddleware, catchError(expensesController.create));
-expenses.delete('/:id', authMiddleware, catchError(expensesController.deleteOne));
+
+expenses.delete(
+  '/:id',
+  authMiddleware,
+  catchError(expensesController.deleteOne),
+);
 expenses.patch('/:id', authMiddleware, catchError(expensesController.update));
 
 export default expenses;

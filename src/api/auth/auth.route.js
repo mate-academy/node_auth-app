@@ -2,6 +2,7 @@ import express from 'express';
 import { authController } from './auth.controller.js';
 import { catchError } from '../../utils/catchError.js';
 import { guestMiddleware } from '../../middlewares/guestMiddleware.js';
+import { authMiddleware } from '../../middlewares/authMiddleware.js';
 
 const { Router } = express;
 
@@ -35,8 +36,7 @@ auth.get(
   catchError(authController.checkResetToken),
 );
 
-// Token management — no guard needed
-auth.get('/refresh', catchError(authController.refresh));
-auth.post('/logout', catchError(authController.logout));
+auth.get('/refresh', authMiddleware, catchError(authController.refresh));
+auth.post('/logout', authMiddleware, catchError(authController.logout));
 
 export default auth;

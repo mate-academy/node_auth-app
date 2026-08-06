@@ -178,13 +178,22 @@ export const resetPassword = async (req, res) => {
 };
 
 export const confirmResetPassword = async (req, res) => {
-  const { password } = req.body;
+  const { password, confirmation } = req.body;
   const { resetPasswordToken } = req.params;
 
-  const isPasswordValid = validatePassword(password);
+  const errors = {
+    password: validatePassword(password),
+    confirmation: !confirmation ? 'Confirmation is required' : undefined,
+  };
 
-  if (isPasswordValid) {
-    throw ApiError.badRequest('Bad Request', { password: isPasswordValid });
+  if (Object.values(errors).some(Boolean)) {
+    throw ApiError.badRequest('Bad Request', errors);
+  }
+
+  if (password !== confirmation) {
+    throw ApiError.badRequest('Bad Request', {
+      confirmation: 'Passwords do not match',
+    });
   }
 
   const user = await usersService.getByResetPasswordToken(resetPasswordToken);
