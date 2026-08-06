@@ -53,7 +53,7 @@ const sendResetPasswordMail = ({ email, resetToken }) => {
 const sendEmailChangedNotification = ({ oldEmail, newEmail }) => {
   const html = `
     <h1>Your email was changed</h1>
-    <p>Your email was changed from <b>${oldEmail}</b> to <b>${newEmail}</p>
+    <p>Your email was changed from <b>${oldEmail}</b> to <b>${newEmail}<b/></p>
   `;
 
   return send({
