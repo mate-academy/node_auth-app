@@ -79,6 +79,20 @@ export const login = async (req, res) => {
   generateTokens(res, user);
 };
 
+export const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const user = await jwtService.verifyRefresh(refreshToken);
+
+  if (!user || !refreshToken) {
+    throw ApiError.unauth();
+  }
+
+  await tokenService.remove(user.id);
+
+  res.sendStatus(204);
+};
+
 export const activate = async (req, res) => {
   const { activationToken } = req.params;
 
@@ -138,4 +152,5 @@ export const authController = {
   login,
   activate,
   refresh,
+  logout,
 };
