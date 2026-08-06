@@ -2,9 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import { routes } from '../api/routes.js';
 import { errorMiddleware } from '../middlewares/errorMiddleware.js';
+import cookieParser from 'cookie-parser';
 
 export const createServer = () => {
   const app = express();
+
+  app.use(express.json());
 
   app.use(
     cors({
@@ -13,7 +16,7 @@ export const createServer = () => {
     }),
   );
 
-  app.use(express.json());
+  app.use(cookieParser());
 
   for (const routeKey in routes) {
     app.use(`/${routeKey}`, routes[routeKey]);

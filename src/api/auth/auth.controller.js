@@ -3,6 +3,7 @@ import * as usersService from '../users/users.service.js';
 import { jwtService } from '../../services/jwt.service.js';
 import { ApiError } from '../../exceptions/api.error.js';
 import bcrypt from 'bcrypt';
+import { tokenService } from '../../models/token/token.service.js';
 
 const nameValidation = (name) => {
   if (!name) {
@@ -75,13 +76,7 @@ export const login = async (req, res) => {
     throw ApiError.badRequest('Account is not activated');
   }
 
-  const normalizedUser = usersService.normalize(user);
-  const accessToken = jwtService.sign(normalizedUser);
-
-  res.send({
-    user: normalizedUser,
-    accessToken,
-  });
+  generateTokens(res, user);
 };
 
 export const activate = async (req, res) => {
@@ -100,8 +95,47 @@ export const activate = async (req, res) => {
   res.send(user);
 };
 
+export const refresh = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    throw ApiError.unauth();
+  }
+
+  const user = jwtService.verifyRefresh(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!user || !token) {
+    throw ApiError.unauth();
+  }
+
+  generateTokens(res, user);
+};
+
+const generateTokens = async (res, user) => {
+  const normalizedUser = usersService.normalize(user);
+
+  const accessToken = jwtService.sign(normalizedUser);
+
+  const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day in ms
+    secure: process.env.APP_ENV !== 'development',
+  });
+
+  res.send({
+    user: normalizedUser,
+    accessToken,
+  });
+};
+
 export const authController = {
   register,
   login,
   activate,
+  refresh,
 };

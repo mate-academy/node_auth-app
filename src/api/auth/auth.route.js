@@ -9,5 +9,6 @@ const auth = Router();
 auth.post('/register', catchError(authController.register));
 auth.post('/login', catchError(authController.login));
 auth.get('/activation/:activationToken', catchError(authController.activate));
+auth.get('/refresh', catchError(authController.refresh));
 
 export default auth;
