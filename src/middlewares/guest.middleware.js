@@ -7,7 +7,7 @@ const { ApiError } = require('../utils/ApiError');
 
 async function guestMiddleware(req, res, next) {
   try {
-    const [type, token] = (req.headers.authorization || '').split(' ');
+    const [type, token] = (req.headers.authorization || '').trim().split(/\s+/);
 
     if (type === 'Bearer' && token) {
       try {

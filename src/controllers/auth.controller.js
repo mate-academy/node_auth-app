@@ -8,13 +8,8 @@ const {
   getRefreshToken,
 } = require('../utils/refreshCookie');
 
-function sendSession(res, session, status = 200) {
-  setRefreshCookie(res, session.refreshToken);
-
-  res.status(status).json({
-    user: session.user,
-    accessToken: session.accessToken,
-  });
+function clientUrl(path) {
+  return (process.env.CLIENT_URL || '/app') + path;
 }
 
 async function register(req, res) {
@@ -29,19 +24,28 @@ async function register(req, res) {
 async function activate(req, res) {
   const session = await authService.activate(req.params.token);
 
-  sendSession(res, session);
+  setRefreshCookie(res, session.refreshToken);
+
+  res.redirect(302, clientUrl('/profile'));
 }
 
 async function login(req, res) {
   const session = await authService.login(req.body);
 
-  sendSession(res, session);
+  setRefreshCookie(res, session.refreshToken);
+
+  res.redirect(303, clientUrl('/profile'));
 }
 
 async function refresh(req, res) {
   const session = await authService.refresh(getRefreshToken(req));
 
-  sendSession(res, session);
+  setRefreshCookie(res, session.refreshToken);
+
+  res.status(200).json({
+    user: session.user,
+    accessToken: session.accessToken,
+  });
 }
 
 async function logout(req, res) {
@@ -49,7 +53,7 @@ async function logout(req, res) {
 
   clearRefreshCookie(res);
 
-  res.status(204).send();
+  res.redirect(303, clientUrl('/login'));
 }
 
 async function requestPasswordReset(req, res) {

@@ -145,7 +145,13 @@
           data = null;
         }
 
-        return { ok: res.ok, status: res.status, data };
+        return {
+          ok: res.ok,
+          status: res.status,
+          redirected: res.redirected,
+          url: res.url,
+          data,
+        };
       }
 
       async function refreshSession() {
@@ -275,8 +281,8 @@
             return;
           }
 
-          setToken(res.data.accessToken);
-          currentUser = res.data.user;
+          setToken('');
+          await refreshSession();
           navigate('/profile');
         };
 
@@ -340,8 +346,8 @@
           return;
         }
 
-        setToken(res.data.accessToken);
-        currentUser = res.data.user;
+        setToken('');
+        await refreshSession();
         notice = { type: 'success', text: 'Account activated' };
         navigate('/profile');
       }

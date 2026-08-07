@@ -6,13 +6,13 @@ const { ApiError } = require('../utils/ApiError');
 
 async function authMiddleware(req, res, next) {
   try {
-    const authorization = req.headers.authorization;
+    const authorization = (req.headers.authorization || '').trim();
 
     if (!authorization) {
       throw ApiError.unauthorized('Authorization token is required');
     }
 
-    const [type, token] = authorization.split(' ');
+    const [type, token] = authorization.split(/\s+/);
 
     if (type !== 'Bearer' || !token) {
       throw ApiError.unauthorized('Invalid authorization format');
