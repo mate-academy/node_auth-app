@@ -44,7 +44,14 @@ async function updatePassword(req, res) {
 }
 
 async function updateEmail(req, res) {
-  const { email, password } = req.body;
+  const { email, emailConfirmation, password } = req.body;
+
+  if (email !== emailConfirmation) {
+    res.status(400).json({ message: 'Confirmation must match the new email' });
+
+    return;
+  }
+
   const user = await User.findByPk(req.user.id);
   const isPasswordValid = await bcrypt.compare(password, user.password);
 

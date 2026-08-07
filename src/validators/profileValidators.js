@@ -22,6 +22,9 @@ const passwordValidator = [
 
 const emailValidator = [
   body('email').isEmail().withMessage('Email must be valid'),
+  body('emailConfirmation')
+    .custom((value, { req }) => value === req.body.email)
+    .withMessage('Confirmation must match the new email'),
   body('password').notEmpty().withMessage('Password is required'),
 ];
 
