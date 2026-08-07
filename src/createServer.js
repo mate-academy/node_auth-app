@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 
@@ -8,16 +9,22 @@ const { profileRouter } = require('./routes/profile.routes');
 const { errorMiddleware } = require('./middlewares/error.middleware');
 const { PASSWORD_RULES } = require('./utils/validatePassword');
 
+const CLIENT_DIR = path.join(__dirname, '..', 'public');
+
 function createServer() {
   const app = express();
 
   app.use(express.json());
   app.use(cookieParser());
 
+  app.use('/app', express.static(CLIENT_DIR));
+
+  app.get('/app/*splat', (req, res) => {
+    res.sendFile(path.join(CLIENT_DIR, 'index.html'));
+  });
+
   app.get('/', (req, res) => {
-    res.status(200).json({
-      message: 'Auth API is running',
-    });
+    res.redirect('/app/');
   });
 
   app.get('/password-rules', (req, res) => {

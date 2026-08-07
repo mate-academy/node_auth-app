@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth App</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 480px;
+        margin: 40px auto;
+        padding: 0 16px;
+        color: #222;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      h2 {
+        font-size: 16px;
+        margin-top: 28px;
+      }
+
+      form {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      input {
+        padding: 8px;
+        border: 1px solid #bbb;
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      button {
+        padding: 8px 12px;
+        border: 0;
+        border-radius: 4px;
+        background: #2d6cdf;
+        color: #fff;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      button.link {
+        background: none;
+        color: #2d6cdf;
+        text-decoration: underline;
+        padding: 0;
+        text-align: left;
+      }
+
+      nav {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .message {
+        padding: 8px;
+        border-radius: 4px;
+        margin: 12px 0;
+        font-size: 14px;
+        white-space: pre-line;
+      }
+
+      .error {
+        background: #fdeaea;
+        color: #a11;
+      }
+
+      .success {
+        background: #e8f6ec;
+        color: #171;
+      }
+
+      .rules {
+        font-size: 13px;
+        color: #666;
+        padding-left: 18px;
+      }
+
+      pre {
+        background: #f4f4f4;
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script>
+      const BASE = '/app';
+
+      const root = document.getElementById('root');
+
+      let accessToken = localStorage.getItem('accessToken') || '';
+      let currentUser = null;
+      let notice = null;
+
+      function setToken(token) {
+        accessToken = token || '';
+
+        if (token) {
+          localStorage.setItem('accessToken', token);
+        } else {
+          localStorage.removeItem('accessToken');
+        }
+      }
+
+      async function api(method, path, body) {
+        const headers = {};
+
+        if (body) {
+          headers['Content-Type'] = 'application/json';
+        }
+
+        if (accessToken) {
+          headers.Authorization = 'Bearer ' + accessToken;
+        }
+
+        const res = await fetch(path, {
+          method,
+          headers,
+          credentials: 'include',
+          body: body ? JSON.stringify(body) : undefined,
+        });
+
+        let data = null;
+
+        try {
+          data = await res.json();
+        } catch (e) {
+          data = null;
+        }
+
+        return { ok: res.ok, status: res.status, data };
+      }
+
+      async function refreshSession() {
+        const res = await api('POST', '/refresh');
+
+        if (res.ok) {
+          setToken(res.data.accessToken);
+          currentUser = res.data.user;
+        } else {
+          setToken('');
+          currentUser = null;
+        }
+
+        return res.ok;
+      }
+
+      async function apiAuth(method, path, body) {
+        let res = await api(method, path, body);
+
+        if (res.status === 401 && (await refreshSession())) {
+          res = await api(method, path, body);
+        }
+
+        return res;
+      }
+
+      function errorText(data) {
+        if (!data) {
+          return 'Request failed';
+        }
+
+        const details = data.details ? '\n- ' + data.details.join('\n- ') : '';
+
+        return (data.message || 'Request failed') + details;
+      }
+
+      function navigate(path) {
+        history.pushState(null, '', BASE + path);
+        render();
+      }
+
+      function route() {
+        const path = location.pathname.replace(BASE, '');
+
+        return path === '' ? '/' : path;
+      }
+
+      function el(html) {
+        const wrapper = document.createElement('div');
+
+        wrapper.innerHTML = html;
+
+        return wrapper;
+      }
+
+      function show(view) {
+        root.innerHTML = '';
+
+        if (notice) {
+          const box = document.createElement('div');
+
+          box.className = 'message ' + notice.type;
+          box.textContent = notice.text;
+          root.appendChild(box);
+          notice = null;
+        }
+
+        root.appendChild(view);
+      }
+
+      function status(node, type, text) {
+        const box = node.querySelector('#status');
+
+        box.className = 'message ' + type;
+        box.textContent = text;
+      }
+
+      async function passwordRules() {
+        const res = await api('GET', '/password-rules');
+
+        if (!res.ok) {
+          return '';
+        }
+
+        return (
+          '<ul class="rules">' +
+          res.data.rules.map((rule) => '<li>' + rule + '</li>').join('') +
+          '</ul>'
+        );
+      }
+
+      function link(node, selector, path) {
+        node.querySelector(selector).onclick = () => navigate(path);
+      }
+
+      async function loginPage() {
+        const view = el(`
+          <h1>Login</h1>
+          <form id="form">
+            <input name="email" type="email" placeholder="Email" required />
+            <input name="password" type="password" placeholder="Password" required />
+            <button type="submit">Log in</button>
+          </form>
+          <nav>
+            <button class="link" id="toRegister">Register</button>
+            <button class="link" id="toReset">Forgot password?</button>
+          </nav>
+          <div id="status"></div>
+        `);
+
+        link(view, '#toRegister', '/register');
+        link(view, '#toReset', '/reset-password');
+
+        view.querySelector('#form').onsubmit = async (event) => {
+          event.preventDefault();
+
+          const form = new FormData(event.target);
+
+          const res = await api('POST', '/login', {
+            email: form.get('email'),
+            password: form.get('password'),
+          });
+
+          if (!res.ok) {
+            status(view, 'error', errorText(res.data));
+
+            return;
+          }
+
+          setToken(res.data.accessToken);
+          currentUser = res.data.user;
+          navigate('/profile');
+        };
+
+        show(view);
+      }
+
+      async function registerPage() {
+        const view = el(`
+          <h1>Register</h1>
+          <form id="form">
+            <input name="name" placeholder="Name" required />
+            <input name="email" type="email" placeholder="Email" required />
+            <input name="password" type="password" placeholder="Password" required />
+            <button type="submit">Register</button>
+          </form>
+          ${await passwordRules()}
+          <nav><button class="link" id="toLogin">Back to login</button></nav>
+          <div id="status"></div>
+        `);
+
+        link(view, '#toLogin', '/login');
+
+        view.querySelector('#form').onsubmit = async (event) => {
+          event.preventDefault();
+
+          const form = new FormData(event.target);
+
+          const res = await api('POST', '/register', {
+            name: form.get('name'),
+            email: form.get('email'),
+            password: form.get('password'),
+          });
+
+          if (!res.ok) {
+            status(view, 'error', errorText(res.data));
+
+            return;
+          }
+
+          status(
+            view,
+            'success',
+            'Check ' + res.data.user.email + ' and follow the activation link',
+          );
+          event.target.reset();
+        };
+
+        show(view);
+      }
+
+      async function activatePage(token) {
+        const view = el('<h1>Activation</h1><div id="status"></div>');
+
+        show(view);
+
+        const res = await api('GET', '/activate/' + token);
+
+        if (!res.ok) {
+          status(view, 'error', errorText(res.data));
+
+          return;
+        }
+
+        setToken(res.data.accessToken);
+        currentUser = res.data.user;
+        notice = { type: 'success', text: 'Account activated' };
+        navigate('/profile');
+      }
+
+      async function resetRequestPage() {
+        const view = el(`
+          <h1>Password reset</h1>
+          <form id="form">
+            <input name="email" type="email" placeholder="Email" required />
+            <button type="submit">Send reset link</button>
+          </form>
+          <nav><button class="link" id="toLogin">Back to login</button></nav>
+          <div id="status"></div>
+        `);
+
+        link(view, '#toLogin', '/login');
+
+        view.querySelector('#form').onsubmit = async (event) => {
+          event.preventDefault();
+
+          const form = new FormData(event.target);
+
+          const res = await api('POST', '/reset-password', {
+            email: form.get('email'),
+          });
+
+          status(
+            view,
+            res.ok ? 'success' : 'error',
+            res.ok ? res.data.message : errorText(res.data),
+          );
+        };
+
+        show(view);
+      }
+
+      async function resetConfirmPage(token) {
+        const view = el(`
+          <h1>New password</h1>
+          <form id="form">
+            <input name="password" type="password" placeholder="New password" required />
+            <input name="confirmation" type="password" placeholder="Confirm password" required />
+            <button type="submit">Save</button>
+          </form>
+          ${await passwordRules()}
+          <div id="status"></div>
+        `);
+
+        view.querySelector('#form').onsubmit = async (event) => {
+          event.preventDefault();
+
+          const form = new FormData(event.target);
+
+          const res = await api('POST', '/reset-password/' + token, {
+            password: form.get('password'),
+            confirmation: form.get('confirmation'),
+          });
+
+          if (!res.ok) {
+            status(view, 'error', errorText(res.data));
+
+            return;
+          }
+
+          root.innerHTML = '';
+
+          const done = el(`
+            <h1>Password changed</h1>
+            <div class="message success">You can log in with the new password</div>
+            <nav><button class="link" id="toLogin">Go to login</button></nav>
+          `);
+
+          link(done, '#toLogin', '/login');
+          root.appendChild(done);
+        };
+
+        show(view);
+      }
+
+      async function confirmEmailPage(token) {
+        const view = el('<h1>Email confirmation</h1><div id="status"></div>');
+
+        show(view);
+
+        const res = await api('GET', '/confirm-email/' + token);
+
+        if (!res.ok) {
+          status(view, 'error', errorText(res.data));
+
+          return;
+        }
+
+        currentUser = res.data.user;
+        status(view, 'success', 'Email changed to ' + res.data.user.email);
+
+        const nav = el('<nav><button class="link" id="toProfile">Profile</button></nav>');
+
+        link(nav, '#toProfile', '/profile');
+        view.appendChild(nav);
+      }
+
+      async function profilePage() {
+        const profile = await apiAuth('GET', '/profile');
+
+        if (!profile.ok) {
+          setToken('');
+          currentUser = null;
+          notice = { type: 'error', text: 'Please log in' };
+          navigate('/login');
+
+          return;
+        }
+
+        currentUser = profile.data.user;
+
+        const view = el(`
+          <h1>Profile</h1>
+          <pre id="user"></pre>
+          <button id="logout">Log out</button>
+
+          <h2>Change name</h2>
+          <form id="nameForm">
+            <input name="name" placeholder="New name" required />
+            <button type="submit">Save name</button>
+          </form>
+
+          <h2>Change password</h2>
+          <form id="passwordForm">
+            <input name="oldPassword" type="password" placeholder="Old password" required />
+            <input name="newPassword" type="password" placeholder="New password" required />
+            <input name="confirmation" type="password" placeholder="Confirm new password" required />
+            <button type="submit">Save password</button>
+          </form>
+          ${await passwordRules()}
+
+          <h2>Change email</h2>
+          <form id="emailForm">
+            <input name="email" type="email" placeholder="New email" required />
+            <input name="password" type="password" placeholder="Current password" required />
+            <button type="submit">Send confirmation</button>
+          </form>
+
+          <div id="status"></div>
+        `);
+
+        const renderUser = () => {
+          view.querySelector('#user').textContent = JSON.stringify(
+            currentUser,
+            null,
+            2,
+          );
+        };
+
+        renderUser();
+
+        view.querySelector('#logout').onclick = async () => {
+          await apiAuth('POST', '/logout');
+          setToken('');
+          currentUser = null;
+          notice = { type: 'success', text: 'Logged out' };
+          navigate('/login');
+        };
+
+        view.querySelector('#nameForm').onsubmit = async (event) => {
+          event.preventDefault();
+
+          const form = new FormData(event.target);
+
+          const res = await apiAuth('PATCH', '/profile/name', {
+            name: form.get('name'),
+          });
+
+          if (!res.ok) {
+            status(view, 'error', errorText(res.data));
+
+            return;
+          }
+
+          currentUser = res.data.user;
+          renderUser();
+          status(view, 'success', res.data.message);
+          event.target.reset();
+        };
+
+        view.querySelector('#passwordForm').onsubmit = async (event) => {
+          event.preventDefault();
+
+          const form = new FormData(event.target);
+
+          const res = await apiAuth('PATCH', '/profile/password', {
+            oldPassword: form.get('oldPassword'),
+            newPassword: form.get('newPassword'),
+            confirmation: form.get('confirmation'),
+          });
+
+          status(
+            view,
+            res.ok ? 'success' : 'error',
+            res.ok ? res.data.message : errorText(res.data),
+          );
+
+          if (res.ok) {
+            event.target.reset();
+          }
+        };
+
+        view.querySelector('#emailForm').onsubmit = async (event) => {
+          event.preventDefault();
+
+          const form = new FormData(event.target);
+
+          const res = await apiAuth('PATCH', '/profile/email', {
+            email: form.get('email'),
+            password: form.get('password'),
+          });
+
+          status(
+            view,
+            res.ok ? 'success' : 'error',
+            res.ok ? res.data.message : errorText(res.data),
+          );
+
+          if (res.ok) {
+            event.target.reset();
+          }
+        };
+
+        show(view);
+      }
+
+      function notFoundPage() {
+        const view = el(`
+          <h1>404</h1>
+          <div class="message error">Page not found</div>
+          <nav><button class="link" id="toHome">Go home</button></nav>
+        `);
+
+        link(view, '#toHome', '/');
+        show(view);
+      }
+
+      async function render() {
+        const path = route();
+
+        const activate = path.match(/^\/activate\/(.+)$/);
+        const reset = path.match(/^\/reset-password\/(.+)$/);
+        const confirm = path.match(/^\/confirm-email\/(.+)$/);
+
+        const isAuthenticated = accessToken
+          ? true
+          : await refreshSession();
+
+        if (confirm) {
+          return confirmEmailPage(confirm[1]);
+        }
+
+        if (isAuthenticated) {
+          if (path === '/profile') {
+            return profilePage();
+          }
+
+          if (
+            path === '/' ||
+            path === '/login' ||
+            path === '/register' ||
+            path === '/reset-password' ||
+            activate ||
+            reset
+          ) {
+            return navigate('/profile');
+          }
+
+          return notFoundPage();
+        }
+
+        if (activate) {
+          return activatePage(activate[1]);
+        }
+
+        if (reset) {
+          return resetConfirmPage(reset[1]);
+        }
+
+        if (path === '/' || path === '/login') {
+          return loginPage();
+        }
+
+        if (path === '/register') {
+          return registerPage();
+        }
+
+        if (path === '/reset-password') {
+          return resetRequestPage();
+        }
+
+        if (path === '/profile') {
+          notice = { type: 'error', text: 'Please log in' };
+
+          return navigate('/login');
+        }
+
+        return notFoundPage();
+      }
+
+      window.onpopstate = render;
+
+      render();
+    </script>
+  </body>
+</html>
