@@ -11,7 +11,7 @@ Implement an application that allows user to:
   - Redirect to profile after login
 - Logout (only authenticated)
   - Redirect to login after logging out
-- Password reset (only non authenticated)
+- Password reset (only non authenticated) 
   - Ask for an email
   - Show email sent page
   - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
