@@ -3,9 +3,9 @@ import { emailService } from '../services/emailService.js';
 import { userService } from '../services/userService.js';
 import bcrypt from 'bcrypt';
 
-async function nameChange(req, res, naxt) {
+async function nameChange(req, res, next) {
   const { email, password } = req.body;
-  const user = userService.getByEmail(email);
+  const user = await userService.getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('User does not exist');
@@ -17,8 +17,8 @@ async function nameChange(req, res, naxt) {
 async function passwordChange(req, res, next) {
   const { email, password, confirmPassword } = req.body;
 
-  const user = userService.getByEmail(email);
-  const isMatched = bcrypt.compare(password, user.password);
+  const user = await userService.getByEmail(email);
+  const isMatched = await bcrypt.compare(password, user.password);
 
   if (!user) {
     throw ApiError.BadRequest('User with this email does not exist');
@@ -38,7 +38,7 @@ async function passwordChange(req, res, next) {
 async function emailChange(req, res, next) {
   const { password, newEmail, email } = req.body;
 
-  const user = userService.getByEmail(email);
+  const user = await userService.getByEmail(email);
   const isPasswordValid = bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {

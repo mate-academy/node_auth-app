@@ -2,7 +2,6 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import { User } from '../models/User.js';
-import nodeCrypto from 'node:crypto';
 
 passport.use(
   new GoogleStrategy(
@@ -13,13 +12,25 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+        const email =
+          profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+
+        if (!email) {
+          return done(null, false, {
+            meassage: 'Email not provided by OAuth provider',
+          });
+        }
+
+        let user = await User.findOne({
+          where: { email: profile.emails[0].value },
+        });
 
         if (!user) {
           user = await User.create({
             name: profile.displayName,
             email: profile.emails[0].value,
-            password: nodeCrypto.randomBytes(16).toString('hex'),
+            password: crypto.randomUUID(),
+            activationToken: null,
           });
         }
 
@@ -40,13 +51,25 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await User.findOne({ email: profile.emails[0].value });
+        const email =
+          profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+
+        if (!email) {
+          return done(null, false, {
+            meassage: 'Email not provided by OAuth provider',
+          });
+        }
+
+        let user = await User.findOne({
+          where: { email: profile.emails[0].value },
+        });
 
         if (!user) {
           user = await User.create({
             name: profile.username || profile.displayName,
-            email: profile.email[0].value,
-            password: nodeCrypto.randomBytes(16).toString('hex'),
+            email: profile.emails[0].value,
+            password: crypto.randomUUID(),
+            activationToken: null,
           });
         }
 

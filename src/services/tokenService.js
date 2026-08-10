@@ -18,13 +18,13 @@ async function save(userId, refreshToken) {
 
 function getByToken(refreshToken) {
   return Token.findOne({
-    where: refreshToken,
+    where: { refreshToken },
   });
 }
 
 function remove(userId) {
   return Token.destroy({
-    where: userId,
+    where: { userId },
   });
 }
 

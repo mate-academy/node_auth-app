@@ -35,13 +35,13 @@ async function register(req, res, next) {
     throw ApiError.BadRequest('Validation error', errors);
   }
 
-  await userService.register(name, email, password);
+  await userService.register({ name, email, password });
 
   res.send({ message: 'OK' });
 }
 
 async function activate(req, res, next) {
-  const { activationToken } = req.body;
+  const { activationToken } = req.params;
 
   const user = await User.findOne({
     where: { activationToken },
@@ -69,13 +69,13 @@ async function forgotPassword(req, res, next) {
 
 async function login(req, res, next) {
   const { name, email, password } = req.body;
-  const user = userService.getByEmail(email);
+  const user = await userService.getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('User with this email does not exist');
   }
 
-  const isPasswordValid = bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Password is wrong');
@@ -85,7 +85,7 @@ async function login(req, res, next) {
     throw ApiError.BadRequest('Name is wrong');
   }
 
-  if (user.activationToken !== null) {
+  if (user.activationToken) {
     throw ApiError.Unauthorized();
   }
 
@@ -126,7 +126,7 @@ async function refresh(req, res, next) {
 
 async function resetPassword(req, res, next) {
   const { email, password, confirmPassword } = req.body;
-  const user = userService.getByEmail(email);
+  const user = await userService.getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('User with this email does not exist');
@@ -136,12 +136,10 @@ async function resetPassword(req, res, next) {
     throw ApiError.BadRequest('Passwords should be equal');
   }
 
-  await userService.resetPassword(email, password);
-
-  res.redirect('/success');
+  await userService.resetPassword(user, password);
 }
 
-async function sendAuthentication(res, user) {
+async function sendAuthentication(res, user, redirect = false) {
   const userData = userService.normalize(user);
   const accessToken = jwtService.generateAccessToken(userData);
   const refreshToken = jwtService.generateRefreshToken(userData);
@@ -155,12 +153,16 @@ async function sendAuthentication(res, user) {
     secure: true,
   });
 
-  res
-    .send({
-      user: userData,
-      accessToken,
-    })
-    .redirect('/profile');
+  if (redirect) {
+    return res.redirect(
+      `${process.env.CLIENT_URL}/oauth-success?accessToken=${accessToken}`,
+    );
+  }
+
+  res.send({
+    user: userData,
+    accessToken,
+  });
 }
 
 export const authController = {
@@ -171,4 +173,5 @@ export const authController = {
   logout,
   forgotPassword,
   resetPassword,
+  sendAuthentication,
 };

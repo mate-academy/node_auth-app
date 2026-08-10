@@ -6,7 +6,7 @@ import { emailService } from './emailService.js';
 
 function getByEmail(email) {
   return User.findOne({
-    where: email,
+    where: { email },
   });
 }
 

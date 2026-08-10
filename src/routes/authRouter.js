@@ -22,6 +22,11 @@ authRouter.post('/passwordChange', catchError(authController.passwordChange));
 authRouter.get(
   '/login/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }),
+  catchError(async (req, res) => {
+    const user = req.user;
+
+    await authController.sendAuthentication(res, user, true);
+  }),
 );
 
 authRouter.get(
@@ -38,6 +43,11 @@ authRouter.get(
 authRouter.get(
   '/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),
+  catchError(async (req, res) => {
+    const user = req.user;
+
+    await authController.sendAuthentication(res, user, true);
+  }),
 );
 
 authRouter.get(
