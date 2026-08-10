@@ -1,4 +1,4 @@
-import { ApiError } from '../exeptions/ApiError.js';
+import { ApiError } from '../exceptions/ApiError.js';
 import { User } from '../models/User.js';
 import { emailService } from '../services/emailService.js';
 import { jwtService } from '../services/jwtService.js';

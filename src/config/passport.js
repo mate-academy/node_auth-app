@@ -17,12 +17,12 @@ passport.use(
 
         if (!email) {
           return done(null, false, {
-            meassage: 'Email not provided by OAuth provider',
+            message: 'Email not provided by OAuth provider',
           });
         }
 
         let user = await User.findOne({
-          where: { email: profile.emails[0].value },
+          where: { email },
         });
 
         if (!user) {
@@ -48,6 +48,7 @@ passport.use(
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: process.env.GITHUB_CALLBACK_URL,
+      scope: ['user:email'],
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
@@ -56,12 +57,12 @@ passport.use(
 
         if (!email) {
           return done(null, false, {
-            meassage: 'Email not provided by OAuth provider',
+            message: 'Email not provided by OAuth provider',
           });
         }
 
         let user = await User.findOne({
-          where: { email: profile.emails[0].value },
+          where: { email },
         });
 
         if (!user) {

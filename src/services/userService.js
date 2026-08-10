@@ -1,4 +1,4 @@
-import { ApiError } from '../exeptions/ApiError.js';
+import { ApiError } from '../exceptions/ApiError.js';
 import { User } from '../models/User.js';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
@@ -15,7 +15,7 @@ function normalize({ name, email, password }) {
 }
 
 async function register({ name, email, password }) {
-  const userExists = getByEmail(email);
+  const userExists = await getByEmail(email);
 
   if (userExists) {
     throw ApiError.BadRequest('Validation error', {
@@ -36,7 +36,7 @@ async function register({ name, email, password }) {
 }
 
 async function forgotPassword(email) {
-  const user = getByEmail(email);
+  const user = await getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('Validation error', {
@@ -49,6 +49,7 @@ async function forgotPassword(email) {
   await user.set({
     resetToken: resetToken,
   });
+  await user.save();
 
   await emailService.sendResetLink(email, resetToken);
 }
@@ -65,7 +66,7 @@ async function resetPassword(user, newPassword) {
 }
 
 async function nameChange(email, name) {
-  const user = getByEmail(email);
+  const user = await getByEmail(email);
 
   user.set({
     name: name,

@@ -1,17 +1,19 @@
-import { ApiError } from '../exeptions/ApiError.js';
+import { ApiError } from '../exceptions/ApiError.js';
 import { emailService } from '../services/emailService.js';
 import { userService } from '../services/userService.js';
 import bcrypt from 'bcrypt';
 
 async function nameChange(req, res, next) {
-  const { email, password } = req.body;
+  const { email, newName } = req.body;
   const user = await userService.getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('User does not exist');
   }
 
-  await userService.nameChange(user, password);
+  await userService.nameChange(user, newName);
+
+  res.send({ message: 'OK' });
 }
 
 async function passwordChange(req, res, next) {
@@ -33,13 +35,15 @@ async function passwordChange(req, res, next) {
   }
 
   await userService.resetPassword(email, password);
+
+  res.send({ message: 'OK' });
 }
 
 async function emailChange(req, res, next) {
   const { password, newEmail, email } = req.body;
 
   const user = await userService.getByEmail(email);
-  const isPasswordValid = bcrypt.compare(password, user.password);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw ApiError.BadRequest('Password is wrong');
@@ -52,6 +56,8 @@ async function emailChange(req, res, next) {
   }
 
   await userService.emailChange(user, newEmail, email);
+
+  res.send({ message: 'OK' });
 }
 
 export const profileController = {
