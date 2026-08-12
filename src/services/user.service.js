@@ -6,8 +6,13 @@ import { emailService } from './email.service.js';
 import { jwtService } from './jwt.service.js';
 import { tokenService } from './token.service.js';
 
-function normalizeUser({ id, email, isActivated }) {
-  return { id, email, isActivated };
+function normalizeUser({ id, name, email, isActivated }) {
+  return {
+    id,
+    name,
+    email,
+    isActivated,
+  };
 }
 
 async function register({ name, email, password }) {
@@ -22,6 +27,7 @@ async function register({ name, email, password }) {
   const activationToken = randomUUID();
 
   const user = await User.create({
+    name,
     email,
     password: passwordHash,
     activationToken,
@@ -58,7 +64,7 @@ async function login({ email, password }) {
     throw ApiError.badRequest('Wrong password');
   }
 
-  if (user.activationToken !== null) {
+  if (!user.isActivated) {
     throw ApiError.badRequest('Account is not activated');
   }
 

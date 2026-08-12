@@ -19,7 +19,7 @@ export function send({ email, subject, html }) {
 }
 
 function sendActivationEmail(email, token) {
-  const href = `${process.env.CLIENT_HOST}/activate/${token}`;
+  const href = `${process.env.CLIENT_URL}/activate/${token}`;
   const html = `
   <h1>Activate account</h1>
   <a href="${href}">${href}</a>
@@ -33,7 +33,7 @@ function sendActivationEmail(email, token) {
 }
 
 function sendPasswordResetLink(email, token) {
-  const href = `${process.env.CLIENT_HOST}/reset-password/${token}`;
+  const href = `${process.env.CLIENT_URL}/reset-password/${token}`;
   const html = `
   <h1>Reset password</h1>
   <a href="${href}">${href}</a>

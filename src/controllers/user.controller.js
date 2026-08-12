@@ -4,7 +4,7 @@ import { User } from '../models/user.js';
 export const userController = {
   async getAllActivated(req, res) {
     const users = await User.findAll({
-      where: { activationToken: null },
+      where: { isActivated: true },
     });
 
     res.send(users);
