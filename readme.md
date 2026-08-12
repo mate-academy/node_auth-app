@@ -21,8 +21,3 @@ Implement an application that allows user to:
   - It allows to change a password (require an old one, `new password` and `confirmation`)
   - To change an email you should type the password, confirm the new email and notify the old email about the change
 - 404 for all the other pages
-
-## (Optional) Advanced tasks
-- Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
-- Profile page should allow to add/remove any social account
-- Add authentication to your Accounting App
