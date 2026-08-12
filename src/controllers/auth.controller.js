@@ -10,8 +10,8 @@ function setRefreshTokenCookie(res, refreshToken) {
 
 export const authController = {
   async register(req, res) {
-    const { email, password } = req.body;
-    const user = await userService.register({ email, password });
+    const { name, email, password } = req.body;
+    const user = await userService.register({ name, email, password });
 
     res.status(201).send(user);
   },
@@ -21,7 +21,7 @@ export const authController = {
 
     await userService.activate(activationToken);
 
-    res.send({ message: 'Account activated successfully' });
+    res.redirect(`${process.env.CLIENT_URL}/profile`);
   },
 
   async login(req, res) {

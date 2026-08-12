@@ -1,7 +1,7 @@
 import { ApiError } from '../exceptions/api.error.js';
 import { User } from '../models/user.js';
 import { randomUUID } from 'crypto';
-import { bcrypt } from 'bcrypt';
+import bcrypt from 'bcrypt';
 import { emailService } from './email.service.js';
 import { jwtService } from './jwt.service.js';
 import { tokenService } from './token.service.js';
@@ -32,7 +32,7 @@ async function register({ name, email, password }) {
   return normalizeUser(user);
 }
 
-async function active(activationToken) {
+async function activate(activationToken) {
   const user = await User.findOne({ where: { activationToken } });
 
   if (!user) {
@@ -125,7 +125,7 @@ async function refresh(refreshToken) {
 
 export const userService = {
   register,
-  active,
+  activate,
   login,
   logout,
   updateProfile,

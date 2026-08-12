@@ -4,20 +4,20 @@ async function save(userId, newToken) {
   const token = await Token.findOne({ where: { userId } });
 
   if (!token) {
-    await Token.create({ userId, refreshToken: newToken });
+    return Token.create({ userId, refreshToken: newToken });
   }
 
   token.refreshToken = newToken;
 
-  await token.save();
+  return token.save();
 }
 
 async function getByToken(refreshToken) {
-  await Token.findOne({ where: { refreshToken } });
+  return Token.findOne({ where: { refreshToken } });
 }
 
 async function remove(userId) {
-  await Token.destroy({ where: { userId } });
+  return Token.destroy({ where: { userId } });
 }
 
 export const tokenService = {

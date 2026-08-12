@@ -2,6 +2,9 @@ import { DataTypes } from 'sequelize';
 import { client } from '../utils/db.js';
 
 export const User = client.define('User', {
+  name: {
+    type: DataTypes.STRING,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -10,6 +13,10 @@ export const User = client.define('User', {
   password: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  isActivated: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   activationToken: {
     type: DataTypes.STRING,
