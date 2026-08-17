@@ -26,3 +26,6 @@ Implement an application that allows user to:
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
 - Profile page should allow to add/remove any social account
 - Add authentication to your Accounting App
+
+
+спочатку схеми зрбити щоб кожна схема мала баді парамс квері
