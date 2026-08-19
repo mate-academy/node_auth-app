@@ -26,3 +26,68 @@ Implement an application that allows user to:
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
 - Profile page should allow to add/remove any social account
 - Add authentication to your Accounting App
+
+## Implemented solution
+
+This repository now contains a complete Express authentication application with:
+
+- registration with name, email, password rules, and activation email;
+- one-time email activation with automatic sign-in and profile redirect;
+- login and logout with protected/guest-only routes;
+- password reset email, confirmation validation, and success page;
+- authenticated profile with name, password, and email changes;
+- confirmation of the new email and notification to the old email;
+- HTML pages plus JSON API endpoints;
+- PostgreSQL persistence through Sequelize;
+- hashed passwords and hashed opaque session tokens;
+- HttpOnly session cookies with SameSite protection;
+- 404 handling for unknown API endpoints and pages.
+
+### Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy `.env.example` to `.env` and configure PostgreSQL.
+
+3. Start the application:
+
+```bash
+npm start
+```
+
+The default address is `http://localhost:3000`.
+
+### Email delivery
+
+In development and tests, sent messages are kept in the email service outbox.
+For real delivery, configure `MAIL_WEBHOOK_URL` with an HTTP endpoint that accepts
+JSON email payloads. `MAIL_WEBHOOK_TOKEN` can be used for a Bearer token.
+
+### API
+
+| Method | Endpoint | Access | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/auth/password-rules` | Public | Password policy |
+| POST | `/api/auth/register` | Guest | Register |
+| GET | `/api/auth/activate/:token` | Guest | Activate account |
+| POST | `/api/auth/login` | Guest | Login |
+| POST | `/api/auth/logout` | Authenticated | Logout |
+| POST | `/api/password/forgot` | Guest | Request reset |
+| POST | `/api/password/reset/:token` | Guest | Reset password |
+| GET | `/api/profile` | Authenticated | Read profile |
+| PATCH | `/api/profile/name` | Authenticated | Change name |
+| PATCH | `/api/profile/password` | Authenticated | Change password |
+| PATCH | `/api/profile/email` | Authenticated | Change email |
+
+### Quality checks
+
+```bash
+npm test
+```
+
+The test command runs formatting/linting, local quality checks, and the Mate
+Academy Jest suite.

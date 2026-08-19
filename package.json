@@ -1,7 +1,7 @@
 {
   "name": "node_auth-app",
   "version": "1.0.0",
-  "description": "Auth app",
+  "description": "Secure authentication application",
   "main": "src/index.js",
   "scripts": {
     "init": "mate-scripts init",
@@ -9,15 +9,22 @@
     "lint": "npm run format && mate-scripts lint",
     "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
     "test:only": "mate-scripts test",
+    "test:quality": "node --test quality/domain.check.js quality/security.check.js quality/auth-flow.check.js",
     "update": "mate-scripts update",
     "postinstall": "npm run update",
-    "test": "npm run lint && npm run test:only"
+    "test": "npm run lint && npm run test:quality && npm run test:only"
   },
   "author": "Mate academy",
   "license": "GPL-3.0",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0",
+    "sequelize": "^6.37.3"
+  },
   "devDependencies": {
     "@mate-academy/eslint-config": "latest",
-    "@mate-academy/scripts": "^1.8.6",
+    "@mate-academy/scripts": "^2.1.3",
     "eslint": "^8.57.0",
     "eslint-plugin-jest": "^28.6.0",
     "eslint-plugin-node": "^11.1.0",
@@ -26,5 +33,8 @@
   },
   "mateAcademy": {
     "projectType": "javascript"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
