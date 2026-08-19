@@ -1,13 +1,13 @@
 'use strict';
 
-const crypto = require('crypto');
+const nodeCrypto = require('crypto');
 const util = require('util');
 
-const scrypt = util.promisify(crypto.scrypt);
+const scrypt = util.promisify(nodeCrypto.scrypt);
 const KEY_LENGTH = 64;
 
 async function hashPassword(password) {
-  const salt = crypto.randomBytes(16).toString('hex');
+  const salt = nodeCrypto.randomBytes(16).toString('hex');
   const derivedKey = await scrypt(password, salt, KEY_LENGTH);
 
   return `scrypt$${salt}$${derivedKey.toString('hex')}`;
@@ -27,7 +27,7 @@ async function verifyPassword(password, storedHash) {
     return false;
   }
 
-  return crypto.timingSafeEqual(storedKey, derivedKey);
+  return nodeCrypto.timingSafeEqual(storedKey, derivedKey);
 }
 
 module.exports = {

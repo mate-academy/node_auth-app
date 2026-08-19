@@ -12,6 +12,7 @@ function createAuthController(authService, sessionService) {
 
     register: asyncHandler(async (req, res) => {
       await authService.register(req.body);
+
       res.status(201).json({
         message: 'Registration successful. Please activate your email.',
         passwordRules: PASSWORD_RULES,
@@ -22,6 +23,7 @@ function createAuthController(authService, sessionService) {
       const user = await authService.activate(req.params.token);
 
       await sessionService.createSession(user, res);
+
       res.json({
         message: 'Account activated successfully',
         redirectTo: '/profile',
@@ -33,6 +35,7 @@ function createAuthController(authService, sessionService) {
       const user = await authService.login(req.body);
 
       await sessionService.createSession(user, res);
+
       res.json({
         redirectTo: '/profile',
         user: toPublicUser(user),

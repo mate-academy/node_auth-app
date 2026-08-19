@@ -29,9 +29,7 @@ function validatePasswordChange(data = {}) {
 function validateEmailChange(data = {}) {
   const email = data.email || data.newEmail;
   const emailConfirmation =
-    data.emailConfirmation ||
-    data.newEmailConfirmation ||
-    data.confirmation;
+    data.emailConfirmation || data.newEmailConfirmation || data.confirmation;
 
   if (!isValidEmail(email)) {
     throw new AppError(400, 'A valid email is required');

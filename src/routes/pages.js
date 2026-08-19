@@ -36,19 +36,13 @@ function createPagesRouter(controller) {
   router.post('/forgot-password', guestPage, controller.forgot);
   router.get('/reset-password/:token', guestPage, controller.showReset);
   router.post('/reset-password/:token', guestPage, controller.reset);
-  router.get(
-    '/reset-password-success',
-    guestPage,
-    controller.resetSuccess,
-  );
+
+  router.get('/reset-password-success', guestPage, controller.resetSuccess);
   router.get('/check-email', guestPage, controller.checkEmail);
   router.get('/profile', protectedPage, controller.profile);
   router.post('/profile/name', protectedPage, controller.updateName);
-  router.post(
-    '/profile/password',
-    protectedPage,
-    controller.updatePassword,
-  );
+
+  router.post('/profile/password', protectedPage, controller.updatePassword);
   router.post('/profile/email', protectedPage, controller.updateEmail);
 
   return router;

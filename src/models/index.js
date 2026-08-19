@@ -9,6 +9,7 @@ User.hasMany(Session, {
   as: 'sessions',
   onDelete: 'CASCADE',
 });
+
 Session.belongsTo(User, {
   foreignKey: 'userId',
   as: 'user',

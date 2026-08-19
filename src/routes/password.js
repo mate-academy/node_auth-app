@@ -6,6 +6,7 @@ function createPasswordRouter(controller, authMiddleware) {
   const router = Router();
 
   router.post('/forgot', authMiddleware.guestOnly, controller.forgotPassword);
+
   router.post(
     '/reset/:token',
     authMiddleware.guestOnly,

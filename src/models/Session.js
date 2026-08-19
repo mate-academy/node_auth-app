@@ -28,10 +28,7 @@ const Session = sequelize.define(
   },
   {
     tableName: 'sessions',
-    indexes: [
-      { fields: ['userId'] },
-      { fields: ['expiresAt'] },
-    ],
+    indexes: [{ fields: ['userId'] }, { fields: ['expiresAt'] }],
   },
 );
 

@@ -44,9 +44,9 @@ function errorHandler(error, req, res, next) {
       return;
     }
 
-    res.status(error.statusCode).send(
-      renderErrorPage(error.statusCode, error.message),
-    );
+    res
+      .status(error.statusCode)
+      .send(renderErrorPage(error.statusCode, error.message));
 
     return;
   }

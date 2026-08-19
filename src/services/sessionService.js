@@ -73,10 +73,7 @@ function createSessionService(sessions) {
       await sessions.deleteByTokenHash(hashToken(token));
     }
 
-    appendSetCookie(
-      res,
-      serializeCookie(COOKIE_NAME, '', cookieOptions(0)),
-    );
+    appendSetCookie(res, serializeCookie(COOKIE_NAME, '', cookieOptions(0)));
   }
 
   return {

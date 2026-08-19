@@ -25,9 +25,9 @@ function createPageController(authService, profileService, sessionService) {
         await authService.register(req.body);
         res.redirect(303, '/check-email?type=activation');
       } catch (error) {
-        res.status(error.statusCode || 400).send(
-          renderRegisterPage(error.message),
-        );
+        res
+          .status(error.statusCode || 400)
+          .send(renderRegisterPage(error.message));
       }
     }),
 
@@ -42,9 +42,9 @@ function createPageController(authService, profileService, sessionService) {
         await sessionService.createSession(user, res);
         res.redirect(303, '/profile');
       } catch (error) {
-        res.status(error.statusCode || 400).send(
-          renderLoginPage(error.message),
-        );
+        res
+          .status(error.statusCode || 400)
+          .send(renderLoginPage(error.message));
       }
     }),
 
@@ -69,9 +69,9 @@ function createPageController(authService, profileService, sessionService) {
         await authService.requestPasswordReset(req.body.email);
         res.redirect(303, '/check-email?type=reset');
       } catch (error) {
-        res.status(error.statusCode || 400).send(
-          renderForgotPasswordPage(error.message),
-        );
+        res
+          .status(error.statusCode || 400)
+          .send(renderForgotPasswordPage(error.message));
       }
     }),
 
@@ -89,9 +89,9 @@ function createPageController(authService, profileService, sessionService) {
         await sessionService.revokeAllForUser(user.id);
         res.redirect(303, '/reset-password-success');
       } catch (error) {
-        res.status(error.statusCode || 400).send(
-          renderResetPasswordPage(req.params.token, error.message),
-        );
+        res
+          .status(error.statusCode || 400)
+          .send(renderResetPasswordPage(req.params.token, error.message));
       }
     }),
 
@@ -107,9 +107,10 @@ function createPageController(authService, profileService, sessionService) {
     },
 
     checkEmail(req, res) {
-      const message = req.query.type === 'reset'
-        ? 'If the account exists, a password reset email was sent.'
-        : 'We sent an activation email. Follow the link to continue.';
+      const message =
+        req.query.type === 'reset'
+          ? 'If the account exists, a password reset email was sent.'
+          : 'We sent an activation email. Follow the link to continue.';
 
       res.send(
         renderMessagePage('Check your email', message, '/login', 'Login'),
