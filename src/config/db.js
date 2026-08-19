@@ -13,4 +13,4 @@ const sequelize = new Sequelize(env.db.name, env.db.user, env.db.password, {
     : false,
 });
 
-module.exports = sequelize;
+module.exports = { sequelize };

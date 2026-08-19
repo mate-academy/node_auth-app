@@ -1,11 +1,7 @@
 'use strict';
 
 const env = require('../config/env');
-const {
-  appendSetCookie,
-  parseCookies,
-  serializeCookie,
-} = require('../utils/cookies');
+const { parseCookies, serializeCookie } = require('../utils/cookies');
 const { createToken, hashToken } = require('../utils/token');
 
 const COOKIE_NAME = 'session';
@@ -33,10 +29,13 @@ function createSessionService(sessions) {
       expiresAt,
     });
 
-    appendSetCookie(
-      res,
-      serializeCookie(COOKIE_NAME, token, cookieOptions(ttl)),
+    const cookie = serializeCookie(
+      COOKIE_NAME,
+      token,
+      cookieOptions(ttl),
     );
+
+    res.setHeader('Set-Cookie', cookie);
   }
 
   async function resolveUser(req) {
@@ -73,7 +72,13 @@ function createSessionService(sessions) {
       await sessions.deleteByTokenHash(hashToken(token));
     }
 
-    appendSetCookie(res, serializeCookie(COOKIE_NAME, '', cookieOptions(0)));
+    const cookie = serializeCookie(
+      COOKIE_NAME,
+      '',
+      cookieOptions(0),
+    );
+
+    res.setHeader('Set-Cookie', cookie);
   }
 
   return {

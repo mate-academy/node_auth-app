@@ -2,7 +2,7 @@
 
 const { DataTypes } = require('sequelize');
 
-const sequelize = require('../config/db');
+const { sequelize } = require('../config/db');
 
 const Session = sequelize.define(
   'Session',
@@ -28,7 +28,10 @@ const Session = sequelize.define(
   },
   {
     tableName: 'sessions',
-    indexes: [{ fields: ['userId'] }, { fields: ['expiresAt'] }],
+    indexes: [
+      { fields: ['userId'] },
+      { fields: ['expiresAt'] },
+    ],
   },
 );
 

@@ -21,10 +21,10 @@ const createEmailService = require('./services/emailService');
 const createProfileService = require('./services/profileService');
 const createSessionService = require('./services/sessionService');
 
-function createRuntime(overrides = {}) {
-  const users = overrides.users || createUserRepository();
-  const sessions = overrides.sessions || createSessionRepository();
-  const mailer = overrides.mailer || createEmailService();
+function createRuntime(adapters = {}) {
+  const users = adapters.users || createUserRepository();
+  const sessions = adapters.sessions || createSessionRepository();
+  const mailer = adapters.mailer || createEmailService();
   const authService = createAuthService(users, mailer);
   const sessionService = createSessionService(sessions);
   const profileService = createProfileService(users, sessions, mailer);
@@ -39,24 +39,28 @@ function createRuntime(overrides = {}) {
       profileService,
       sessionService,
     ),
-    passwordController: createPasswordController(authService, sessionService),
-    profileController: createProfileController(profileService, sessionService),
+    passwordController: createPasswordController(
+      authService,
+      sessionService,
+    ),
+    profileController: createProfileController(
+      profileService,
+      sessionService,
+    ),
   };
 }
 
-function createApp(overrides = {}) {
-  const runtime = createRuntime(overrides);
+function createApp(adapters = {}) {
+  const runtime = createRuntime(adapters);
   const app = express();
 
   app.disable('x-powered-by');
-
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'no-referrer');
     next();
   });
-
   app.use(
     cors({
       origin: env.clientUrl,
@@ -66,7 +70,6 @@ function createApp(overrides = {}) {
   app.use(express.json({ limit: '32kb' }));
   app.use(express.urlencoded({ extended: false, limit: '32kb' }));
   app.use(runtime.authMiddleware.loadSession);
-
   app.use('/api', (req, res, next) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     next();
@@ -75,17 +78,14 @@ function createApp(overrides = {}) {
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
   });
-
   app.use(
     '/api/auth',
     createAuthRouter(runtime.authController, runtime.authMiddleware),
   );
-
   app.use(
     '/api/password',
     createPasswordRouter(runtime.passwordController, runtime.authMiddleware),
   );
-
   app.use(
     '/api/profile',
     createProfileRouter(runtime.profileController, runtime.authMiddleware),
