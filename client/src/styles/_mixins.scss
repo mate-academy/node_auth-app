@@ -1,0 +1,33 @@
+@use './variables' as *;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin input-base {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+
+  color: $text;
+
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: $radius;
+  outline: none;
+
+  transition:
+    border-color $transition,
+    background-color $transition;
+
+  &:hover {
+    border-color: $border-hover;
+  }
+
+  &:focus {
+    border-color: $text;
+    background: $surface-light;
+  }
+}
