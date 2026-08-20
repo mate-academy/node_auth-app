@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const ACCESS_TOKEN_KEY = 'AccessToken';
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
@@ -9,7 +11,7 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('AccessToken');
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -44,14 +46,14 @@ api.interceptors.response.use(
         );
 
         if (data.accessToken) {
-          localStorage.setItem('AccessToken', data.accessToken);
+          localStorage.setItem(ACCESS_TOKEN_KEY, data.accessToken);
           originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
         }
 
         return api(originalRequest);
       } catch (refreshError) {
-        localStorage.removeItem('accessToken');
-        // window.location.href = '/login';
+        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        window.location.href = '/login';
         return Promise.reject(refreshError);
       }
     }

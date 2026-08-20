@@ -45,7 +45,7 @@ const Token = sequelize.define(
   },
 );
 
-Token.prototype.compareRefresh = function async(candidateToken) {
+Token.prototype.compareRefresh = async function (candidateToken) {
   return hashToken(candidateToken) === this.token;
 };
 

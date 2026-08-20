@@ -56,6 +56,12 @@ export const ProfilePasswordForm = () => {
           {...register('previousPassword')}
           type="password"
         />
+
+        <p className="text-xs text-slate-400">
+          Password must be at least 8 characters long and contain at least one
+          letter and one number.
+        </p>
+
         <Input
           label="New password"
           error={errors.newPassword?.message}

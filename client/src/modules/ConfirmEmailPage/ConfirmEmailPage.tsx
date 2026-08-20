@@ -47,7 +47,7 @@ export const ConfirmEmailPage = () => {
 
   useEffect(() => {
     if (!isSuccess) return;
-    const timer = setTimeout(() => navigate('/login'), 5000);
+    const timer = setTimeout(() => navigate('/profile'), 5000);
 
     return () => clearTimeout(timer);
   }, [isSuccess, navigate]);
