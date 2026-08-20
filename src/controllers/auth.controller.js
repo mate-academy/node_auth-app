@@ -1,6 +1,7 @@
 import ms from 'ms';
 import * as authService from '../services/auth.service.js';
 import * as tokenService from '../services/token.service.js';
+import { TOKEN_TYPES } from '../constants/token.constant.js';
 
 const cookieOptions = {
   httpOnly: true,
@@ -33,7 +34,6 @@ const login = async (req, res) => {
 
   res.cookie('RefreshToken', refreshToken, cookieOptions);
 
-  console.log('RefreshToken cookie set:', refreshToken);
   res.status(200).json({
     status: 'success',
     accessToken,

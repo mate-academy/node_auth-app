@@ -31,7 +31,7 @@ const send = async ({ from, to, subject, html }) => {
     html,
   });
 
-  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+  // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 
   return info;
 };
@@ -78,4 +78,4 @@ const sendEmailChangeLink = async (email, token) => {
   return send({ to: email, subject, html });
 };
 
-export {send, sendEmailChangeLink, sendActivationLink, sendResetPasswordLink };
+export { send, sendEmailChangeLink, sendActivationLink, sendResetPasswordLink };

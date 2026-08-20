@@ -15,7 +15,8 @@ const changePasswordSchema = z.object({
           .max(64, 'Password is too long')
           .regex(
             passwordRegex,
-            'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+            'Password must contain at least one uppercase' +
+              ' letter, one lowercase letter, and one number',
           ),
       ),
   }),

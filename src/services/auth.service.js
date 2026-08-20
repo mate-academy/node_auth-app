@@ -133,12 +133,9 @@ const resetPassword = async (resetToken, newPassword) => {
 const refresh = async (token) => {
   let data = null;
 
-  console.log('Error verifying refresh token:', token);
-
   try {
     data = jwt.verify(token, process.env.REFRESH_TOKEN_SIGNATURE);
   } catch (error) {
-    console.log('Error verifying refresh token:', error);
     throw new AppError('Session is expired', 401);
   }
 

@@ -47,5 +47,4 @@ router.post(
   asyncHandler(authController.resetPassword),
 );
 
-
 export default router;
