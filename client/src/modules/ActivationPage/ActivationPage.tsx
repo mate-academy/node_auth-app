@@ -60,7 +60,7 @@ export const ActivationPage = () => {
           Email has been activated successfully
         </h2>
         <p className="text-sm text-slate-400 mb-6">
-          Redirecting to login page in 5 seconds...
+          Redirecting to profile page in 5 seconds...
         </p>
         <Link
           to="/login"

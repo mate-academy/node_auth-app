@@ -90,6 +90,11 @@ export const RegisterPage = () => {
           type="email"
         />
 
+        <p className="text-xs text-slate-400">
+          Password must be at least 8 characters long and contain at least one
+          letter and one number.
+        </p>
+
         <Input
           label="Password"
           error={errors.password?.message}
@@ -97,10 +102,6 @@ export const RegisterPage = () => {
           {...register('password')}
           type="password"
         />
-        <p className="text-xs text-slate-400">
-          Password must be at least 8 characters long and contain at least one
-          letter and one number.
-        </p>
 
         <Input
           label="Confirm password"
