@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getPasswordErrors } from '../utils/password.js';
 
 export const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -14,6 +15,14 @@ export const RegisterPage = () => {
 
     setError('');
     setSuccess('');
+
+    const passwordErrors = getPasswordErrors(password);
+
+if (passwordErrors.length) {
+  setError(passwordErrors.join(', '));
+
+  return;
+}
 
     try {
       const response = await fetch(

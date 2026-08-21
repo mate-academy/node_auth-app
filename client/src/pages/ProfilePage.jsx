@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getPasswordErrors } from '../utils/password.js';
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
@@ -103,6 +104,20 @@ export const ProfilePage = () => {
 
     const accessToken = localStorage.getItem('accessToken');
 
+    if (newPassword !== confirmation) {
+  setError('Passwords do not match');
+
+  return;
+}
+
+const passwordErrors = getPasswordErrors(newPassword);
+
+if (passwordErrors.length) {
+  setError(passwordErrors.join(', '));
+
+  return;
+}
+
     try {
       const response = await fetch(
         'http://localhost:3000/profile/password',
@@ -143,46 +158,49 @@ export const ProfilePage = () => {
   };
 
   const handleEmailChange = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    setError('');
-    setMessage('');
+  setError('');
+  setMessage('');
 
-    const accessToken = localStorage.getItem('accessToken');
+  const accessToken = localStorage.getItem('accessToken');
 
-    try {
-      const response = await fetch(
-        'http://localhost:3000/profile/email',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            email: newEmail,
-            password: emailPassword,
-          }),
+  try {
+    const response = await fetch(
+      'http://localhost:3000/profile/email',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
         },
+        body: JSON.stringify({
+          email: newEmail,
+          password: emailPassword,
+        }),
+      },
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(
+        data.message || 'Failed to request email change',
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(
-          data.message || 'Failed to request email change',
-        );
-
-        return;
-      }
-
-      setMessage(data.message);
-      setNewEmail('');
-      setEmailPassword('');
-    } catch {
-      setError('Something went wrong');
+      return;
     }
-  };
+
+    setNewEmail('');
+    setEmailPassword('');
+
+    localStorage.removeItem('accessToken');
+
+    navigate('/login');
+  } catch {
+    setError('Something went wrong');
+  }
+};
 
   const handleLogout = async () => {
     const accessToken = localStorage.getItem('accessToken');

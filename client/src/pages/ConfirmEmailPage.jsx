@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
 export const ConfirmEmailPage = () => {
   const { token } = useParams();
+  const navigate = useNavigate();
 
   const hasConfirmed = useRef(false);
 
@@ -31,9 +32,11 @@ export const ConfirmEmailPage = () => {
           return;
         }
 
-        localStorage.removeItem('accessToken');
+        localStorage.setItem('accessToken', data.accessToken);
 
         setStatus('success');
+
+        navigate('/profile');
       } catch {
         setError('Something went wrong');
         setStatus('error');
@@ -41,7 +44,7 @@ export const ConfirmEmailPage = () => {
     };
 
     confirmEmail();
-  }, [token]);
+  }, [token, navigate]);
 
   if (status === 'loading') {
     return (
@@ -81,10 +84,6 @@ export const ConfirmEmailPage = () => {
             <h1 className="auth-title">
               Email confirmation failed
             </h1>
-
-            <p className="auth-description">
-              We could not confirm your new email address.
-            </p>
           </header>
 
           <div className="auth-message auth-message--error">
@@ -104,37 +103,5 @@ export const ConfirmEmailPage = () => {
     );
   }
 
-  return (
-    <main className="auth-page">
-      <section className="auth-card">
-        <header className="auth-card__header">
-          <p className="auth-eyebrow">
-            auth.system / email updated
-          </p>
-
-          <h1 className="auth-title">
-            Email changed
-          </h1>
-
-          <p className="auth-description">
-            Your email address has been successfully changed.
-            Please log in again using your new email.
-          </p>
-        </header>
-
-        <div className="auth-message auth-message--success">
-          Email confirmation complete.
-        </div>
-
-        <div className="auth-links">
-          <Link
-            className="auth-link"
-            to="/login"
-          >
-            Go to login
-          </Link>
-        </div>
-      </section>
-    </main>
-  );
+  return null;
 };

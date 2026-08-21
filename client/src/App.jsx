@@ -41,9 +41,13 @@ export const App = () => {
       />
 
       <Route
-        path="/confirm-email/:token"
-        element={<ConfirmEmailPage />}
-      />
+  path="/confirm-email/:token"
+  element={
+    <GuestRoute>
+      <ConfirmEmailPage />
+    </GuestRoute>
+  }
+/>
 
       <Route
         path="/login"

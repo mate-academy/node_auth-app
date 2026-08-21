@@ -1,4 +1,4 @@
-const validatePassword = (password) => {
+export const getPasswordErrors = (password) => {
   const errors = [];
 
   if (password.length < 8) {
@@ -18,8 +18,4 @@ const validatePassword = (password) => {
   }
 
   return errors;
-};
-
-module.exports = {
-  validatePassword,
 };

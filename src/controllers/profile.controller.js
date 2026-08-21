@@ -1,6 +1,7 @@
 const authService = require('../services/auth.service');
 const { validatePassword } = require('../utils/password');
 const emailService = require('../services/email.service');
+const tokenService = require('../services/token.service');
 
 const getProfile = (req, res) => {
   const { user } = req;
@@ -140,8 +141,11 @@ const confirmEmailChange = async (req, res) => {
 
   await emailService.sendEmailChangedNotification(oldEmail, newEmail);
 
+  const accessToken = tokenService.generateAccessToken(user);
+
   return res.status(200).send({
     message: 'Email changed successfully',
+    accessToken,
     user: {
       id: user.id,
       name: user.name,
