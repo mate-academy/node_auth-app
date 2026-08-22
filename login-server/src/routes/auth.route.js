@@ -13,3 +13,4 @@ authRouter.get(
   authMiddleware,
   catchError(authController.getProfile),
 );
+authRouter.get('/refresh', catchError(authController.refresh));

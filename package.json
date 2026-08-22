@@ -76,6 +76,7 @@
     "commander": "^5.1.0",
     "concat-map": "^0.0.1",
     "convert-source-map": "^2.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "create-jest": "^29.7.0",
     "cross-env": "^7.0.3",

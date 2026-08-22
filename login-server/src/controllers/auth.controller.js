@@ -74,8 +74,34 @@ const login = async (req, res) => {
     throw ApiError.badRequest('Wrong password');
   }
 
+  generateTokens(res, user);
+};
+
+const getProfile = async (req, res) => {
+  res.send(req.user);
+};
+
+const refresh = (req, res) => {
+  const refreshToken = req.cookies;
+  const user = jwtService.verifyRefresh(refreshToken);
+
+  if (!user) {
+    throw ApiError.unauthorized();
+  }
+
+  generateTokens(res, user);
+};
+
+const generateTokens = (res, user) => {
   const normalizedUser = userService.normalize(user);
+
   const accessToken = jwtService.sign(normalizedUser);
+  const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    HttpOnly: true,
+  });
 
   res.send({
     user: normalizedUser,
@@ -83,13 +109,10 @@ const login = async (req, res) => {
   });
 };
 
-const getProfile = async (req, res) => {
-  res.send(req.user);
-};
-
 export const authController = {
   register,
   activate,
   login,
   getProfile,
+  refresh,
 };
