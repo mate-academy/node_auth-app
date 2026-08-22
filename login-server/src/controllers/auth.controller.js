@@ -3,6 +3,7 @@ import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
+import { tokenService } from '../services/token.service.js';
 
 function validateEmail(value) {
   if (!value) {
@@ -74,33 +75,37 @@ const login = async (req, res) => {
     throw ApiError.badRequest('Wrong password');
   }
 
-  generateTokens(res, user);
+  await generateTokens(res, user);
 };
 
 const getProfile = async (req, res) => {
   res.send(req.user);
 };
 
-const refresh = (req, res) => {
-  const refreshToken = req.cookies;
-  const user = jwtService.verifyRefresh(refreshToken);
+const refresh = async (req, res) => {
+  const { refreshToken } = req.cookies;
 
-  if (!user) {
+  const userData = jwtService.verifyRefresh(refreshToken);
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!userData || !token) {
     throw ApiError.unauthorized();
   }
 
-  generateTokens(res, user);
+  const user = await userService.findByEmail(userData.email);
+  await generateTokens(res, user);
 };
 
-const generateTokens = (res, user) => {
+const generateTokens = async (res, user) => {
   const normalizedUser = userService.normalize(user);
 
   const accessToken = jwtService.sign(normalizedUser);
-  const refreshToken = jwtService.signRefresh(normalizedUser);
+  const refreshAccessToken = jwtService.signRefresh(normalizedUser);
 
-  res.cookie('refreshToken', refreshToken, {
-    maxAge: 30 * 24 * 60 * 60 * 1000,
+  await tokenService.save(normalizedUser.id, refreshAccessToken);
+  res.cookie('refreshToken', refreshAccessToken, {
     HttpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
   });
 
   res.send({
