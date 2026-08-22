@@ -6,8 +6,8 @@
   "scripts": {
     "init": "mate-scripts init",
     "start": "nodemon login-server/index.js",
-    "lint": "npm run format && mate-scripts lint",
-    "format": "prettier --ignore-path .prettierignore --write './src/**/*.{js,ts}'",
+    "lint": "npm run format && mate-scripts lint login-app/src login-server/src",
+    "format": "prettier --ignore-path .prettierignore --write './{login-app,login-server}/src/**/*.{js,jsx}'",
     "test:only": "mate-scripts test",
     "update": "mate-scripts update",
     "postinstall": "npm run update",
