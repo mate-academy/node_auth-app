@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import nodemailer from 'nodemailer';
 
-// Create a transporter using SMTP
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
@@ -32,6 +31,35 @@ function sendActivationEmail(email, token) {
   });
 }
 
+function sendPasswordResetEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset-password-confirm?token=${token}`;
+  const html = `
+  <h1>Reset your password</h1>
+  <p>Follow the link below to set a new password. The link is valid for 1 hour.</p>
+   <a href="${href}">${href}</a>`;
+
+  return send({
+    email,
+    html,
+    subject: 'Password reset',
+  });
+}
+
+function sendEmailChangedNotification(oldEmail, newEmail) {
+  const html = `
+  <h1>Your email has been changed</h1>
+  <p>The email on your account was changed to <b>${newEmail}</b>.</p>
+  <p>If you did not make this change, please contact support immediately.</p>`;
+
+  return send({
+    email: oldEmail,
+    html,
+    subject: 'Your account email was changed',
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
+  sendPasswordResetEmail,
+  sendEmailChangedNotification,
 };

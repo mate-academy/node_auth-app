@@ -15,8 +15,8 @@ export const ResetPassword = () => {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
 
     if (password !== confirmPassword) {
@@ -49,61 +49,84 @@ export const ResetPassword = () => {
 
   if (!token) {
     return (
-      <div style={{ textAlign: 'center', marginTop: '40px' }}>
-        <h2>Invalid or missing reset token.</h2>
-      </div>
+      <section className="section">
+        <div className="container">
+          <div className="columns is-centered">
+            <div className="column is-5-desktop is-7-tablet">
+              <div className="notification is-warning is-light has-text-centered">
+                <h2 className="subtitle is-5 font-weight-bold">
+                  Invalid or missing reset token.
+                </h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        fontFamily: 'Arial, sans-serif',
-      }}
-    >
-      <h2>Create New Password</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>
-            New Password
-          </label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: '100%', padding: '10px', boxSizing: 'border-box' }}
-          />
+    <section className="section">
+      <div className="container">
+        <div className="columns is-centered">
+          <div className="column is-4-desktop is-6-tablet">
+            <div className="box">
+              <h2 className="title is-4 has-text-centered">
+                Create New Password
+              </h2>
+
+              <form onSubmit={handleSubmit}>
+                <div className="field">
+                  <label className="label">New Password</label>
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder="********"
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label className="label">Confirm New Password</label>
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="password"
+                      required
+                      value={confirmPassword}
+                      onChange={(event) =>
+                        setConfirmPassword(event.target.value)
+                      }
+                      placeholder="********"
+                    />
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="notification is-danger is-light py-2 px-3 my-3 is-size-7">
+                    {error}
+                  </div>
+                )}
+
+                <div className="field mt-5">
+                  <div className="control">
+                    <button
+                      type="submit"
+                      className="button is-success is-fullwidth"
+                    >
+                      Save New Password
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>
-            Confirm New Password
-          </label>
-          <input
-            type="password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            style={{ width: '100%', padding: '10px', boxSizing: 'border-box' }}
-          />
-        </div>
-        {error && <p style={{ color: 'red', fontSize: '14px' }}>{error}</p>}
-        <button
-          type="submit"
-          style={{
-            width: '100%',
-            padding: '10px',
-            background: '#28a745',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          Save New Password
-        </button>
-      </form>
-    </div>
+      </div>
+    </section>
   );
 };

@@ -7,8 +7,8 @@ export const ForgotPassword = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const { API_URL } = useAuth();
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError('');
     setMessage('');
 
@@ -27,53 +27,68 @@ export const ForgotPassword = () => {
   };
 
   return (
-    <div
-      style={{
-        maxWidth: '400px',
-        margin: '40px auto',
-        fontFamily: 'Arial, sans-serif',
-      }}
-    >
-      <h2>Reset Password</h2>
-      <p style={{ color: '#666', fontSize: '14px' }}>
-        Enter your email address and we will send you instructions to reset your
-        password.
-      </p>
+    <section className="section">
+      <div className="container">
+        <div className="columns is-centered">
+          <div className="column is-4-desktop is-6-tablet">
+            <div className="box">
+              <h2 className="title is-4 has-text-centered">Reset Password</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <input
-            type="email"
-            placeholder="Enter your email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: '100%', padding: '10px', boxSizing: 'border-box' }}
-          />
+              <p className="has-text-grey is-size-6 mb-4">
+                Enter your email address and we will send you instructions to
+                reset your password.
+              </p>
+
+              <form onSubmit={handleSubmit}>
+                <div className="field">
+                  <label className="label">Email Address</label>
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="email"
+                      placeholder="e.g. alex@example.com"
+                      required
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {message && (
+                  <div className="notification is-success is-light py-2 px-3 my-3 is-size-7">
+                    {message}
+                  </div>
+                )}
+
+                {error && (
+                  <div className="notification is-danger is-light py-2 px-3 my-3 is-size-7">
+                    {error}
+                  </div>
+                )}
+
+                <div className="field mt-5">
+                  <div className="control">
+                    <button
+                      type="submit"
+                      className="button is-link is-fullwidth"
+                    >
+                      Send Instructions
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <hr />
+
+              <div className="has-text-centered is-size-7">
+                <Link to="/login" className="has-text-link">
+                  Back to Login
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
-        {message && (
-          <p style={{ color: 'green', fontSize: '14px' }}>{message}</p>
-        )}
-        {error && <p style={{ color: 'red', fontSize: '14px' }}>{error}</p>}
-        <button
-          type="submit"
-          style={{
-            width: '100%',
-            padding: '10px',
-            background: '#007bff',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          Send Instructions
-        </button>
-      </form>
-      <p style={{ marginTop: '15px', textAlign: 'center' }}>
-        <Link to="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
-          Back to Login
-        </Link>
-      </p>
-    </div>
+      </div>
+    </section>
   );
 };

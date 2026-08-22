@@ -60,6 +60,7 @@
     "browserslist": "^4.23.2",
     "bser": "^2.1.1",
     "buffer-from": "^1.1.2",
+    "bulma": "^1.0.4",
     "call-bind": "^1.0.7",
     "callsites": "^3.1.0",
     "camelcase": "^5.3.1",

@@ -22,6 +22,14 @@ export class ApiError extends Error {
     });
   }
 
+  static forbidden(message, errors) {
+    return new ApiError({
+      message,
+      errors,
+      status: 403,
+    });
+  }
+
   static notFound(errors) {
     return new ApiError({
       message: 'not found',

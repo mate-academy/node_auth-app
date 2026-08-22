@@ -16,8 +16,8 @@ export const Register = () => {
     return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(pwd);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     if (!validatePassword(formData.password)) {
       setError(
         'Password must be at least 8 characters long, including a number and an uppercase letter.',
@@ -39,42 +39,95 @@ export const Register = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '40px auto' }}>
-      <h2>Registration</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Name"
-          required
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-        <br />
-        <br />
-        <input
-          type="email"
-          placeholder="Email"
-          required
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-        />
-        <br />
-        <br />
-        <input
-          type="password"
-          placeholder="Password"
-          required
-          onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
-          }
-        />
-        <p style={{ fontSize: '12px', color: '#666' }}>
-          Password requirements: ≥8 characters, 1 number, 1 uppercase letter.
-        </p>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Register</button>
-      </form>
-      <p>
-        <Link to="/login">Already have an account? Sign In</Link>
-      </p>
-    </div>
+    <section className="section">
+      <div className="container">
+        <div className="columns is-centered">
+          <div className="column is-4-desktop is-6-tablet">
+            <div className="box">
+              <h2 className="title is-4 has-text-centered">Registration</h2>
+
+              <form onSubmit={handleSubmit}>
+                <div className="field">
+                  <label className="label">Name</label>
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="text"
+                      placeholder="e.g. Alex Smith"
+                      required
+                      onChange={(event) =>
+                        setFormData({ ...formData, name: event.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label className="label">Email</label>
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="email"
+                      placeholder="e.g. alex@example.com"
+                      required
+                      onChange={(event) =>
+                        setFormData({ ...formData, email: event.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label className="label">Password</label>
+                  <div className="control">
+                    <input
+                      className="input"
+                      type="password"
+                      placeholder="********"
+                      required
+                      onChange={(event) =>
+                        setFormData({
+                          ...formData,
+                          password: event.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <p className="help has-text-grey-dark mt-1">
+                    Password requirements: ≥8 characters, 1 number, 1 uppercase
+                    letter.
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="notification is-danger is-light py-2 px-3 my-3">
+                    {error}
+                  </div>
+                )}
+
+                <div className="field mt-5">
+                  <div className="control">
+                    <button
+                      type="submit"
+                      className="button is-primary is-fullwidth"
+                    >
+                      Register
+                    </button>
+                  </div>
+                </div>
+              </form>
+
+              <hr />
+
+              <div className="has-text-centered is-size-7">
+                <Link to="/login" className="has-text-link">
+                  Already have an account? Sign In
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };

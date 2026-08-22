@@ -9,10 +9,21 @@ export const Activate = () => {
   const [status, setStatus] = useState(
     token ? 'Activating account...' : 'Activation token is missing.',
   );
-  const { API_URL } = useAuth();
+  const { API_URL, login } = useAuth();
   const navigate = useNavigate();
 
   const effectRan = useRef(false);
+
+  const getStatusStyle = () => {
+    if (!token || status.includes('failed')) {
+      return 'is-danger';
+    }
+
+    if (status.includes('Successfully')) {
+      return 'is-success';
+    }
+    return 'is-link';
+  };
 
   useEffect(() => {
     if (!token || effectRan.current === true) {
@@ -21,19 +32,48 @@ export const Activate = () => {
 
     effectRan.current = true;
 
-    fetch(`${API_URL}/activate?activationToken=${token}`).then(async (res) => {
+    fetch(`${API_URL}/activate?activationToken=${token}`, {
+      credentials: 'include',
+    }).then(async (res) => {
       if (res.ok) {
-        setStatus('Successfully activated! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 10000);
+        const data = await res.json();
+
+        login(data.accessToken);
+        setStatus('Successfully activated! Redirecting to your profile...');
+        setTimeout(() => navigate('/profile'), 1500);
       } else {
         setStatus('Activation failed. The token is invalid or has expired.');
       }
     });
-  }, [API_URL, navigate, token]);
+  }, [API_URL, login, navigate, token]);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '40px' }}>
-      <h2>{status}</h2>
-    </div>
+    <section className="section">
+      <div className="container">
+        <div className="columns is-centered">
+          <div className="column is-5-desktop is-7-tablet">
+            <div className="box has-text-centered p-5">
+              <h2
+                className={`title is-4 has-text-${getStatusStyle().replace('is-', '')} mb-4`}
+              >
+                {status}
+              </h2>
+
+              {token && status.includes('Activating') && (
+                <progress className="progress is-small is-link my-4" max="100">
+                  Loading
+                </progress>
+              )}
+
+              {status.includes('Successfully') && (
+                <p className="has-text-grey is-size-6 mt-2">
+                  You will be automatically redirected in a few seconds...
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
