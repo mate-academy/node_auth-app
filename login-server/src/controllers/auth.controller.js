@@ -1,11 +1,47 @@
 import { User } from '../models/user.js';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
+import { ApiError } from '../exeptions/api.error.js';
+import bcrypt from 'bcrypt';
+
+function validateEmail(value) {
+  if (!value) {
+    return 'Email is required!';
+  }
+
+  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
+
+  if (!emailPattern.test(value)) {
+    return 'Email is not valid';
+  }
+}
+
+function validatePassword(value) {
+  if (!value) {
+    return 'Password is required!';
+  }
+
+  const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+  if (!passwordPattern.test(value)) {
+    return 'Password is not valid';
+  }
+}
 
 const register = async (req, res) => {
   const { email, password } = req.body;
 
-  await userService.register(email, password);
+  const errors = {
+    email: validateEmail(email),
+    password: validatePassword(password),
+  };
+
+  if (errors.email || errors.password) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  const hashedPass = await bcrypt.hash(password, 10);
+  await userService.register(email, hashedPass);
   res.send({ message: 'Ok' });
 };
 
@@ -28,9 +64,14 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await userService.findByEmail(email);
 
-  if (!user || user.password !== password) {
-    res.sendStatus(401);
-    return;
+  if (!user) {
+    throw ApiError.badRequest('No such user');
+  }
+
+  const isPasswordValid = bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password');
   }
 
   const normalizedUser = userService.normalize(user);

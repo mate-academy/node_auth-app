@@ -53,6 +53,7 @@
     "babel-preset-current-node-syntax": "^1.0.1",
     "babel-preset-jest": "^29.6.3",
     "balanced-match": "^1.0.2",
+    "bcrypt": "^6.0.0",
     "before-after-hook": "^3.0.2",
     "brace-expansion": "^1.1.11",
     "braces": "^3.0.3",
