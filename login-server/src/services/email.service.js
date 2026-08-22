@@ -11,19 +11,27 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-try {
-  const info = await transporter.sendMail({
-    to: 'zqzam3pdtk@lnovic.com', // list of recipients
-    subject: 'Hello', // subject line
-    text: 'Hello world?', // plain text body
-    html: '<b>Hello world?</b>', // HTML body
+export function send({ email, subject, html }) {
+  return transporter.sendMail({
+    to: email,
+    subject,
+    html,
   });
-
-  console.log('Message sent: %s', info.messageId);
-  // Preview URL is only available when using an Ethereal test account
-  console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-} catch (err) {
-  console.error('Error while sending mail:', err);
 }
 
-console.log('Email is sent');
+function sendActivationEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/activate?activationToken=${token}`;
+  const html = `
+  <h1>Activate account</h1>
+   <a href="${href}">${href}</a>`;
+
+  return send({
+    email,
+    html,
+    subject: 'Activate',
+  });
+}
+
+export const emailService = {
+  sendActivationEmail,
+};

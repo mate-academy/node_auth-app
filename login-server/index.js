@@ -5,6 +5,7 @@ import 'dotenv/config';
 import express from 'express';
 import { authRouter } from './src/routes/auth.route.js';
 import cors from 'cors';
+import { userRouter } from './src/routes/user.route.js';
 
 const PORT = process.env.PORT || 3004;
 
@@ -18,6 +19,7 @@ app.use(
   }),
 );
 app.use('/api', authRouter);
+app.use('/users', userRouter);
 
 app.get('/', (req, res) => {
   res.send('Hello!');

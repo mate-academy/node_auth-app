@@ -20,7 +20,7 @@ export const Login = () => {
     const data = await res.json();
 
     if (res.ok) {
-      login(data.token);
+      login(data.accessToken);
       navigate('/profile');
     } else {
       setError(data.message || 'Invalid credentials');
