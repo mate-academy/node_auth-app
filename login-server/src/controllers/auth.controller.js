@@ -5,6 +5,24 @@ import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/token.service.js';
 
+const generateTokens = async (res, user) => {
+  const normalizedUser = userService.normalize(user);
+
+  const accessToken = jwtService.sign(normalizedUser);
+  const refreshAccessToken = jwtService.signRefresh(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshAccessToken);
+  res.cookie('refreshToken', refreshAccessToken, {
+    HttpOnly: true,
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+  });
+
+  res.send({
+    user: normalizedUser,
+    accessToken,
+  });
+};
+
 function validateEmail(value) {
   if (!value) {
     return 'Email is required!';
@@ -85,7 +103,7 @@ const getProfile = async (req, res) => {
 const refresh = async (req, res) => {
   const { refreshToken } = req.cookies;
 
-  const userData = jwtService.verifyRefresh(refreshToken);
+  const userData = await jwtService.verifyRefresh(refreshToken);
   const token = await tokenService.getByToken(refreshToken);
 
   if (!userData || !token) {
@@ -96,22 +114,17 @@ const refresh = async (req, res) => {
   await generateTokens(res, user);
 };
 
-const generateTokens = async (res, user) => {
-  const normalizedUser = userService.normalize(user);
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const userData = await jwtService.verifyRefresh(refreshToken);
 
-  const accessToken = jwtService.sign(normalizedUser);
-  const refreshAccessToken = jwtService.signRefresh(normalizedUser);
+  if (!userData || !refreshToken) {
+    throw ApiError.unauthorized();
+  }
 
-  await tokenService.save(normalizedUser.id, refreshAccessToken);
-  res.cookie('refreshToken', refreshAccessToken, {
-    HttpOnly: true,
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  });
+  await tokenService.remove(userData.id);
 
-  res.send({
-    user: normalizedUser,
-    accessToken,
-  });
+  res.sendStatus(204);
 };
 
 export const authController = {
@@ -120,4 +133,5 @@ export const authController = {
   login,
   getProfile,
   refresh,
+  logout,
 };
