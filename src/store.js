@@ -109,11 +109,11 @@ class Store {
   }
 
   findSession(id) {
-    return this.read((data) =>
-      data.sessions.find(
+    return this.read((data) => {
+      return data.sessions.find(
         (session) => session.id === id && session.expiresAt > Date.now(),
-      ),
-    );
+      );
+    });
   }
 
   deleteSession(id) {

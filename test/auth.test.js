@@ -28,17 +28,14 @@ const createClient = (baseUrl) => {
   };
 
   const request = async (route, options = {}) => {
+    const cookieHeader = [...cookies]
+      .map(([key, value]) => `${key}=${value}`)
+      .join('; ');
     const response = await fetch(`${baseUrl}${route}`, {
       redirect: 'manual',
       ...options,
       headers: {
-        ...(cookies.size
-          ? {
-              Cookie: [...cookies]
-                .map(([key, value]) => `${key}=${value}`)
-                .join('; '),
-            }
-          : {}),
+        ...(cookies.size ? { Cookie: cookieHeader } : {}),
         ...options.headers,
       },
     });
@@ -81,13 +78,13 @@ describe('authentication application', () => {
   });
 
   afterEach(async () => {
-    await new Promise((resolve, reject) =>
-      server.close((error) => (error ? reject(error) : resolve())),
-    );
+    await new Promise((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
     await fs.rm(temporaryDirectory, { recursive: true, force: true });
   });
 
-  test('registers, requires activation, and opens the profile after confirmation', async () => {
+  test('requires activation before profile access', async () => {
     const registerPage = await client.request('/register');
     const csrf = csrfFrom(await registerPage.text());
     const registration = await client.request('/register', {

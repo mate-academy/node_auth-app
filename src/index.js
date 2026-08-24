@@ -4,6 +4,7 @@ require('./load-env');
 
 const config = require('./config');
 const { createApp } = require('./app');
+const { logger } = require('./logger');
 
 const { app, store } = createApp();
 
@@ -11,17 +12,17 @@ if (require.main === module) {
   store.ready
     .then(() => {
       app.listen(config.port, () => {
-        console.log(`Northstar is ready at ${config.appUrl}`);
+        logger.info(`Northstar is ready at ${config.appUrl}`);
 
         if (!config.isProduction && !config.resendApiKey) {
-          console.log(
+          logger.info(
             `Email previews are available at ${config.appUrl}/dev/emails`,
           );
         }
       });
     })
     .catch((error) => {
-      console.error('Could not start Northstar:', error);
+      logger.error(error);
       process.exitCode = 1;
     });
 }

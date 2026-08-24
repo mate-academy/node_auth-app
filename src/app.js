@@ -3,6 +3,7 @@
 const express = require('express');
 
 const defaultConfig = require('./config');
+const { logger } = require('./logger');
 const { createMailer } = require('./mailer');
 const {
   createSignedValue,
@@ -31,6 +32,16 @@ const SESSION_COOKIE = 'northstar_session';
 const CSRF_COOKIE = 'northstar_csrf';
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "style-src 'self'",
+  "script-src 'self'",
+  "img-src 'self' data:",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
+const EMAIL_PREVIEW_LINK = 'Local email: <a href="/dev/emails">Open inbox</a>';
 
 const parseCookies = (header = '') =>
   Object.fromEntries(
@@ -111,8 +122,7 @@ const createApp = (options = {}) => {
 
   app.use((request, response, next) => {
     response.set({
-      'Content-Security-Policy':
-        "default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+      'Content-Security-Policy': CONTENT_SECURITY_POLICY,
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'X-Content-Type-Options': 'nosniff',
@@ -316,18 +326,19 @@ const createApp = (options = {}) => {
   );
 
   app.get('/activation-sent', onlyGuest, (request, response) => {
+    const email = normalizeEmail(request.query.email);
+
     response.send(
       messagePage({
         eyebrow: 'Check your inbox',
         title: 'Activate your account',
-        message: `We sent an activation link to ${normalizeEmail(request.query.email)}.`,
+        message: `We sent an activation link to ${email}.`,
         detail:
-          'The link expires in 24 hours. Check your spam folder if it doesn’t arrive.',
+          'The link expires in 24 hours. ' +
+          'Check your spam folder if it doesn’t arrive.',
         actionHref: '/login',
         actionLabel: 'Go to sign in',
-        secondary: config.isProduction
-          ? ''
-          : 'Developing locally? <a href="/dev/emails">Open the email preview</a>',
+        secondary: config.isProduction ? '' : EMAIL_PREVIEW_LINK,
       }),
     );
   });
@@ -475,17 +486,19 @@ const createApp = (options = {}) => {
   );
 
   app.get('/reset-email-sent', onlyGuest, (request, response) => {
+    const email = normalizeEmail(request.query.email);
+
     response.send(
       messagePage({
         eyebrow: 'Check your inbox',
         title: 'Your reset link is on its way',
-        message: `If an active account exists for ${normalizeEmail(request.query.email)}, we’ve sent a password reset link.`,
+        message:
+          `If an active account exists for ${email}, ` +
+          'we’ve sent a password reset link.',
         detail: 'For your security, the link expires in one hour.',
         actionHref: '/login',
         actionLabel: 'Back to sign in',
-        secondary: config.isProduction
-          ? ''
-          : 'Developing locally? <a href="/dev/emails">Open the email preview</a>',
+        secondary: config.isProduction ? '' : EMAIL_PREVIEW_LINK,
       }),
     );
   });
@@ -801,7 +814,7 @@ const createApp = (options = {}) => {
   });
 
   app.use((error, request, response, next) => {
-    console.error(error);
+    logger.error(error);
 
     if (response.headersSent) {
       next(error);

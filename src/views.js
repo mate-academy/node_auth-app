@@ -11,6 +11,13 @@ const escapeHtml = (value = '') =>
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
 
+const PASSWORD_TOGGLE =
+  '<button class="password-toggle" type="button" ' +
+  'aria-label="Show password">Show</button>';
+const EMPTY_INBOX =
+  '<div class="empty-state">No messages yet. Register an account ' +
+  'to send the first one.</div>';
+
 const field = ({
   autocomplete,
   hint,
@@ -32,11 +39,7 @@ const field = ({
         type="${escapeHtml(type)}"
         value="${type === 'password' ? '' : escapeHtml(value)}"
       >
-      ${
-        type === 'password'
-          ? '<button class="password-toggle" type="button" aria-label="Show password">Show</button>'
-          : ''
-      }
+      ${type === 'password' ? PASSWORD_TOGGLE : ''}
     </span>
     ${hint ? `<span class="field__hint">${escapeHtml(hint)}</span>` : ''}
   </label>`;
@@ -451,7 +454,7 @@ const inboxPage = ({ emails }) =>
                     </article>`,
                   )
                   .join('')
-              : '<div class="empty-state">No messages yet. Register an account to send the first one.</div>'
+              : EMPTY_INBOX
           }
         </div>
       </section>`,

@@ -1,18 +1,36 @@
 module.exports = {
   extends: '@mate-academy/eslint-config',
   env: {
-    browser: true,
     jest: true,
     node: true,
   },
   rules: {
-    indent: 'off',
-    'max-len': 'off',
-    'no-console': 'off',
+    indent: [
+      'error',
+      2,
+      {
+        SwitchCase: 1,
+        VariableDeclarator: 1,
+        outerIIFEBody: 1,
+        FunctionDeclaration: { parameters: 1, body: 1 },
+        FunctionExpression: { parameters: 1, body: 1 },
+        CallExpression: { arguments: 1 },
+        ArrayExpression: 1,
+        ObjectExpression: 1,
+        ImportDeclaration: 1,
+        ignoredNodes: ['TemplateLiteral *'],
+      },
+    ],
     'no-proto': 0,
-    'no-shadow': 'off',
-    'object-curly-newline': 'off',
-    'function-paren-newline': 'off',
   },
+  overrides: [
+    {
+      files: ['src/public/**/*.js'],
+      env: {
+        browser: true,
+        node: false,
+      },
+    },
+  ],
   plugins: ['jest'],
 };
