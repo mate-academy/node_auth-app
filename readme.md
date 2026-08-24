@@ -1,28 +1,53 @@
-# Auth application
-Implement an application that allows user to:
-- Register using name, email and password (only non authenticated)
-  - Inform the users about the rules for a password and check them
-  - send and activation email
-- Actvation page (only non authenticated)
-  - the user should be activated only after email confirmation
-  - redirect to Profile after the activation
-- Login with valid credentials (email and password) (only non authenticated)
-  - If user is not active ask them to activate their email
-  - Redirect to profile after login
-- Logout (only authenticated)
-  - Redirect to login after logging out
-- Password reset (only non authenticated)
-  - Ask for an email
-  - Show email sent page
-  - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
-  - Show Success page with a link to login
-- Profile page (only authenticated)
-  - You can change a name
-  - It allows to change a password (require an old one, `new password` and `confirmation`)
-  - To change an email you should type the password, confirm the new email and notify the old email about the change
-- 404 for all the other pages
+# Northstar authentication
 
-## (Optional) Advanced tasks
-- Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
-- Profile page should allow to add/remove any social account
-- Add authentication to your Accounting App
+A complete server-rendered authentication application built with Node.js and
+Express. It includes registration, email activation, login/logout, password
+recovery, and protected profile settings.
+
+## Run locally
+
+Requirements: Node.js 20 or newer.
+
+```bash
+npm install
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000). In local development,
+outgoing messages are stored in the development inbox at
+[http://localhost:3000/dev/emails](http://localhost:3000/dev/emails), so all
+email links can be tested without configuring an external provider.
+
+Copy `.env.example` to `.env` or provide its values through your runtime. A
+production deployment must set a stable `SESSION_SECRET` of at least 32
+characters and set `APP_URL` to its public origin. Set `RESEND_API_KEY` and
+`MAIL_FROM` to deliver real email through Resend.
+
+## Included flows
+
+- Registration with visible and server-enforced password rules
+- Single-use, expiring account activation links
+- Protected login, logout, and profile routes
+- Enumeration-safe password recovery with expiring reset links
+- Profile name updates and authenticated password changes
+- Confirmed email changes with notifications to the previous address
+- Branded success, expired-link, and 404 pages
+
+Passwords use Node's scrypt implementation with a unique salt. Session IDs and
+email tokens are cryptographically random; email tokens are stored only as
+SHA-256 digests. The app also uses signed HTTP-only cookies, CSRF protection,
+rate limiting, strict security headers, and generic recovery responses.
+
+Persistent local data is written atomically to `data/auth.json`, which is
+ignored by Git. Email bodies are copied to the development inbox only outside
+production.
+
+## Validation
+
+```bash
+npm test
+```
+
+The test suite covers activation-gated login, password validation, CSRF,
+route guards, password recovery, profile updates, email confirmation, logout,
+and the 404 fallback.
