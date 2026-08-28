@@ -400,6 +400,12 @@ function createApp(options = {}) {
       type: 'email',
       autocomplete: 'email',
     });
+    const emailConfirmationField = field({
+      label: 'Confirm new email',
+      name: 'emailConfirmation',
+      type: 'email',
+      autocomplete: 'email',
+    });
     const emailPasswordField = field({
       label: 'Current password',
       name: 'password',
@@ -435,7 +441,7 @@ function createApp(options = {}) {
         wide: true,
         body: `<div class="profile-head"><div><h1>Hello, ${escapeHtml(user.name)}</h1><p class="lede">Manage your personal details and sign-in security.</p></div><form method="post" action="/logout"><button class="secondary">Sign out</button></form></div>${alert(notice, 'success')}
 <div class="profile-grid"><section><h2>Personal details</h2><form method="post" action="/profile/name">${nameField}<button>Save name</button></form></section>
-<section><h2>Email address</h2><p class="muted">Current: ${escapeHtml(user.email)}</p><form method="post" action="/profile/email">${emailField}${emailPasswordField}<button>Change email</button></form></section>
+<section><h2>Email address</h2><p class="muted">Current: ${escapeHtml(user.email)}</p><form method="post" action="/profile/email">${emailField}${emailConfirmationField}${emailPasswordField}<button>Change email</button></form></section>
 <section><h2>Change password</h2><form method="post" action="/profile/password">${oldPasswordField}${newPasswordField}${confirmationField}<button>Update password</button></form></section></div>`,
       }),
     );
@@ -489,9 +495,14 @@ function createApp(options = {}) {
     try {
       const user = userFor(req);
       const nextEmail = normalizeEmail(req.body.email);
+      const emailConfirmation = normalizeEmail(req.body.emailConfirmation);
 
       if (!validEmail(nextEmail)) {
         return profileResult(req, res, 'Enter a valid email address.');
+      }
+
+      if (nextEmail !== emailConfirmation) {
+        return profileResult(req, res, 'Email addresses must match.');
       }
 
       if (store.findByEmail(nextEmail)) {
