@@ -16,7 +16,12 @@ const googleLogin = async (profile) => {
     });
   }
 
-  const googleEmail = profile.emails[0].value;
+  const googleEmail = profile.emails?.[0]?.value;
+
+  if (!googleEmail) {
+    throw ApiError.badRequest('No email found');
+  }
+
   let existingUser = await User.findOne({
     where: { email: googleEmail },
   });
@@ -60,6 +65,10 @@ const githubLogin = async (profile, accessToken) => {
   });
 
   const emails = await response.json();
+
+  if (!Array.isArray(emails)) {
+    throw ApiError.badRequest('No emails found');
+  }
 
   const primaryEmail = emails.find((item) => item.primary && item.verified);
 

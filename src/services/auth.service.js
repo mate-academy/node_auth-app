@@ -69,6 +69,10 @@ const login = async ({ email, password }) => {
     throw ApiError.badRequest('No such user');
   }
 
+  if (!user.password) {
+    throw ApiError.badRequest('No such user');
+  }
+
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {

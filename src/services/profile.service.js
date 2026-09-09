@@ -35,6 +35,10 @@ const changePassword = async ({ id, oldPassword, password, confirmation }) => {
     throw ApiError.notFound('User not found');
   }
 
+  if (!user.password) {
+    throw ApiError.badRequest('No such user');
+  }
+
   const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
 
   if (!isPasswordValid) {
@@ -69,6 +73,10 @@ const changeEmail = async ({ id, password, confirmation, email }) => {
   }
 
   const oldEmail = user.email;
+
+  if (!user.password) {
+    throw ApiError.badRequest('No such user');
+  }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
