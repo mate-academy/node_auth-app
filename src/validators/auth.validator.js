@@ -26,6 +26,6 @@ export function validatePassword(value) {
   }
 
   if (value.length < 6) {
-    return 'At least 6 characters';
+    return 'Password must contain at least 6 characters';
   }
 }

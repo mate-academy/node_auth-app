@@ -44,7 +44,7 @@ const changePassword = async ({ id, oldPassword, password, confirmation }) => {
   const passwordError = validatePassword(password);
 
   if (passwordError) {
-    throw ApiError.badRequest('Invalid password');
+    throw ApiError.badRequest(passwordError);
   }
 
   if (password !== confirmation) {

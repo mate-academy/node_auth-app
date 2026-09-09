@@ -64,9 +64,7 @@ const logout = async (req, res) => {
 };
 
 const loginGoogle = async (req, res) => {
-  const user = req.user;
-
-  const result = await authService.completeLogin(user);
+  const result = await authService.completeLogin(req.user);
 
   res.cookie('refreshToken', result.refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -74,15 +72,13 @@ const loginGoogle = async (req, res) => {
   });
 
   res.send({
-    user: normalizeUser(user),
+    user: normalizeUser(result.user),
     accessToken: result.accessToken,
   });
 };
 
 const loginGithub = async (req, res) => {
-  const user = req.user;
-
-  const result = await authService.completeLogin(user);
+  const result = await authService.completeLogin(req.user);
 
   res.cookie('refreshToken', result.refreshToken, {
     maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -90,7 +86,7 @@ const loginGithub = async (req, res) => {
   });
 
   res.send({
-    user: normalizeUser(user),
+    user: normalizeUser(result.user),
     accessToken: result.accessToken,
   });
 };

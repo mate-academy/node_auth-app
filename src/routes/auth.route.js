@@ -4,17 +4,22 @@ import passport from '../passport/passport.js';
 import { authController } from '../controllers/auth.controller.js';
 import { catchError } from '../utils/catchError.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { guestMiddleware } from '../middlewares/guestMiddleware.js';
 
 export const authRouter = express.Router();
 
-authRouter.post('/register', catchError(authController.register));
+authRouter.post(
+  '/register',
+  guestMiddleware,
+  catchError(authController.register),
+);
 
 authRouter.get(
   '/activation/:activationToken',
   catchError(authController.activate),
 );
 
-authRouter.post('/login', catchError(authController.login));
+authRouter.post('/login', guestMiddleware, catchError(authController.login));
 
 authRouter.post('/refresh', catchError(authController.refresh));
 

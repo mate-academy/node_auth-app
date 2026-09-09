@@ -33,7 +33,9 @@ const confirmPasswordReset = async (resetToken, password, confirmation) => {
     throw ApiError.badRequest('Invalid reset token');
   }
 
-  const isExpired = Date.now() > user.resetPasswordExpires.getTime();
+  const isExpired =
+    !user.resetPasswordExpires ||
+    Date.now() > user.resetPasswordExpires.getTime();
 
   if (isExpired) {
     user.resetPasswordToken = null;
