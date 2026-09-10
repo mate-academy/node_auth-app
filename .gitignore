@@ -1,13 +1,21 @@
-# IDE
-.idea
-.vscode
+# Залежності (Node.js)
+node_modules/
 
-# Node
-node_modules
+# Змінні середовища (ніколи не комітьте секрети!)
+.env
+.env.*
+**/.env
+!.env.example
 
-# MacOS
+# Системні файли macOS
 .DS_Store
 
-# env files
-*.env
-.env*
+# Логи
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Папки збірки (за потреби)
+dist/
+build/
+
