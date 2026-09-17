@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/pages/login.html" },
+    { "source": "/auth/activation/**", "destination": "/pages/activate.html" },
+    { "source": "/auth/reset-password/**", "destination": "/pages/reset-password.html" }
+  ]
+}

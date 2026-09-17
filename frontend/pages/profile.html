@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Мій профіль</title>
+<link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+
+<div class="page">
+  <div class="topbar">
+    <h1>Мій профіль</h1>
+    <button id="logoutBtn" class="btn-secondary">Вийти</button>
+  </div>
+
+  <div class="panel">
+    <h2>Інформація про акаунт</h2>
+    <div class="info-row">
+      <span class="label">ID</span>
+      <span class="value" id="infoId">—</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Ім'я</span>
+      <span class="value" id="infoName">—</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Email</span>
+      <span class="value" id="infoEmail">—</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Змінити ім'я</h2>
+    <form id="nameForm" class="form-row">
+      <div class="field">
+        <label for="nameInput">Ім'я</label>
+        <input type="text" id="nameInput" required autocomplete="name" />
+      </div>
+      <button type="submit" class="btn">Зберегти ім'я</button>
+    </form>
+    <div id="nameMessage" class="message"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Змінити email</h2>
+    <form id="emailForm" class="form-row">
+      <div class="field">
+        <label for="emailInput">Новий email</label>
+        <input type="email" id="emailInput" required autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="confirmEmailInput">Підтвердіть новий email</label>
+        <input type="email" id="confirmEmailInput" required autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="emailPasswordInput">Поточний пароль</label>
+        <input type="password" id="emailPasswordInput" required autocomplete="current-password" />
+      </div>
+      <button type="submit" class="btn">Зберегти email</button>
+    </form>
+    <div id="emailMessage" class="message"></div>
+  </div>
+
+  <!-- GET /profile не каже, чи в юзера вже є пароль (OAuth-акаунт без
+       пароля, чи звичайний). За замовчуванням показуємо updatePasswordPanel
+       і даємо ручний лінк-перемикач в обидва боки (автоматично визначити
+       нема як — forgot-password однаково спрацює для будь-кого, незалежно
+       від того, чи пароль уже є). Після успішного POST /profile/set-password
+       (profile.js) теж автоматично перемикаємось назад на updatePasswordPanel. -->
+  <div class="panel" id="setPasswordPanel" hidden>
+    <h2>Додати пароль</h2>
+    <p class="notice">
+      Для акаунтів, створених через Google/GitHub/Facebook — пароля ще
+      нема, його можна встановити тут напряму.
+    </p>
+    <form id="setPasswordForm" class="form-row">
+      <div class="field">
+        <label for="setPasswordNewInput">Новий пароль</label>
+        <input type="password" id="setPasswordNewInput" required autocomplete="new-password" />
+      </div>
+      <div class="field">
+        <label for="setPasswordConfirmInput">Підтвердіть новий пароль</label>
+        <input type="password" id="setPasswordConfirmInput" required autocomplete="new-password" />
+      </div>
+      <button type="submit" class="btn">Встановити пароль</button>
+    </form>
+    <div id="setPasswordMessage" class="message"></div>
+    <p class="notice">
+      <a href="#" id="showUpdatePasswordLink">Вже маєте пароль? Змінити його</a>
+    </p>
+  </div>
+
+  <div class="panel" id="updatePasswordPanel">
+    <h2>Змінити пароль</h2>
+    <p class="notice">
+      Натисніть кнопку — ми надішлемо на вашу пошту лист із посиланням на
+      сторінку зміни пароля.
+    </p>
+    <button id="sendPasswordChangeLinkBtn" class="btn">Надіслати лист для зміни пароля</button>
+    <div id="passwordMessage" class="message"></div>
+    <p class="notice">
+      <a href="#" id="showSetPasswordLink">Акаунт через Google/GitHub/Facebook, пароля ще нема? Встановити</a>
+    </p>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/dom.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/profile.js"></script>
+</body>
+</html>
