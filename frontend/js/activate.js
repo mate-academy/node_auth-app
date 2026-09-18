@@ -18,17 +18,20 @@ async function runActivation(token) {
         'error',
       );
       activateBackToAuth.hidden = false;
+
       return;
     }
 
+    session.set(data.user, data.accessToken);
+
     showMessage(
       activateMessage,
-      'Акаунт активовано! Тепер увійдіть у систему.',
+      'Акаунт активовано! Переходимо до профілю…',
       'success',
     );
 
     setTimeout(() => {
-      window.location.href = '/pages/login.html';
+      window.location.href = '/pages/profile.html';
     }, 1200);
   } catch (err) {
     showMessage(

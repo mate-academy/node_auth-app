@@ -1,12 +1,6 @@
 /* eslint-disable no-undef */
 'use strict';
 
-// Сторінка скидання пароля (reset-password.html). Бекенд шле лист з
-// посиланням ".../auth/reset-password/<token>" — цей шлях перенаправляється
-// сюди через frontend/serve.json (rewrite), а сам токен беремо з хвоста
-// шляху (або з ?resetToken=) через extractToken() з main.js.
-// Залежить від api.js, dom.js, main.js.
-
 const resetPasswordForm = document.getElementById('resetPasswordForm');
 const resetPasswordInput = document.getElementById('resetPasswordInput');
 const resetConfirmPasswordInput = document.getElementById(

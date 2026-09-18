@@ -1,9 +1,6 @@
 /* eslint-disable no-undef */
 'use strict';
 
-// Сторінка реєстрації (register.html).
-// Залежить від api.js, dom.js, main.js (redirectIfAuthenticated).
-
 redirectIfAuthenticated();
 
 const registerForm = document.getElementById('registerForm');

@@ -18,6 +18,8 @@ const register = async (req, res) => {
 
   if (user) {
     res.status(400).json({ message: 'User is exist with your Email' });
+
+    return;
   }
 
   const errors = {

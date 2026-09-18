@@ -1,7 +1,3 @@
-// Точка входу для компіляції: npm run build:css (або watch:css під час
-// розробки). Компілює в ../css/styles.css. Порядок @use визначає порядок
-// у зібраному CSS.
-
 @use "variables";
 @use "base";
 @use "auth";

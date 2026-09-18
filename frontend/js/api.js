@@ -30,13 +30,6 @@ const session = {
   },
 };
 
-/**
- * @param {string} path
- * @param {object} [options]
- * @param {string} [options.method='POST']
- * @param {object} [options.body]
- * @param {boolean} [options.auth=false]
- */
 async function apiRequest(path, { method = 'POST', body, auth = false } = {}) {
   const headers = { 'Content-Type': 'application/json' };
 

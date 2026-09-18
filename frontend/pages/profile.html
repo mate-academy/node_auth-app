@@ -62,12 +62,6 @@
     <div id="emailMessage" class="message"></div>
   </div>
 
-  <!-- GET /profile не каже, чи в юзера вже є пароль (OAuth-акаунт без
-       пароля, чи звичайний). За замовчуванням показуємо updatePasswordPanel
-       і даємо ручний лінк-перемикач в обидва боки (автоматично визначити
-       нема як — forgot-password однаково спрацює для будь-кого, незалежно
-       від того, чи пароль уже є). Після успішного POST /profile/set-password
-       (profile.js) теж автоматично перемикаємось назад на updatePasswordPanel. -->
   <div class="panel" id="setPasswordPanel" hidden>
     <h2>Додати пароль</h2>
     <p class="notice">
@@ -86,22 +80,26 @@
       <button type="submit" class="btn">Встановити пароль</button>
     </form>
     <div id="setPasswordMessage" class="message"></div>
-    <p class="notice">
-      <a href="#" id="showUpdatePasswordLink">Вже маєте пароль? Змінити його</a>
-    </p>
   </div>
 
   <div class="panel" id="updatePasswordPanel">
     <h2>Змінити пароль</h2>
-    <p class="notice">
-      Натисніть кнопку — ми надішлемо на вашу пошту лист із посиланням на
-      сторінку зміни пароля.
-    </p>
-    <button id="sendPasswordChangeLinkBtn" class="btn">Надіслати лист для зміни пароля</button>
+    <form id="passwordForm" class="form-row">
+      <div class="field">
+        <label for="oldPasswordInput">Поточний пароль</label>
+        <input type="password" id="oldPasswordInput" required autocomplete="current-password" />
+      </div>
+      <div class="field">
+        <label for="newPasswordInput">Новий пароль</label>
+        <input type="password" id="newPasswordInput" required autocomplete="new-password" />
+      </div>
+      <div class="field">
+        <label for="confirmPasswordInput">Підтвердіть новий пароль</label>
+        <input type="password" id="confirmPasswordInput" required autocomplete="new-password" />
+      </div>
+      <button type="submit" class="btn">Змінити пароль</button>
+    </form>
     <div id="passwordMessage" class="message"></div>
-    <p class="notice">
-      <a href="#" id="showSetPasswordLink">Акаунт через Google/GitHub/Facebook, пароля ще нема? Встановити</a>
-    </p>
   </div>
 </div>
 

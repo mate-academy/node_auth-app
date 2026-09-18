@@ -1,11 +1,3 @@
-// Картка-контейнер для окремих сторінок: login.html, register.html,
-// activate.html, reset-password.html (усі мають клас .card).
-// (Раніше тут ще жили .tabs/.tab і перемикання форм через .active — це
-// було потрібно, коли логін/реєстрація/забули-пароль жили в одному
-// #authView на одній SPA-сторінці. Тепер це окремі html-файли, а форма
-// "забули пароль" на login.html перемикається просто через атрибут
-// hidden — див. js/login.js.)
-
 .card {
   width: 100%;
   max-width: 380px;
@@ -17,8 +9,14 @@
   margin: 40px auto;
 }
 
+.btn-helpers {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
 .passport {
-  width: 47%;
+  flex: 1;
   background: #ffffff;
   color: #451818;
   font-size: small;

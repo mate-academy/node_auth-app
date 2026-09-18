@@ -154,11 +154,11 @@ button {
 .btn-helpers {
   display: flex;
   justify-content: space-between;
-  gap: 3px;
+  gap: 4px;
 }
 
 .passport {
-  width: 47%;
+  flex: 1;
   background: #ffffff;
   color: #451818;
   font-size: small;

@@ -24,21 +24,12 @@ const setPasswordConfirmInput = document.getElementById(
 const setPasswordMessage = document.getElementById('setPasswordMessage');
 
 const updatePasswordPanel = document.getElementById('updatePasswordPanel');
-const sendPasswordChangeLinkBtn = document.getElementById(
-  'sendPasswordChangeLinkBtn',
-);
+const passwordForm = document.getElementById('passwordForm');
+const oldPasswordInput = document.getElementById('oldPasswordInput');
+const newPasswordInput = document.getElementById('newPasswordInput');
+const confirmPasswordInput = document.getElementById('confirmPasswordInput');
 const passwordMessage = document.getElementById('passwordMessage');
 
-const showUpdatePasswordLink = document.getElementById(
-  'showUpdatePasswordLink',
-);
-const showSetPasswordLink = document.getElementById('showSetPasswordLink');
-
-// GET /profile не повідомляє, чи в юзера вже є пароль (OAuth-акаунт без
-// нього, чи звичайний) — тож замість автоматичного визначення даємо ручний
-// перемикач між панелями (посилання showSetPasswordLink/showUpdatePasswordLink
-// нижче) плюс автоперемикання назад на "Змінити пароль" одразу після
-// успішного встановлення пароля.
 function showSetPasswordPanel(errorMessage) {
   setPasswordPanel.hidden = false;
   updatePasswordPanel.hidden = true;
@@ -56,18 +47,6 @@ function showUpdatePasswordPanel(errorMessage) {
     showMessage(passwordMessage, errorMessage, 'error');
   }
 }
-
-showSetPasswordLink.addEventListener('click', (e) => {
-  e.preventDefault();
-  clearMessage(passwordMessage);
-  showSetPasswordPanel();
-});
-
-showUpdatePasswordLink.addEventListener('click', (e) => {
-  e.preventDefault();
-  clearMessage(setPasswordMessage);
-  showUpdatePasswordPanel();
-});
 
 function renderUser(user) {
   infoId.textContent = user.id;
@@ -134,7 +113,6 @@ nameForm.addEventListener('submit', async (e) => {
   }
 });
 
-
 emailForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessage(emailMessage);
@@ -185,7 +163,6 @@ emailForm.addEventListener('submit', async (e) => {
   }
 });
 
-
 setPasswordForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   clearMessage(setPasswordMessage);
@@ -212,9 +189,6 @@ setPasswordForm.addEventListener('submit', async (e) => {
     });
 
     if (!ok) {
-      // Бекенд каже, що пароль уже є — значить, вгадали не ту панель
-      // (GET /profile не повідомляє, чи є пароль). Перемикаємось і
-      // передаємо це саме повідомлення користувачу.
       if (data?.message?.includes('already set')) {
         showUpdatePasswordPanel(data.message);
 
@@ -230,8 +204,6 @@ setPasswordForm.addEventListener('submit', async (e) => {
       return;
     }
 
-    // Пароль щойно з'явився — далі це вже акаунт з паролем, тож
-    // перемикаємось на панель "Змінити пароль" і показуємо успіх там.
     setPasswordForm.reset();
     showUpdatePasswordPanel();
     showMessage(passwordMessage, 'Пароль встановлено', 'success');
@@ -246,32 +218,54 @@ setPasswordForm.addEventListener('submit', async (e) => {
   }
 });
 
-sendPasswordChangeLinkBtn.addEventListener('click', async () => {
+passwordForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
   clearMessage(passwordMessage);
-  sendPasswordChangeLinkBtn.disabled = true;
 
-  const email = session.getUser()?.email;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+
+  submitBtn.disabled = true;
+
+  const oldPassword = oldPasswordInput.value;
+  const newPassword = newPasswordInput.value;
+  const confirmPassword = confirmPasswordInput.value;
+
+  if (newPassword !== confirmPassword) {
+    showMessage(
+      passwordMessage,
+      'Новий пароль та підтвердження не співпадають',
+      'error',
+    );
+    submitBtn.disabled = false;
+
+    return;
+  }
 
   try {
-    const { ok, data } = await apiRequest('/auth/forgot-password', {
-      body: { email },
+    const { ok, data } = await apiRequest('/profile/password', {
+      method: 'PATCH',
+      auth: true,
+      body: { oldPassword, newPassword, confirmPassword },
     });
 
     if (!ok) {
+      if (data?.message?.includes('No password set')) {
+        showSetPasswordPanel(data.message);
+
+        return;
+      }
+
       showMessage(
         passwordMessage,
-        data?.message || 'Не вдалося надіслати лист',
+        data?.message || 'Не вдалося змінити пароль',
         'error',
       );
 
       return;
     }
 
-    showMessage(
-      passwordMessage,
-      'Перевірте пошту — ми надіслали посилання для зміни пароля.',
-      'success',
-    );
+    passwordForm.reset();
+    showMessage(passwordMessage, 'Пароль змінено', 'success');
   } catch (err) {
     showMessage(
       passwordMessage,
@@ -279,7 +273,7 @@ sendPasswordChangeLinkBtn.addEventListener('click', async () => {
       'error',
     );
   } finally {
-    sendPasswordChangeLinkBtn.disabled = false;
+    submitBtn.disabled = false;
   }
 });
 
