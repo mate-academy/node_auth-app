@@ -1,0 +1,60 @@
+.page {
+  width: 100%;
+  max-width: 480px;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    margin: 0;
+    text-align: left;
+  }
+}
+
+.panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    color: var(--muted);
+  }
+
+  .value {
+    font-weight: 500;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}

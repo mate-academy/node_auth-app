@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Реєстрація</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="card">
+      <h1>Реєстрація</h1>
+
+      <form id="registerForm" class="form-row">
+        <div>
+          <label for="registerName">Ім'я</label>
+          <input type="text" id="registerName" required autocomplete="name" />
+        </div>
+        <div>
+          <label for="registerEmail">Email</label>
+          <input
+            type="email"
+            id="registerEmail"
+            required
+            autocomplete="email"
+          />
+          <div class="field-error" id="registerEmailError"></div>
+        </div>
+        <div>
+          <label for="registerPassword">Пароль</label>
+          <input
+            type="password"
+            id="registerPassword"
+            required
+            autocomplete="new-password"
+          />
+          <div class="field-error" id="registerPasswordError"></div>
+        </div>
+        <button type="submit" class="btn">Зареєструватись</button>
+        <div class="btn-helpers">
+          <a class="btn passport" href="http://localhost:3005/auth/google"
+            >Увійти за допомогою Google</a
+          >
+          <a class="btn passport" href="http://localhost:3005/auth/github"
+            >Увійти за допомогою GitHub</a
+          >
+          <a class="btn passport" href="http://localhost:3005/auth/facebook"
+            >Увійти за допомогою FaceBook</a
+          >
+        </div>
+        <p class="notice">
+          Вже є акаунт? <a href="/pages/login.html">Увійти</a>
+        </p>
+      </form>
+
+      <div id="authMessage" class="message"></div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/dom.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/register.js"></script>
+  </body>
+</html>

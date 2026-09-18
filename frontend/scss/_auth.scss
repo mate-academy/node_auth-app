@@ -1,0 +1,34 @@
+.card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  margin: 40px auto;
+}
+
+.btn-helpers {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.passport {
+  flex: 1;
+  background: #ffffff;
+  color: #451818;
+  font-size: small;
+  text-decoration: none;
+  text-align: center;
+  justify-content: center;
+  transition: all 0.45s ease;
+  border: 2px rgb(139, 20, 145) solid;
+
+  &:hover {
+    border: 2px white solid;
+    color: #fff;
+    background-color: #4400ff;
+  }
+}
