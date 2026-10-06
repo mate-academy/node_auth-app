@@ -3,11 +3,12 @@
 .vscode
 
 # Node
-node_modules
+node_modules/
 
 # MacOS
 .DS_Store
 
-# env files
-*.env
-.env*
+# Environment
+.env
+.env.*
+!.env.example

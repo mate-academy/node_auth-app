@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Logowanie</title>
+  </head>
+  <body>
+    <main>
+      <h1>Zaloguj się</h1>
+
+      <% if (error) { %>
+        <p role="alert"><%= error %></p>
+      <% } %>
+
+      <form action="/login" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <p>
+          <label for="email">Adres e-mail</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value="<%= email %>"
+            autocomplete="username"
+            maxlength="254"
+            required
+          >
+        </p>
+
+        <p>
+          <label for="password">Hasło</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </p>
+
+        <button type="submit">Zaloguj się</button>
+      </form>
+
+      <p><a href="/password-reset">Nie pamiętasz hasła?</a></p>
+      <p>Nie masz konta? <a href="/register">Zarejestruj się</a></p>
+    </main>
+  </body>
+</html>

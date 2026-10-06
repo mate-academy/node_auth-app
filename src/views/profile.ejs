@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mój profil</title>
+  </head>
+  <body>
+    <main>
+      <h1>Mój profil</h1>
+      <p>Konto jest aktywne. Jesteś zalogowany.</p>
+      <p>Imię: <strong><%= user.name %></strong></p>
+      <p>E-mail: <strong><%= user.email %></strong></p>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <p role="alert"><%= error %></p>
+      <% } %>
+
+      <h2>Zmień imię</h2>
+
+      <form action="/profile/name" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <p>
+          <label for="name">Imię</label>
+          <input
+            id="name"
+            name="name"
+            value="<%= user.name %>"
+            autocomplete="given-name"
+            maxlength="255"
+            required
+          >
+        </p>
+
+        <button type="submit">Zapisz imię</button>
+      </form>
+
+<h2>Zmień hasło</h2>
+
+<p id="password-rules">
+  Nowe hasło musi mieć minimum 12 znaków, małą i wielką literę
+  oraz cyfrę. Maksymalna długość to 72 bajty.
+</p>
+
+<form action="/profile/password" method="post">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <p>
+    <label for="oldPassword">Dotychczasowe hasło</label>
+    <input
+      id="oldPassword"
+      name="oldPassword"
+      type="password"
+      autocomplete="current-password"
+      required
+    >
+  </p>
+
+  <p>
+    <label for="newPassword">Nowe hasło</label>
+    <input
+      id="newPassword"
+      name="newPassword"
+      type="password"
+      autocomplete="new-password"
+      aria-describedby="password-rules"
+      minlength="12"
+      required
+    >
+  </p>
+
+  <p>
+    <label for="confirmation">Powtórz nowe hasło</label>
+    <input
+      id="confirmation"
+      name="confirmation"
+      type="password"
+      autocomplete="new-password"
+      minlength="12"
+      required
+    >
+  </p>
+
+  <button type="submit">Zmień hasło</button>
+</form>
+
+<h2>Zmień adres e-mail</h2>
+
+<p>Zmiana nastąpi po potwierdzeniu linku wysłanego na nowy adres.</p>
+
+<form action="/profile/email" method="post">
+  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+  <p>
+    <label for="newEmail">Nowy adres e-mail</label>
+    <input
+      id="newEmail"
+      name="newEmail"
+      type="email"
+      autocomplete="email"
+      maxlength="254"
+      required
+    >
+  </p>
+
+  <p>
+    <label for="emailPassword">Obecne hasło do aplikacji</label>
+    <input
+      id="emailPassword"
+      name="password"
+      type="password"
+      autocomplete="current-password"
+      required
+    >
+  </p>
+
+  <button type="submit">Wyślij link potwierdzający</button>
+</form>
+
+
+      <hr>
+
+      <form action="/logout" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button type="submit">Wyloguj się</button>
+      </form>
+    </main>
+  </body>
+</html>

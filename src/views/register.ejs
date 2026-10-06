@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rejestracja</title>
+  </head>
+  <body>
+    <main>
+      <h1>Utwórz konto</h1>
+
+      <% if (error) { %>
+        <p role="alert"><%= error %></p>
+      <% } %>
+
+      <form action="/register" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+        <p>
+          <label for="name">Imię</label>
+          <input
+            id="name"
+            name="name"
+            value="<%= values.name %>"
+            autocomplete="given-name"
+            maxlength="255"
+            required
+          >
+        </p>
+
+        <p>
+          <label for="email">Adres e-mail</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            value="<%= values.email %>"
+            autocomplete="email"
+            maxlength="255"
+            required
+          >
+        </p>
+
+        <p id="password-rules"><%= passwordRules %></p>
+
+        <p>
+          <label for="password">Hasło</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            aria-describedby="password-rules"
+            minlength="12"
+            required
+          >
+        </p>
+
+        <p>
+          <label for="confirmation">Powtórz hasło</label>
+          <input
+            id="confirmation"
+            name="confirmation"
+            type="password"
+            autocomplete="new-password"
+            required
+          >
+        </p>
+
+        <button type="submit">Zarejestruj się</button>
+      </form>
+
+      <p>Masz już konto? <a href="/login">Zaloguj się</a></p>
+    </main>
+  </body>
+</html>
