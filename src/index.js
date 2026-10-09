@@ -1,1 +1,42 @@
-'use strict';
+const express = require('express');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const authRoutes = require('./routes/authRoutes');
+const profileRoutes = require('./routes/profileRoutes');
+const {
+  isAuthenticated,
+  isNotAuthenticated,
+} = require('./middleware/authMiddleware');
+
+dotenv.config(); // Load environment variables
+
+const app = express();
+
+app.use(express.json()); // Parse JSON bodies
+
+// 1. Auth Routes (Only accessible if NOT logged in)
+app.use('/api/auth', isNotAuthenticated, authRoutes);
+
+// 2. Profile Routes (Only accessible if logged in)
+app.use('/api/profile', isAuthenticated, profileRoutes);
+
+// 3. 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ message: '404 - Page Not Found' });
+});
+
+// Database & Server
+console.log('Attempting to connect to MongoDB...');
+
+mongoose
+  .connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 5000,
+  })
+  .then(() => {
+    console.log('✅ MongoDB Connected successfully!');
+    app.listen(3000, () => console.log('🚀 Server running on port 3000'));
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:');
+    console.error(err.message);
+  });
