@@ -6,22 +6,37 @@ const {
   validateLogin,
 } = require('../middleware/validateMiddleware');
 
-// --- Public Routes (Non-authenticated) ---
+// Import both auth middlewares here!
+const {
+  isAuthenticated,
+  isNotAuthenticated,
+} = require('../middleware/authMiddleware');
 
-// Register
-router.post('/register', validateRegister, authController.register);
+// --- Public Routes (Blocked if ALREADY logged in) ---
+router.post(
+  '/register',
+  isNotAuthenticated,
+  validateRegister,
+  authController.register,
+);
+router.post('/login', isNotAuthenticated, validateLogin, authController.login);
 
-// Activate Account (User clicks link in email)
+router.post(
+  '/forgot-password',
+  isNotAuthenticated,
+  authController.forgotPassword,
+);
+
+router.post(
+  '/reset-password/:token',
+  isNotAuthenticated,
+  authController.resetPassword,
+);
+
+// --- Authenticated Routes (Blocked if NOT logged in) ---
+router.post('/logout', isAuthenticated, authController.logout);
+
+// --- Token Activation Route (Accessible by anyone with the link) ---
 router.get('/activate/:token', authController.activate);
-
-// Login
-router.post('/login', validateLogin, authController.login);
-
-// Logout
-router.post('/logout', authController.logout);
-
-// Password Reset
-router.post('/forgot-password', authController.forgotPassword);
-router.post('/reset-password/:token', authController.resetPassword);
 
 module.exports = router;
