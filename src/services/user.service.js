@@ -12,12 +12,12 @@ export const getByEmail = async (email) => {
   return User.findOne({ where: { email } });
 };
 
-export const create = async ({ name, email, password }) => {
-  return User.create({ name, email, password });
+export const create = async ({ name, email, passwordHash }) => {
+  return User.create({ name, email, passwordHash });
 };
 
 export const update = async (id, data) => {
-  const user = User.findByPk(id);
+  const user = await User.findByPk(id);
 
   if (!user) {
     return null;
