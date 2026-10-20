@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { sequelize } from './db.js';
-import './model/user.model.js'; // модель должна быть импортирована до sync
+import './model/user.model.js';
 import * as authController from './controllers/auth.controller.js';
 
 const PORT = process.env.PORT || 3000;

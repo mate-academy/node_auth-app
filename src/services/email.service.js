@@ -1,11 +1,5 @@
-export const sendActivationEmail = () => {
+export const sendActivationEmail = () => {};
 
-};
+export const sendResetEmail = () => {};
 
-export const sendResetEmail = () => {
-
-};
-
-export const sendEmailChangedNotification = () => {
-
-};
+export const sendEmailChangedNotification = () => {};
