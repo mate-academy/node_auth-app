@@ -3,11 +3,13 @@ import express from 'express';
 import { sequelize } from './db.js';
 import './model/user.model.js';
 import * as authController from './controllers/auth.controller.js';
+import cors from 'cors';
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -15,6 +17,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/registration', authController.register);
+app.get('/activate/:activationToken', authController.activate);
 
 const start = async () => {
   try {

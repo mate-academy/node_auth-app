@@ -12,8 +12,23 @@ export const getByEmail = async (email) => {
   return User.findOne({ where: { email } });
 };
 
-export const create = async ({ name, email, passwordHash }) => {
-  return User.create({ name, email, passwordHash });
+export const getByActivationToken = async (activationToken) => {
+  return User.findOne({ where: { activationToken } });
+};
+
+export const create = async ({
+  // eslint-disable-next-line no-shadow
+  name,
+  email,
+  passwordHash,
+  activationToken,
+}) => {
+  return User.create({
+    name,
+    email,
+    passwordHash,
+    activationToken,
+  });
 };
 
 export const update = async (id, data) => {

@@ -1,13 +1,16 @@
 import bcrypt from 'bcrypt';
 import * as userService from '../services/user.service.js';
 import * as validation from '../utils/validators.js';
+import { sendActivationEmail } from '../utils/mailer.js';
+import { uuid } from 'uuidv4';
 
 export const register = async (req, res) => {
+  // eslint-disable-next-line no-shadow
   const { name, email, password } = req.body;
 
   const errors = {
     name: validation.validateName(name),
-    email: validation.validateEmail(email),
+    email: validation.validateEmail(email.trim().toLowerCase()),
     password: validation.validatePassword(password),
   };
 
@@ -17,7 +20,7 @@ export const register = async (req, res) => {
     return;
   }
 
-  if (await userService.getByEmail(email)) {
+  if (await userService.getByEmail(email.trim().toLowerCase())) {
     res.sendStatus(409);
 
     return;
@@ -25,7 +28,15 @@ export const register = async (req, res) => {
 
   try {
     const passwordHash = await bcrypt.hash(password, 10);
-    const user = await userService.create({ name, email, passwordHash });
+    const activationToken = uuid();
+    const user = await userService.create({
+      name,
+      email,
+      passwordHash,
+      activationToken,
+    });
+
+    await sendActivationEmail(user.email, activationToken);
 
     res.status(201).send({ id: user.id, name: user.name, email: user.email });
   } catch (error) {
@@ -35,6 +46,27 @@ export const register = async (req, res) => {
       return;
     }
 
+    // eslint-disable-next-line no-console
+    console.error(error);
+
     res.sendStatus(500);
   }
+};
+
+export const activate = async (req, res) => {
+  const { activationToken } = req.params;
+
+  const user = await userService.getByActivationToken(activationToken);
+
+  if (!user) {
+    res.status(404).send('Invalid or already used activation link');
+
+    return;
+  }
+
+  user.activationToken = null;
+  user.isActive = true;
+  user.save();
+
+  res.send('Your account is active!');
 };
