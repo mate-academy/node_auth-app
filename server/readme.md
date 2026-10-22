@@ -16,6 +16,8 @@ Implement an application that allows user to:
   - Show email sent page
   - add Reset Password confirmation page (with `password` and `confirmation` fields that must be equal)
   - Show Success page with a link to login
+  - `POST /forgot-password` accepts `{ "email": "..." }` and sends a reset link when the account exists
+  - `POST /reset-password/:token` accepts `{ "password": "...", "confirmation": "..." }`; reset links expire after one hour and can only be used once
 - Profile page (only authenticated)
   - You can change a name
   - It allows to change a password (require an old one, `new password` and `confirmation`)
