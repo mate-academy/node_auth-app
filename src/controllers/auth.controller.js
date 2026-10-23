@@ -66,7 +66,23 @@ export const activate = async (req, res) => {
 
   user.activationToken = null;
   user.isActive = true;
-  user.save();
+  await user.save();
 
-  res.send('Your account is active!');
+  res.redirect(`/profiles/${user.id}`);
+};
+
+export const loadProfile = async (req, res) => {
+  const { id } = req.params;
+
+  const user = await userService.getById(id);
+
+  if (!user) {
+    res.status(404).send('User profile not found');
+
+    return;
+  }
+
+  const { name, email } = user;
+
+  res.send({ name, email });
 };

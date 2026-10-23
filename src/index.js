@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 
 app.post('/registration', authController.register);
 app.get('/activate/:activationToken', authController.activate);
+app.get('/profiles/:id', authController.loadProfile);
 
 const start = async () => {
   try {
