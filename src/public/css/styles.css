@@ -1,0 +1,121 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f5f6f8;
+  --card: #fff;
+  --text: #1c1f24;
+  --muted: #6b7280;
+  --line: #d9dde3;
+  --accent: #2f5bea;
+  --ok: #15803d;
+  --err: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161a;
+    --card: #1d2026;
+    --text: #e8eaee;
+    --muted: #98a0ad;
+    --line: #2f343c;
+    --accent: #7c9bff;
+    --ok: #4ade80;
+    --err: #f87171;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font: 16px/1.5 system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+header a { color: var(--text); text-decoration: none; margin-right: 16px; }
+header form { display: inline; }
+main { max-width: 480px; margin: 32px auto; padding: 0 16px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+h1 { font-size: 1.5rem; margin: 0 0 16px; }
+h2 { font-size: 1.1rem; margin: 0 0 12px; }
+
+label {
+  display: block;
+  margin: 12px 0 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+button {
+  margin-top: 16px;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.link {
+  background: none;
+  color: var(--accent);
+  padding: 0;
+  margin: 0;
+  font-weight: 400;
+}
+
+a { color: var(--accent); }
+.muted { color: var(--muted); font-size: 0.9rem; }
+
+.alert {
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  border: 1px solid;
+}
+
+.alert ul { margin: 0; padding-left: 18px; }
+.alert.error { color: var(--err); border-color: var(--err); }
+.alert.success { color: var(--ok); border-color: var(--ok); }
+.alert.info { border-color: var(--line); }
+
+.rules {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.rules li::before { content: '\2717  '; color: var(--err); }
+.rules li.ok { color: var(--ok); }
+.rules li.ok::before { content: '\2713  '; color: var(--ok); }
