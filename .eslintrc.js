@@ -1,10 +1,24 @@
 module.exports = {
-  extends: '@mate-academy/eslint-config',
+  root: true,
+  extends: '@mate-academy/eslint-config-react-typescript',
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: './tsconfig.app.json',
+    tsconfigRootDir: __dirname,
+    ecmaFeatures: {
+      jsx: true,
+    },
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
   env: {
-    jest: true
+    jest: true,
   },
   rules: {
-    'no-proto': 0
+    'no-proto': 0,
   },
-  plugins: ['jest']
+  plugins: ['jest', '@typescript-eslint'],
 };
