@@ -21,12 +21,23 @@ export const sendEmail = ({ to, subject, text, html }) => {
 };
 
 export const sendActivationEmail = (to, token) => {
-  const link = `${process.env.CLIENT_URL}/activate/${token}`;
+  const link = `${process.env.BACK_URL}/auth/activate/${token}`;
 
   return sendEmail({
     to,
     subject: 'Activate your account',
     text: `Follow the link to activate your account: ${link}`,
     html: `<a href="${link}">Activate your account</a>`,
+  });
+};
+
+export const sendResetEmail = (to, token) => {
+  const link = `${process.env.BACK_URL}/auth/reset/${token}`;
+
+  return sendEmail({
+    to,
+    subject: 'Reset password',
+    text: `Follow the link to reset your password: ${link}`,
+    html: `<a href="${link}">Reset password</a>`,
   });
 };

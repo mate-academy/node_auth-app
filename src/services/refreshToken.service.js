@@ -3,11 +3,9 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { RefreshToken } from '../model/refreshToken.model.js';
 import 'dotenv/config';
+import { sha256 } from '../utils/tokenHasher.js';
 
 export const REFRESH_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-
-const sha256 = (token) =>
-  crypto.createHash('sha256').update(token).digest('hex');
 
 export const generateAccessToken = (userId) => {
   return jwt.sign({ sub: userId }, process.env.JWT_ACCESS_SECRET, {
@@ -15,7 +13,7 @@ export const generateAccessToken = (userId) => {
   });
 };
 
-export const verifyAccessToken = (token) => {
+export const verifyAccessToken = async (token) => {
   try {
     return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
   } catch {
@@ -24,6 +22,8 @@ export const verifyAccessToken = (token) => {
 };
 
 export const generateRefreshToken = async (userId) => {
+  await removeAllUserTokens(userId);
+
   const token = crypto.randomBytes(48).toString('hex');
 
   await RefreshToken.create({
@@ -44,7 +44,9 @@ export const verifyRefreshToken = async (token) => {
     return null;
   }
 
-  if (Date.now() >= refreshToken.expireAt.getTime()) {
+  if (Date.now() >= refreshToken.expiresAt.getTime()) {
+    await removeRefreshToken(token);
+
     return null;
   }
 
