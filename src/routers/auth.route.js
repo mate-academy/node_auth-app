@@ -9,10 +9,15 @@ authRouter.post('/registration', authController.register);
 authRouter.get('/activate/:activationToken', authController.activate);
 authRouter.post('/login', authController.login);
 authRouter.get('/profile', authMiddleware, authController.loadProfile);
-authRouter.get('/auto-authorization', authController.generateAccessToken);
+
+authRouter.patch(
+  '/profile/password',
+  authMiddleware,
+  authController.changePassword,
+);
 authRouter.post('/refresh', tokenController.refreshAccessToken);
 authRouter.post('/logout', authController.logout);
-authRouter.post('/reset', authController.requestPasswordReset);
-authRouter.get('/reset/:resetToken', authController.resetPassword);
+authRouter.post('/reset-password', authController.requestPasswordReset);
+authRouter.patch('/reset', authController.resetPassword);
 
 export default authRouter;

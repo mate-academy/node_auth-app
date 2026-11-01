@@ -32,7 +32,7 @@ export const sendActivationEmail = (to, token) => {
 };
 
 export const sendResetEmail = (to, token) => {
-  const link = `${process.env.BACK_URL}/auth/reset/${token}`;
+  const link = `${process.env.FRONT_URL}/reset/${token}`;
 
   return sendEmail({
     to,
