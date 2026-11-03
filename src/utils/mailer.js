@@ -31,6 +31,25 @@ export const sendActivationEmail = (to, token) => {
   });
 };
 
+export const sendChangeEmail = (to, token) => {
+  const link = `${process.env.BACK_URL}/auth/email/confirm/${token}`;
+
+  return sendEmail({
+    to,
+    subject: 'Change your email adress',
+    text: `Follow the link to change your email: ${link}`,
+    html: `<a href="${link}">Change your email</a>`,
+  });
+};
+
+export const sendWarningEmail = (to, newEmail) => {
+  return sendEmail({
+    to,
+    subject: 'Warning about change current email',
+    text: `Your current email adress will be changed to this one "${newEmail}"`,
+  });
+};
+
 export const sendResetEmail = (to, token) => {
   const link = `${process.env.FRONT_URL}/reset/${token}`;
 

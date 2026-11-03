@@ -1,11 +1,17 @@
 import bcrypt from 'bcrypt';
 import * as userService from '../services/user.service.js';
 import * as validation from '../utils/validators.js';
-import { sendActivationEmail, sendResetEmail } from '../utils/mailer.js';
+import {
+  sendActivationEmail,
+  sendResetEmail,
+  sendChangeEmail,
+  sendWarningEmail,
+} from '../utils/mailer.js';
 // eslint-disable-next-line no-shadow
 import crypto from 'crypto';
 import * as refreshService from '../services/refreshToken.service.js';
 import * as resetService from '../services/resetToken.service.js';
+import * as changeService from '../services/changeToken.service.js';
 
 export const normalizeEmail = (email) =>
   typeof email === 'string' ? email.trim().toLowerCase() : email;
@@ -81,7 +87,6 @@ export const activate = async (req, res) => {
 
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  const normalizedEmail = normalizeEmail(email);
 
   if (typeof email !== 'string') {
     return res.status(400).json({
@@ -95,6 +100,7 @@ export const login = async (req, res) => {
     });
   }
 
+  const normalizedEmail = normalizeEmail(email);
   const user = await userService.getByEmail(normalizedEmail);
 
   if (!user) {
@@ -121,7 +127,11 @@ export const login = async (req, res) => {
 
   const accessToken = await refreshService.generateAccessToken(user.id);
 
-  res.status(200).json({ accessToken });
+  res.status(200).json({
+    message: 'Success',
+    user: { name: user.name, email: user.email, isActive: user.isActive },
+    accessToken,
+  });
 };
 
 export const loadProfile = async (req, res) => {
@@ -133,9 +143,16 @@ export const loadProfile = async (req, res) => {
     });
   }
 
-  const { name, email } = user;
+  const { name, email, isActive } = user;
 
-  return res.json({ name, email });
+  return res.json({
+    message: 'Success',
+    user: {
+      name,
+      email,
+      isActive,
+    },
+  });
 };
 
 export const setCookie = async (user, res) => {
@@ -258,13 +275,13 @@ export const resetPassword = async (req, res) => {
 export const changePassword = async (req, res) => {
   const { currentPassword, password, confirmation } = req.body ?? {};
 
-  const checkPassword = checkPasswordMatch(password, confirmation);
-
   if (typeof currentPassword !== 'string') {
     return res.status(400).json({
       message: 'Invalid type of current password',
     });
   }
+
+  const checkPassword = checkPasswordMatch(password, confirmation);
 
   if (checkPassword !== null) {
     return res.status(400).json({
@@ -303,4 +320,107 @@ export const changePassword = async (req, res) => {
   });
 
   res.status(200).json({ message: 'Password has been changed' });
+};
+
+export const changeEmail = async (req, res) => {
+  const { currentPassword, newEmail, confirmEmail } = req.body || {};
+
+  if (typeof currentPassword !== 'string') {
+    return res.status(400).json({
+      message: 'Invalid type of password',
+    });
+  }
+
+  if (typeof newEmail !== 'string') {
+    return res.status(400).json({
+      message: 'Invalid type of email',
+    });
+  }
+
+  if (typeof confirmEmail !== 'string') {
+    return res.status(400).json({
+      message: 'Invalid type of email',
+    });
+  }
+
+  const normalizedNewEmail = normalizeEmail(newEmail);
+  const normalizedConfirmEmail = normalizeEmail(confirmEmail);
+
+  const newEmailError = validation.validateEmail(normalizedNewEmail);
+
+  if (newEmailError) {
+    return res.status(400).json({
+      message: newEmailError,
+    });
+  }
+
+  if (normalizedNewEmail !== normalizedConfirmEmail) {
+    return res.status(400).json({
+      message: 'Emails do not match',
+    });
+  }
+
+  const user = await userService.getById(req.user.id);
+
+  if (!user) {
+    return res.status(401).json({
+      message: 'User profile not found',
+    });
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    currentPassword,
+    user.passwordHash,
+  );
+
+  if (!isPasswordValid) {
+    return res.status(400).json({
+      message: 'Invalid password',
+    });
+  }
+
+  if (normalizedNewEmail === user.email) {
+    return res.status(409).json({
+      message: 'The new email cannot be identical to the current one',
+    });
+  }
+
+  const existingUser = await userService.getByEmail(normalizedNewEmail);
+
+  if (existingUser) {
+    return res.status(409).json({
+      message: 'User with this email already exists',
+    });
+  }
+
+  const token = await changeService.generateChangeToken(
+    user.id,
+    normalizedNewEmail,
+  );
+
+  await sendChangeEmail(normalizedNewEmail, token);
+  await sendWarningEmail(user.email, normalizedNewEmail);
+
+  return res.status(200).json({
+    message: 'Confirmation link sent to the new email',
+  });
+};
+
+export const confirmEmailChange = async (req, res) => {
+  const { changeToken } = req.params;
+  const record = await changeService.consumeChangeToken(changeToken);
+
+  if (!record) {
+    return res.redirect(`${process.env.FRONT_URL}/profile?emailChange=invalid`);
+  }
+
+  const taken = await userService.getByEmail(record.newEmail);
+
+  if (taken) {
+    return res.redirect(`${process.env.FRONT_URL}/profile?emailChange=taken`);
+  }
+
+  await userService.update(record.userId, { email: record.newEmail });
+
+  res.redirect(`${process.env.FRONT_URL}/profile?emailChange=success`);
 };

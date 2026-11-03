@@ -15,6 +15,14 @@ authRouter.patch(
   authMiddleware,
   authController.changePassword,
 );
+
+authRouter.patch('/profile/email', authMiddleware, authController.changeEmail);
+
+authRouter.get(
+  '/email/confirm/:changeToken',
+  authController.confirmEmailChange,
+);
+
 authRouter.post('/refresh', tokenController.refreshAccessToken);
 authRouter.post('/logout', authController.logout);
 authRouter.post('/reset-password', authController.requestPasswordReset);
