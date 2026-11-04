@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import PasswordInput from "@/components/PasswordInput";
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { useAuth } from "../AuthContext";
+import { BASE_URL } from "@/api";
 
 type Form = {
   email: string;
@@ -18,7 +19,9 @@ export default function LoginPage() {
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
+  const [inactive, setInactive] = useState(false);
   const { setUser } = useAuth();
+  const navigate = useNavigate();
 
   function handleFormEvent(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -33,15 +36,12 @@ export default function LoginPage() {
   async function handleForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setInactive(false);
 
     try {
-      const BASE_URL = "http://localhost:3000";
-
       const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(form),
       });
@@ -50,11 +50,14 @@ export default function LoginPage() {
 
       if (!response.ok) {
         setError(data.message);
+        setInactive(response.status === 403);
+
         return;
       }
 
       localStorage.setItem("accessToken", data.accessToken);
       setUser(data.user);
+      navigate("/profile", { replace: true });
     } catch (error) {
       console.error(error);
       setError("Login failed");
@@ -83,8 +86,6 @@ export default function LoginPage() {
             required
             className="h-12 rounded-xl border-black/10 bg-white/70 px-4 text-black placeholder:text-black/40 focus-visible:ring-black/20"
           />
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
 
         <div className="space-y-2">
@@ -100,9 +101,21 @@ export default function LoginPage() {
             placeholder="Password"
             required
           />
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
+
+        {error && (
+          <div className="space-y-1">
+            <p className="text-sm text-red-600">{error}</p>
+            {inactive && (
+              <Link
+                to="/reset"
+                className="text-sm underline underline-offset-4"
+              >
+                Resend activation email
+              </Link>
+            )}
+          </div>
+        )}
 
         <Button
           type="submit"

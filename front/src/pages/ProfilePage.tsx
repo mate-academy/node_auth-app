@@ -72,7 +72,7 @@ export default function ProfilePage() {
       const response = await apiFetch("/auth/profile/password", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(name),
+        body: JSON.stringify(changePassword),
       });
 
       const data = await response.json();
