@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,6 @@ export default function LoginPage() {
     password: "",
   });
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   const { setUser } = useAuth();
 
   function handleFormEvent(event: ChangeEvent<HTMLInputElement>) {

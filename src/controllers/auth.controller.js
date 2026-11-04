@@ -208,7 +208,7 @@ export const requestPasswordReset = async (req, res) => {
       if (!activationToken) {
         activationToken = crypto.randomBytes(48).toString('hex');
 
-        await userService.update(user.i00d, { activationToken });
+        await userService.update(user.id, { activationToken });
       }
       await sendActivationEmail(user.email, activationToken);
     } else {
@@ -423,4 +423,40 @@ export const confirmEmailChange = async (req, res) => {
   await userService.update(record.userId, { email: record.newEmail });
 
   res.redirect(`${process.env.FRONT_URL}/profile?emailChange=success`);
+};
+
+export const changeName = async (req, res) => {
+  const { name } = req.body || {};
+
+  if (typeof name !== 'string') {
+    return res.status(400).json({
+      message: 'Invalid type of name',
+    });
+  }
+
+  const normalizedName = name.trim();
+  const user = await userService.getById(req.user.id);
+
+  if (!user) {
+    return res.status(401).json({
+      message: 'User not found',
+    });
+  }
+
+  const validMessage = validation.validateName(normalizedName);
+
+  if (validMessage) {
+    return res.status(400).json({
+      message: validMessage,
+    });
+  }
+
+  const updatedUser = await userService.update(req.user.id, {
+    name: normalizedName,
+  });
+
+  return res.status(200).json({
+    message: 'The name was successfully changed!',
+    user: { name: updatedUser.name, email: updatedUser.email },
+  });
 };

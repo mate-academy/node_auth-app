@@ -23,6 +23,8 @@ authRouter.get(
   authController.confirmEmailChange,
 );
 
+authRouter.patch('/profile/name', authMiddleware, authController.changeName);
+
 authRouter.post('/refresh', tokenController.refreshAccessToken);
 authRouter.post('/logout', authController.logout);
 authRouter.post('/reset-password', authController.requestPasswordReset);

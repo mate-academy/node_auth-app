@@ -5,6 +5,7 @@ import RegistrationPage from "@/pages/RegistrationPage";
 import ActivationPage from "@/pages/ActivationPage";
 import ResetPasswordPage from "@/pages/ResetPasswordPage";
 import ProfilePage from "@/pages/ProfilePage";
+import NotFoundPage from "@/pages/NotFoundPage";
 import ResetPage from "@/pages/ResetPage";
 import { AuthProvider } from "./AuthContext";
 import GuestRoute from "@/components/GuestRoute";
@@ -29,6 +30,7 @@ export default function App() {
           </Route>
 
           <Route path="/activation" element={<ActivationPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

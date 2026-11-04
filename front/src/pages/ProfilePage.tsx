@@ -35,8 +35,10 @@ const EMPTY_EMAIL_FORM: ChangeEmail = {
 export default function ProfilePage() {
   const [changePassword, setChangePassword] =
     useState<ChangePassword>(EMPTY_PASSWORD_FORM);
-  const [changeEmail, setChangeEmail] =
-    useState<ChangeEmail>(EMPTY_EMAIL_FORM);
+  const [changeEmail, setChangeEmail] = useState<ChangeEmail>(EMPTY_EMAIL_FORM);
+  const [name, setName] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [statusName, setStatusName] = useState("");
   const [passError, setPassError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [logoutError, setLogoutError] = useState("");
@@ -70,7 +72,7 @@ export default function ProfilePage() {
       const response = await apiFetch("/auth/profile/password", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(changePassword),
+        body: JSON.stringify(name),
       });
 
       const data = await response.json();
@@ -120,6 +122,39 @@ export default function ProfilePage() {
       }
 
       console.error(error);
+    }
+  };
+
+  const handleUpdateName = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setNameError("");
+    setStatusName("");
+
+    try {
+      const response = await apiFetch("/auth/profile/name", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return setNameError(data.message);
+      }
+
+      setStatusName(data.message);
+      setUser(data.user);
+      setName("");
+    } catch (error) {
+      if (error instanceof SessionExpiredError) {
+        setUser(null);
+
+        return;
+      }
+
+      console.error(error);
+      setNameError("Something went wrong. Try again later.");
     }
   };
 
@@ -320,6 +355,44 @@ export default function ProfilePage() {
                   className="h-12 w-full rounded-xl bg-black text-white hover:bg-black/85"
                 >
                   Update Email Address
+                </Button>
+              </div>
+            </form>
+          </section>
+
+          <section className="space-y-5 rounded-xl border bg-card p-5 shadow-sm sm:p-6">
+            <div className="space-y-1">
+              <h2 className="text-lg font-semibold">Change Name</h2>
+              <p className="text-sm text-muted-foreground">
+                Update the name displayed on your account.
+              </p>
+              {nameError && <p className="text-sm text-red-600">{nameError}</p>}
+              {statusName && (
+                <p className="text-sm text-green-700">{statusName}</p>
+              )}
+            </div>
+
+            <form className="space-y-4" onSubmit={handleUpdateName}>
+              <div className="space-y-2">
+                <Label htmlFor="name">New Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  type="text"
+                  placeholder="Enter your new name"
+                  autoComplete="name"
+                  maxLength={40}
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  className="h-12 w-full rounded-xl bg-black text-white hover:bg-black/85"
+                >
+                  Update Name
                 </Button>
               </div>
             </form>

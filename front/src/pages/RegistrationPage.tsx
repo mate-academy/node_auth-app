@@ -184,6 +184,11 @@ export default function RegistrationPage() {
             className="h-12 rounded-xl border-black/10 bg-white/70"
           />
 
+          <p className="text-xs text-muted-foreground">
+            6–40 characters, at least one uppercase letter, at least 4 digits,
+            one special character. No spaces or Cyrillic letters.
+          </p>
+
           {errors.password && (
             <p className="text-sm text-red-600">{errors.password}</p>
           )}
