@@ -45,8 +45,25 @@ async function register(req, res) {
   res.json({ user: userService.normalize(user) });
 }
 
+async function activation(req, res) {
+  const { email, token } = req.params;
+
+  const user = await userService.findByEmail(email);
+
+  if (!user || user.activationToken !== token) {
+    res.sendStatus(404);
+
+    return;
+  }
+
+  user.activationToken = null;
+  await user.save();
+  res.json({ user: userService.normalize(user) });
+}
+
 module.exports = {
   authController: {
     register,
+    activation,
   },
 };
