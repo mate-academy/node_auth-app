@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-// const { authRouter } = require('./routes/auth.router');
+const { authRouter } = require('./routes/auth.router');
 
 function createServer() {
   const app = express();
@@ -16,6 +16,7 @@ function createServer() {
   );
 
   app.use(cookieParser());
+  app.use('/auth', authRouter);
 
   return app;
 }
