@@ -61,9 +61,30 @@ async function activation(req, res) {
   res.json({ user: userService.normalize(user) });
 }
 
+async function login(req, res) {
+  const { email, password } = req.body;
+  const user = await userService.findByEmail(email);
+  const isPasswordValid = await bcrypt.compare(password, user?.password || '');
+
+  if (!user || !isPasswordValid) {
+    res.status(401).json({ message: 'Invalid credentials' });
+
+    return;
+  }
+
+  if (user.activationToken !== null) {
+    res.status(403).json({ message: 'Please activate your email' });
+
+    return;
+  }
+
+  res.json({ user: userService.normalize(user) });
+}
+
 module.exports = {
   authController: {
     register,
     activation,
+    login,
   },
 };
