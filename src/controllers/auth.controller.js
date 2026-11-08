@@ -59,7 +59,22 @@ async function activation(req, res) {
 
   user.activationToken = null;
   await user.save();
-  res.json({ user: userService.normalize(user) });
+
+  sendAuthentication(res, user);
+}
+
+function sendAuthentication(res, user) {
+  const normalizedUser = userService.normalize(user);
+  const accessToken = jwt.generateAccessToken(normalizedUser);
+  const refreshToken = jwt.generateRefreshToken(normalizedUser);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+  res.json({ user: normalizedUser, accessToken });
 }
 
 async function login(req, res) {
@@ -79,19 +94,28 @@ async function login(req, res) {
     return;
   }
 
-  const normalizedUser = userService.normalize(user);
+  sendAuthentication(res, user);
+}
 
-  const accessToken = jwt.generateAccessToken(normalizedUser);
-  const refreshToken = jwt.generateRefreshToken(normalizedUser);
+async function refresh(req, res) {
+  const refreshToken = req.cookies.refreshToken || '';
+  const userData = jwt.validateRefreshToken(refreshToken);
 
-  res.cookie('refreshToken', refreshToken, {
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    httpOnly: true,
-    sameSite: 'none',
-    secure: true,
-  });
+  if (!userData) {
+    res.status(401).json({ message: 'Invalid token' });
 
-  res.json({ user: normalizedUser, accessToken });
+    return;
+  }
+
+  const user = await userService.findByEmail(userData.email);
+
+  if (!user) {
+    res.status(401).json({ message: 'Invalid token' });
+
+    return;
+  }
+
+  sendAuthentication(res, user);
 }
 
 module.exports = {
@@ -99,5 +123,6 @@ module.exports = {
     register,
     activation,
     login,
+    refresh,
   },
 };
