@@ -4,6 +4,7 @@ const { randomUUID } = require('crypto');
 const bcrypt = require('bcrypt');
 const userService = require('../services/user.service');
 const mailer = require('../utils/mailer');
+const jwt = require('../utils/jwt');
 
 async function register(req, res) {
   const { name, email, password } = req.body;
@@ -78,7 +79,19 @@ async function login(req, res) {
     return;
   }
 
-  res.json({ user: userService.normalize(user) });
+  const normalizedUser = userService.normalize(user);
+
+  const accessToken = jwt.generateAccessToken(normalizedUser);
+  const refreshToken = jwt.generateRefreshToken(normalizedUser);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  });
+
+  res.json({ user: normalizedUser, accessToken });
 }
 
 module.exports = {
