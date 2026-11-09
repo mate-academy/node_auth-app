@@ -30,18 +30,19 @@ function sendActivationLink(email, token) {
   return send(email, 'Account activation', html);
 }
 
-// function sendResetLink(email, token) {
-//   const link = `${process.env.CLIENT_URL}/reset-password/${email}/${token}`;
+function sendResetLink(email, token) {
+  const link = `${process.env.CLIENT_URL}/reset-password/${email}/${token}`;
 
-//   const html = `
-//     <h1>Account reset password</h1>
-//     <a href="${link}">${link}</a>
-//   `;
+  const html = `
+    <h1>Account reset password</h1>
+    <a href="${link}">${link}</a>
+  `;
 
-//   return send(email, 'Reset password', html);
-// }
+  return send(email, 'Reset password', html);
+}
 
 module.exports = {
   send,
   sendActivationLink,
+  sendResetLink,
 };

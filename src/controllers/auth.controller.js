@@ -141,6 +141,52 @@ async function logout(req, res) {
   res.sendStatus(204);
 }
 
+async function resetRequest(req, res) {
+  const email = req.body.email;
+  const user = await userService.findByEmail(email);
+
+  if (user) {
+    const resetToken = randomUUID();
+
+    user.resetToken = resetToken;
+    await user.save();
+    await mailer.sendResetLink(email, resetToken);
+  }
+
+  res.json({ message: 'If this email is registered, we sent a reset link' });
+}
+
+async function resetPassword(req, res) {
+  const { email, token, password, confirmation } = req.body;
+  const user = await userService.findByEmail(email);
+  const passwordError = userService.validatePassword(password);
+
+  if (passwordError) {
+    res.status(400).json({ message: 'Invalid password' });
+
+    return;
+  }
+
+  if (password !== confirmation) {
+    res.status(400).json({ message: 'Invalid password' });
+
+    return;
+  }
+
+  if (!user || user.resetToken !== token) {
+    res.status(404).json({ message: 'Not found' });
+
+    return;
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+
+  user.password = hash;
+  user.resetToken = null;
+  await user.save();
+  res.json({ message: 'Password changed' });
+}
+
 module.exports = {
   authController: {
     register,
@@ -148,5 +194,7 @@ module.exports = {
     login,
     refresh,
     logout,
+    resetRequest,
+    resetPassword,
   },
 };

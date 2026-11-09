@@ -10,5 +10,7 @@ authRouter.get('/activate/:email/:token', authController.activation);
 authRouter.post('/login', authController.login);
 authRouter.get('/refresh', authController.refresh);
 authRouter.post('/logout', authController.logout);
+authRouter.post('/reset-request', authController.resetRequest);
+authRouter.post('/reset-password', authController.resetPassword);
 
 module.exports = { authRouter };
