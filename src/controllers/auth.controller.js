@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const userService = require('../services/user.service');
 const mailer = require('../utils/mailer');
 const jwt = require('../utils/jwt');
+const tokenService = require('../services/token.service');
 
 async function register(req, res) {
   const { name, email, password } = req.body;
@@ -60,13 +61,15 @@ async function activation(req, res) {
   user.activationToken = null;
   await user.save();
 
-  sendAuthentication(res, user);
+  await sendAuthentication(res, user);
 }
 
-function sendAuthentication(res, user) {
+async function sendAuthentication(res, user) {
   const normalizedUser = userService.normalize(user);
   const accessToken = jwt.generateAccessToken(normalizedUser);
   const refreshToken = jwt.generateRefreshToken(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
 
   res.cookie('refreshToken', refreshToken, {
     maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -94,7 +97,7 @@ async function login(req, res) {
     return;
   }
 
-  sendAuthentication(res, user);
+  await sendAuthentication(res, user);
 }
 
 async function refresh(req, res) {
@@ -107,6 +110,14 @@ async function refresh(req, res) {
     return;
   }
 
+  const token = await tokenService.findByToken(refreshToken);
+
+  if (!token) {
+    res.status(401).json({ message: 'Invalid Token' });
+
+    return;
+  }
+
   const user = await userService.findByEmail(userData.email);
 
   if (!user) {
@@ -115,7 +126,19 @@ async function refresh(req, res) {
     return;
   }
 
-  sendAuthentication(res, user);
+  await sendAuthentication(res, user);
+}
+
+async function logout(req, res) {
+  const refreshToken = req.cookies.refreshToken || '';
+  const userData = jwt.validateRefreshToken(refreshToken);
+
+  if (userData) {
+    await tokenService.remove(userData.id);
+  }
+
+  res.clearCookie('refreshToken');
+  res.sendStatus(204);
 }
 
 module.exports = {
@@ -124,5 +147,6 @@ module.exports = {
     activation,
     login,
     refresh,
+    logout,
   },
 };
