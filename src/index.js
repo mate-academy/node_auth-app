@@ -164,16 +164,17 @@ app.get('/activate', guestOnly, (req, res) => {
 
   if (user) {
     user.active = true;
+
+    // Автоматически логиним пользователя
+    const sessionId = generateToken();
+
+    sessions[sessionId] = user.id;
+    res.setHeader('Set-Cookie', `sessionId=${sessionId}; HttpOnly; Path=/`);
   }
   delete tokens[token];
 
-  res.send(
-    renderPage(
-      'Account Activated',
-      '<p>Your account has been activated.</p>' +
-        '<a href="/login">Click here to login</a>',
-    ),
-  );
+  // Редирект в профиль после успешной активации
+  res.redirect('/profile');
 });
 
 app.get('/login', guestOnly, (req, res) => {
