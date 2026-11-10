@@ -6,6 +6,10 @@ function findByEmail(email) {
   return User.findOne({ where: { email } });
 }
 
+function findById(id) {
+  return User.findOne({ where: { id } });
+}
+
 function create(name, email, password, activationToken) {
   return User.create({
     name,
@@ -41,10 +45,16 @@ function validateEmail(email) {
   }
 }
 
+function findByEmailChangeToken(token) {
+  return User.findOne({ where: { emailChangeToken: token } });
+}
+
 module.exports = {
   findByEmail,
+  findById,
   create,
   normalize,
   validatePassword,
   validateEmail,
+  findByEmailChangeToken,
 };

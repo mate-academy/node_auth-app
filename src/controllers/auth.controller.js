@@ -118,7 +118,7 @@ async function refresh(req, res) {
     return;
   }
 
-  const user = await userService.findByEmail(userData.email);
+  const user = await userService.findById(userData.id);
 
   if (!user) {
     res.status(401).json({ message: 'Invalid token' });

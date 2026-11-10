@@ -4,7 +4,7 @@ require('./models/User');
 require('./models/Token');
 
 sequelize
-  .sync()
+  .sync({ alter: true })
   // eslint-disable-next-line no-console
   .then(() => console.log('Tables created'))
   // eslint-disable-next-line no-console
