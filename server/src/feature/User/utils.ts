@@ -1,0 +1,19 @@
+import type { User } from '../../models/User.model.js';
+
+export type NormalizedAuthUser = ReturnType<typeof normalizeAuth>;
+
+export function normalizeAuth({ id, email }: User) {
+  return { id, email };
+}
+
+export function validateEmail(email: string) {
+  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
+
+  if (!email) return 'Email is required';
+  if (!emailPattern.test(email)) return 'Email is not valid';
+}
+
+export function validatePassword(password: string) {
+  if (!password) return 'Password is required';
+  if (password.length < 6) return 'At least 6 characters';
+}
