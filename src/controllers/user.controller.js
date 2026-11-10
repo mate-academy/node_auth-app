@@ -20,11 +20,12 @@ async function getProfile(req, res) {
 async function updateName(req, res) {
   const { name } = req.body || {};
 
-  if (!name) {
-    res.status(400).json({
-      errors: { name: 'Name is required' },
-      message: 'Validation error',
-    });
+  const nameError = userService.validateName(name);
+
+  if (nameError) {
+    res
+      .status(400)
+      .json({ errors: { name: nameError }, message: 'Validation error' });
 
     return;
   }
@@ -44,7 +45,7 @@ async function updateName(req, res) {
 }
 
 async function updatePassword(req, res) {
-  const { oldPassword, newPassword, confirmation } = req.body;
+  const { oldPassword, newPassword, confirmation } = req.body || {};
   const validatePassword = userService.validatePassword(newPassword);
 
   if (newPassword !== confirmation) {
