@@ -33,6 +33,16 @@ function validatePassword(password) {
   }
 }
 
+function validateName(name) {
+  if (!name) {
+    return 'Name is required';
+  }
+
+  if (name.trim().length < 2) {
+    return 'At least 2 characters';
+  }
+}
+
 function validateEmail(email) {
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
@@ -56,5 +66,6 @@ module.exports = {
   normalize,
   validatePassword,
   validateEmail,
+  validateName,
   findByEmailChangeToken,
 };

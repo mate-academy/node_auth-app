@@ -13,9 +13,10 @@ async function register(req, res) {
   const errors = {
     email: userService.validateEmail(email),
     password: userService.validatePassword(password),
+    name: userService.validateName(name),
   };
 
-  if (errors.email || errors.password) {
+  if (errors.email || errors.password || errors.name) {
     res.status(400).json({ errors, message: 'Validation error' });
 
     return;

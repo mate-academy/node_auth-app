@@ -3,6 +3,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const { authRouter } = require('./routes/auth.router');
 const { userRouter } = require('./routes/user.router');
+const { errorMiddleware } = require('./middlewares/error.middleware');
 
 function createServer() {
   const app = express();
@@ -19,6 +20,7 @@ function createServer() {
   app.use(cookieParser());
   app.use('/auth', authRouter);
   app.use('/profile', userRouter);
+  app.use(errorMiddleware);
 
   return app;
 }
