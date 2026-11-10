@@ -18,7 +18,7 @@ async function getProfile(req, res) {
 }
 
 async function updateName(req, res) {
-  const { name } = req.body.name || {};
+  const { name } = req.body || {};
 
   if (!name) {
     res.status(400).json({
