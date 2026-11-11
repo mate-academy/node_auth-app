@@ -23,7 +23,7 @@ export const AccountActivationPage = () => {
     }
 
     activate(email, activationToken)
-      .then(() => setTimeout(() => navigate('/'), 2000))
+      .then(() => setTimeout(() => navigate('/profile'), 2000))
       .catch((error: AxiosError<{ message?: string }>) => {
         setError(error.response?.data?.message ?? `Wrong activation link`);
       })

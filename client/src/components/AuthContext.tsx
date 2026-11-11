@@ -43,8 +43,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }
 
   async function checkActivation() {
-    await checkAuth();
-
     const { isActivated } = await authService.isActivated();
     setActivated(isActivated);
   }

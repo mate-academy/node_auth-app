@@ -19,6 +19,8 @@ async function start() {
   await sequelize.sync();
 }
 
+start();
+
 const server = createServer();
 
 server.listen(3000, () => {
@@ -29,5 +31,3 @@ process.on('SIGTERM', async () => {
   await sequelize.close();
   server.close();
 });
-
-start();

@@ -179,33 +179,29 @@ const resetPassword: RequestHandler = async (req, res) => {
   const { token } = req.params;
 
   if (typeof token !== 'string') {
-    res.status(401).json({ message: 'Invalid token' });
-    return;
+    return res.status(401).json({ message: 'Invalid token' });
   }
 
   const userData = jwt.validateResetPasswordToken(token) as NormalizedAuthUser | null;
   const user = await userRepository.getByEmail(userData?.email || '');
 
   if (!user || !userData) {
-    res.status(401).json({ message: 'Invalid token' });
-    return;
+    return res.status(401).json({ message: 'Invalid token' });
   }
 
   const tokenFromDB = await resetPasswordTokenRepository.getUnusedByUserId(user.id);
   const isTokenExist = await bcrypt.compare(token, tokenFromDB?.token || '');
 
   if (!tokenFromDB || !isTokenExist) {
-    res.status(401).json({ message: 'Invalid token' });
-    return;
+    return res.status(401).json({ message: 'Invalid token' });
   }
 
   await resetPasswordTokenRepository.useToken(tokenFromDB.token);
 
   const { password, confirmation } = req.body;
-  console.log("Used token " + JSON.stringify({ password, confirmation }) + "\nStart update "+ Date.now());
 
   if (password !== confirmation) {
-    res.status(401).json({ message: 'Password not confirmed' });
+    return res.status(401).json({ message: 'Password not confirmed' });
   }
 
   const newPassword = await bcrypt.hash(password, 10);

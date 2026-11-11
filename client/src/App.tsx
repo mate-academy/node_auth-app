@@ -30,7 +30,7 @@ export function App() {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
 
-    // checkAuth();
+    checkAuth();
     checkActivation();
   }, []);
 
