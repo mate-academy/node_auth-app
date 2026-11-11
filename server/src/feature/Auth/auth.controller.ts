@@ -133,19 +133,13 @@ const sendAuthentication = async (res: Response, user: User) => {
 
 const checkActivaton: RequestHandler = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken || '';
-  //console.log('refreshToken ' + refreshToken);
-
   const userData = jwt.validateRefreshToken(refreshToken) as NormalizedAuthUser;
-  //console.log(userData);
 
   if (userData) {
     const user = await userRepository.getByEmail(userData.email);
-    ///console.log(user.activationToken);
 
     return res.send({ isActivated: !user.activationToken });
   }
-
-  //console.log('No check activationToken');
 
   return res.send({ isActivated: false });
 };

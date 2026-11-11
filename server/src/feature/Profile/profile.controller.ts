@@ -1,10 +1,9 @@
 import type { Response } from "express";
-import { jwt } from "../../config/jwt.js";
 import type { User } from "../../models/User.model.js";
 import { userRepository } from "../User/user.repository.js";
 import type { AuthRequest } from "../../middlewares/authMiddleware.js";
 import bcrypt from 'bcrypt';
-import { checkPassword } from "../../middlewares/checkPassword.js";
+import { checkPassword } from "../User/utils.js";
 import { mailer } from "../../config/mailer.js";
 
 function normalize({ id, name, email }: User) {
@@ -42,10 +41,13 @@ const changePassword = async (req: AuthRequest, res: Response) => {
 
   const user = await userRepository.getByEmail(email);
 
-  await checkPassword(res, user, oldPassword);
+  const isPasswordCorrect = await checkPassword(res, user, oldPassword);
+  if (!isPasswordCorrect) {
+    return res;
+  }
 
   if (newPassword !== confirmation) {
-    res.status(400).json({ message: 'Password not confirmed' });
+    return res.status(400).json({ message: 'Password not confirmed' });
   }
 
   const password = await bcrypt.hash(newPassword, 10);
@@ -62,16 +64,19 @@ const changeEmail = async (req: AuthRequest, res: Response) => {
 
   const user = await userRepository.getByEmail(email);
 
-  await checkPassword(res, user, password);
+  const isPasswordCorrect = await checkPassword(res, user, password);
+  if (!isPasswordCorrect) {
+    return res;
+  }
 
   if (newEmail !== emailConfirmation) {
-    res.status(400).json({ message: 'Email not confirmed' });
+    return res.status(400).json({ message: 'Email not confirmed' });
   }
 
   const existingUser = await userRepository.getByEmail(newEmail);
 
   if (existingUser) {
-    res.status(400).json({ message: 'User with this email already exists' });
+    return res.status(400).json({ message: 'User with this email already exists' });
   }
 
   await userRepository.update(user.id, { email: newEmail });

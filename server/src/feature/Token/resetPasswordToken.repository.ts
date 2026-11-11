@@ -22,7 +22,7 @@ function deleteByUserId(userId: number) {
 }
 
 function useToken(token: string) {
-  return ResetPasswordToken.update({usedAt: Date.now()}, {
+  return ResetPasswordToken.update({usedAt: new Date()}, {
     where: {
       token,
     },

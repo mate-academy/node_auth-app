@@ -1,12 +1,16 @@
 import { User } from '../../models/User.model.js';
 
+function getAll() {
+  return User.findAll();
+}
+
 function getByEmail(email: string) {
   return User.findOne({
     where: { email },
   });
 }
 
-function create({ name, email, password, activationToken }) {
+function create({ name, email, password, activationToken }: Omit<User, "id">) {
   return User.create({ name, email, password, activationToken });
 }
 
@@ -41,4 +45,5 @@ export const userRepository = {
   create,
   activate,
   update,
+  getAll,
 };

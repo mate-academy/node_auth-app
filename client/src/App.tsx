@@ -20,6 +20,7 @@ import { ForgotPasswordSent } from './pages/ForgotPasswordSent';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { Toaster } from 'sonner';
+import { NotFound } from './components/NotFound';
 
 export function App() {
   const navigate = useNavigate();
@@ -123,6 +124,7 @@ export function App() {
               <Route path="users" element={<UsersPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </section>
 
