@@ -7,7 +7,7 @@ export const authRouter = Router();
 
 authRouter.post('/registration', authController.register);
 authRouter.post('/login', authController.login);
-authRouter.get('/activation/:email/:token', authMiddleware, authController.activate);
+authRouter.get('/activation/:email/:token', authController.activate);
 authRouter.get('/refresh', cookieParser(), authController.refresh);
 authRouter.post('/logout', authMiddleware, authController.logout);
 authRouter.get('/is-activated', cookieParser(), authController.checkActivaton);

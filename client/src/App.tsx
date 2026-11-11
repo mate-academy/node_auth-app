@@ -21,6 +21,7 @@ import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { Toaster } from 'sonner';
 import { NotFound } from './components/NotFound';
+import { RequireNonAuth } from './components/RequireNonAuth';
 
 export function App() {
   const navigate = useNavigate();
@@ -110,20 +111,24 @@ export function App() {
         <section className="section">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="sign-up" element={<RegistrationPage />} />
             <Route
               path="activate/:email/:activationToken"
               element={<AccountActivationPage />}
             />
-            <Route path="login" element={<LoginPage />} />
-            <Route path="forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="forgot-password/sent" element={<ForgotPasswordSent />}/>
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />}/>
+
+            <Route path="/" element={<RequireNonAuth />}>
+              <Route path="sign-up" element={<RegistrationPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="forgot-password/sent" element={<ForgotPasswordSent />}/>
+              <Route path="reset-password/:token" element={<ResetPasswordPage />} />
+            </Route>
 
             <Route path="/" element={<RequireAuth />}>
               <Route path="users" element={<UsersPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </section>

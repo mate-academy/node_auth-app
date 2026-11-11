@@ -20,7 +20,7 @@ export const ProfilePage = () => {
       .catch(() => {
         toast.error('Failed to load user');
       });
-  }, []);
+  }, [editField]);
 
   if (!authentificatedUser) {
     return <p>Loading user...</p>;

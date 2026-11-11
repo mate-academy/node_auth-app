@@ -19,7 +19,7 @@ async function start() {
   await sequelize.sync();
 }
 
-start();
+await start();
 
 const server = createServer();
 
