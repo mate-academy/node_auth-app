@@ -1,0 +1,23 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Check your email</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p>
+      If an account exists for
+      @if (email) {
+      <b>{{ email }}</b>,
+      } @else {
+      this email,
+      }
+      we've sent a link to reset your password.
+    </p>
+    <p>The link is valid for 1 hour. If you don't see the email, check the Spam folder.</p>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <a mat-button routerLink="/login">Back to login</a>
+    <a mat-button routerLink="/forgot-password">Send again</a>
+  </mat-card-actions>
+</mat-card>

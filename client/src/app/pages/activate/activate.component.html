@@ -1,0 +1,24 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Account activation</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    @if (error()) {
+    <p class="form-error">{{ error() }}</p>
+    <p>If you have already activated your account, just log in.</p>
+    } @else {
+    <div class="loading">
+      <mat-spinner diameter="40" />
+      <p>Activating your account…</p>
+    </div>
+    }
+  </mat-card-content>
+
+  @if (error()) {
+  <mat-card-actions>
+    <a mat-button routerLink="/login">Go to login</a>
+    <a mat-button routerLink="/register">Register</a>
+  </mat-card-actions>
+  }
+</mat-card>

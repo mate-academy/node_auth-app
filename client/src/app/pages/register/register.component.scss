@@ -1,0 +1,20 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+}
+
+.form-error {
+  color: #d32f2f;
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
+.login-link {
+  display: flex;
+  justify-content: center;
+}
+
+mat-card {
+  padding: 8px;
+}

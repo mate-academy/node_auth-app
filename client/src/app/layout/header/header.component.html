@@ -1,0 +1,17 @@
+<mat-toolbar color="primary">
+  <a routerLink="/" class="logo">Auth App</a>
+
+  <span class="spacer"></span>
+
+  @if (auth.user(); as user)
+  {
+  <span class="user-name">{{ user.name }}</span>
+  <a mat-button routerLink="/profile" routerLinkActive="active">Profile</a>
+  <button mat-button (click)="logout()">Logout</button>
+  }
+  @else
+  {
+  <a mat-button routerLink="/login" routerLinkActive="active">Login</a>
+  <a mat-button routerLink="/register" routerLinkActive="active">Register</a>
+  }
+</mat-toolbar>

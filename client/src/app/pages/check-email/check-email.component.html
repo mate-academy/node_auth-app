@@ -1,0 +1,21 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Check your email</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p>
+      We sent an activation link to
+      @if (email) {
+      <b>{{ email }}</b>.
+      } @else {
+      your email.
+      }
+    </p>
+    <p>Open it to activate your account. If you don't see it, check the Spam folder.</p>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <a mat-button routerLink="/login">Go to login</a>
+  </mat-card-actions>
+</mat-card>

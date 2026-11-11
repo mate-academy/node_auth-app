@@ -1,0 +1,30 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+}
+
+.form-error {
+  color: #d32f2f;
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
+mat-card {
+  padding: 8px;
+}
