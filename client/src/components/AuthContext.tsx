@@ -6,10 +6,8 @@ import { User } from '../types/user';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const AuthContext = React.createContext({
   isChecked: false,
-  isActivated: false,
   currentUser: null as User | null,
   checkAuth: async () => {},
-  checkActivation: async () => {},
   activate: async (_email: string, _token: string) => {},
   login: async (_email: string, _password: string) => {},
   logout: async () => { },
@@ -18,15 +16,13 @@ const AuthContext = React.createContext({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isChecked, setChecked] = useState(true);
-  const [isActivated, setActivated] = useState(false);
+  const [isChecked, setChecked] = useState(false);
 
   async function activate(email: string, token: string) {
     const { accessToken, user } = await authService.activate(email, token);
 
     accessTokenService.save(accessToken);
     setCurrentUser(user);
-    setActivated(true);
   }
 
   async function checkAuth() {
@@ -40,11 +36,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setChecked(true);
     }
-  }
-
-  async function checkActivation() {
-    const { isActivated } = await authService.isActivated();
-    setActivated(isActivated);
   }
 
   async function login(email: string, password: string) {
@@ -64,15 +55,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const value = useMemo(
     () => ({
       isChecked,
-      isActivated,
       currentUser,
       checkAuth,
-      checkActivation,
       activate,
       login,
       logout,
     }),
-    [currentUser, isChecked, isActivated],
+    [currentUser, isChecked],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -8,6 +8,10 @@ export function normalizeAuth({ id, email }: User) {
   return { id, email };
 }
 
+export function normalizeUser({ id, name, email }: User) {
+  return { id, name, email };
+}
+
 export function validateEmail(email: string) {
   const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
 
@@ -20,18 +24,18 @@ export function validatePassword(password: string) {
   if (password.length < 6) return 'At least 6 characters';
 }
 
-export const checkPassword = async (res: Response, user: User | null, password: string) => {
-  if (!user) {
-    res.status(401).json({ message: 'Unauthorized' });
-    return false;
-  }
+// export const checkPassword = async (res: Response, user: User | null, password: string) => {
+//   if (!user) {
+//     res.status(401).json({ message: 'Unauthorized' });
+//     return false;
+//   }
 
-  const isPasswordValid = await bcrypt.compare(password, user?.password || '');
+//   const isPasswordValid = await bcrypt.compare(password, user?.password || '');
 
-  if (!isPasswordValid) {
-    res.status(400).json({ message: 'Invalid password' });
-    return false;
-  }
+//   if (!isPasswordValid) {
+//     res.status(400).json({ message: 'Invalid password' });
+//     return false;
+//   }
 
-  return true;
-};
+//   return true;
+// };

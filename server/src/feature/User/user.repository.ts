@@ -10,6 +10,10 @@ function getByEmail(email: string) {
   });
 }
 
+function getById(id: number) {
+  return User.findByPk(id);
+}
+
 function create({ name, email, password, activationToken }: Omit<User, "id">) {
   return User.create({ name, email, password, activationToken });
 }
@@ -42,6 +46,7 @@ async function update(id: number, data: Partial<Omit<User, "id">>) {
 
 export const userRepository = {
   getByEmail,
+  getById,
   create,
   activate,
   update,

@@ -20,8 +20,17 @@ function deleteByUserId(userId: number) {
   });
 }
 
+function deleteToken(token: string) {
+  return RefreshToken.destroy({
+    where: {
+      token,
+    },
+  });
+}
+
 export const refreshTokenRepository = {
   create,
   deleteByUserId,
   getByToken,
+  deleteToken,
 };

@@ -1,5 +1,5 @@
+import { userRepository } from '../User/user.repository.js';
 import { expenseService } from './expense.service.js';
-import { userService } from '../User/user.service.js';
 
 const getAll = async (req, res) => {
   const { userId, categories, from, to } = req.query;
@@ -42,7 +42,7 @@ const create = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const expensesUser = await userService.getById(Number(userId));
+  const expensesUser = await userRepository.getById(Number(userId));
 
   if (!expensesUser) {
     return res.sendStatus(400);

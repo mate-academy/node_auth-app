@@ -26,13 +26,12 @@ import { RequireNonAuth } from './components/RequireNonAuth';
 export function App() {
   const navigate = useNavigate();
   const [error, setError] = usePageError('');
-  const { isChecked, currentUser, logout, checkAuth, checkActivation } = useAuth();
+  const { isChecked, currentUser, logout, checkAuth } = useAuth();
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
 
     checkAuth();
-    checkActivation();
   }, []);
 
   if (!isChecked) {
@@ -128,7 +127,7 @@ export function App() {
               <Route path="users" element={<UsersPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
-            
+
             <Route path="*" element={<NotFound />} />
           </Routes>
         </section>

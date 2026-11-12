@@ -19,13 +19,13 @@ export const RegistrationPage = () => {
   const [error, setError] = usePageError('');
   const [registered, setRegistered] = useState(false);
 
-  const { isChecked, currentUser, isActivated } = useAuth();
+  const { isChecked, currentUser } = useAuth();
 
   if (isChecked && currentUser) {
     return <Navigate to="/" />;
   }
 
-  if (registered && !isActivated) {
+  if (registered) {
     return <RequireActivation />;
   }
 

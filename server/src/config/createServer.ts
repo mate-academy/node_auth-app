@@ -6,6 +6,7 @@ import { userRouter } from '../feature/User/user.router.js';
 import { expenseRouter } from '../feature/Expense/expense.router.js';
 import { authRouter } from '../feature/Auth/auth.router.js';
 import { profileRouter } from '../feature/Profile/profile.router.js';
+import { errorMidleware } from '../middlewares/errorMiddleware.js';
 
 export const createServer = () => {
   const app = express();
@@ -27,6 +28,8 @@ export const createServer = () => {
   app.use('/profile', profileRouter);
   app.use('/users', userRouter);
   app.use('/expenses', expenseRouter);
+
+  app.use(errorMidleware);
 
   return app;
 };

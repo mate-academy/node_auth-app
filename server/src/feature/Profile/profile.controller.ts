@@ -1,92 +1,45 @@
 import type { Response } from "express";
-import type { User } from "../../models/User.model.js";
-import { userRepository } from "../User/user.repository.js";
 import type { AuthRequest } from "../../middlewares/authMiddleware.js";
-import bcrypt from 'bcrypt';
-import { checkPassword } from "../User/utils.js";
-import { mailer } from "../../config/mailer.js";
-
-function normalize({ id, name, email }: User) {
-  return { id, name, email };
-}
+import { profileService } from "./profile.service.js";
 
 const getOwner = async (req: AuthRequest, res: Response) => {
-  const currentUser = await userRepository.getByEmail(req.user.email) as User | null;
+  const user = await profileService.getOwner(req.user.id);
 
-  if (!currentUser) {
-    return res.status(401).json({
-      message: "User not found",
-    })
-  }
-
-  return res.status(200).json(
-    normalize(currentUser),
-  )
+  return res.status(200).json(user);
 };
 
 const changeName = async (req: AuthRequest, res: Response) => {
   const { name } = req.body;
-  const updatedUser = await userRepository.update(req.user.id, { name });
 
-  if (updatedUser.name !== name) {
-    return res.sendStatus(500);
-  }
+  await profileService.changeName(req.user.id, name);
 
   return res.sendStatus(204);
 };
 
 const changePassword = async (req: AuthRequest, res: Response) => {
   const { oldPassword, newPassword, confirmation } = req.body;
-  const {email} = req.user;
 
-  const user = await userRepository.getByEmail(email);
+  const data = await profileService.changePassword(
+    req.user.id,
+    oldPassword,
+    newPassword,
+    confirmation,
+  );
 
-  const isPasswordCorrect = await checkPassword(res, user, oldPassword);
-  if (!isPasswordCorrect) {
-    return res;
-  }
-
-  if (newPassword !== confirmation) {
-    return res.status(400).json({ message: 'Password not confirmed' });
-  }
-
-  const password = await bcrypt.hash(newPassword, 10);
-  await userRepository.update(user.id, {password});
-
-  return res.status(201).json({
-    message: 'Your password has been changed successfully.',
-  })
+  return res.status(200).json(data);
 };
 
 const changeEmail = async (req: AuthRequest, res: Response) => {
   const { newEmail, password, emailConfirmation } = req.body;
-  const {email} = req.user;
 
-  const user = await userRepository.getByEmail(email);
+  const data = await profileService.changeEmail(
+    req.user.id,
+    newEmail,
+    password,
+    emailConfirmation,
+  );
 
-  const isPasswordCorrect = await checkPassword(res, user, password);
-  if (!isPasswordCorrect) {
-    return res;
-  }
-
-  if (newEmail !== emailConfirmation) {
-    return res.status(400).json({ message: 'Email not confirmed' });
-  }
-
-  const existingUser = await userRepository.getByEmail(newEmail);
-
-  if (existingUser) {
-    return res.status(400).json({ message: 'User with this email already exists' });
-  }
-
-  await userRepository.update(user.id, { email: newEmail });
-
-  mailer.sendChangingEmail(user?.email, newEmail);
-
-  return res.status(204).json({
-    message: 'Your email has been changed successfully.',
-  })
-
+  return res.status(200).json(data);
 };
 
 

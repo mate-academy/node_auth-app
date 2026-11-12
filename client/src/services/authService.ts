@@ -23,10 +23,6 @@ export const authService = {
 
   refresh: (): Promise<AuthData> => client.get('/refresh'),
 
-  isActivated: (): Promise<{ isActivated: boolean }> => {
-    return client.get('/is-activated');
-  },
-
   forgotPassword: (email: string) => {
     return client.post('/forgot-password', { email });
   },

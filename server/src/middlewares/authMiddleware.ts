@@ -14,6 +14,9 @@ export function authMiddleware(
   const authHeader = req.headers['authorization'] || '';
   const [, accessToken] = authHeader.split(' ');
 
+  // console.log("authHeader: " + authHeader);
+  // console.log("accessToken: " + accessToken);
+
   if (!authHeader || !accessToken) {
     res.status(401).json({ message: 'Token is required' });
     return;

@@ -7,11 +7,11 @@ const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET as string;
 const RESET_PASSWORD_SECRET = process.env.JWT_RESET_PASSWORD_SECRET as string;
 
 function generateAccessToken(user: NormalizedAuthUser) {
-  return jsonwebtoken.sign(user, ACCESS_SECRET, { expiresIn: '10m' });
+  return jsonwebtoken.sign(user, ACCESS_SECRET, { expiresIn: '10s' });
 }
 
 function generateRefreshToken(user: NormalizedAuthUser) {
-  return jsonwebtoken.sign(user, REFRESH_SECRET, { expiresIn: '7d' });
+  return jsonwebtoken.sign(user, REFRESH_SECRET, { expiresIn: '15s' });
 }
 
 function generateResetPasswordToken(user: NormalizedAuthUser) {
