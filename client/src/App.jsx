@@ -96,13 +96,13 @@ function App() {
           <Routes>
             <Route path="*" element={<NotFoundPage />} />
             <Route path="/" element={<HomePage />} />
-            <Route
-              path="reset-email/:email/:token"
-              element={<ConfirmEmailPage />}
-            />
 
             <Route path="/" element={<RequireAuth />}>
               <Route path="profile" element={<ProfilePage />} />
+              <Route
+                path="reset-email/:email/:token"
+                element={<ConfirmEmailPage />}
+              />
             </Route>
 
             <Route path="/" element={<RequireNonAuth />}>
