@@ -46,6 +46,7 @@ export const AuthProvider = ({ children }) => {
     () => ({
       isChecked,
       user,
+      setUser,
       checkAuth,
       activate,
       login,

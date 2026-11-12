@@ -33,6 +33,10 @@ function resetPassword({ email, token, password, confirmation }) {
   });
 }
 
+function confirmEmail(email, token) {
+  return authClient.get(`/profile/email/confirm/${email}/${token}`);
+}
+
 export const authService = {
   register,
   login,
@@ -41,4 +45,5 @@ export const authService = {
   refresh,
   resetRequest,
   resetPassword,
+  confirmEmail,
 };

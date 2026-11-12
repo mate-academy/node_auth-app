@@ -17,6 +17,7 @@ import { ProfilePage } from './pages/ProfilePage.jsx';
 import { RequireNonAuth } from './components/RequireNonAuth.jsx';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage.jsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
+import { ConfirmEmailPage } from './pages/ConfirmEmailPage.jsx';
 
 function App() {
   const navigate = useNavigate();
@@ -95,6 +96,10 @@ function App() {
           <Routes>
             <Route path="*" element={<NotFoundPage />} />
             <Route path="/" element={<HomePage />} />
+            <Route
+              path="reset-email/:email/:token"
+              element={<ConfirmEmailPage />}
+            />
 
             <Route path="/" element={<RequireAuth />}>
               <Route path="profile" element={<ProfilePage />} />
