@@ -134,9 +134,13 @@ async function logout(req, res) {
   const refreshToken = req.cookies.refreshToken || '';
   const userData = jwt.validateRefreshToken(refreshToken);
 
-  if (userData) {
-    await tokenService.remove(userData.id);
+  if (!userData) {
+    res.status(401).json({ message: 'Unauthorized' });
+
+    return;
   }
+
+  await tokenService.remove(userData.id);
 
   res.clearCookie('refreshToken');
   res.sendStatus(204);
