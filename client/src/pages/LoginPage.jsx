@@ -46,7 +46,7 @@ export const LoginPage = () => {
         onSubmit={({ email, password }) => {
           return login({ email, password })
             .then(() => {
-              navigate(location.state?.from?.pathname || '/');
+              navigate(location.state?.from?.pathname || '/profile');
             })
             .catch(error => {
               setError(error.response?.data?.message);
@@ -133,7 +133,13 @@ export const LoginPage = () => {
                 Log in
               </button>
             </div>
-            Do not have an account? <Link to="/sign-up">Sign up</Link>
+            <p>
+              Do not have an account? <Link to="/sign-up">Sign up</Link>
+            </p>
+            <p>
+              Do not remember your password?
+              <Link to="/forgot-password">Reset password</Link>
+            </p>
           </Form>
         )}
       </Formik>

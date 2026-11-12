@@ -9,10 +9,14 @@ import { AuthContext } from './components/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { RegistrationPage } from './pages/RegistrationPage';
 import { RequireAuth } from './components/RequireAuth';
-import { UsersPage } from './pages/UsersPage';
 import { Loader } from './components/Loader.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { usePageError } from './hooks/usePageError.js';
+import { NotFoundPage } from './pages/NotFoundPage.jsx';
+import { ProfilePage } from './pages/ProfilePage.jsx';
+import { RequireNonAuth } from './components/RequireNonAuth.jsx';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage.jsx';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
 
 function App() {
   const navigate = useNavigate();
@@ -39,9 +43,11 @@ function App() {
             Home
           </NavLink>
 
-          <NavLink to="/users" className="navbar-item">
-            Users
-          </NavLink>
+          {user && (
+            <NavLink to="/profile" className="navbar-item">
+              Profile
+            </NavLink>
+          )}
         </div>
 
         <div className="navbar-end">
@@ -53,7 +59,7 @@ function App() {
                   onClick={() => {
                     logout()
                       .then(() => {
-                        navigate('/');
+                        navigate('/login');
                       })
                       .catch(error => {
                         setError(error.response?.data?.message);
@@ -87,16 +93,25 @@ function App() {
       <main>
         <section className="section">
           <Routes>
+            <Route path="*" element={<NotFoundPage />} />
             <Route path="/" element={<HomePage />} />
-            <Route path="sign-up" element={<RegistrationPage />} />
-            <Route
-              path="activate/:email/:token"
-              element={<AccountActivationPage />}
-            />
-            <Route path="login" element={<LoginPage />} />
 
             <Route path="/" element={<RequireAuth />}>
-              <Route path="users" element={<UsersPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+            </Route>
+
+            <Route path="/" element={<RequireNonAuth />}>
+              <Route path="sign-up" element={<RegistrationPage />} />
+              <Route
+                path="activate/:email/:token"
+                element={<AccountActivationPage />}
+              />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="forgot-password" element={<ForgotPasswordPage />} />
+              <Route
+                path="reset-password/:email/:token"
+                element={<ResetPasswordPage />}
+              />
             </Route>
           </Routes>
         </section>
