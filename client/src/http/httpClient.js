@@ -24,17 +24,15 @@ function onResponseSuccess(res) {
 async function onResponseError(error) {
   const originalRequest = error.config;
 
-  if (error.response.status !== 401) {
+  if (error.response?.status !== 401 || originalRequest._isRetry) {
     throw error;
   }
 
-  try {
-    const { accessToken } = await authService.refresh();
+  originalRequest._isRetry = true;
 
-    accessTokenService.save(accessToken);
+  const { accessToken } = await authService.refresh();
 
-    return httpClient.request(originalRequest);
-  } catch (error) {
-    throw error;
-  }
+  accessTokenService.save(accessToken);
+
+  return httpClient.request(originalRequest);
 }
