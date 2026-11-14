@@ -6,13 +6,13 @@ import { emailService } from '../email.js';
 import { confirmedEmail } from '../pages/confirmed-email.js';
 
 export const controllerRegister = async (req, res) => {
+  const token = v4();
+
   const { email, password, username } = req.body;
 
   // const newUser =
 
-  await User.create({ email, password, username });
-
-  const token = v4();
+  await User.create({ email, password, username, token });
 
   await emailService.sendConfirmEmail(email, token);
 
@@ -30,6 +30,6 @@ export const activate = async (req, res) => {
   }
 
   user.token = null;
-  user.save();
+  await user.save();
   res.send(confirmedEmail);
 };
