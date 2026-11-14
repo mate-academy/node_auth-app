@@ -5,7 +5,7 @@ import { confirmEmail } from './pages/confirm-email.js';
 import { register } from './pages/register.js';
 import { login } from './pages/login.js';
 import { home } from './pages/home.js';
-import { controllerRegister } from './controllers/auth.controller.js';
+import { controllerRegister, activate } from './controllers/auth.controller.js';
 
 import express from 'express';
 
@@ -39,3 +39,7 @@ app.get('/login', (req, res) => {
 app.get('/confirm-email', (req, res) => {
   res.send(confirmEmail);
 });
+
+export const authRouter = new express.Router();
+
+authRouter.get('/activation/:token', activate);

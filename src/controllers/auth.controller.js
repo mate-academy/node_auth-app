@@ -1,4 +1,4 @@
-// import { user } from '../models/user.js';
+import { User } from '../models/user.js';
 import { v4 } from 'uuid';
 
 import { emailService } from '../email.js';
@@ -15,4 +15,17 @@ export const controllerRegister = async (req, res) => {
   // res.send(newUser);
 
   res.redirect('/confirm-email');
+};
+
+export const activate = async (req, res) => {
+  const { token } = req.params;
+  const user = await User.findOne({ where: token });
+
+  if (!user) {
+    res.sendStatus(404);
+  }
+
+  user.token = null;
+  user.save();
+  res.send(user);
 };

@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import { client } from '../db.js';
 // import { useState } from 'react';
 
-export const user = client.define('user', {
+export const User = client.define('user', {
   email: {
     type: DataTypes.STRING,
     unique: true,
@@ -15,6 +15,9 @@ export const user = client.define('user', {
   username: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  token: {
+    type: DataTypes.STRING,
   },
 });
 
