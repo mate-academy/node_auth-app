@@ -12,7 +12,12 @@ export const controllerRegister = async (req, res) => {
 
   // const newUser =
 
-  await User.create({ email, password, username, token });
+  await User.create({
+    email,
+    password,
+    username,
+    token,
+  });
 
   await emailService.sendConfirmEmail(email, token);
 
