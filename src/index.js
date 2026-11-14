@@ -6,6 +6,7 @@ import { register } from './pages/register.js';
 import { login } from './pages/login.js';
 import { home } from './pages/home.js';
 import { controllerRegister, activate } from './controllers/auth.controller.js';
+import { client } from './db.js';
 
 import express from 'express';
 
@@ -14,6 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static('src/public'));
 app.use(express.urlencoded({ extended: true }));
+await client.sync({ alter: true });
 
 const port = process.env.PORT || 3000;
 
@@ -42,4 +44,4 @@ app.get('/confirm-email', (req, res) => {
 
 export const authRouter = new express.Router();
 
-authRouter.get('/activation/:token', activate);
+app.get('/activation/:token', activate);

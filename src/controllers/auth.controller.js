@@ -3,6 +3,8 @@ import { v4 } from 'uuid';
 
 import { emailService } from '../email.js';
 
+import { confirmedEmail } from '../pages/confirmed-email.js';
+
 export const controllerRegister = async (req, res) => {
   const { email /* password, username */ } = req.body;
 
@@ -19,7 +21,7 @@ export const controllerRegister = async (req, res) => {
 
 export const activate = async (req, res) => {
   const { token } = req.params;
-  const user = await User.findOne({ where: token });
+  const user = await User.findOne({ where: { token } });
 
   if (!user) {
     res.sendStatus(404);
@@ -27,5 +29,5 @@ export const activate = async (req, res) => {
 
   user.token = null;
   user.save();
-  res.send(user);
+  res.send(confirmedEmail);
 };

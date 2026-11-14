@@ -19,7 +19,7 @@ export const sendEmail = async (to, subject, html) => {
 };
 
 const sendConfirmEmail = async (email, token) => {
-  const href = `${process.env.CLIENT_HOST}activate/${token}`;
+  const href = `${process.env.CLIENT_HOST}activation/${token}`;
   const html = `
   <h1>Confirm your e-mail!</h1>
   <p>Please confirm your email within 20 minutes.</p>
