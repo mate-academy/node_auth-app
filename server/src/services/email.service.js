@@ -1,7 +1,6 @@
 import nodemailer from 'nodemailer';
 import 'dotenv/config';
 
-// Create a transporter using SMTP
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
@@ -11,13 +10,29 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const info = await transporter.sendMail({
-  from: '"Example Team" <team@example.com>', // sender address
-  to: 'tegije7041@bwingmedia.com', // list of recipients
-  subject: 'Hello', // subject line
-  text: 'Hello world?', // plain text body
-  html: '<b>Hello world?</b>', // HTML body
-});
+function send({ email, subject, html }) {
+  return transporter.sendMail({
+    to: email,
+    subject,
+    html,
+  });
+}
 
-// eslint-disable-next-line no-console
-console.log('Email sent:', info.messageId);
+function sendActivationEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/activate/${token}`;
+  const html = `
+  <h1>Activate account</h1>
+  <a href="${href}">${href}</a>
+  `;
+
+  return send({
+    email,
+    subject: 'Activate your account',
+    html,
+  });
+}
+
+export const emailService = {
+  sendActivationEmail,
+  send,
+};
