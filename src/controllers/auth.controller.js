@@ -6,9 +6,11 @@ import { emailService } from '../email.js';
 import { confirmedEmail } from '../pages/confirmed-email.js';
 
 export const controllerRegister = async (req, res) => {
-  const { email /* password, username */ } = req.body;
+  const { email, password, username } = req.body;
 
-  // const newUser = await user.create({ email, password, username });
+  // const newUser =
+
+  await User.create({ email, password, username });
 
   const token = v4();
 
