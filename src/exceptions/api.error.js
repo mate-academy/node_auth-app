@@ -37,4 +37,12 @@ export class ApiError extends Error {
       status: 409,
     });
   }
+
+  static forbidden(message, errors) {
+    return new ApiError({
+      message,
+      errors,
+      status: 403,
+    });
+  }
 }
