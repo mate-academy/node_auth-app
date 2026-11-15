@@ -77,7 +77,6 @@ export const loginSystem = async (req, res) => {
     <div class="container">
     <h1>Olá, bem-vindo(a), ${user}</h1>
     <div class="box"><div>
-    <a href="/change-password" class="btn">Mudar Senha</a>
     <a href="/logout" class="btn">Logout</a>
     </div>
     </div>

@@ -3,6 +3,7 @@
 import 'dotenv/config';
 import { confirmEmail } from './pages/confirm-email.js';
 import { register } from './pages/register.js';
+import { changePassword } from './pages/change-password.js';
 
 import { login } from './pages/login.js';
 
@@ -42,6 +43,10 @@ app.get('/register', (req, res) => {
 
 app.get('/login', (req, res) => {
   res.send(login);
+});
+
+app.get('/change-password', (req, res) => {
+  res.send(changePassword);
 });
 
 app.post('/enter', loginSystem);

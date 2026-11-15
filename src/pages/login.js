@@ -19,6 +19,8 @@ export const login = ` <script src="/scripts/login-form.js" defer></script>
     <button type="submit">login</button>
     </form>
     <footer class="main__footer">
-    <p>New here? <a href="/register">Sign up</a></p>
+    <p>New here? <a href="/register">Sign up</a><br>
+    <a href="/change-password" class="btn">Change Password</a>
+    </p>
     </footer>
     </main>`;
