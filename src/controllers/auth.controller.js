@@ -64,14 +64,25 @@ export const loginSystem = async (req, res) => {
   const user = await FindByEmail(email);
 
   if (!user || user.password !== password) {
-    res.send(401);
+    res.sendStatus(401);
   } else {
     // login
-    const acesstoken = sign(user);
 
-    res.send({
-      user,
-      acesstoken,
-    });
+    res.send = `
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <div class="account">
+    <div class="container">
+    <h1>Olá, bem-vindo(a), ${user}</h1>
+    <div class="box"><div>
+    <a href="/change-password" class="btn">Mudar Senha</a>
+    <a href="/logout" class="btn">Logout</a>
+    </div>
+    </div>
+    </div>
+    </div>
+    `;
   }
 };
