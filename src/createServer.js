@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { authRoute } from './routes/auth.route.js';
+import { errorMiddleware } from './middleware/error.middleware.js';
 
 export function createServer() {
   const app = express();
@@ -19,6 +20,8 @@ export function createServer() {
   app.get('/', (req, res) => {
     res.send('Hello');
   });
+
+  app.use(errorMiddleware);
 
   return app;
 }
