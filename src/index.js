@@ -3,9 +3,15 @@
 import 'dotenv/config';
 import { confirmEmail } from './pages/confirm-email.js';
 import { register } from './pages/register.js';
+
 import { login } from './pages/login.js';
+
 import { home } from './pages/home.js';
-import { controllerRegister, activate } from './controllers/auth.controller.js';
+import {
+  controllerRegister,
+  activate,
+  loginSystem,
+} from './controllers/auth.controller.js';
 import { client } from './db.js';
 
 import express from 'express';
@@ -37,6 +43,8 @@ app.get('/register', (req, res) => {
 app.get('/login', (req, res) => {
   res.send(login);
 });
+
+app.post('/enter', loginSystem);
 
 app.get('/confirm-email', (req, res) => {
   res.send(confirmEmail);

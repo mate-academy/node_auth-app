@@ -22,3 +22,7 @@ export const User = client.define('user', {
 });
 
 // const emailVerified = useState(false);
+
+export const FindByEmail = (email) => {
+  return User.findOne({ where: { email } });
+};
