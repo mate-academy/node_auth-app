@@ -5,6 +5,7 @@ import { authRoute } from './routes/auth.route.js';
 import { userRouter } from './routes/user.route.js';
 import { profileRouter } from './routes/profile.route.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
+import { ApiError } from './exceptions/api.error.js';
 
 export function createServer() {
   const app = express();
@@ -23,6 +24,10 @@ export function createServer() {
 
   app.get('/', (req, res) => {
     res.send('Hello');
+  });
+
+  app.use(() => {
+    throw ApiError.notFound('Route not found');
   });
 
   app.use(errorMiddleware);

@@ -14,6 +14,7 @@ import { UsersPage } from './pages/UsersPage';
 import { ProfilePage } from './pages/ProfilePage.jsx';
 import { ResetPasswordRequestPage } from './pages/ResetPasswordRequestPage.jsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
+import { NotFoundPage } from './pages/NotFoundPage.jsx';
 import { Loader } from './components/Loader.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { usePageError } from './hooks/usePageError.js';
@@ -120,6 +121,8 @@ function App() {
               <Route path="users" element={<UsersPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
+
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </section>
 
