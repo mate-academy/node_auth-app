@@ -4,7 +4,7 @@ import './models/user.model.js';
 import './models/token.model.js';
 
 try {
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ alter: true });
 
   // eslint-disable-next-line no-console
   console.log('Table created');

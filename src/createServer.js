@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { authRoute } from './routes/auth.route.js';
+import { userRouter } from './routes/user.route.js';
+import { profileRouter } from './routes/profile.route.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 
 export function createServer() {
@@ -16,6 +18,8 @@ export function createServer() {
   app.use(express.json());
   app.use(cookieParser());
   app.use(authRoute);
+  app.use(userRouter);
+  app.use(profileRouter);
 
   app.get('/', (req, res) => {
     res.send('Hello');

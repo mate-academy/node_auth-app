@@ -46,7 +46,7 @@ export const LoginPage = () => {
         onSubmit={({ email, password }) => {
           return login({ email, password })
             .then(() => {
-              navigate(location.state?.from?.pathname || '/');
+              navigate(location.state?.from?.pathname || '/profile');
             })
             .catch(error => {
               setError(error.response?.data?.message);
@@ -133,6 +133,9 @@ export const LoginPage = () => {
                 Log in
               </button>
             </div>
+            <p className="mb-2">
+              <Link to="/reset-password">Forgot password?</Link>
+            </p>
             Do not have an account? <Link to="/sign-up">Sign up</Link>
           </Form>
         )}

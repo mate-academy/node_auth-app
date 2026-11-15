@@ -103,10 +103,73 @@ async function refresh(req, res) {
   const user = await User.findByPk(userData.id);
 
   if (!user) {
-    throw ApiError.unauthorized('...');
+    throw ApiError.unauthorized('User not found');
   }
 
   await generateTokens(res, user);
+}
+
+async function logout(req, res) {
+  const refreshToken = req.cookies.refreshToken;
+  const userData = jwtService.verifyRefresh(refreshToken);
+
+  if (userData) {
+    await tokenService.remove(userData.id);
+  }
+
+  res.clearCookie('refreshToken');
+  res.sendStatus(204);
+}
+
+async function requestPasswordReset(req, res) {
+  const { email } = req.body;
+
+  if (validators.validateEmail(email)) {
+    throw ApiError.badRequest('Validation error');
+  }
+
+  const user = await User.findOne({ where: { email } });
+
+  if (user) {
+    user.resetToken = crypto.randomUUID();
+    user.resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+    await emailService.sendResetEmail(email, user.resetToken);
+  }
+
+  res.send({
+    message: 'If this email is registered, we have sent a reset link',
+  });
+}
+
+async function resetPassword(req, res) {
+  const { resetToken } = req.params;
+  const { password, confirmation } = req.body;
+
+  const errors = {
+    confirmation:
+      password !== confirmation ? 'Passwords do not match' : undefined,
+    password: validators.validatePassword(password),
+  };
+
+  if (errors.confirmation || errors.password) {
+    throw ApiError.badRequest('Validation error', errors);
+  }
+
+  const user = await User.findOne({ where: { resetToken } });
+
+  if (!user || user.resetTokenExpires < new Date()) {
+    throw ApiError.badRequest('Reset link is invalid or expired');
+  }
+
+  const securedPassword = await bcrypt.hash(password, 10);
+
+  user.password = securedPassword;
+  user.resetToken = null;
+  user.resetTokenExpires = null;
+  await user.save();
+  await tokenService.remove(user.id);
+  res.send({ message: 'Password has been changed' });
 }
 
 export const authController = {
@@ -114,4 +177,7 @@ export const authController = {
   activate,
   login,
   refresh,
+  logout,
+  requestPasswordReset,
+  resetPassword,
 };

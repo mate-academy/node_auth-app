@@ -34,4 +34,37 @@ function sendActivationEmail(email, token) {
   });
 }
 
-export const emailService = { send, sendActivationEmail };
+function sendResetEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${token}`;
+
+  const html = `
+    <h1>Reset password</h1>
+    <a href='${href}'>${href}</a>
+  `;
+
+  return send({
+    email: email,
+    subject: 'Reset your password',
+    html: html,
+  });
+}
+
+function sendEmailChangedEmail(oldEmail, newEmail) {
+  const html = `
+    <h1>Changing email</h1>
+    <p>Your account email was changed to ${newEmail}. If it wasn't you, contact support.</p>
+  `;
+
+  return send({
+    email: oldEmail,
+    subject: 'Your email has been changed',
+    html: html,
+  });
+}
+
+export const emailService = {
+  send,
+  sendActivationEmail,
+  sendResetEmail,
+  sendEmailChangedEmail,
+};

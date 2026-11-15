@@ -12,5 +12,5 @@ export const Token = sequelize.define(
   },
 );
 
-Token.belongsTo(User);
-User.hasOne(Token);
+Token.belongsTo(User, { foreignKey: 'userId' });
+User.hasOne(Token, { foreignKey: 'userId' });
