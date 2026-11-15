@@ -1,0 +1,4 @@
+# The React client is linted by its own config (client/.eslintrc.cjs)
+# with its own dependencies, not by the backend lint run.
+client/
+node_modules/

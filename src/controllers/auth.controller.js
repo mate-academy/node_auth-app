@@ -110,12 +110,9 @@ async function refresh(req, res) {
 }
 
 async function logout(req, res) {
-  const refreshToken = req.cookies.refreshToken;
-  const userData = jwtService.verifyRefresh(refreshToken);
-
-  if (userData) {
-    await tokenService.remove(userData.id);
-  }
+  // authMiddleware has already checked the access token
+  // and put the user data into req.user
+  await tokenService.remove(req.user.id);
 
   res.clearCookie('refreshToken');
   res.sendStatus(204);

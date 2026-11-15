@@ -10,7 +10,6 @@ import { LoginPage } from './pages/LoginPage';
 import { RegistrationPage } from './pages/RegistrationPage';
 import { RequireAuth } from './components/RequireAuth';
 import { RequireNonAuth } from './components/RequireNonAuth.jsx';
-import { UsersPage } from './pages/UsersPage';
 import { ProfilePage } from './pages/ProfilePage.jsx';
 import { ResetPasswordRequestPage } from './pages/ResetPasswordRequestPage.jsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
@@ -42,10 +41,6 @@ function App() {
         <div className="navbar-start">
           <NavLink to="/" className="navbar-item">
             Home
-          </NavLink>
-
-          <NavLink to="/users" className="navbar-item">
-            Users
           </NavLink>
 
           {user && (
@@ -118,7 +113,6 @@ function App() {
             </Route>
 
             <Route element={<RequireAuth />}>
-              <Route path="users" element={<UsersPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
 

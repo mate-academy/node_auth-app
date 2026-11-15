@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { accessTokenService } from '../services/accessTokenService.js';
 import { authService } from '../services/authService.js';
+import { httpClient } from '../http/httpClient.js';
 
 export const AuthContext = React.createContext({});
 
@@ -36,10 +37,15 @@ export const AuthProvider = ({ children }) => {
   }
 
   async function logout() {
-    await authService.logout();
-
-    accessTokenService.remove();
-    setUser(null);
+    try {
+      // /logout is protected on the server, so it goes through httpClient:
+      // it sends the access token and refreshes it if it has expired
+      await httpClient.post('/logout');
+    } finally {
+      // Forget the session locally even if the request failed
+      accessTokenService.remove();
+      setUser(null);
+    }
   }
 
   const value = useMemo(

@@ -24,17 +24,23 @@ function onResponseSuccess(res) {
 async function onResponseError(error) {
   const originalRequest = error.config;
 
-  if (error.response.status !== 401) {
+  // Not a 401 (or no response at all) - nothing to refresh
+  if (error.response?.status !== 401) {
     throw error;
   }
 
-  try {
-    const { accessToken } = await authService.refresh();
-
-    accessTokenService.save(accessToken);
-
-    return httpClient.request(originalRequest);
-  } catch (error) {
+  // This request was already retried once after a refresh.
+  // A second 401 means the session is really gone - stop here
+  // instead of refreshing and retrying forever.
+  if (originalRequest._isRetry) {
     throw error;
   }
+
+  originalRequest._isRetry = true;
+
+  const { accessToken } = await authService.refresh();
+
+  accessTokenService.save(accessToken);
+
+  return httpClient.request(originalRequest);
 }
