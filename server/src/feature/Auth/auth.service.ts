@@ -8,8 +8,13 @@ import { jwt } from '../../config/jwt.js';
 import type { User } from '../../models/User.model.js';
 import { refreshTokenRepository } from '../Token/refreshToken.repository.js';
 import { resetPasswordTokenRepository } from '../Token/resetPasswordToken.repository.js';
+import type { AuthenticationData } from './types.js';
 
-const register = async (name: string, email: string, password: string) => {
+const register = async (
+  name: string,
+  email: string,
+  password: string,
+): Promise<NormalizedAuthUser> => {
 
   const errors = {
     email: validateEmail(email),
@@ -41,7 +46,7 @@ const register = async (name: string, email: string, password: string) => {
   return normalizeAuth(user);
 };
 
-const refresh = async (refreshToken: string) => {
+const refresh = async (refreshToken: string): Promise<AuthenticationData> => {
   const userData = jwt.validateRefreshToken(refreshToken);
 
   if (!userData) {
@@ -58,11 +63,20 @@ const refresh = async (refreshToken: string) => {
   return createAuthentication(user);
 };
 
-const login = async (email: string, password: string) => {
+const login = async (
+  email: string,
+  password: string
+): Promise<AuthenticationData> => {
   const user = await userRepository.getByEmail(email);
 
   if (!user) {
     throw ApiError.BadRequest('Invalid credentials');
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.Unauthorized('Invalid credentials');
   }
 
   const isActivated = user.activationToken === null;
@@ -71,16 +85,13 @@ const login = async (email: string, password: string) => {
     throw ApiError.Forbidden('Check your email for activation account');
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-
-  if (!isPasswordValid) {
-    throw ApiError.BadRequest('Invalid credentials');
-  }
-
   return createAuthentication(user);
 };
 
-const activate = async (email: string, activationToken: string) => {
+const activate = async (
+  email: string,
+  activationToken: string
+): Promise<AuthenticationData> => {
   const user = await userRepository.getByEmail(email);
 
   if (!user || user.activationToken !== activationToken) {
@@ -93,15 +104,10 @@ const activate = async (email: string, activationToken: string) => {
 };
 
 const logout = async (refreshToken: string) => {
-  // const userData = jwt.validateRefreshToken(refreshToken) as NormalizedAuthUser;
-
-  // if (userData) {
-  //   await refreshTokenRepository.deleteByUserId(userData.id);
-  // }
   await refreshTokenRepository.deleteToken(refreshToken);
 };
 
-const forgotPassword = async (email: string) => {
+const forgotPassword = async (email: string): Promise<{message: string}> => {
   const emailError = validateEmail(email);
 
   if (emailError) {
@@ -136,8 +142,8 @@ const resetPassword = async (
   token: string,
   password: string,
   confirmation: string,
-) => {
-  const userData = jwt.validateResetPasswordToken(token) as NormalizedAuthUser | null;
+): Promise<{ message: string }> => {
+  const userData = jwt.validateResetPasswordToken(token);
 
   if (!userData) {
     throw ApiError.BadRequest('Invalid token');
@@ -171,8 +177,6 @@ const resetPassword = async (
 
   await userRepository.update(user.id, { password: newPassword });
 
-  // after that we'll delete this token
-  //await resetPasswordTokenRepository.useToken(tokenFromDB.token);
   await resetPasswordTokenRepository.deleteByUserId(user.id);
 
   return {
@@ -180,7 +184,7 @@ const resetPassword = async (
   };
 };
 
-const createAuthentication = async (user: User) => {
+const createAuthentication = async (user: User): Promise<AuthenticationData> => {
   const userData = normalizeAuth(user);
 
   const accessToken = jwt.generateAccessToken(userData);

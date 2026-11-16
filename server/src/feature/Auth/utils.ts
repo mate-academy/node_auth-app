@@ -1,11 +1,5 @@
 import type { Response } from 'express';
-import type { NormalizedAuthUser } from '../feature/User/utils.js';
-
-type AuthenticationData = {
-  user: NormalizedAuthUser;
-  accessToken: string;
-  refreshToken: string;
-};
+import type { AuthenticationData } from './types.js';
 
 export const sendAuthentication = (res: Response, data: AuthenticationData) => {
   res.cookie('refreshToken', data.refreshToken, {

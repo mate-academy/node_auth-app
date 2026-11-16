@@ -1,4 +1,5 @@
 import { User } from '../../models/User.model.js';
+import type { CreateUserData } from './types.js';
 
 function getAll() {
   return User.findAll();
@@ -14,7 +15,7 @@ function getById(id: number) {
   return User.findByPk(id);
 }
 
-function create({ name, email, password, activationToken }: Omit<User, "id">) {
+function create({ name, email, password, activationToken }: CreateUserData) {
   return User.create({ name, email, password, activationToken });
 }
 

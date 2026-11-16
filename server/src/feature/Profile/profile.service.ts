@@ -2,12 +2,11 @@ import { mailer } from "../../config/mailer.js";
 import { ApiError } from "../../exceptions/api.error.js";
 import type { User } from "../../models/User.model.js";
 import { userRepository } from "../User/user.repository.js";
-import { normalizeUser, validateEmail, validatePassword } from "../User/utils.js";
+import { normalizeUser, validateEmail, validatePassword, type NormalizedUser } from "../User/utils.js";
 import bcrypt from 'bcrypt';
 
-
-const getOwner = async (userId: number) => {
-  const user = await userRepository.getById(userId) as User | null;
+const getOwner = async (userId: number): Promise<NormalizedUser> => {
+  const user = await userRepository.getById(userId);
 
   if (!user) {
     throw ApiError.Unauthorized('User not found');
@@ -29,14 +28,14 @@ const changePassword = async (
   oldPassword: string,
   newPassword: string,
   confirmation: string,
-) => {
+): Promise<{ message: string }> => {
   const validationError = validatePassword(newPassword);
 
   if (validationError) {
     throw ApiError.BadRequest(validationError);
   }
 
-  const user = await userRepository.getById(userId) as User | null;
+  const user = await userRepository.getById(userId);
 
   if (!user) {
     throw ApiError.NotFound('User not found');
@@ -65,14 +64,14 @@ const changeEmail = async (
   newEmail: string,
   password: string,
   emailConfirmation: string,
-) => {
+): Promise<{ message: string }> => {
   const validationError = validateEmail(newEmail);
 
   if (validationError) {
     throw ApiError.BadRequest(validationError);
   }
 
-  const user = await userRepository.getById(userId) as User | null;
+  const user = await userRepository.getById(userId);
 
   if (!user) {
     throw ApiError.NotFound('User not found');

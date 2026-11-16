@@ -1,6 +1,9 @@
+import type { ErrorRequestHandler } from "express";
 import { ApiError } from "../exceptions/api.error.js"
 
-export const errorMidleware = (error, req, res, next) => {
+export const errorMidleware: ErrorRequestHandler = (error, req, res, next) => {
+  console.error(error);
+
   if (error instanceof ApiError) {
     res.status(error.status).send({
       message: error.message,

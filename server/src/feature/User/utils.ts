@@ -1,14 +1,21 @@
-import type { User } from '../../models/User.model.js';
-import type { Response } from 'express';
-import bcrypt from 'bcrypt';
+import { User } from "../../models/User.model.js";
 
-export type NormalizedAuthUser = ReturnType<typeof normalizeAuth>;
+export type NormalizedAuthUser = {
+  id: number;
+  email: string;
+};
 
-export function normalizeAuth({ id, email }: User) {
+export type NormalizedUser = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+export function normalizeAuth({ id, email }: User): NormalizedAuthUser {
   return { id, email };
 }
 
-export function normalizeUser({ id, name, email }: User) {
+export function normalizeUser({ id, name, email }: User): NormalizedUser {
   return { id, name, email };
 }
 
@@ -23,19 +30,3 @@ export function validatePassword(password: string) {
   if (!password) return 'Password is required';
   if (password.length < 6) return 'At least 6 characters';
 }
-
-// export const checkPassword = async (res: Response, user: User | null, password: string) => {
-//   if (!user) {
-//     res.status(401).json({ message: 'Unauthorized' });
-//     return false;
-//   }
-
-//   const isPasswordValid = await bcrypt.compare(password, user?.password || '');
-
-//   if (!isPasswordValid) {
-//     res.status(400).json({ message: 'Invalid password' });
-//     return false;
-//   }
-
-//   return true;
-// };

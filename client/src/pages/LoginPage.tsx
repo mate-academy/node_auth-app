@@ -29,7 +29,7 @@ export const LoginPage = () => {
         onSubmit={({ email, password }) => {
           return login(email, password)
             .then(() => {
-              navigate('/profile');
+              navigate(location.state?.from || '/');
             })
             .catch((error: AxiosError<{ message?: string }>) => {
               setError(error.response?.data?.message ?? '');

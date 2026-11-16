@@ -7,15 +7,12 @@ export interface AuthRequest extends Request {
 }
 
 export function authMiddleware(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) {
   const authHeader = req.headers['authorization'] || '';
   const [, accessToken] = authHeader.split(' ');
-
-  // console.log("authHeader: " + authHeader);
-  // console.log("accessToken: " + accessToken);
 
   if (!authHeader || !accessToken) {
     res.status(401).json({ message: 'Token is required' });
@@ -29,7 +26,7 @@ export function authMiddleware(
     return;
   }
 
-  req.user = userData;
+  res.locals.user = userData;
 
   next();
 }

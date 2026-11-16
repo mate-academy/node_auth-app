@@ -3,6 +3,7 @@
 
 import { createServer } from './config/createServer.js';
 import { sequelize } from './config/db.js';
+import { createServer as createHttpServer } from 'node:http';
 
 import './models/associations.js';
 
@@ -21,13 +22,16 @@ async function start() {
 
 await start();
 
-const server = createServer();
+const app = createServer();
+const server = createHttpServer(app);
 
 server.listen(3000, () => {
   console.log('Server is running on localhost:3000');
 });
 
-process.on('SIGTERM', async () => {
-  await sequelize.close();
-  server.close();
+process.on('SIGTERM', () => {
+  server.close(async () => {
+    await sequelize.close();
+    process.exit(0);
+  });
 });

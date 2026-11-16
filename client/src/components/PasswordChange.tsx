@@ -6,7 +6,11 @@ import { userService } from '../services/userService';
 import { toast } from 'sonner';
 import { useAuth } from './AuthContext';
 
-export const PasswordChange = ({ onDone }) => {
+interface Props {
+  onDone: () => void;
+}
+
+export const PasswordChange = ({ onDone }: Props) => {
   const { logout } = useAuth();
 
   return (
@@ -16,7 +20,6 @@ export const PasswordChange = ({ onDone }) => {
         newPassword: '',
         confirmPassword: '',
       }}
-      //validateOnMount={true}
       validate={({ oldPassword, newPassword, confirmPassword }) => {
         const errors: {
           oldPassword?: string;

@@ -1,10 +1,7 @@
 'use strict';
 
 import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
+import 'dotenv/config';
 
 const {
   POSTGRES_HOST,
@@ -24,8 +21,6 @@ export const sequelize = new Sequelize({
   username: POSTGRES_USER || 'postgres',
   host: POSTGRES_HOST || 'localhost',
   dialect: 'postgres',
-  port: POSTGRES_PORT || 5432,
+  port: Number(POSTGRES_PORT) || 5432,
   password: POSTGRES_PASSWORD || '123',
 });
-
-//sequelize.sync();

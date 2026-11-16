@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express';
 import { authService } from './auth.service.js';
-import { sendAuthentication } from '../../utils/sendAuthentication.js';
+import { ApiError } from '../../exceptions/api.error.js';
+import { sendAuthentication } from './utils.js';
 
 const register: RequestHandler = async (req, res) => {
   const { name, email, password } = req.body;
@@ -13,6 +14,11 @@ const register: RequestHandler = async (req, res) => {
 
 const activate: RequestHandler = async (req, res) => {
   const { email, token } = req.params;
+
+  if (typeof email !== 'string' || typeof token !== 'string') {
+    throw ApiError.BadRequest('Invalid activation link');
+  }
+
   const data = await authService.activate(email, token);
 
   return sendAuthentication(res, data);
@@ -51,6 +57,11 @@ const forgotPassword: RequestHandler = async (req, res) => {
 const resetPassword: RequestHandler = async (req, res) => {
   const { token } = req.params;
   const { password, confirmation } = req.body;
+
+  if (typeof token !== 'string') {
+    throw ApiError.BadRequest('Invalid reset password link');
+  }
+
   const result = await authService.resetPassword(token, password, confirmation);
 
   return res.status(201).json(result);

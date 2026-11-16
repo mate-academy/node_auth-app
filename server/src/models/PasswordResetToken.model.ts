@@ -1,10 +1,19 @@
 'use strict';
 
-import { DataTypes } from 'sequelize';
+import { DataTypes, Model, type CreationOptional, type InferAttributes, type InferCreationAttributes } from 'sequelize';
 import { sequelize } from '../config/db.js';
 
-export const ResetPasswordToken = sequelize.define(
-  'ResetPasswordToken',
+export class ResetPasswordToken extends Model<
+  InferAttributes<ResetPasswordToken>,
+  InferCreationAttributes<ResetPasswordToken>
+> {
+  declare id: CreationOptional<number>;
+  declare userId: number;
+  declare token: string;
+  declare usedAt: CreationOptional<Date | null>;
+}
+
+ResetPasswordToken.init(
   {
     id: {
       type: DataTypes.INTEGER,
@@ -18,13 +27,15 @@ export const ResetPasswordToken = sequelize.define(
     token: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: true
     },
     usedAt: {
       type: DataTypes.DATE,
     },
   },
   {
+    sequelize,
+    modelName: 'ResetPasswordToken',
     updatedAt: false,
   },
 );
