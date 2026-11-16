@@ -7,9 +7,14 @@ try {
   await sequelize.sync({ alter: true });
 
   // eslint-disable-next-line no-console
-  console.log('Table created');
-  await sequelize.close();
+  console.log('Tables are synced');
 } catch (error) {
   // eslint-disable-next-line no-console
-  console.error('Table creation failed:', error.message);
+  console.error('Table sync failed:', error.message);
+
+  // Finish the script with an error code, so npm / CI see the failure
+  process.exitCode = 1;
+} finally {
+  // Close the DB connection in both cases, success and failure
+  await sequelize.close();
 }

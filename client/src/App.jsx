@@ -15,7 +15,6 @@ import { ResetPasswordRequestPage } from './pages/ResetPasswordRequestPage.jsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
 import { NotFoundPage } from './pages/NotFoundPage.jsx';
 import { Loader } from './components/Loader.jsx';
-import { HomePage } from './pages/HomePage.jsx';
 import { usePageError } from './hooks/usePageError.js';
 
 function App() {
@@ -39,10 +38,6 @@ function App() {
         aria-label="main navigation"
       >
         <div className="navbar-start">
-          <NavLink to="/" className="navbar-item">
-            Home
-          </NavLink>
-
           {user && (
             <NavLink to="/profile" className="navbar-item">
               Profile
@@ -93,8 +88,6 @@ function App() {
       <main>
         <section className="section">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-
             <Route element={<RequireNonAuth />}>
               <Route path="sign-up" element={<RegistrationPage />} />
               <Route
