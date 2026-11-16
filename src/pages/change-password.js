@@ -1,0 +1,32 @@
+export const changePassword = ` <script src="/scripts/login-form.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <main class="main">
+    <link rel="stylesheet" href="/styles/form.css">
+    <form class="main__form"  action="/enter" method="POST">
+    <h1 class="main__title">Change your password</h1>
+    <p class="main__text">Password rules:</p>
+    <ul class="main__list">
+    <li>• Minimum of 6 characters</li>
+    <li>• One uppercase letter</li>
+    <li>• One symbol</li>
+    </ul>
+    <div class="main__form-area">
+    <label class="main__form-label">Insert your email</label>
+    <input class="main__form-input email" name="email" type="email" placeholder="test@contact.com" required />
+    <p class="main__error email-error">email field cannot be empty</p>
+    </div>
+    <div class="main__form-area">
+    <label class="main__form-label">enter your new password</label>
+    <input class="main__form-input password" name="password" type="password" placeholder="your password" required />
+    <p class="main__error password-error">password field cannot be empty</p>
+    </div>
+    <button type="submit">Change Password</button>
+    </form>
+    <footer class="main__footer">
+    <p>New here? <a href="/register">Sign up</a><br>
+    <a href="/login" class="btn">Login</a>
+    </p>
+    </footer>
+    </main>`;
