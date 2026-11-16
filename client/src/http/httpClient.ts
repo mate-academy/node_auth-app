@@ -1,6 +1,10 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { authService } from '../services/authService';
 import { accessTokenService } from '../services/accessTokenService';
+
+type RetryRequestConfig = InternalAxiosRequestConfig & {
+  isRetry?: boolean;
+};
 
 export const httpClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL as string,
@@ -9,7 +13,7 @@ export const httpClient = axios.create({
 
 // add `Authorization` header to all requests
 httpClient.interceptors.request.use(request => {
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = accessTokenService.get();
 
   if (accessToken) {
     request.headers.Authorization = `Bearer ${accessToken}`;
@@ -18,20 +22,48 @@ httpClient.interceptors.request.use(request => {
   return request;
 });
 
+let refreshPromise: Promise<void> | null = null;
+
+async function refreshAccessToken() {
+  if (!refreshPromise) {
+    refreshPromise = authService
+      .refresh()
+      .then(({ accessToken }) => {
+        accessTokenService.save(accessToken);
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  await refreshPromise;
+}
+
 httpClient.interceptors.response.use(
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   res => res.data,
 
-  // retry request after refreshing access token
   async (error: AxiosError) => {
-    if (error.response?.status !== 401) {
+    const originalRequest = error.config as RetryRequestConfig | undefined;
+
+    if (error.response?.status !== 401 || !originalRequest) {
       throw error;
     }
 
-    const originalRequest = error.config;
-    const { accessToken } = await authService.refresh();
+    if (originalRequest.isRetry) {
+      throw error;
+    }
 
-    accessTokenService.save(accessToken);
+    originalRequest.isRetry = true;
+
+    try {
+      await refreshAccessToken();
+    } catch (refreshError) {
+      accessTokenService.remove();
+      window.location.href = '/login';
+
+      throw refreshError;
+    }
 
     return httpClient.request(originalRequest!);
   },
