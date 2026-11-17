@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import 'dotenv/config';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -21,8 +20,29 @@ function send({ email, subject, html }) {
 function sendActivationEmail(email, token) {
   const href = `${process.env.CLIENT_HOST}/activate/${token}`;
   const html = `
-  <h1>Activate account</h1>
-  <a href="${href}">${href}</a>
+    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f6f8fb; border-radius: 12px;">
+      <h1 style="color: #1f2937; font-size: 24px; margin: 0 0 16px;">
+        👋 Welcome!
+      </h1>
+
+      <p style="color: #4b5563; font-size: 16px; line-height: 1.5; margin: 0 0 24px;">
+        Thanks for signing up! Please confirm your email to activate your account.
+      </p>
+
+      <a href="${href}"
+         style="display: inline-block; padding: 14px 28px; background: #22c55e; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 8px;">
+        ✅ Activate account
+      </a>
+
+      <p style="color: #9ca3af; font-size: 13px; line-height: 1.5; margin: 24px 0 0;">
+        If the button doesn't work, copy this link into your browser:<br>
+        <a href="${href}" style="color: #3b82f6; word-break: break-all;">${href}</a>
+      </p>
+
+      <p style="color: #9ca3af; font-size: 13px; margin: 16px 0 0;">
+        If you didn't create an account, just ignore this email.
+      </p>
+    </div>
   `;
 
   return send({
