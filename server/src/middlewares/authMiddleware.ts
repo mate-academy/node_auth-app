@@ -3,7 +3,7 @@ import { jwt } from '../config/jwt.js';
 import type { NormalizedAuthUser } from '../feature/User/utils.js';
 
 export interface AuthRequest extends Request {
-  user: NormalizedAuthUser
+  user: NormalizedAuthUser;
 }
 
 export function authMiddleware(

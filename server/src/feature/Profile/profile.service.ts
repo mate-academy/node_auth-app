@@ -1,8 +1,13 @@
-import { mailer } from "../../config/mailer.js";
-import { ApiError } from "../../exceptions/api.error.js";
-import type { User } from "../../models/User.model.js";
-import { userRepository } from "../User/user.repository.js";
-import { normalizeUser, validateEmail, validatePassword, type NormalizedUser } from "../User/utils.js";
+import { mailer } from '../../config/mailer.js';
+import { ApiError } from '../../exceptions/api.error.js';
+import type { User } from '../../models/User.model.js';
+import { userRepository } from '../User/user.repository.js';
+import {
+  normalizeUser,
+  validateEmail,
+  validatePassword,
+  type NormalizedUser,
+} from '../User/utils.js';
 import bcrypt from 'bcrypt';
 
 const getOwner = async (userId: number): Promise<NormalizedUser> => {
@@ -107,4 +112,4 @@ export const profileService = {
   changeName,
   changePassword,
   changeEmail,
-}
+};

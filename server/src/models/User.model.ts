@@ -1,6 +1,13 @@
 'use strict';
 
-import { DataTypes, Model, type CreationOptional, type InferAttributes, type InferCreationAttributes, type Optional } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  type CreationOptional,
+  type InferAttributes,
+  type InferCreationAttributes,
+  type Optional,
+} from 'sequelize';
 import { sequelize } from '../config/db.js';
 
 export class User extends Model<

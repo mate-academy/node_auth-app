@@ -1,7 +1,12 @@
 import { randomBytes } from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { userRepository } from '../User/user.repository.js';
-import { validateEmail, validatePassword, normalizeAuth, type NormalizedAuthUser } from '../User/utils.js';
+import {
+  validateEmail,
+  validatePassword,
+  normalizeAuth,
+  type NormalizedAuthUser,
+} from '../User/utils.js';
 import { mailer } from '../../config/mailer.js';
 import { ApiError } from '../../exceptions/api.error.js';
 import { jwt } from '../../config/jwt.js';
@@ -15,7 +20,6 @@ const register = async (
   email: string,
   password: string,
 ): Promise<NormalizedAuthUser> => {
-
   const errors = {
     email: validateEmail(email),
     password: validatePassword(password),
@@ -28,7 +32,9 @@ const register = async (
   const existingUser = await userRepository.getByEmail(email);
 
   if (existingUser) {
-    throw ApiError.BadRequest('Email is already taken', { email: 'Email is already taken' });
+    throw ApiError.BadRequest('Email is already taken', {
+      email: 'Email is already taken',
+    });
   }
 
   const activationToken = randomBytes(32).toString('hex');
@@ -65,7 +71,7 @@ const refresh = async (refreshToken: string): Promise<AuthenticationData> => {
 
 const login = async (
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthenticationData> => {
   const user = await userRepository.getByEmail(email);
 
@@ -90,7 +96,7 @@ const login = async (
 
 const activate = async (
   email: string,
-  activationToken: string
+  activationToken: string,
 ): Promise<AuthenticationData> => {
   const user = await userRepository.getByEmail(email);
 
@@ -107,7 +113,7 @@ const logout = async (refreshToken: string) => {
   await refreshTokenRepository.deleteToken(refreshToken);
 };
 
-const forgotPassword = async (email: string): Promise<{message: string}> => {
+const forgotPassword = async (email: string): Promise<{ message: string }> => {
   const emailError = validateEmail(email);
 
   if (emailError) {
@@ -116,7 +122,7 @@ const forgotPassword = async (email: string): Promise<{message: string}> => {
     });
   }
 
-  const existingUser = await userRepository.getByEmail(email) as User | null;
+  const existingUser = (await userRepository.getByEmail(email)) as User | null;
 
   if (existingUser) {
     const resetToken = jwt.generateResetPasswordToken(
@@ -155,9 +161,10 @@ const resetPassword = async (
     throw ApiError.BadRequest('Invalid token');
   }
 
-  const tokenFromDB = await resetPasswordTokenRepository.getUnusedByUserId(user.id);
+  const tokenFromDB = await resetPasswordTokenRepository.getUnusedByUserId(
+    user.id,
+  );
   const isTokenExist = await bcrypt.compare(token, tokenFromDB?.token || '');
-
 
   if (!tokenFromDB || !isTokenExist) {
     throw ApiError.BadRequest('Invalid token');
@@ -184,7 +191,9 @@ const resetPassword = async (
   };
 };
 
-const createAuthentication = async (user: User): Promise<AuthenticationData> => {
+const createAuthentication = async (
+  user: User,
+): Promise<AuthenticationData> => {
   const userData = normalizeAuth(user);
 
   const accessToken = jwt.generateAccessToken(userData);
@@ -208,4 +217,4 @@ export const authService = {
   logout,
   forgotPassword,
   resetPassword,
-}
+};

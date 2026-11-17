@@ -1,5 +1,5 @@
-import type { ErrorRequestHandler } from "express";
-import { ApiError } from "../exceptions/api.error.js"
+import type { ErrorRequestHandler } from 'express';
+import { ApiError } from '../exceptions/api.error.js';
 
 export const errorMidleware: ErrorRequestHandler = (error, req, res, next) => {
   console.error(error);
@@ -8,7 +8,7 @@ export const errorMidleware: ErrorRequestHandler = (error, req, res, next) => {
     res.status(error.status).send({
       message: error.message,
       errors: error.errors,
-    })
+    });
 
     return;
   }
@@ -16,4 +16,4 @@ export const errorMidleware: ErrorRequestHandler = (error, req, res, next) => {
   res.status(500).json({
     message: 'Internal server error',
   });
-}
+};

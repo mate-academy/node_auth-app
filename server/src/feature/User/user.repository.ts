@@ -28,11 +28,11 @@ function activate(email: string) {
       where: {
         email,
       },
-    }
+    },
   );
 }
 
-async function update(id: number, data: Partial<Omit<User, "id">>) {
+async function update(id: number, data: Partial<Omit<User, 'id'>>) {
   await User.update(
     { ...data },
     {

@@ -22,14 +22,15 @@ function deleteByUserId(userId: number) {
 }
 
 function useToken(token: string) {
-  return ResetPasswordToken.update({usedAt: new Date()}, {
-    where: {
-      token,
+  return ResetPasswordToken.update(
+    { usedAt: new Date() },
+    {
+      where: {
+        token,
+      },
     },
-  });
+  );
 }
-
-
 
 export const resetPasswordTokenRepository = {
   create,

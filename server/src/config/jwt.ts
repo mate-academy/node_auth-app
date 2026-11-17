@@ -24,7 +24,7 @@ function validateToken(token: string, secretKey: string) {
 
     return typeof userData === 'string'
       ? null
-      : userData as NormalizedAuthUser;
+      : (userData as NormalizedAuthUser);
   } catch (error) {
     return null;
   }

@@ -1,0 +1,8 @@
+{
+  "name": "node_auth-app",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install --prefix server",
+    "test": "npm test --prefix server"
+  }
+}

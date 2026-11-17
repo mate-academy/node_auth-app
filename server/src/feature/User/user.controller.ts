@@ -1,5 +1,5 @@
-import type { RequestHandler } from "express";
-import { userService } from "./user.service.js";
+import type { RequestHandler } from 'express';
+import { userService } from './user.service.js';
 
 const getAll: RequestHandler = async (req, res) => {
   const users = await userService.getAll();
@@ -10,4 +10,3 @@ const getAll: RequestHandler = async (req, res) => {
 export const userController = {
   getAll,
 };
-

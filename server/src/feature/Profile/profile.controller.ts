@@ -1,6 +1,6 @@
-import type { Response, Request } from "express";
-import type { AuthRequest } from "../../middlewares/authMiddleware.js";
-import { profileService } from "./profile.service.js";
+import type { Response, Request } from 'express';
+import type { AuthRequest } from '../../middlewares/authMiddleware.js';
+import { profileService } from './profile.service.js';
 
 const getOwner = async (req: Request, res: Response) => {
   const user = await profileService.getOwner(res.locals.user.id);
@@ -42,11 +42,9 @@ const changeEmail = async (req: Request, res: Response) => {
   return res.status(200).json(data);
 };
 
-
 export const profileController = {
   getOwner,
   changeName,
   changePassword,
   changeEmail,
 };
-

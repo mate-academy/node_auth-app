@@ -1,4 +1,4 @@
-import type { NormalizedAuthUser } from "../User/utils.js";
+import type { NormalizedAuthUser } from '../User/utils.js';
 
 export type AuthenticationData = {
   user: NormalizedAuthUser;

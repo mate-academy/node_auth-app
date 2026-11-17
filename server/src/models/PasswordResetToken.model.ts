@@ -1,6 +1,12 @@
 'use strict';
 
-import { DataTypes, Model, type CreationOptional, type InferAttributes, type InferCreationAttributes } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  type CreationOptional,
+  type InferAttributes,
+  type InferCreationAttributes,
+} from 'sequelize';
 import { sequelize } from '../config/db.js';
 
 export class ResetPasswordToken extends Model<
@@ -27,7 +33,7 @@ ResetPasswordToken.init(
     token: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
+      unique: true,
     },
     usedAt: {
       type: DataTypes.DATE,

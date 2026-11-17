@@ -8,7 +8,7 @@ export class ApiError extends Error {
   status: number;
   errors: Record<string, string>;
 
-  constructor({message, status, errors = {}}: ApiErrorOptions) {
+  constructor({ message, status, errors = {} }: ApiErrorOptions) {
     super(message);
 
     this.status = status;
@@ -19,15 +19,15 @@ export class ApiError extends Error {
     return new ApiError({
       message,
       status: 400,
-      errors
+      errors,
     });
   }
 
-  static Unauthorized(message: string = "Unauthorized user", errors = {}) {
+  static Unauthorized(message: string = 'Unauthorized user', errors = {}) {
     return new ApiError({
       message,
       status: 401,
-      errors
+      errors,
     });
   }
 
@@ -35,7 +35,7 @@ export class ApiError extends Error {
     return new ApiError({
       message,
       status: 404,
-      errors
+      errors,
     });
   }
 

@@ -1,6 +1,12 @@
 'use strict';
 
-import { DataTypes, Model, type CreationOptional, type InferAttributes, type InferCreationAttributes } from 'sequelize';
+import {
+  DataTypes,
+  Model,
+  type CreationOptional,
+  type InferAttributes,
+  type InferCreationAttributes,
+} from 'sequelize';
 import { sequelize } from '../config/db.js';
 
 export class RefreshToken extends Model<
