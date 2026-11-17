@@ -52,7 +52,52 @@ function sendActivationEmail(email, token) {
   });
 }
 
+function sendResetEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset/${token}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; background: #f4f5f7; padding: 40px 0;">
+      <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 32px; text-align: center;">
+        <h1 style="margin: 0 0 16px; font-size: 24px; color: #1f2937;">
+          Reset your password
+        </h1>
+
+        <p style="margin: 0 0 24px; font-size: 16px; color: #4b5563; line-height: 1.5;">
+          We received a request to reset your password.
+          Click the button below to choose a new one.
+        </p>
+
+        <a
+          href="${href}"
+          style="display: inline-block; padding: 14px 28px; background: #ef4444; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold;"
+        >
+          Reset password
+        </a>
+
+        <p style="margin: 24px 0 8px; font-size: 13px; color: #9ca3af;">
+          If the button doesn't work, copy this link:
+        </p>
+
+        <a href="${href}" style="font-size: 13px; color: #3b82f6; word-break: break-all;">
+          ${href}
+        </a>
+
+        <p style="margin: 24px 0 0; font-size: 13px; color: #9ca3af;">
+          If you didn't request a password reset, just ignore this email.
+          Your password will stay the same.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return send({
+    email,
+    subject: 'Reset your Password',
+    html,
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
+  sendResetEmail,
   send,
 };

@@ -18,7 +18,7 @@ export class ApiError extends Error {
     return new ApiError({
       massage: 'unauthorized user',
       errors,
-      status: 400,
+      status: 401,
     });
   }
 

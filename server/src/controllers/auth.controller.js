@@ -133,7 +133,21 @@ const logout = async (req, res) => {
   }
 
   await tokenService.remove(userData.id);
+
+  res.clearCookie('refreshToken');
   res.sendStatus(204);
+};
+
+const reset = async (req, res) => {
+  const { email } = req.body;
+  const emailError = validateEmail(email);
+
+  if (emailError) {
+    throw ApiError.badRequest('Bad request', { email: emailError });
+  }
+
+  await userService.reset(email);
+  res.send({ message: 'Email sent' });
 };
 
 export const authControllers = {
@@ -142,4 +156,5 @@ export const authControllers = {
   login,
   refresh,
   logout,
+  reset,
 };

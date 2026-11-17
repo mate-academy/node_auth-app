@@ -40,9 +40,24 @@ async function register(name, email, password) {
   await emailService.sendActivationEmail(email, activationToken);
 }
 
+async function reset(email) {
+  const existUser = await findByEmail(email);
+
+  if (!existUser) {
+    throw ApiError.notFound({ email: 'No such user' });
+  }
+
+  const resetToken = uuidv4();
+
+  existUser.resetToken = resetToken;
+  await existUser.save();
+  await emailService.sendResetEmail(email, resetToken);
+}
+
 export const userService = {
   getAllActivated,
   normalize,
   findByEmail,
   register,
+  reset,
 };
