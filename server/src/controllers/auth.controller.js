@@ -138,7 +138,7 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
-const reset = async (req, res) => {
+const forgotPassword = async (req, res) => {
   const { email } = req.body;
   const emailError = validateEmail(email);
 
@@ -146,8 +146,31 @@ const reset = async (req, res) => {
     throw ApiError.badRequest('Bad request', { email: emailError });
   }
 
-  await userService.reset(email);
+  await userService.createTokenResetSendMail(email);
   res.send({ message: 'Email sent' });
+};
+
+const resetPassword = async (req, res) => {
+  const { resetToken } = req.params;
+  const { password, confirmation } = req.body;
+
+  const passwordError = validatePassword(password);
+
+  if (passwordError) {
+    throw ApiError.badRequest('Bad request', { password: passwordError });
+  }
+
+  if (password !== confirmation) {
+    throw ApiError.badRequest('Bad request', {
+      confirmation: 'Passwords do not match',
+    });
+  }
+
+  const hashePass = await bcrypt.hash(password, 10);
+
+  await userService.resetTokenCreateNewPassword(resetToken, hashePass);
+
+  res.send({ message: 'Password is reset' });
 };
 
 export const authControllers = {
@@ -156,5 +179,6 @@ export const authControllers = {
   login,
   refresh,
   logout,
-  reset,
+  forgotPassword,
+  resetPassword,
 };

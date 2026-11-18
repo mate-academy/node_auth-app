@@ -40,7 +40,7 @@ async function register(name, email, password) {
   await emailService.sendActivationEmail(email, activationToken);
 }
 
-async function reset(email) {
+async function createTokenResetSendMail(email) {
   const existUser = await findByEmail(email);
 
   if (!existUser) {
@@ -54,10 +54,23 @@ async function reset(email) {
   await emailService.sendResetEmail(email, resetToken);
 }
 
+async function resetTokenCreateNewPassword(resetToken, password) {
+  const user = await User.findOne({ where: { resetToken } });
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  user.resetToken = null;
+  user.password = password;
+  await user.save();
+}
+
 export const userService = {
   getAllActivated,
   normalize,
   findByEmail,
   register,
-  reset,
+  createTokenResetSendMail,
+  resetTokenCreateNewPassword,
 };
