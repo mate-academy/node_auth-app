@@ -5,6 +5,13 @@ import cn from 'classnames';
 
 import { authService } from '../services/authService.js';
 import { usePageError } from '../hooks/usePageError.js';
+import { CheckEmail } from '../components/CheckEmail.jsx';
+
+function validateName(value) {
+  if (!value) {
+    return 'Name is required';
+  }
+}
 
 function validateEmail(value) {
   if (!value) {
@@ -33,12 +40,7 @@ export const RegistrationPage = () => {
   const [registered, setRegistered] = useState(false);
 
   if (registered) {
-    return (
-      <section className="">
-        <h1 className="title">Check your email</h1>
-        <p>We have sent you an email with the activation link</p>
-      </section>
-    );
+    return <CheckEmail />;
   }
 
   return (
@@ -46,14 +48,15 @@ export const RegistrationPage = () => {
       <Formik
         initialValues={{
           email: '',
+          name: '',
           password: '',
         }}
         validateOnMount={true}
-        onSubmit={({ email, password }, formikHelpers) => {
+        onSubmit={({ email, password, name }, formikHelpers) => {
           formikHelpers.setSubmitting(true);
 
           authService
-            .register({ email, password })
+            .register({ email, password, name })
             .then(() => {
               setRegistered(true);
             })
@@ -69,6 +72,7 @@ export const RegistrationPage = () => {
               const { errors, message } = error.response.data;
 
               formikHelpers.setFieldError('email', errors?.email);
+              formikHelpers.setFieldError('name', errors?.name);
               formikHelpers.setFieldError('password', errors?.password);
 
               if (message) {
@@ -113,6 +117,38 @@ export const RegistrationPage = () => {
 
               {touched.email && errors.email && (
                 <p className="help is-danger">{errors.email}</p>
+              )}
+            </div>
+            <div className="field">
+              <label htmlFor="name" className="label">
+                Name
+              </label>
+
+              <div className="control has-icons-left has-icons-right">
+                <Field
+                  validate={validateName}
+                  name="name"
+                  type="name"
+                  id="name"
+                  placeholder="Oleksandr Orel"
+                  className={cn('input', {
+                    'is-danger': touched.name && errors.name,
+                  })}
+                />
+
+                <span className="icon is-small is-left">
+                  <i className="fa fa-address-card"></i>
+                </span>
+
+                {touched.name && errors.name && (
+                  <span className="icon is-small is-right has-text-danger">
+                    <i className="fas fa-exclamation-triangle"></i>
+                  </span>
+                )}
+              </div>
+
+              {touched.name && errors.name && (
+                <p className="help is-danger">{errors.name}</p>
               )}
             </div>
             <div className="field">

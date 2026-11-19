@@ -13,15 +13,28 @@ import { UsersPage } from './pages/UsersPage';
 import { Loader } from './components/Loader.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { usePageError } from './hooks/usePageError.js';
+import { ProfilePage } from './pages/ProfilePage.jsx';
+import { NotFoundPage } from './pages/NotFoundPage.jsx';
+import { ProfileContext } from './components/ProfileContext.jsx';
+import { EmailActivationPage } from './pages/EmailActivationPage.jsx';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
+import { ResetPasswordConfirmationPage } from './pages/ResetPasswordConfirmationPage.jsx';
 
 function App() {
   const navigate = useNavigate();
   const [error, setError] = usePageError();
   const { isChecked, user, logout, checkAuth } = useContext(AuthContext);
+  const { getProfile } = useContext(ProfileContext);
 
   useEffect(() => {
     checkAuth();
   }, []);
+
+  useEffect(() => {
+    if (user?.id) {
+      getProfile();
+    }
+  }, [user?.id]);
 
   if (!isChecked) {
     return <Loader />;
@@ -39,6 +52,10 @@ function App() {
             Home
           </NavLink>
 
+          <NavLink to="/profile" className="navbar-item">
+            Profile
+          </NavLink>
+
           <NavLink to="/users" className="navbar-item">
             Users
           </NavLink>
@@ -53,7 +70,7 @@ function App() {
                   onClick={() => {
                     logout()
                       .then(() => {
-                        navigate('/');
+                        navigate('/login');
                       })
                       .catch(error => {
                         setError(error.response?.data?.message);
@@ -97,7 +114,18 @@ function App() {
 
             <Route path="/" element={<RequireAuth />}>
               <Route path="users" element={<UsersPage />} />
+              <Route path="profile" element={<ProfilePage />} />
             </Route>
+            <Route
+              path="/changeEmail/activation/:activationToken"
+              element={<EmailActivationPage />}
+            />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route
+              path="/passwordReset/activation/:activationToken"
+              element={<ResetPasswordConfirmationPage />}
+            />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </section>
 

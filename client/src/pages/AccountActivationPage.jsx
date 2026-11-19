@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { AuthContext } from '../components/AuthContext.jsx';
 import { Loader } from '../components/Loader.jsx';
@@ -7,12 +7,16 @@ import { Loader } from '../components/Loader.jsx';
 export const AccountActivationPage = () => {
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
+  const navigate = useNavigate();
 
   const { activate } = useContext(AuthContext);
   const { activationToken } = useParams();
 
   useEffect(() => {
     activate(activationToken)
+      .then((res) => {
+        navigate('/profile');
+      })
       .catch(error => {
         setError(error.response?.data?.message || `Wrong activation link`);
       })

@@ -5,6 +5,8 @@ import cn from 'classnames';
 
 import { AuthContext } from '../components/AuthContext.jsx';
 import { usePageError } from '../hooks/usePageError.js';
+import { CheckEmail } from '../components/CheckEmail.jsx';
+import { useState } from 'react';
 
 function validateEmail(value) {
   if (!value) {
@@ -31,9 +33,14 @@ function validatePassword(value) {
 export const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isRequireActivation, setRequireActivation] = useState(false);
 
   const [error, setError] = usePageError('');
   const { login } = useContext(AuthContext);
+
+  if (isRequireActivation) {
+    return <CheckEmail />;
+  }
 
   return (
     <>
@@ -46,9 +53,13 @@ export const LoginPage = () => {
         onSubmit={({ email, password }) => {
           return login({ email, password })
             .then(() => {
-              navigate(location.state?.from?.pathname || '/');
+              navigate(location.state?.from?.pathname || '/profile');
             })
             .catch(error => {
+              if (error.status === 403) {
+                setRequireActivation(true);
+              }
+
               setError(error.response?.data?.message);
             });
         }}
@@ -134,6 +145,8 @@ export const LoginPage = () => {
               </button>
             </div>
             Do not have an account? <Link to="/sign-up">Sign up</Link>
+            <br />
+            Forget password? <Link to="/reset-password">Reset password</Link>
           </Form>
         )}
       </Formik>
