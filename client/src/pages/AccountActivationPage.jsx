@@ -15,7 +15,9 @@ export const AccountActivationPage = () => {
   useEffect(() => {
     activate(activationToken)
       .then((res) => {
-        navigate('/profile');
+        setTimeout(() => {
+          navigate('/profile');
+        }, 5000);
       })
       .catch(error => {
         setError(error.response?.data?.message || `Wrong activation link`);

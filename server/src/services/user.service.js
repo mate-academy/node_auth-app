@@ -2,6 +2,7 @@ import { ApiError } from "../exceptions/api.error.js";
 import { User } from "../models/user.js"
 import { v4 as uuidv4 } from 'uuid';
 import { emailService } from "./email.service.js";
+import { validationService } from "./validation.service.js";
 
 const normalize = ({ id, name, email }) => ({
   id, name, email
@@ -27,6 +28,14 @@ const register = async ({ email, password, name }) => {
     throw ApiError.badRequest('User already exist', {
       email: 'Email is already used'
     })
+  }
+  const email = validationService.validateEmail(email);
+  const name = validationService.validateName(name);
+  const password = validationService.validatePassword(password);
+  const errors = { email, name, password };
+
+  if (email || name || password) {
+    throw ApiError.badRequest('validation error', errors);
   }
 
   const newUser = await User.create({ email, password, activationToken, name });

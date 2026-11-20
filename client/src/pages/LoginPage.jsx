@@ -56,7 +56,7 @@ export const LoginPage = () => {
               navigate(location.state?.from?.pathname || '/profile');
             })
             .catch(error => {
-              if (error.status === 403) {
+              if (error.response.status === 403) {
                 setRequireActivation(true);
               }
 

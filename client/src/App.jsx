@@ -9,9 +9,7 @@ import { AuthContext } from './components/AuthContext';
 import { LoginPage } from './pages/LoginPage';
 import { RegistrationPage } from './pages/RegistrationPage';
 import { RequireAuth } from './components/RequireAuth';
-import { UsersPage } from './pages/UsersPage';
 import { Loader } from './components/Loader.jsx';
-import { HomePage } from './pages/HomePage.jsx';
 import { usePageError } from './hooks/usePageError.js';
 import { ProfilePage } from './pages/ProfilePage.jsx';
 import { NotFoundPage } from './pages/NotFoundPage.jsx';
@@ -19,6 +17,7 @@ import { ProfileContext } from './components/ProfileContext.jsx';
 import { EmailActivationPage } from './pages/EmailActivationPage.jsx';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.jsx';
 import { ResetPasswordConfirmationPage } from './pages/ResetPasswordConfirmationPage.jsx';
+import { GuestRoute } from './components/GuestRoute.jsx';
 
 function App() {
   const navigate = useNavigate();
@@ -48,16 +47,8 @@ function App() {
         aria-label="main navigation"
       >
         <div className="navbar-start">
-          <NavLink to="/" className="navbar-item">
-            Home
-          </NavLink>
-
           <NavLink to="/profile" className="navbar-item">
             Profile
-          </NavLink>
-
-          <NavLink to="/users" className="navbar-item">
-            Users
           </NavLink>
         </div>
 
@@ -104,26 +95,26 @@ function App() {
       <main>
         <section className="section">
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="sign-up" element={<RegistrationPage />} />
-            <Route
-              path="activate/:activationToken"
-              element={<AccountActivationPage />}
-            />
-            <Route path="login" element={<LoginPage />} />
+            <Route path="/" element={<GuestRoute />}>
+              <Route path="sign-up" element={<RegistrationPage />} />
+              <Route
+                path="activate/:activationToken"
+                element={<AccountActivationPage />}
+              />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="reset-password" element={<ResetPasswordPage />} />
+              <Route
+                path="/passwordReset/activation/:activationToken"
+                element={<ResetPasswordConfirmationPage />}
+              />
+            </Route>
 
             <Route path="/" element={<RequireAuth />}>
-              <Route path="users" element={<UsersPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
             <Route
               path="/changeEmail/activation/:activationToken"
               element={<EmailActivationPage />}
-            />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route
-              path="/passwordReset/activation/:activationToken"
-              element={<ResetPasswordConfirmationPage />}
             />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

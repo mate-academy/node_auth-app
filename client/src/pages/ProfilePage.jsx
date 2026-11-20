@@ -73,7 +73,9 @@ export const ProfilePage = () => {
 
         const { errors, message } = error.response.data;
 
-        formikHelpers.setFieldError('name', errors?.name);
+        formikHelpers.setFieldError('oldPassword', errors?.oldPassword);
+        formikHelpers.setFieldError('password', errors?.password);
+        formikHelpers.setFieldError('confirmPassword', errors?.confirmPassword);
 
         if (message) {
           setError(message);
@@ -85,11 +87,14 @@ export const ProfilePage = () => {
       });
   };
 
-  const onChangeEmailSubmit = ({ email, password }, formikHelpers) => {
+  const onChangeEmailSubmit = (
+    { email, confirmEmail, password },
+    formikHelpers,
+  ) => {
     formikHelpers.setSubmitting(true);
 
     userService
-      .updateEmail({ email, password })
+      .updateEmail({ email, confirmEmail, password })
       .catch(error => {
         if (error.message) {
           setError(error.message);
@@ -101,7 +106,8 @@ export const ProfilePage = () => {
 
         const { errors, message } = error.response.data;
 
-        formikHelpers.setFieldError('name', errors?.name);
+        formikHelpers.setFieldError('email', errors?.email);
+        formikHelpers.setFieldError('password', errors?.password);
 
         if (message) {
           setError(message);
@@ -222,6 +228,7 @@ export const ProfilePage = () => {
                   Confirm
                 </button>
                 <button
+                  type="button"
                   className={cn('button is-danger has-text-weight-bold')}
                   onClick={() => setChangeName(false)}
                 >
@@ -366,6 +373,7 @@ export const ProfilePage = () => {
                   Confirm
                 </button>
                 <button
+                  type="button"
                   className={cn('button is-danger has-text-weight-bold')}
                   onClick={() => setChangePass(false)}
                 >
@@ -382,6 +390,7 @@ export const ProfilePage = () => {
           initialValues={{
             email: '',
             password: '',
+            confirmEmail: '',
           }}
           validateOnMount={true}
           onSubmit={onChangeEmailSubmit}
@@ -419,6 +428,44 @@ export const ProfilePage = () => {
 
                 {touched.email && errors.email && (
                   <p className="help is-danger">{errors.email}</p>
+                )}
+              </div>
+
+              <div className="field">
+                <label htmlFor="confirmEmail" className="label">
+                  Confirm Email
+                </label>
+
+                <div className="control has-icons-left has-icons-right">
+                  <Field
+                    validate={value => {
+                      return validationService.validateConfirmationEmail(
+                        value,
+                        values.email,
+                      );
+                    }}
+                    name="confirmEmail"
+                    type="email"
+                    id="confirmEmail"
+                    placeholder="e.g. bobsmith@gmail.com"
+                    className={cn('input', {
+                      'is-danger': touched.confirmEmail && errors.confirmEmail,
+                    })}
+                  />
+
+                  <span className="icon is-small is-left">
+                    <i className="fa fa-envelope"></i>
+                  </span>
+
+                  {touched.confirmEmail && errors.confirmEmail && (
+                    <span className="icon is-small is-right has-text-danger">
+                      <i className="fas fa-exclamation-triangle"></i>
+                    </span>
+                  )}
+                </div>
+
+                {touched.confirmEmail && errors.confirmEmail && (
+                  <p className="help is-danger">{errors.confirmEmail}</p>
                 )}
               </div>
 
@@ -471,6 +518,7 @@ export const ProfilePage = () => {
                   Confirm
                 </button>
                 <button
+                  type="button"
                   className={cn('button is-danger has-text-weight-bold')}
                   onClick={() => setChangePass(false)}
                 >

@@ -35,7 +35,7 @@ function resetPassword({ email }) {
 function resetPasswordConfirm({ password, confirmPassword, token }) {
   return authClient.patch('/reset-password', {
     password,
-    confirmPassword,
+    confirmation: confirmPassword,
     token,
   });
 }

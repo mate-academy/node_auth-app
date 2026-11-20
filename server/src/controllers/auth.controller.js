@@ -56,7 +56,7 @@ const activate = async (req, res) => {
   }
 
   user.activationToken = null;
-  user.save();
+  await user.save();
 
   res.send(userService.normalize(user));
 }
@@ -78,7 +78,7 @@ const login = async (req, res) => {
 
   if (user.activationToken) throw ApiError.notActivated()
 
-  generateTokens(res, user);
+  await generateTokens(res, user);
 }
 
 const logout = async (req, res) => {
@@ -106,7 +106,7 @@ const refresh = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  generateTokens(res, user)
+  await generateTokens(res, user)
 }
 
 const password = async (req, res) => {
@@ -172,7 +172,7 @@ const resetPassword = async (req, res) => {
 }
 
 const resetPasswordConfirm = async (req, res) => {
-  const { password, confirmPassword, token } = req.body;
+  const { password, confirmation, token } = req.body;
 
   const user = await userService.findByPasswordResetToken(token);
 
@@ -182,10 +182,10 @@ const resetPasswordConfirm = async (req, res) => {
 
   const errors = {
     password: validationService.validatePassword(password),
-    confirmPassword: validationService.validateConfirmPassword(password, confirmPassword),
+    confirmation: validationService.validateConfirmPassword(password, confirmation),
   }
 
-  if (errors.password || errors.confirmPassword) {
+  if (errors.password || errors.confirmation) {
     throw ApiError.badRequest('Bad request', errors)
   }
   const hashedPass = await bcrypt.hash(password, 10);

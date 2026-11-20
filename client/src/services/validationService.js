@@ -38,9 +38,22 @@ const validateConfirmationPassword = (confirmationPass, password) => {
   }
 };
 
+const validateConfirmationEmail = (confirmationEmail, email) => {
+  const validationMessage = validateEmail(confirmationEmail);
+
+  if (validationMessage) {
+    return validationMessage;
+  }
+
+  if (email !== confirmationEmail) {
+    return `Confirmation email doesn't match new email`;
+  }
+};
+
 export const validationService = {
   validateName,
   validateEmail,
   validatePassword,
   validateConfirmationPassword,
+  validateConfirmationEmail,
 };

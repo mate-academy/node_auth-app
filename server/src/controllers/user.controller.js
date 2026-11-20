@@ -6,6 +6,7 @@ import { userService } from "../services/user.service.js";
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { tokenService } from "../services/token.service.js";
+import { validationService } from "../services/validation.service.js";
 
 
 async function validatePassword(password, passwordInDatabase) {
@@ -36,7 +37,7 @@ const getMe = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-  const userBody = req.body;
+  const { name } = req.body;
   const authorization = req.headers['authorization'] || '';
   const [_, token] = authorization.split(' ');
   const userData = jwtService.verify(token);
@@ -49,7 +50,7 @@ const updateUser = async (req, res) => {
     throw ApiError.notFound({ user: `user is not found`});
   }
 
-  const updatedUser = { ...user.dataValues, ...userBody };
+  const updatedUser = { ...user.dataValues, name };
 
   await user.update(updatedUser);
 
@@ -57,7 +58,7 @@ const updateUser = async (req, res) => {
 }
 
 const updateUserEmail = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, confirmEmail, password } = req.body;
   const authorization = req.headers['authorization'] || '';
   const [_, token] = authorization.split(' ');
   const userData = jwtService.verify(token);
@@ -65,6 +66,11 @@ const updateUserEmail = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
+  const confirmEmailValidation = validationService.validateConfirmationEmail(confirmEmail, email);
+
+  if (confirmEmailValidation) {
+    throw ApiError.badRequest(confirmEmailValidation);
+  }
 
   const user = await userService.findById(userData.id);
   if (!user) {

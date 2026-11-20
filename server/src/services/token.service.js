@@ -18,7 +18,7 @@ async function getByToken(refreshToken) {
 }
 
 async function remove(userId) {
-  Token.destroy({ where: { userId }})
+  await Token.destroy({ where: { userId }})
 }
 
 export const tokenService = {

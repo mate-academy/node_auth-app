@@ -20,10 +20,6 @@ app.use(cookieParser());
 app.use(authRouter);
 app.use('/users', userRouter);
 
-app.get('/', (req, res) => {
-  res.send('Hello');
-})
-
 app.use(errorMiddleware);
 app.listen(PORT, () => {
   console.log('Server is running');

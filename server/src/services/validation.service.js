@@ -38,9 +38,22 @@ async function validateOldPassword(password, passwordInDatabase) {
 
 function validateConfirmPassword(password, confirmPassword) {
   if (password !== confirmPassword) {
-    return 'Entered old password is wrong!';
+    return `Password and confirmation password do not match`;
   }
 }
+
+
+const validateConfirmationEmail = (confirmationEmail, email) => {
+  const validationMessage = validateEmail(confirmationEmail);
+
+  if (validationMessage) {
+    return validationMessage;
+  }
+
+  if (email !== confirmationEmail) {
+    return `Confirmation email doesn't match new email`;
+  }
+};
 
 export const validationService = {
   validateEmail,
@@ -48,4 +61,5 @@ export const validationService = {
   validateName,
   validateOldPassword,
   validateConfirmPassword,
+  validateConfirmationEmail,
 }

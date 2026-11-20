@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Formik, Form, Field } from 'formik';
 import cn from 'classnames';
 
@@ -13,6 +13,16 @@ export const ResetPasswordConfirmationPage = () => {
 
   const [error, setError] = usePageError('');
   const { activationToken } = useParams();
+  const [isPassChanged, setPassChanged] = useState(false);
+
+  if (isPassChanged) {
+    return (
+      <div>
+        <p>Password reset successfully!</p>
+        <Link to="/login">Login</Link>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -30,13 +40,9 @@ export const ResetPasswordConfirmationPage = () => {
               token: activationToken,
             })
             .then(() => {
-              navigate('/login');
+              setPassChanged(true);
             })
             .catch(error => {
-              if (error.status === 403) {
-                setRequireActivation(true);
-              }
-
               setError(error.response?.data?.message);
             });
         }}
