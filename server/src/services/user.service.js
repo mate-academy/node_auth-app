@@ -2,6 +2,7 @@ import { ApiError } from '../exeptions/api.error.js';
 import { User } from '../models/user.js';
 import { emailService } from '../services/email.service.js';
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcrypt';
 
 function getAllActivated() {
   return User.findAll({
@@ -66,6 +67,40 @@ async function resetTokenCreateNewPassword(resetToken, password) {
   await user.save();
 }
 
+async function changeName(id, name) {
+  const user = await User.findOne({ where: { id } });
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  user.name = name;
+  await user.save();
+
+  return normalize(user);
+}
+
+async function changePassword(id, oldPassword, newPassword) {
+  const user = await User.findOne({ where: { id } });
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password', {
+      oldPassword: 'Wrong password',
+    });
+  }
+
+  const hashePass = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashePass;
+  await user.save();
+}
+
 export const userService = {
   getAllActivated,
   normalize,
@@ -73,4 +108,6 @@ export const userService = {
   register,
   createTokenResetSendMail,
   resetTokenCreateNewPassword,
+  changeName,
+  changePassword,
 };

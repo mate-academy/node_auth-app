@@ -4,42 +4,15 @@ import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exeptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/token.service.js';
-
-function validateEmail(value) {
-  if (!value) {
-    return 'Email is required';
-  }
-
-  const emailPattern = /^[\w.+-]+@([\w-]+\.){1,3}[\w-]{2,}$/;
-
-  if (!emailPattern.test(value)) {
-    return 'Email is not valid';
-  }
-}
-
-function validatePassword(value) {
-  if (!value) {
-    return 'Password is required';
-  }
-
-  if (value.length < 6) {
-    return 'At least 6 characters';
-  }
-}
-
-function validateName(value) {
-  if (!value) {
-    return 'Name is required';
-  }
-}
+import { validation } from '../utils/validation.js';
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    name: validateName(name),
-    email: validateEmail(email),
-    password: validatePassword(password),
+    name: validation.validateName(name),
+    email: validation.validateEmail(email),
+    password: validation.validatePassword(password),
   };
 
   if (errors.name || errors.email || errors.password) {
@@ -140,7 +113,7 @@ const logout = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
-  const emailError = validateEmail(email);
+  const emailError = validation.validateEmail(email);
 
   if (emailError) {
     throw ApiError.badRequest('Bad request', { email: emailError });
@@ -154,7 +127,7 @@ const resetPassword = async (req, res) => {
   const { resetToken } = req.params;
   const { password, confirmation } = req.body;
 
-  const passwordError = validatePassword(password);
+  const passwordError = validation.validatePassword(password);
 
   if (passwordError) {
     throw ApiError.badRequest('Bad request', { password: passwordError });
