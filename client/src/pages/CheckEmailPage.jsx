@@ -6,14 +6,19 @@ export default function CheckEmailPage() {
 
   return (
     <section className="card">
-      <h1>Перевірте пошту</h1>
+      <h1>Check your email</h1>
       <p>
-        Ми надіслали лист для активації акаунта
-        {email ? <> на <strong>{email}</strong></> : null}. Перейдіть за
-        посиланням у листі, щоб завершити реєстрацію.
+        We have sent an email to activate your account.
+        {email ? (
+          <>
+            {' '}
+            на <strong>{email}</strong>
+          </>
+        ) : null}
+        . Follow the link in the email to complete your registration.
       </p>
       <p className="card__footer">
-        Активували акаунт? <Link to="/login">Увійти</Link>
+        Have you activated your account? <Link to="/login">Log in</Link>
       </p>
     </section>
   );

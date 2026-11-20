@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { loginUser } from '../api/auth';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,12 +19,8 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const data = await loginUser(form);
-      // TODO: збережи токен / дані користувача (context, redux тощо)
-      if (data?.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken);
-      }
-      navigate('/');
+      await login(form);
+      navigate(location.state?.from?.pathname || '/profile', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,7 +30,7 @@ export default function LoginPage() {
 
   return (
     <section className="card">
-      <h1>Вхід</h1>
+      <h1>Log in</h1>
 
       <form className="form" onSubmit={handleSubmit}>
         <label className="field">
@@ -48,7 +46,7 @@ export default function LoginPage() {
         </label>
 
         <label className="field">
-          Пароль
+          Password
           <input
             type="password"
             name="password"
@@ -62,12 +60,12 @@ export default function LoginPage() {
         {error && <p className="form__error">{error}</p>}
 
         <button className="btn btn--primary" disabled={loading}>
-          {loading ? 'Входимо…' : 'Увійти'}
+          {loading ? "Let's go in..." : 'Log in'}
         </button>
       </form>
 
       <p className="card__footer">
-        Немає акаунта? <Link to="/register">Зареєструватися</Link>
+        Don't have an account? <Link to="/register">Register</Link>
       </p>
     </section>
   );

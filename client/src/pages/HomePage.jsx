@@ -1,8 +1,8 @@
 export default function HomePage() {
   return (
     <section className="card">
-      <h1>Головна</h1>
-      <p>Увійдіть або створіть акаунт, щоб продовжити.</p>
+      <h1>Home page</h1>
+      <p>Client test project for implementing authorization and registration</p>
     </section>
   );
 }

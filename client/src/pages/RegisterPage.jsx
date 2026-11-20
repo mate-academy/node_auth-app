@@ -28,11 +28,11 @@ export default function RegisterPage() {
 
   return (
     <section className="card">
-      <h1>Реєстрація</h1>
+      <h1>Registration</h1>
 
       <form className="form" onSubmit={handleSubmit}>
         <label className="field">
-          Імʼя
+          Name
           <input
             type="text"
             name="name"
@@ -56,7 +56,7 @@ export default function RegisterPage() {
         </label>
 
         <label className="field">
-          Пароль
+          Password
           <input
             type="password"
             name="password"
@@ -76,7 +76,7 @@ export default function RegisterPage() {
       </form>
 
       <p className="card__footer">
-        Вже є акаунт? <Link to="/login">Увійти</Link>
+        Already have an account? <Link to="/login">Log in</Link>
       </p>
     </section>
   );

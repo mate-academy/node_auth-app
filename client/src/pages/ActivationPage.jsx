@@ -26,8 +26,8 @@ export default function ActivationPage() {
   if (status === 'loading') {
     return (
       <section className="card">
-        <h1>Активація акаунта</h1>
-        <p>Перевіряємо посилання…</p>
+        <h1>Account activation</h1>
+        <p>Checking the link...</p>
       </section>
     );
   }
@@ -35,10 +35,10 @@ export default function ActivationPage() {
   if (status === 'success') {
     return (
       <section className="card">
-        <h1>Акаунт активовано</h1>
-        <p>Ваша пошта підтверджена. Тепер можна увійти в акаунт.</p>
+        <h1>Account activated</h1>
+        <p>Your email has been verified. You can now log in to your account.</p>
         <Link to="/login" className="btn btn--primary">
-          Увійти
+          Log in
         </Link>
       </section>
     );
@@ -46,14 +46,11 @@ export default function ActivationPage() {
 
   return (
     <section className="card">
-      <h1>Посилання не активне</h1>
-      <p>
-        {message ||
-          'Це посилання недійсне або вже було використане.'}
-      </p>
+      <h1>The link is not active.</h1>
+      <p>{message || 'This link is invalid or has already been used.'}</p>
       <p className="card__footer">
-        Спробуйте <Link to="/register">зареєструватися</Link> ще раз або{' '}
-        <Link to="/login">увійти</Link>, якщо акаунт уже активований.
+        Try <Link to="/register">register</Link> again or{' '}
+        <Link to="/login">log in</Link> if your account is already active.
       </p>
     </section>
   );
