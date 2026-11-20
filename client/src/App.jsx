@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import CheckEmailPage from './pages/CheckEmailPage';
+import ActivationPage from './pages/ActivationPage';
 
 export default function App() {
   return (
@@ -15,6 +16,10 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/check-email" element={<CheckEmailPage />} />
+           <Route
+            path="/activate/:activationToken"
+            element={<ActivationPage />}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

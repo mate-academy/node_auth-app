@@ -5,3 +5,6 @@ export const registerUser = ({ name, email, password }) =>
 
 export const loginUser = ({ email, password }) =>
   request('/login', { method: 'POST', body: { email, password } });
+
+export const activateUser = (activationToken) =>
+  request(`/activation/${encodeURIComponent(activationToken)}`);
