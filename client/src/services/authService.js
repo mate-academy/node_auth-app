@@ -32,10 +32,10 @@ function resetPassword({ email }) {
   return authClient.post('/reset-password', { email });
 }
 
-function resetPasswordConfirm({ password, confirmPassword, token }) {
+function resetPasswordConfirm({ password, confirmation, token }) {
   return authClient.patch('/reset-password', {
     password,
-    confirmation: confirmPassword,
+    confirmation,
     token,
   });
 }

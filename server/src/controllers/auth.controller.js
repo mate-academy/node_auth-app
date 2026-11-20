@@ -58,7 +58,7 @@ const activate = async (req, res) => {
   user.activationToken = null;
   await user.save();
 
-  res.send(userService.normalize(user));
+  await generateTokens(res, user);
 }
 
 const login = async (req, res) => {
@@ -89,7 +89,7 @@ const logout = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  tokenService.remove(userData.id);
+  await tokenService.remove(userData.id);
 
   res.sendStatus(204);
 }

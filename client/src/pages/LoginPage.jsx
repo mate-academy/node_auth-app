@@ -60,7 +60,7 @@ export const LoginPage = () => {
                 setRequireActivation(true);
               }
 
-              setError(error.response?.data?.message);
+              setError(error.response?.data?.message || error.message);
             });
         }}
       >

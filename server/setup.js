@@ -4,5 +4,6 @@ import './src/models/user.js';
 import './src/models/token.js';
 
 client.sync({
-  force: true
-})
+  alter: false,
+  force: false,
+});

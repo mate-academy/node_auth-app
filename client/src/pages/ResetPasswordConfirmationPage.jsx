@@ -29,14 +29,14 @@ export const ResetPasswordConfirmationPage = () => {
       <Formik
         initialValues={{
           password: '',
-          confirmPassword: '',
+          confirmation: '',
         }}
         validateOnMount={true}
-        onSubmit={({ password, confirmPassword }) => {
+        onSubmit={({ password, confirmation }) => {
           return authService
             .resetPasswordConfirm({
               password,
-              confirmPassword,
+              confirmation,
               token: activationToken,
             })
             .then(() => {
@@ -86,7 +86,7 @@ export const ResetPasswordConfirmationPage = () => {
             </div>
 
             <div className="field">
-              <label htmlFor="confirmPassword" className="label">
+              <label htmlFor="confirmation" className="label">
                 Confirm password
               </label>
 
@@ -98,13 +98,13 @@ export const ResetPasswordConfirmationPage = () => {
                       values.password,
                     );
                   }}
-                  name="confirmPassword"
+                  name="confirmation"
                   type="password"
-                  id="confirmPassword"
+                  id="confirmation"
                   placeholder="*******"
                   className={cn('input', {
                     'is-danger':
-                      touched.confirmPassword && errors.confirmPassword,
+                      touched.confirmation && errors.confirmation,
                   })}
                 />
 
@@ -112,15 +112,15 @@ export const ResetPasswordConfirmationPage = () => {
                   <i className="fa fa-lock"></i>
                 </span>
 
-                {touched.confirmPassword && errors.confirmPassword && (
+                {touched.confirmation && errors.confirmation && (
                   <span className="icon is-small is-right has-text-danger">
                     <i className="fas fa-exclamation-triangle"></i>
                   </span>
                 )}
               </div>
 
-              {touched.confirmPassword && errors.confirmPassword ? (
-                <p className="help is-danger">{errors.confirmPassword}</p>
+              {touched.confirmation && errors.confirmation ? (
+                <p className="help is-danger">{errors.confirmation}</p>
               ) : (
                 <p className="help">At least 6 characters</p>
               )}
@@ -132,7 +132,7 @@ export const ResetPasswordConfirmationPage = () => {
                   'is-loading': isSubmitting,
                 })}
                 disabled={
-                  isSubmitting || errors.confirmPassword || errors.password
+                  isSubmitting || errors.confirmation || errors.password
                 }
               >
                 Confirm

@@ -29,12 +29,13 @@ const register = async ({ email, password, name }) => {
       email: 'Email is already used'
     })
   }
-  const email = validationService.validateEmail(email);
-  const name = validationService.validateName(name);
-  const password = validationService.validatePassword(password);
-  const errors = { email, name, password };
+  const errors = { 
+    email: validationService.validateEmail(email),
+    name: validationService.validateName(name),
+    password: validationService.validatePassword(password),
+  };
 
-  if (email || name || password) {
+  if (errors.email || errors.name || errors.password) {
     throw ApiError.badRequest('validation error', errors);
   }
 

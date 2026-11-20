@@ -21,9 +21,6 @@ export const ProfilePage = () => {
   const [error, setError] = usePageError('');
   const { profile: user, getProfile } = useContext(ProfileContext);
   const [activeTab, setActiveTab] = useState(PROFILE_TAB.hidden);
-  const [isChangeName, setChangeName] = useState(false);
-  const [isChangePass, setChangePass] = useState(false);
-  const [isChangeEmail, setChangeEmail] = useState(false);
 
   const onChangeNameSubmit = ({ name }, formikHelpers) => {
     formikHelpers.setSubmitting(true);
@@ -94,7 +91,7 @@ export const ProfilePage = () => {
     formikHelpers.setSubmitting(true);
 
     userService
-      .updateEmail({ email, confirmEmail, password })
+      .updateEmail({ email, confirmation: confirmEmail, password })
       .catch(error => {
         if (error.message) {
           setError(error.message);
@@ -108,6 +105,7 @@ export const ProfilePage = () => {
 
         formikHelpers.setFieldError('email', errors?.email);
         formikHelpers.setFieldError('password', errors?.password);
+        formikHelpers.setFieldError('confirmEmail', errors?.confirmation);
 
         if (message) {
           setError(message);
@@ -230,7 +228,7 @@ export const ProfilePage = () => {
                 <button
                   type="button"
                   className={cn('button is-danger has-text-weight-bold')}
-                  onClick={() => setChangeName(false)}
+                  onClick={() => setActiveTab(PROFILE_TAB.hidden)}
                 >
                   Cancel
                 </button>
@@ -375,7 +373,7 @@ export const ProfilePage = () => {
                 <button
                   type="button"
                   className={cn('button is-danger has-text-weight-bold')}
-                  onClick={() => setChangePass(false)}
+                  onClick={() => setActiveTab(PROFILE_TAB.hidden)}
                 >
                   Cancel
                 </button>
@@ -520,7 +518,7 @@ export const ProfilePage = () => {
                 <button
                   type="button"
                   className={cn('button is-danger has-text-weight-bold')}
-                  onClick={() => setChangePass(false)}
+                  onClick={() => setActiveTab(PROFILE_TAB.hidden)}
                 >
                   Cancel
                 </button>

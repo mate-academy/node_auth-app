@@ -107,15 +107,15 @@ function App() {
                 path="/passwordReset/activation/:activationToken"
                 element={<ResetPasswordConfirmationPage />}
               />
+              <Route
+                path="/changeEmail/activation/:activationToken"
+                element={<EmailActivationPage />}
+              />
             </Route>
 
             <Route path="/" element={<RequireAuth />}>
               <Route path="profile" element={<ProfilePage />} />
             </Route>
-            <Route
-              path="/changeEmail/activation/:activationToken"
-              element={<EmailActivationPage />}
-            />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </section>

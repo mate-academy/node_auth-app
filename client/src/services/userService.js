@@ -12,8 +12,8 @@ function updateUserName({ name }) {
   return httpClient.put(`/users/me`, { name });
 }
 
-function updateEmail({ email, confirmEmail, password }) {
-  return httpClient.patch(`/users/me/email`, { email, confirmEmail, password });
+function updateEmail({ email, confirmation, password }) {
+  return httpClient.patch(`/users/me/email`, { email, confirmation, password });
 }
 
 function activateChangeEmail({ token }) {

@@ -58,7 +58,7 @@ const updateUser = async (req, res) => {
 }
 
 const updateUserEmail = async (req, res) => {
-  const { email, confirmEmail, password } = req.body;
+  const { email, confirmation, password } = req.body;
   const authorization = req.headers['authorization'] || '';
   const [_, token] = authorization.split(' ');
   const userData = jwtService.verify(token);
@@ -66,10 +66,10 @@ const updateUserEmail = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  const confirmEmailValidation = validationService.validateConfirmationEmail(confirmEmail, email);
+  const confirmEmailValidation = validationService.validateConfirmationEmail(confirmation, email);
 
   if (confirmEmailValidation) {
-    throw ApiError.badRequest(confirmEmailValidation);
+    throw ApiError.badRequest(confirmEmailValidation, { confirmation: confirmEmailValidation });
   }
 
   const user = await userService.findById(userData.id);
@@ -78,12 +78,12 @@ const updateUserEmail = async (req, res) => {
   }
   const invalidPass = await validatePassword(password, user.password);
   if (invalidPass) {
-    throw ApiError.badRequest('Wrong password');
+    throw ApiError.badRequest('Wrong password', { password: 'wrong password' });
   }
 
   const isExist = await userService.findByEmail(email);
   if (isExist) {
-     throw ApiError.badRequest('Email already in use');
+     throw ApiError.badRequest('Email already in use', { email: 'Email already in use' });
   }
   const emailChangeToken = uuidv4();
 
