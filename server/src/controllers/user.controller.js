@@ -50,8 +50,37 @@ const changePassword = async (req, res) => {
   res.send({ message: 'Password changed' });
 };
 
+const changeEmail = async (req, res) => {
+  const { id } = req.user;
+  const { password, newEmail } = req.body;
+
+  if (!password) {
+    throw ApiError.badRequest('Bad request', {
+      password: 'Password is required',
+    });
+  }
+
+  const newEmailError = validation.validateEmail(newEmail);
+
+  if (newEmailError) {
+    throw ApiError.badRequest('Bad request', {
+      newEmail: newEmailError,
+    });
+  }
+
+  if (newEmail === req.user.email) {
+    throw ApiError.badRequest('Bad request', {
+      newEmail: 'This is your current email',
+    });
+  }
+
+  await userService.changeEmail(id, password, newEmail);
+  res.send({ message: 'Confirmation email sent' });
+};
+
 export const userController = {
   getAllActivated,
   changeName,
   changePassword,
+  changeEmail,
 };

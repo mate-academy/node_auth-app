@@ -96,8 +96,53 @@ function sendResetEmail(email, token) {
   });
 }
 
+function sendChangeEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/change-email/${token}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; background: #f4f5f7; padding: 40px 0;">
+      <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 32px; text-align: center;">
+        <h1 style="margin: 0 0 16px; font-size: 24px; color: #1f2937;">
+          📧 Confirm your new email
+        </h1>
+
+        <p style="margin: 0 0 24px; font-size: 16px; color: #4b5563; line-height: 1.5;">
+          You requested to change the email for your account to this address.
+          Click the button below to confirm it.
+        </p>
+
+        <a
+          href="${href}"
+          style="display: inline-block; padding: 14px 28px; background: #3b82f6; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: bold;"
+        >
+          Confirm email
+        </a>
+
+        <p style="margin: 24px 0 8px; font-size: 13px; color: #9ca3af;">
+          If the button doesn't work, copy this link:
+        </p>
+
+        <a href="${href}" style="font-size: 13px; color: #3b82f6; word-break: break-all;">
+          ${href}
+        </a>
+
+        <p style="margin: 24px 0 0; font-size: 13px; color: #9ca3af;">
+          If you didn't request this change, just ignore this email.
+          Your current email will stay the same.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return send({
+    email,
+    subject: 'Change your email',
+    html,
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
   sendResetEmail,
   send,
+  sendChangeEmail,
 };

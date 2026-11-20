@@ -18,3 +18,9 @@ userRoute.patch(
   authMiddlewares,
   catchError(userController.changePassword),
 );
+
+userRoute.patch(
+  '/change-email',
+  authMiddlewares,
+  catchError(userController.changeEmail),
+);

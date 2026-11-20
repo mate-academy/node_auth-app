@@ -25,4 +25,10 @@ export const User = client.define('user', {
   resetToken: {
     type: DataTypes.STRING,
   },
+  newEmail: {
+    type: DataTypes.STRING,
+  },
+  resetEmailToken: {
+    type: DataTypes.STRING,
+  },
 });

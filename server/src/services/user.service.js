@@ -101,6 +101,38 @@ async function changePassword(id, oldPassword, newPassword) {
   await user.save();
 }
 
+async function changeEmail(id, password, newEmail) {
+  const user = await User.findOne({ where: { id } });
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong password', {
+      password: 'Wrong password',
+    });
+  }
+
+  const existUser = await findByEmail(newEmail);
+
+  if (existUser) {
+    throw ApiError.badRequest('Bad request', {
+      newEmail: 'Email is already taken',
+    });
+  }
+
+  const resetEmailToken = uuidv4();
+
+  user.resetEmailToken = resetEmailToken;
+  user.newEmail = newEmail;
+  await user.save();
+
+  await emailService.sendChangeEmail(newEmail, resetEmailToken);
+}
+
 export const userService = {
   getAllActivated,
   normalize,
@@ -110,4 +142,5 @@ export const userService = {
   resetTokenCreateNewPassword,
   changeName,
   changePassword,
+  changeEmail,
 };
