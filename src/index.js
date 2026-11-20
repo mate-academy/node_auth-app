@@ -3,6 +3,7 @@ import express from 'express';
 import 'dotenv/config';
 import { authRouter } from './routes/auth.route.js';
 import cors from 'cors';
+import { errorMiddleware } from './middlewares/errorMiddleware.js';
 
 const PORT = process.env.PORT || 3004;
 
@@ -23,3 +24,5 @@ app.get('/', (req, res) => {
 
 // eslint-disable-next-line no-console
 app.listen(PORT, () => console.log('Server is running...'));
+
+app.use(errorMiddleware);

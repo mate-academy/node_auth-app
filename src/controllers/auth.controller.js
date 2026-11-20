@@ -1,23 +1,33 @@
 import { User } from '../models/user.js';
-import { emailService } from '../services/email.service.js';
-import { v4 as uuidv4 } from 'uuid';
 import { userService } from '../services/user.service.js';
 import { jwtService } from '../services/jwt.service.js';
+import { ApiError } from '../exceptions/api.error.js';
+
+export function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  return !emailRegex.test(email);
+}
+
+export function validatePassword(password) {
+  return typeof password !== 'string' || password.length < 6;
+}
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
 
-  const activationToken = uuidv4();
-  const newUser = await User.create({
-    name,
-    email,
-    password,
-    activationToken,
-  });
+  const errors = {
+    email: validateEmail(email),
+    password: validatePassword(password),
+  };
 
-  await emailService.sendActivationEmail(email, activationToken);
+  if (errors.email || errors.password) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
 
-  res.send(newUser);
+  await userService.register(name, email, password);
+
+  res.send({ message: 'OK' });
 };
 
 const activate = async (req, res) => {
@@ -41,11 +51,11 @@ const login = async (req, res) => {
   const user = await userService.findByEmail(email);
 
   if (user.activationToken) {
-    return res.status(403).send({ message: 'Activate your account via email' });
+    throw ApiError.badRequest('Activate your account via email');
   }
 
   if (!user || user.password !== password) {
-    return res.status(401).send({ message: 'Wrong email or password' });
+    throw ApiError.badRequest('Wrong email or password');
   }
 
   const normalizedUser = userService.normalize(user);
