@@ -1,0 +1,22 @@
+.earth {
+  position: fixed;
+  top: 50%;
+  left: 20vh;
+  width: 30vh;
+  transform: translateY(-50%);
+  pointer-events: none;
+  filter: drop-shadow(0 0 80px rgba(90, 160, 255, 0.45));
+}
+.photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  mask-image: radial-gradient(circle closest-side, #000 94%, transparent 97%);
+}
+
+@media (max-width: 768px) {
+  .earth {
+    width: 260px;
+    left: -100px;
+  }
+}

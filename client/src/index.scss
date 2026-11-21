@@ -1,0 +1,13 @@
+$bg: #000;
+$text: #e8eaf2;
+
+html,
+body {
+  min-height: 100vh;
+  background: $bg;
+  color: $text;
+}
+
+#root {
+  min-height: 100vh;
+}

@@ -1,10 +1,13 @@
+import { Earth } from "./components/Earth"
+import { Starfield } from "./components/Starfield"
 
 export const App = () => {
  
 
   return (
    <div>
-    <div>AUth client</div>
+    <Starfield />
+    <Earth />
    </div>
   )
 }
