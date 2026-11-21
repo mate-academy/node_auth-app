@@ -20,3 +20,8 @@ authRoute.patch(
   '/reset-password/:resetToken',
   catchError(authControllers.resetPassword),
 );
+
+authRoute.patch(
+  '/change-email/:resetEmailToken',
+  catchError(authControllers.confirmEmail),
+);

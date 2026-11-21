@@ -140,9 +140,41 @@ function sendChangeEmail(email, token) {
   });
 }
 
+function sendEmailChangedNotice(oldEmail, newEmail) {
+  const html = `
+    <div style="font-family: Arial, sans-serif; background: #f4f5f7; padding: 40px 0;">
+      <div style="max-width: 480px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 32px; text-align: center;">
+        <h1 style="margin: 0 0 16px; font-size: 24px; color: #1f2937;">
+          ⚠️ Your email was changed
+        </h1>
+
+        <p style="margin: 0 0 16px; font-size: 16px; color: #4b5563; line-height: 1.5;">
+          The email for your account was changed to:
+        </p>
+
+        <p style="margin: 0 0 24px; font-size: 18px; font-weight: bold; color: #1f2937;">
+          ${newEmail}
+        </p>
+
+        <p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5;">
+          If you made this change, you can ignore this email.<br>
+          If it wasn't you, please contact support immediately.
+        </p>
+      </div>
+    </div>
+  `;
+
+  return send({
+    email: oldEmail,
+    subject: 'Your email was changed',
+    html,
+  });
+}
+
 export const emailService = {
   sendActivationEmail,
   sendResetEmail,
   send,
   sendChangeEmail,
+  sendEmailChangedNotice,
 };

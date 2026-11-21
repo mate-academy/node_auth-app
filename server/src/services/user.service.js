@@ -133,6 +133,25 @@ async function changeEmail(id, password, newEmail) {
   await emailService.sendChangeEmail(newEmail, resetEmailToken);
 }
 
+async function confirmEmail(resetEmailToken) {
+  const user = await User.findOne({ where: { resetEmailToken } });
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  const oldEmail = user.email;
+
+  user.resetEmailToken = null;
+  user.email = user.newEmail;
+  user.newEmail = null;
+  await user.save();
+
+  await emailService.sendEmailChangedNotice(oldEmail, user.email);
+
+  return normalize(user);
+}
+
 export const userService = {
   getAllActivated,
   normalize,
@@ -143,4 +162,5 @@ export const userService = {
   changeName,
   changePassword,
   changeEmail,
+  confirmEmail,
 };

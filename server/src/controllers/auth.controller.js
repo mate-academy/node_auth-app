@@ -72,7 +72,11 @@ const refresh = async (req, res) => {
     throw ApiError.unauthorized();
   }
 
-  const user = await userService.findByEmail(userData.email);
+  const user = await User.findByPk(userData.id);
+
+  if (!user) {
+    throw ApiError.unauthorized();
+  }
 
   await generateTokens(res, user);
 };
@@ -146,6 +150,14 @@ const resetPassword = async (req, res) => {
   res.send({ message: 'Password is reset' });
 };
 
+const confirmEmail = async (req, res) => {
+  const { resetEmailToken } = req.params;
+
+  const user = await userService.confirmEmail(resetEmailToken);
+
+  res.send(user);
+};
+
 export const authControllers = {
   register,
   activate,
@@ -154,4 +166,5 @@ export const authControllers = {
   logout,
   forgotPassword,
   resetPassword,
+  confirmEmail,
 };
