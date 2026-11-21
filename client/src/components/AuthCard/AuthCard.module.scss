@@ -1,0 +1,32 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+// сама скляна картка
+.authCard {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 36px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  background: rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(18px);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08); 
+
+  :global(.title) {
+    color: #fff;
+  }
+
+  :global(.subtitle) {
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 28px;
+  }
+}
