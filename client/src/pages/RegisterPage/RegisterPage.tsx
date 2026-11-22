@@ -11,6 +11,8 @@ export const RegisterPage = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const isPasswordLong = password.length >= 6;
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -90,18 +92,30 @@ export const RegisterPage = () => {
           <label className="label" htmlFor="password">
             Password
           </label>
-          <div className="control">
-            <input
-              className="input"
-              type="password"
-              autoComplete="new-password"
-              placeholder="Password"
-              id="password"
-              required
-              minLength={6}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
+          <div className="field has-addons mb-0">
+            <div className="control is-expanded">
+              <input
+                className="input"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
+                placeholder="Password"
+                id="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </div>
+            <div className="control">
+              <button
+                type="button"
+                className="button"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? '🌝' : '🌚'}
+              </button>
+            </div>
           </div>
           {errors.password && (
             <p className="help is-danger">{errors.password}</p>
