@@ -3,14 +3,14 @@ import { AuthCard } from '../../components/AuthCard';
 import axios from 'axios';
 import { useState } from 'react';
 import { authApi } from '../../api/authApi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const [isLogin, setIsLogin] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -20,7 +20,7 @@ export const LoginPage = () => {
 
     try {
       await authApi.login(email, password);
-      setIsLogin(true);
+      navigate('/profile');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const { message } = error.response.data;
@@ -30,10 +30,6 @@ export const LoginPage = () => {
       }
     }
   };
-
-  if (isLogin) {
-    return <p>Users</p>;
-  }
 
   return (
     <AuthCard title="Login" subtitle="Welcome back">
@@ -93,7 +89,7 @@ export const LoginPage = () => {
         {errors.form && <p className="help is-danger mb-3">{errors.form}</p>}
 
         <button className="button is-link is-fullwidth" type="submit">
-          Sign up
+          Log in
         </button>
       </form>
       <p className="has-text-centered mt-4">

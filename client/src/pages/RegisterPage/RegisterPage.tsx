@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthCard } from '../../components/AuthCard';
 import { authApi } from '../../api/authApi';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 export const RegisterPage = () => {
   const [name, setName] = useState('');
@@ -133,6 +134,9 @@ export const RegisterPage = () => {
           Sign up
         </button>
       </form>
+      <p className="has-text-centered mt-4">
+        You have an account? <Link to="/login">Log in</Link>
+      </p>
     </AuthCard>
   );
 };
