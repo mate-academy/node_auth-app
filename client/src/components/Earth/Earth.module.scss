@@ -14,10 +14,3 @@
   height: auto;
   mask-image: radial-gradient(circle closest-side, #000 70%, transparent 90%);
 }
-
-@media (max-width: 768px) {
-  .earth {
-    width: 260px;
-    left: -100px;
-  }
-}
