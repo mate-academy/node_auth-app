@@ -4,6 +4,7 @@ import { Starfield } from './components/Starfield';
 import { RegisterPage } from './pages/RegisterPage';
 // import { NotFoundPage } from './pages/NotFoundPage';
 import { ActivatePage } from './pages/ActivatePage';
+import { LoginPage } from './pages/LoginPage';
 
 export const App = () => {
   return (
@@ -11,9 +12,10 @@ export const App = () => {
       <Starfield />
       <Earth />
       <Routes>
-        <Route path="/" element={<Navigate to="/register" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/activate/:activationToken" element={<ActivatePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="*" element={<h1>404</h1>} />
       </Routes>
     </div>

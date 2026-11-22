@@ -9,10 +9,18 @@ const register = (name: string, email: string, password: string) => {
 };
 
 const activate = (activationToken: string) => {
-  return api.get(`/activation/${activationToken}`)
+  return api.get(`/activation/${activationToken}`);
+};
+
+const login = (email: string, password: string) => {
+  return api.post('/login', {
+    email,
+    password,
+  });
 };
 
 export const authApi = {
   register,
   activate,
+  login,
 };
