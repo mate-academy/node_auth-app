@@ -26,9 +26,18 @@ export const Starfield = () => {
   return (
     <div className={styles.starfield} aria-hidden="true">
       <div className={styles.milky} />
-      <div className={`${styles.layer} ${styles.small}`} style={{ boxShadow: stars.small }} />
-      <div className={`${styles.layer} ${styles.medium}`} style={{ boxShadow: stars.medium }} />
-      <div className={`${styles.layer} ${styles.big}`} style={{ boxShadow: stars.big }} />
+      <div
+        className={`${styles.layer} ${styles.small}`}
+        style={{ boxShadow: stars.small }}
+      />
+      <div
+        className={`${styles.layer} ${styles.medium}`}
+        style={{ boxShadow: stars.medium }}
+      />
+      <div
+        className={`${styles.layer} ${styles.big}`}
+        style={{ boxShadow: stars.big }}
+      />
       <div className={styles.shooting} />
     </div>
   );

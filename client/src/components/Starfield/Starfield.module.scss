@@ -10,8 +10,16 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 18% at 50% 50%, rgba(120, 130, 255, 0.07), transparent 70%),
-    radial-gradient(ellipse 40% 10% at 30% 40%, rgba(255, 255, 255, 0.04), transparent 70%);
+    radial-gradient(
+      ellipse 60% 18% at 50% 50%,
+      rgba(120, 130, 255, 0.07),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 10% at 30% 40%,
+      rgba(255, 255, 255, 0.04),
+      transparent 70%
+    );
   transform: rotate(-18deg) scale(1.4);
 }
 
@@ -56,13 +64,28 @@
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 
 @keyframes shoot {
-  0% { transform: translate(0, 0) rotate(-28deg); opacity: 0; }
-  2% { opacity: 1; }
-  12% { transform: translate(-500px, 265px) rotate(-28deg); opacity: 0; }
-  100% { opacity: 0; }
+  0% {
+    transform: translate(0, 0) rotate(-28deg);
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+  }
+  12% {
+    transform: translate(-500px, 265px) rotate(-28deg);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }

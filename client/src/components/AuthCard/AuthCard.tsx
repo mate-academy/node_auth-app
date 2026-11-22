@@ -1,10 +1,10 @@
-import type React from "react";
-import styles from "./AuthCard.module.scss";
+import type React from 'react';
+import styles from './AuthCard.module.scss';
 
 type Props = {
   title: string;
   subtitle?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export const AuthCard: React.FC<Props> = ({ title, subtitle, children }) => {
