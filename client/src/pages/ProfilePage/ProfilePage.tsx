@@ -3,8 +3,20 @@ import { AuthCard } from '../../components/AuthCard';
 import { useAuth } from '../../context/AuthContext';
 
 export const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, isChecking } = useAuth();
 
+  if (isChecking) {
+    return (
+      <AuthCard title="Loading... 🛰️">
+        <div className="has-text-centered">
+          <span
+            className="button is-loading is-ghost is-large"
+            aria-label="Loading"
+          />
+        </div>
+      </AuthCard>
+    );
+  }
   if (!user) {
     return <Navigate to={'/login'} replace />;
   }
