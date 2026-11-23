@@ -12,6 +12,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetEmailSentPage from './pages/ResetEmailSentPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ResetSuccessPage from './pages/ResetSuccessPage';
+import ConfirmEmailPage from './pages/ConfirmEmailPage';
 
 export default function App() {
   return (
@@ -37,6 +38,8 @@ export default function App() {
           <Route element={<RequireAuth />}>
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
+
+          <Route path="/confirm-email/:token" element={<ConfirmEmailPage />} />
 
           <Route
             path="/activation/:activationToken"

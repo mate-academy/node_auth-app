@@ -27,4 +27,16 @@ export const User = client.define('user', {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  pendingEmail: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  emailChangeToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  emailChangeExpires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 });

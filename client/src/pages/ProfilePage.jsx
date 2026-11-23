@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ChangePasswordForm from '../components/ChangePasswordForm';
+import ChangeEmailForm from '../components/ChangeEmailForm';
 
 export default function ProfilePage() {
   const { user, updateName } = useAuth();
@@ -90,6 +91,7 @@ export default function ProfilePage() {
       )}
 
       <ChangePasswordForm />
+      <ChangeEmailForm />
     </section>
   );
 }

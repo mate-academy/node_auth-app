@@ -28,3 +28,9 @@ export const changePassword = ({ oldPassword, newPassword, confirmation }) =>
     method: 'PATCH',
     body: { oldPassword, newPassword, confirmation },
   });
+
+  export const requestEmailChange = ({ password, newEmail }) =>
+  request('/profile/email', { method: 'PATCH', body: { password, newEmail } });
+
+export const confirmEmailChange = (token) =>
+  request(`/email-change/${encodeURIComponent(token)}`);

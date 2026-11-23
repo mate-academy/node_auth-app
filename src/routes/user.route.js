@@ -16,3 +16,14 @@ userRouter.patch(
   authMiddleware,
   catchError(userController.changePassword),
 );
+
+userRouter.patch(
+  '/profile/email',
+  authMiddleware,
+  catchError(userController.requestEmailChange),
+);
+
+userRouter.get(
+  '/email-change/:token',
+  catchError(userController.confirmEmailChange),
+);

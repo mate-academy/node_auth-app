@@ -40,8 +40,31 @@ function sendPasswordResetEmail(email, token) {
   return send({ email, html, subject: 'Reset password' });
 }
 
+function sendEmailChangeConfirmation(newEmail, token) {
+  const href = `${process.env.CLIENT_HOST}/confirm-email/${token}`;
+  const html = `
+    <h1>Confirm your new email</h1>
+    <p>The link is valid for 1 hour.</p>
+    <a href="${href}">${href}</a>
+  `;
+
+  return send({ email: newEmail, html, subject: 'Confirm new email' });
+}
+
+function sendEmailChangedNotification(oldEmail, newEmail) {
+  const html = `
+    <h1>Your email was changed</h1>
+    <p>The email of your account was changed to <strong>${newEmail}</strong>.</p>
+    <p>If this wasn't you, reset your password immediately.</p>
+  `;
+
+  return send({ email: oldEmail, html, subject: 'Email changed' });
+}
+
 export const emailService = {
   send,
   sendActivationEmail,
   sendPasswordResetEmail,
+  sendEmailChangedNotification,
+  sendEmailChangeConfirmation,
 };
