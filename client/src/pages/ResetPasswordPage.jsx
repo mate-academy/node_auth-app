@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
             value={form.password}
             onChange={handleChange}
             autoComplete="new-password"
-            minLength={6}
+            minLength={PASSWORD_MIN_LENGTH}
             required
           />
           <small className="field__hint">
@@ -63,7 +63,7 @@ export default function ResetPasswordPage() {
             value={form.confirmation}
             onChange={handleChange}
             autoComplete="new-password"
-            minLength={6}
+            minLength={PASSWORD_MIN_LENGTH}
             required
           />
         </label>

@@ -22,10 +22,6 @@ app.use(cookieParser());
 app.use(authRouter);
 app.use(userRouter);
 
-app.get('/', (req, res) => {
-  res.send('Hello!');
-});
-
 // eslint-disable-next-line no-console
 app.listen(PORT, () => console.log('Server is running...'));
 

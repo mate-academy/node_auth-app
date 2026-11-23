@@ -62,7 +62,7 @@ export default function ChangePasswordForm() {
           value={form.newPassword}
           onChange={handleChange}
           autoComplete="new-password"
-          minLength={{PASSWORD_MIN_LENGTH}}
+          minLength={PASSWORD_MIN_LENGTH}
           required
         />
         <small className="field__hint">
@@ -78,7 +78,7 @@ export default function ChangePasswordForm() {
           value={form.confirmation}
           onChange={handleChange}
           autoComplete="new-password"
-          minLength={{PASSWORD_MIN_LENGTH}}
+          minLength={PASSWORD_MIN_LENGTH}
           required
         />
       </label>
