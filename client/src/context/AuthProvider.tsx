@@ -21,9 +21,9 @@ export const AuthProvider = ({ children }: Props) => {
 
     isRequested.current = true;
 
-    const refresh = async() => {
+    const checkAuth  = async() => {
       try {
-        const {data} = await authApi.checkAuth();
+        const {data} = await authApi.refresh();
         setUser(data.user);
       } catch {
         setUser(null);
@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }: Props) => {
         setIsChecking(false);
       }
     }
-    refresh();
+    checkAuth ();
   }, [])
 
   return (

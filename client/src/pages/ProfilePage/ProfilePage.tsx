@@ -1,9 +1,17 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { AuthCard } from '../../components/AuthCard';
 import { useAuth } from '../../context/AuthContext';
+import { authApi } from '../../api/authApi';
 
 export const ProfilePage = () => {
-  const { user, isChecking } = useAuth();
+  const { user, isChecking, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogOut = async () => {
+   await authApi.logOut();
+    setUser(null);
+    navigate('/login');
+  };
 
   if (isChecking) {
     return (
@@ -47,6 +55,14 @@ export const ProfilePage = () => {
       </p>
 
       <p className="has-text-centered has-text-grey-light mb-5">{user.email}</p>
+      <button
+        type="button"
+        className="button is-small is-danger is-outlined"
+        style={{ position: 'absolute', top: 5, right: 16 }}
+        onClick={handleLogOut}
+      >
+        Log out
+      </button>
     </AuthCard>
   );
 };

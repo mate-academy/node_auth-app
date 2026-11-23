@@ -25,13 +25,18 @@ const login = (email: string, password: string) => {
   });
 };
 
-const checkAuth = () => {
+const refresh = () => {
   return api.get<AuthResponse>('/refresh')
+};
+
+const logOut = () => {
+  return api.post('/logout');
 };
 
 export const authApi = {
   register,
   activate,
   login,
-  checkAuth,
+  refresh,
+  logOut,
 };
