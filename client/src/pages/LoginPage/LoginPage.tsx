@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { authApi } from '../../api/authApi';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -14,12 +15,15 @@ export const LoginPage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const { setUser } = useAuth();
+
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrors({});
 
     try {
-      await authApi.login(email, password);
+      const { data } = await authApi.login(email, password);
+      setUser(data.user);
       navigate('/profile');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
