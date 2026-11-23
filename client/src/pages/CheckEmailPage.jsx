@@ -12,7 +12,7 @@ export default function CheckEmailPage() {
         {email ? (
           <>
             {' '}
-            на <strong>{email}</strong>
+            to <strong>{email}</strong>
           </>
         ) : null}
         . Follow the link in the email to complete your registration.

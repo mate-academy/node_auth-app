@@ -34,18 +34,20 @@ export default function App() {
               element={<ResetPasswordPage />}
             />
             <Route path="/reset-success" element={<ResetSuccessPage />} />
+            <Route
+              path="/activation/:activationToken"
+              element={<ActivationPage />}
+            />
+            <Route
+              path="/confirm-email/:token"
+              element={<ConfirmEmailPage />}
+            />
           </Route>
 
           <Route element={<RequireAuth />}>
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
 
-          <Route path="/confirm-email/:token" element={<ConfirmEmailPage />} />
-
-          <Route
-            path="/activation/:activationToken"
-            element={<ActivationPage />}
-          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
