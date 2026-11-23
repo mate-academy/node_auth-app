@@ -4,6 +4,9 @@ import { jwtService } from '../services/jwt.service.js';
 import { ApiError } from '../exceptions/api.error.js';
 import bcrypt from 'bcrypt';
 import { tokenService } from '../services/token.service.js';
+import { emailService } from '../services/email.service.js';
+import { v4 as uuidv4 } from 'uuid';
+import { Op } from 'sequelize';
 
 function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -123,10 +126,65 @@ const logout = async (req, res) => {
   res.sendStatus(204);
 };
 
+const requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+
+  if (validateEmail(email)) {
+    throw ApiError.badRequest('Invalid email');
+  }
+
+  const user = await userService.findByEmail(email);
+
+  if (user && !user.activationToken) {
+    user.resetToken = uuidv4();
+    user.resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+
+    await emailService.sendPasswordResetEmail(email, user.resetToken);
+  }
+
+  res.send({ message: 'OK' });
+};
+
+const resetPassword = async (req, res) => {
+  const { resetToken } = req.params;
+  const { password, confirmation } = req.body;
+
+  if (validatePassword(password)) {
+    throw ApiError.badRequest('Password must be at least 6 characters');
+  }
+
+  if (password !== confirmation) {
+    throw ApiError.badRequest('Passwords do not match');
+  }
+
+  const user = await User.findOne({
+    where: {
+      resetToken,
+      resetTokenExpires: { [Op.gt]: new Date() },
+    },
+  });
+
+  if (!user) {
+    throw ApiError.badRequest('This link is invalid or has expired');
+  }
+
+  user.password = await bcrypt.hash(password, 10);
+  user.resetToken = null;
+  user.resetTokenExpires = null;
+  await user.save();
+
+  await tokenService.remove(user.id);
+
+  res.send({ message: 'OK' });
+};
+
 export const authController = {
   register,
   activate,
   login,
   refresh,
   logout,
+  resetPassword,
+  requestPasswordReset,
 };

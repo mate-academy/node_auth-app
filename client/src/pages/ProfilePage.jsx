@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import ChangePasswordForm from '../components/ChangePasswordForm';
 
 export default function ProfilePage() {
   const { user, updateName } = useAuth();
@@ -87,6 +88,8 @@ export default function ProfilePage() {
           </button>
         </>
       )}
+
+      <ChangePasswordForm />
     </section>
   );
 }

@@ -56,6 +56,7 @@ export default function LoginPage() {
             required
           />
         </label>
+        <Link to="/forgot-password">Forgot password?</Link>
 
         {error && <p className="form__error">{error}</p>}
 

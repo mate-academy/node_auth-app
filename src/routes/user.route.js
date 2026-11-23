@@ -10,3 +10,9 @@ userRouter.patch(
   authMiddleware,
   catchError(userController.updateName),
 );
+
+userRouter.patch(
+  '/profile/password',
+  authMiddleware,
+  catchError(userController.changePassword),
+);

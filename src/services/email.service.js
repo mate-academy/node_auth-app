@@ -29,7 +29,19 @@ function sendActivationEmail(email, token) {
   return send({ email, html, subject: 'Activate' });
 }
 
+function sendPasswordResetEmail(email, token) {
+  const href = `${process.env.CLIENT_HOST}/reset-password/${token}`;
+  const html = `
+    <h1>Reset your password</h1>
+    <p>The link is valid for 1 hour. If this wasn't you, ignore this email.</p>
+    <a href="${href}">${href}</a>
+  `;
+
+  return send({ email, html, subject: 'Reset password' });
+}
+
 export const emailService = {
   send,
   sendActivationEmail,
+  sendPasswordResetEmail,
 };

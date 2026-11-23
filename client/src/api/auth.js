@@ -13,3 +13,18 @@ export const activateUser = (activationToken) =>
 
 export const updateProfile = ({ name }) =>
   request('/profile', { method: 'PATCH', body: { name } });
+
+export const requestPasswordReset = (email) =>
+  request('/password-reset', { method: 'POST', body: { email } });
+
+export const resetPassword = (resetToken, { password, confirmation }) =>
+  request(`/password-reset/${encodeURIComponent(resetToken)}`, {
+    method: 'POST',
+    body: { password, confirmation },
+  });
+
+export const changePassword = ({ oldPassword, newPassword, confirmation }) =>
+  request('/profile/password', {
+    method: 'PATCH',
+    body: { oldPassword, newPassword, confirmation },
+  });

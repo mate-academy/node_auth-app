@@ -13,3 +13,13 @@ authRouter.get(
 authRouter.post('/login', catchError(authController.login));
 authRouter.get('/refresh', catchError(authController.refresh));
 authRouter.post('/logout', catchError(authController.logout));
+
+authRouter.post(
+  '/password-reset',
+  catchError(authController.requestPasswordReset),
+);
+
+authRouter.post(
+  '/password-reset/:resetToken',
+  catchError(authController.resetPassword),
+);

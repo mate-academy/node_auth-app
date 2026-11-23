@@ -19,4 +19,12 @@ export const User = client.define('user', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  resetToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  resetTokenExpires: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
 });
