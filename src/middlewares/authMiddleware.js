@@ -1,4 +1,4 @@
-import { jwtService } from '../services/jwt.service';
+import { jwtService } from '../services/jwt.service.js';
 
 export const authMiddleware = (req, res, next) => {
   const authorization = req.headers['authorization'] || '';
@@ -13,6 +13,8 @@ export const authMiddleware = (req, res, next) => {
   if (!userData) {
     return res.status(401).send({ message: 'Unathorized' });
   }
+
+  req.user = userData;
 
   next();
 };

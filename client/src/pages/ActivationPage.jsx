@@ -1,27 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { activateUser } from '../api/auth';
+import { useAuth } from '../context/AuthContext';
 
 export default function ActivationPage() {
   const { activationToken } = useParams();
+  const { activate, isLoading } = useAuth();
   const [status, setStatus] = useState('loading'); // loading | success | error
   const [message, setMessage] = useState('');
 
-  // У StrictMode (dev) ефект викликається двічі, а токен одноразовий —
-  // другий запит повернув би помилку, тому захищаємося від дубля
   const requested = useRef(false);
 
   useEffect(() => {
-    if (requested.current) return;
+    if (isLoading || requested.current) return;
     requested.current = true;
 
-    activateUser(activationToken)
+    activate(activationToken)
       .then(() => setStatus('success'))
       .catch((err) => {
         setMessage(err.message);
         setStatus('error');
       });
-  }, [activationToken]);
+  }, [activationToken, activate, isLoading]);
 
   if (status === 'loading') {
     return (
@@ -36,9 +35,9 @@ export default function ActivationPage() {
     return (
       <section className="card">
         <h1>Account activated</h1>
-        <p>Your email has been verified. You can now log in to your account.</p>
-        <Link to="/login" className="btn btn--primary">
-          Log in
+        <p>Your email has been verified and you are now logged in.</p>
+        <Link to="/profile" className="btn btn--primary">
+          Continue
         </Link>
       </section>
     );

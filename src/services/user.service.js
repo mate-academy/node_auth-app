@@ -7,8 +7,8 @@ function findByEmail(email) {
   return User.findOne({ where: { email } });
 }
 
-function normalize({ name, email }) {
-  return { name, email };
+function normalize({ id, name, email }) {
+  return { id, name, email };
 }
 
 async function register(name, email, password) {

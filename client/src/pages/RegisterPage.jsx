@@ -20,7 +20,25 @@ export default function RegisterPage() {
       await registerUser(form);
       navigate('/check-email', { state: { email: form.email } });
     } catch (err) {
-      setError(err.message);
+      const { email, password } = err.errors || {};
+
+      if (email || password) {
+        const parts = [];
+
+        if (email)
+          parts.push(typeof email === 'string' ? email : 'Invalid email');
+        if (password) {
+          parts.push(
+            typeof password === 'string'
+              ? password
+              : 'Password must be at least 6 characters',
+          );
+        }
+
+        setError(parts.join('. '));
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -71,7 +89,7 @@ export default function RegisterPage() {
         {error && <p className="form__error">{error}</p>}
 
         <button className="btn btn--primary" disabled={loading}>
-          {loading ? 'Створюємо акаунт…' : 'Створити акаунт'}
+          {loading ? 'Creating an account…' : 'Create an account'}
         </button>
       </form>
 
