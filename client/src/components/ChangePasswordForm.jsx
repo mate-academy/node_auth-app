@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { changePassword } from '../api/auth';
+import { PASSWORD_MIN_LENGTH } from '../constans.js';
 
 const EMPTY = { oldPassword: '', newPassword: '', confirmation: '' };
 
@@ -64,6 +65,9 @@ export default function ChangePasswordForm() {
           minLength={6}
           required
         />
+        <small className="field__hint">
+          At least {PASSWORD_MIN_LENGTH} characters
+        </small>
       </label>
 
       <label className="field">

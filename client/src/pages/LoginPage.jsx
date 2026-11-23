@@ -20,7 +20,7 @@ export default function LoginPage() {
 
     try {
       await login(form);
-      navigate(location.state?.from?.pathname || '/profile', { replace: true });
+      navigate('/profile', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

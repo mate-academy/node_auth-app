@@ -13,6 +13,7 @@ import ResetEmailSentPage from './pages/ResetEmailSentPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ResetSuccessPage from './pages/ResetSuccessPage';
 import ConfirmEmailPage from './pages/ConfirmEmailPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
   return (
@@ -45,7 +46,7 @@ export default function App() {
             path="/activation/:activationToken"
             element={<ActivationPage />}
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
     </>

@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function ActivationPage() {
   const { activationToken } = useParams();
   const { activate, isLoading } = useAuth();
-  const [status, setStatus] = useState('loading'); // loading | success | error
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
+  const [failed, setFailed] = useState(false);
 
   const requested = useRef(false);
 
@@ -15,14 +16,18 @@ export default function ActivationPage() {
     requested.current = true;
 
     activate(activationToken)
-      .then(() => setStatus('success'))
+      .then(() => navigate('/profile', { replace: true }))
       .catch((err) => {
-        setMessage(err.message);
-        setStatus('error');
+        setMessage(
+          err.status === 404
+            ? 'This link is invalid or has already been used.'
+            : err.message
+        );
+        setFailed(true);
       });
-  }, [activationToken, activate, isLoading]);
+  }, [activationToken, activate, isLoading, navigate]);
 
-  if (status === 'loading') {
+  if (!failed) {
     return (
       <section className="card">
         <h1>Account activation</h1>
@@ -31,22 +36,10 @@ export default function ActivationPage() {
     );
   }
 
-  if (status === 'success') {
-    return (
-      <section className="card">
-        <h1>Account activated</h1>
-        <p>Your email has been verified and you are now logged in.</p>
-        <Link to="/profile" className="btn btn--primary">
-          Continue
-        </Link>
-      </section>
-    );
-  }
-
   return (
     <section className="card">
       <h1>The link is not active.</h1>
-      <p>{message || 'This link is invalid or has already been used.'}</p>
+      <p>{message}</p>
       <p className="card__footer">
         Try <Link to="/register">register</Link> again or{' '}
         <Link to="/login">log in</Link> if your account is already active.

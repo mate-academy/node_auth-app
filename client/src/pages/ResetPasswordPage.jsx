@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { resetPassword } from '../api/auth';
+import { PASSWORD_MIN_LENGTH } from '../constans.js';
 
 export default function ResetPasswordPage() {
   const { resetToken } = useParams();
@@ -49,6 +50,9 @@ export default function ResetPasswordPage() {
             minLength={6}
             required
           />
+          <small className="field__hint">
+            At least {PASSWORD_MIN_LENGTH} characters
+          </small>
         </label>
 
         <label className="field">

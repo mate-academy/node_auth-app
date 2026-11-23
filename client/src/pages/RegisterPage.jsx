@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../api/auth';
+import { PASSWORD_MIN_LENGTH } from '../constans.js';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -21,24 +22,9 @@ export default function RegisterPage() {
       navigate('/check-email', { state: { email: form.email } });
     } catch (err) {
       const { email, password } = err.errors || {};
+      const messages = [email, password].filter(Boolean);
 
-      if (email || password) {
-        const parts = [];
-
-        if (email)
-          parts.push(typeof email === 'string' ? email : 'Invalid email');
-        if (password) {
-          parts.push(
-            typeof password === 'string'
-              ? password
-              : 'Password must be at least 6 characters',
-          );
-        }
-
-        setError(parts.join('. '));
-      } else {
-        setError(err.message);
-      }
+      setError(messages.length ? messages.join('. ') : err.message);
     } finally {
       setLoading(false);
     }
@@ -84,6 +70,9 @@ export default function RegisterPage() {
             minLength={6}
             required
           />
+          <small className="field__hint">
+            At least {PASSWORD_MIN_LENGTH} characters
+          </small>
         </label>
 
         {error && <p className="form__error">{error}</p>}

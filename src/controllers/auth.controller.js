@@ -14,10 +14,6 @@ function validateEmail(email) {
   return !emailRegex.test(email);
 }
 
-function validatePassword(password) {
-  return typeof password !== 'string' || password.length < 6;
-}
-
 const generateTokens = async (res, user) => {
   const normalizedUser = userService.normalize(user);
 
@@ -41,17 +37,15 @@ const register = async (req, res) => {
   const { name, email, password } = req.body;
 
   const errors = {
-    email: validateEmail(email),
-    password: validatePassword(password),
+    email: validateEmail(email) ? 'Invalid email' : null,
+    password: userService.getPasswordError(password),
   };
 
   if (errors.email || errors.password) {
     throw ApiError.badRequest('Bad request', errors);
   }
 
-  const hashedPass = await bcrypt.hash(password, 10);
-
-  await userService.register(name, email, hashedPass);
+  await userService.register(name, email, password);
 
   res.send({ message: 'OK' });
 };
@@ -150,8 +144,10 @@ const resetPassword = async (req, res) => {
   const { resetToken } = req.params;
   const { password, confirmation } = req.body;
 
-  if (validatePassword(password)) {
-    throw ApiError.badRequest('Password must be at least 6 characters');
+  const passwordError = userService.getPasswordError(password);
+
+  if (passwordError) {
+    throw ApiError.badRequest(passwordError);
   }
 
   if (password !== confirmation) {
