@@ -6,6 +6,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { ActivatePage } from './pages/ActivatePage';
 import { LoginPage } from './pages/LoginPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ActivateEmailPage } from './pages/ActivateEmailPage';
 
 export const App = () => {
   return (
@@ -16,6 +17,7 @@ export const App = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/activate/:activationToken" element={<ActivatePage />} />
+        <Route path="/change-email/:resetEmailToken" element={<ActivateEmailPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="*" element={<h1>404</h1>} />

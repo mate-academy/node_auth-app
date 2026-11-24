@@ -9,7 +9,7 @@ export const ActivatePage = () => {
   const { activationToken } = useParams();
   const [error, setError] = useState('');
 
-  const { user, isChecking, setUser } = useAuth();
+  const { user, setUser } = useAuth();
 
   const isRequested = useRef(false);
 
@@ -31,20 +31,8 @@ export const ActivatePage = () => {
     };
 
     activateUser();
-  }, [activationToken]);
+  }, [activationToken, user, setUser]);
 
-  if (isChecking) {
-    return (
-      <AuthCard title="Loading... 🛰️">
-        <div className="has-text-centered">
-          <span
-            className="button is-loading is-ghost is-large"
-            aria-label="Loading"
-          />
-        </div>
-      </AuthCard>
-    );
-  }
   if (user) {
     return <Navigate to={'/profile'} replace />;
   }

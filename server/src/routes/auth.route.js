@@ -6,7 +6,7 @@ export const authRoute = express.Router();
 
 authRoute.post('/registration', catchError(authControllers.register));
 
-authRoute.get(
+authRoute.patch(
   '/activation/:activationToken',
   catchError(authControllers.activate),
 );

@@ -15,7 +15,7 @@ const register = (name: string, email: string, password: string) => {
 };
 
 const activate = (activationToken: string) => {
-  return api.get<AuthResponse>(`/activation/${activationToken}`);
+  return api.patch<AuthResponse>(`/activation/${activationToken}`);
 };
 
 const login = (email: string, password: string) => {
@@ -33,12 +33,17 @@ const logOut = () => {
   return api.post('/logout');
 };
 
+ const confirmEmail = (resetEmailToken: string ) => {
+  return api.patch<User>(`/change-email/${resetEmailToken}`);
+ };
+
 export const authApi = {
   register,
   activate,
   login,
   refresh,
   logOut,
+  confirmEmail,
 };
 
 
