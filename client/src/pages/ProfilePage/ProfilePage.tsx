@@ -5,6 +5,7 @@ import { authApi } from '../../api/authApi';
 import { accessTokenService } from '../../api/accessToken';
 import { useState } from 'react';
 import { ChangeNameForm } from '../../components/ChangeNameForm';
+import { ChangeEmailForm } from '../../components/ChangeEmailForm';
 
 type Tab = 'name' | 'email' | 'password';
 
@@ -81,7 +82,7 @@ export const ProfilePage = () => {
 
       {activeTab === 'name' && <ChangeNameForm /> }
       {activeTab === 'password' && <p>Password form</p>}
-      {activeTab === 'email' && <p>Email form</p>}
+      {activeTab === 'email' && <ChangeEmailForm />}
 
       <button
         type="button"

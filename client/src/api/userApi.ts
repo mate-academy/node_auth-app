@@ -14,6 +14,11 @@ const changeName = (name: string) => {
   return api.patch('/users/change-name', {name}, getAuthHeder());
 };
 
+const changeEmail = (newEmail: string, password: string) => {
+  return api.patch('/users/change-email', {newEmail, password}, getAuthHeder());
+};
+
 export const userAuth = {
   changeName,
+  changeEmail,
 };
