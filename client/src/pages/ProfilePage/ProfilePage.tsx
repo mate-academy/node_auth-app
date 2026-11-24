@@ -3,13 +3,22 @@ import { AuthCard } from '../../components/AuthCard';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
 import { accessTokenService } from '../../api/accessToken';
+import { useState } from 'react';
+import { ChangeNameForm } from '../../components/ChangeNameForm';
+
+type Tab = 'name' | 'email' | 'password';
 
 export const ProfilePage = () => {
   const { user, isChecking, setUser } = useAuth();
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
+
+  const handleTabClick = (tab: Tab) => {
+    setActiveTab(tab);
+  };
 
   const handleLogOut = async () => {
-   await authApi.logOut();
-   accessTokenService.remove();
+    await authApi.logOut();
+    accessTokenService.remove();
     setUser(null);
   };
 
@@ -55,6 +64,25 @@ export const ProfilePage = () => {
       </p>
 
       <p className="has-text-centered has-text-grey-light mb-5">{user.email}</p>
+
+      <div className="tabs is-toggle is-fullwidth is-small">
+        <ul>
+          <li className={activeTab === 'name' ? 'is-active' : ''}>
+            <a onClick={() => handleTabClick('name')}>Name</a>
+          </li>
+          <li className={activeTab === 'email' ? 'is-active' : ''}>
+            <a onClick={() => handleTabClick('email')}>Email</a>
+          </li>
+          <li className={activeTab === 'password' ? 'is-active' : ''}>
+            <a onClick={() => handleTabClick('password')}>Password</a>
+          </li>
+        </ul>
+      </div>
+
+      {activeTab === 'name' && <ChangeNameForm /> }
+      {activeTab === 'password' && <p>Password form</p>}
+      {activeTab === 'email' && <p>Email form</p>}
+
       <button
         type="button"
         className="button is-small is-danger is-outlined"
