@@ -1,6 +1,11 @@
 import type { User } from '../types/User';
 import { api } from './api';
 
+export type AuthResponse = {
+  user: User;
+  accessToken: string;
+};
+
 const register = (name: string, email: string, password: string) => {
   return api.post('/registration', {
     name,
@@ -10,12 +15,7 @@ const register = (name: string, email: string, password: string) => {
 };
 
 const activate = (activationToken: string) => {
-  return api.get(`/activation/${activationToken}`);
-};
-
-export type AuthResponse = {
-  user: User;
-  accessToken: string;
+  return api.get<AuthResponse>(`/activation/${activationToken}`);
 };
 
 const login = (email: string, password: string) => {
@@ -40,3 +40,5 @@ export const authApi = {
   refresh,
   logOut,
 };
+
+

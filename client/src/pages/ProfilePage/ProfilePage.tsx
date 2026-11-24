@@ -1,16 +1,16 @@
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { AuthCard } from '../../components/AuthCard';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
+import { accessTokenService } from '../../api/accessToken';
 
 export const ProfilePage = () => {
   const { user, isChecking, setUser } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogOut = async () => {
    await authApi.logOut();
+   accessTokenService.remove();
     setUser(null);
-    navigate('/login');
   };
 
   if (isChecking) {

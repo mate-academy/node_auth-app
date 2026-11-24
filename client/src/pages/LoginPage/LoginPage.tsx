@@ -3,19 +3,19 @@ import { AuthCard } from '../../components/AuthCard';
 import axios from 'axios';
 import { useState } from 'react';
 import { authApi } from '../../api/authApi';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { accessTokenService } from '../../api/accessToken';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const { setUser } = useAuth();
+  const { user, isChecking, setUser } = useAuth();
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,8 +23,8 @@ export const LoginPage = () => {
 
     try {
       const { data } = await authApi.login(email, password);
+      accessTokenService.save(data.accessToken);
       setUser(data.user);
-      navigate('/profile');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         const { message } = error.response.data;
@@ -34,6 +34,22 @@ export const LoginPage = () => {
       }
     }
   };
+
+  if (isChecking) {
+    return (
+      <AuthCard title="Loading... 🛰️">
+        <div className="has-text-centered">
+          <span
+            className="button is-loading is-ghost is-large"
+            aria-label="Loading"
+          />
+        </div>
+      </AuthCard>
+    );
+  }
+  if (user) {
+    return <Navigate to={'/profile'} replace />;
+  }
 
   return (
     <AuthCard title="Login" subtitle="Welcome back">
