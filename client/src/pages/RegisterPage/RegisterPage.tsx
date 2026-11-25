@@ -16,7 +16,7 @@ export const RegisterPage = () => {
 
   const isPasswordLong = password.length >= 6;
 
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrors({});
 
