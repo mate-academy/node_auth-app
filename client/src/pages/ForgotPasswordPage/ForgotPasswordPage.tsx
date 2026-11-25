@@ -85,6 +85,8 @@ export const ForgotPasswordPage = () => {
           {errors.email && <p className="help is-danger">{errors.email}</p>}
         </div>
 
+        {errors.form && <p className="help is-danger mb-3">{errors.form}</p>}
+
         <button className="button is-link is-fullwidth" type="submit">
           Send
         </button>
