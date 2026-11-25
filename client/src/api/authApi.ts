@@ -26,20 +26,24 @@ const login = (email: string, password: string) => {
 };
 
 const refresh = () => {
-  return api.get<AuthResponse>('/refresh')
+  return api.get<AuthResponse>('/refresh');
 };
 
 const logOut = () => {
   return api.post('/logout');
 };
 
- const confirmEmail = (resetEmailToken: string ) => {
+const confirmEmail = (resetEmailToken: string) => {
   return api.patch<User>(`/change-email/${resetEmailToken}`);
- };
+};
 
- const forgotPassword = (email: string) => {
-  return api.post('/forgot-password', {email});
- };
+const forgotPassword = (email: string) => {
+  return api.post('/forgot-password', { email });
+};
+
+const resetPassword = (password: string, confirmation: string, resetToken: string) => {
+  return api.patch(`/reset-password/${resetToken}`, {password, confirmation});
+};
 
 export const authApi = {
   register,
@@ -49,6 +53,5 @@ export const authApi = {
   logOut,
   confirmEmail,
   forgotPassword,
+  resetPassword,
 };
-
-

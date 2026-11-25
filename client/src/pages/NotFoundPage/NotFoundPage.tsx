@@ -1,9 +1,12 @@
-import styles from './NotFoundPage.module.scss';
+import { Link } from 'react-router-dom';
+import { AuthCard } from '../../components/AuthCard';
 
 export const NotFoundPage = () => {
   return (
-    <div className={styles.notFoundPage}>
-      <div></div>
-    </div>
+    <AuthCard title="404 🛸" subtitle="Lost in space? This page doesn't exist">
+      <p className="has-text-centered">
+        <Link to="/">← Back to Earth</Link>
+      </p>
+    </AuthCard>
   );
 };
