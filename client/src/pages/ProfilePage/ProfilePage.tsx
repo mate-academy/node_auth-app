@@ -81,7 +81,7 @@ export const ProfilePage = () => {
         </ul>
       </div>
 
-      {activeTab === 'name' && <ChangeNameForm /> }
+      {activeTab === 'name' && <ChangeNameForm />}
       {activeTab === 'password' && <ChangePasswordForm />}
       {activeTab === 'email' && <ChangeEmailForm />}
 

@@ -41,8 +41,12 @@ const forgotPassword = (email: string) => {
   return api.post('/forgot-password', { email });
 };
 
-const resetPassword = (password: string, confirmation: string, resetToken: string) => {
-  return api.patch(`/reset-password/${resetToken}`, {password, confirmation});
+const resetPassword = (
+  password: string,
+  confirmation: string,
+  resetToken: string,
+) => {
+  return api.patch(`/reset-password/${resetToken}`, { password, confirmation });
 };
 
 export const authApi = {

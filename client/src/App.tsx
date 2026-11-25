@@ -19,7 +19,10 @@ export const App = () => {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/activate/:activationToken" element={<ActivatePage />} />
-        <Route path="/change-email/:resetEmailToken" element={<ActivateEmailPage />} />
+        <Route
+          path="/change-email/:resetEmailToken"
+          element={<ActivateEmailPage />}
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />

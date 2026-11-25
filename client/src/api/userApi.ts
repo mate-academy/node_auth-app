@@ -26,11 +26,15 @@ const changePassword = (
   newPassword: string,
   confirmation: string,
 ) => {
-  return api.patch('/users/change-password', {
-    oldPassword,
-    newPassword,
-    confirmation,
-  }, getAuthHeder());
+  return api.patch(
+    '/users/change-password',
+    {
+      oldPassword,
+      newPassword,
+      confirmation,
+    },
+    getAuthHeder(),
+  );
 };
 
 export const userAuth = {

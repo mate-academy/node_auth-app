@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { authApi } from '../../api/authApi';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { AuthCard } from '../../components/AuthCard';
+import { useAuth } from '../../context/AuthContext';
 
 export const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
 
   const { resetToken } = useParams();
+  const { user, isChecking } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,22 +33,44 @@ export const ResetPasswordPage = () => {
       setConfirmation('');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        setErrors(error.response.data.errors ?? { form: error.response.data.message });
+        setErrors(
+          error.response.data.errors ?? { form: error.response.data.message },
+        );
       } else {
         setErrors({ form: 'Server is not responding' });
       }
     }
   };
 
+  if (isChecking) {
+    return (
+      <AuthCard title="Loading... 🛰️">
+        <div className="has-text-centered">
+          <span
+            className="button is-loading is-ghost is-large"
+            aria-label="Loading"
+          />
+        </div>
+      </AuthCard>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/profile" replace />;
+  }
+
   if (isSaved) {
-  return (
-    <AuthCard title="Password changed ✅" subtitle="You can now log in with your new password">
-      <p className="has-text-centered">
-        <Link to="/login">Log in</Link>
-      </p>
-    </AuthCard>
-  );
-}
+    return (
+      <AuthCard
+        title="Password changed ✅"
+        subtitle="You can now log in with your new password"
+      >
+        <p className="has-text-centered">
+          <Link to="/login">Log in</Link>
+        </p>
+      </AuthCard>
+    );
+  }
 
   return (
     <AuthCard title="New password 🔑" subtitle="Choose a new password">

@@ -1,7 +1,7 @@
-import { createContext, useContext } from "react";
-import type { User } from "../types/User";
+import { createContext, useContext } from 'react';
+import type { User } from '../types/User';
 
-type AuthContextType  = {
+type AuthContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
   isChecking: boolean;
@@ -18,4 +18,3 @@ export const useAuth = () => {
 
   return context;
 };
-
