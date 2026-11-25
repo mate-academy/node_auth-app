@@ -26,3 +26,49 @@ Implement an application that allows user to:
 - Implement Sign-up with Google, Facebook, Github (use Passport.js lib)
 - Profile page should allow to add/remove any social account
 - Add authentication to your Accounting App
+
+## How to run
+
+### Server
+```bash
+cd server
+npm install
+```
+
+Create `server/.env`:
+```
+PORT=3005
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_db_password
+DB_DATABASE=postgres
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASSWORD=your_app_password
+
+CLIENT_HOST=http://localhost:5173
+
+JWT_KEY=your_secret
+JWT_REFRESH_KEY=your_refresh_secret
+```
+
+```bash
+node setup.js
+npm start
+```
+
+### Client
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Open http://localhost:5173
+
+## Credits
+Earth image: "The Blue Marble", NASA / Apollo 17 crew (public domain, via Wikimedia Commons)
