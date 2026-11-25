@@ -1,0 +1,170 @@
+import { User } from '../models/user.js';
+import { userService } from '../services/user.service.js';
+import { jwtService } from '../services/jwt.service.js';
+import { ApiError } from '../exeptions/api.error.js';
+import bcrypt from 'bcrypt';
+import { tokenService } from '../services/token.service.js';
+import { validation } from '../utils/validation.js';
+
+const register = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const errors = {
+    name: validation.validateName(name),
+    email: validation.validateEmail(email),
+    password: validation.validatePassword(password),
+  };
+
+  if (errors.name || errors.email || errors.password) {
+    throw ApiError.badRequest('Bad request', errors);
+  }
+
+  const hashePass = await bcrypt.hash(password, 10);
+
+  await userService.register(name, email, hashePass);
+
+  res.send({ message: 'OK' });
+};
+
+const activate = async (req, res) => {
+  const { activationToken } = req.params;
+  const user = await User.findOne({ where: { activationToken } });
+
+  if (!user) {
+    throw ApiError.notFound();
+  }
+
+  user.activationToken = null;
+  await user.save();
+
+  await generateTokens(res, user);
+};
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await userService.findByEmail(email);
+
+  if (!user) {
+    throw ApiError.badRequest('Wrong email or password');
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw ApiError.badRequest('Wrong email or password');
+  }
+
+  if (user.activationToken) {
+    throw ApiError.badRequest('Please activate your email!');
+  }
+
+  await generateTokens(res, user);
+};
+
+const refresh = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const userData = await jwtService.verifyRefresh(refreshToken);
+
+  const token = await tokenService.getByToken(refreshToken);
+
+  if (!userData || !token) {
+    throw ApiError.unauthorized();
+  }
+
+  const user = await User.findByPk(userData.id);
+
+  if (!user) {
+    throw ApiError.unauthorized();
+  }
+
+  await generateTokens(res, user);
+};
+
+const generateTokens = async (res, user) => {
+  const normalizedUser = userService.normalize(user);
+
+  const accessToken = jwtService.sign(normalizedUser);
+  const refreshToken = jwtService.signRefresh(normalizedUser);
+
+  await tokenService.save(normalizedUser.id, refreshToken);
+
+  res.cookie('refreshToken', refreshToken, {
+    maxAge: 30 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  });
+
+  res.send({
+    user: normalizedUser,
+    accessToken,
+  });
+};
+
+const logout = async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  const userData = await jwtService.verifyRefresh(refreshToken);
+
+  if (!userData || !refreshToken) {
+    throw ApiError.unauthorized();
+  }
+
+  await tokenService.remove(userData.id);
+
+  res.clearCookie('refreshToken');
+  res.sendStatus(204);
+};
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const emailError = validation.validateEmail(email);
+
+  if (emailError) {
+    throw ApiError.badRequest('Bad request', { email: emailError });
+  }
+
+  await userService.createTokenResetSendMail(email);
+  res.send({ message: 'Email sent' });
+};
+
+const resetPassword = async (req, res) => {
+  const { resetToken } = req.params;
+  const { password, confirmation } = req.body;
+
+  const passwordError = validation.validatePassword(password);
+
+  if (passwordError) {
+    throw ApiError.badRequest('Bad request', { password: passwordError });
+  }
+
+  if (password !== confirmation) {
+    throw ApiError.badRequest('Bad request', {
+      confirmation: 'Passwords do not match',
+    });
+  }
+
+  const hashePass = await bcrypt.hash(password, 10);
+
+  await userService.resetTokenCreateNewPassword(resetToken, hashePass);
+
+  res.send({ message: 'Password is reset' });
+};
+
+const confirmEmail = async (req, res) => {
+  const { resetEmailToken } = req.params;
+
+  const user = await userService.confirmEmail(resetEmailToken);
+
+  res.send(user);
+};
+
+export const authControllers = {
+  register,
+  activate,
+  login,
+  refresh,
+  logout,
+  forgotPassword,
+  resetPassword,
+  confirmEmail,
+};

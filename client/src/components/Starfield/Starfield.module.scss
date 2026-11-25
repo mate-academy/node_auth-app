@@ -1,0 +1,91 @@
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.milky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse 60% 18% at 50% 50%,
+      rgba(120, 130, 255, 0.07),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 10% at 30% 40%,
+      rgba(255, 255, 255, 0.04),
+      transparent 70%
+    );
+  transform: rotate(-18deg) scale(1.4);
+}
+
+.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+.small {
+  width: 1px;
+  height: 1px;
+}
+
+.medium {
+  width: 3px;
+  height: 3px;
+  animation-duration: 6s;
+  animation-delay: 1s;
+}
+
+.big {
+  width: 4px;
+  height: 4px;
+  animation-duration: 8s;
+  animation-delay: 2s;
+}
+
+.shooting {
+  position: absolute;
+  top: 12%;
+  left: 70%;
+  width: 180px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), transparent);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  opacity: 0;
+  animation: shoot 9s ease-in infinite 3s;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes shoot {
+  0% {
+    transform: translate(0, 0) rotate(-28deg);
+    opacity: 0;
+  }
+  2% {
+    opacity: 1;
+  }
+  12% {
+    transform: translate(-500px, 265px) rotate(-28deg);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
