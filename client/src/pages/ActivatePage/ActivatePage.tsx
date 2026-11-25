@@ -9,12 +9,12 @@ export const ActivatePage = () => {
   const { activationToken } = useParams();
   const [error, setError] = useState('');
 
-  const { user, setUser } = useAuth();
+  const { user, isChecking, setUser } = useAuth();
 
   const isRequested = useRef(false);
 
   useEffect(() => {
-    if (!activationToken || isRequested.current) {
+    if (!activationToken || isRequested.current || user || isChecking) {
       return;
     }
 
@@ -31,7 +31,7 @@ export const ActivatePage = () => {
     };
 
     activateUser();
-  }, [activationToken, user, setUser]);
+  }, [activationToken, user, setUser, isChecking]);
 
   if (user) {
     return <Navigate to={'/profile'} replace />;
