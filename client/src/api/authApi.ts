@@ -37,6 +37,10 @@ const logOut = () => {
   return api.patch<User>(`/change-email/${resetEmailToken}`);
  };
 
+ const forgotPassword = (email: string) => {
+  return api.post('/forgot-password', {email});
+ };
+
 export const authApi = {
   register,
   activate,
@@ -44,6 +48,7 @@ export const authApi = {
   refresh,
   logOut,
   confirmEmail,
+  forgotPassword,
 };
 
 

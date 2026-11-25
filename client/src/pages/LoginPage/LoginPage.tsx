@@ -104,6 +104,10 @@ export const LoginPage = () => {
           {errors.password && (
             <p className="help is-danger">{errors.password}</p>
           )}
+
+          <p className="has-text-right is-size-7 mt-1">
+            <Link to="/forgot-password">Forgot password?</Link>
+          </p>
         </div>
 
         {errors.form && <p className="help is-danger mb-3">{errors.form}</p>}
