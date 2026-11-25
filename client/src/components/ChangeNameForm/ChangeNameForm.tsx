@@ -10,7 +10,7 @@ export const ChangeNameForm = () => {
 
   const { setUser } = useAuth();
 
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrors({});
     setIsSaved(false);
