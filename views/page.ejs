@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title><%= title %> | Auth App</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      background: #f4f6fa;
+      color: #202938;
+      margin: 0;
+      padding: 20px;
+    }
+
+    main {
+      max-width: 480px;
+      margin: 40px auto;
+      padding: 28px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 24px;
+    }
+
+    form {
+      display: grid;
+      gap: 12px;
+      margin: 24px 0;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    input,
+    button {
+      width: 100%;
+      font: inherit;
+      padding: 12px;
+      border: 1px solid #aab3bf;
+      border-radius: 6px;
+    }
+
+    input:focus {
+      border-color: #254d9b;
+      outline: 2px solid #dbe7ff;
+    }
+
+    button {
+      background: #254d9b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #193b80;
+    }
+
+    small {
+      color: #465363;
+      font-size: 13px;
+      font-weight: normal;
+    }
+
+    .error {
+      color: #a32121;
+      background: #fff1f1;
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .message {
+      color: #23623d;
+      background: #edf8f0;
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    nav {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    a {
+      color: #254d9b;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main>
+
+    <h1><%= title %></h1>
+
+    <% if (message) { %>
+
+      <p class="message" role="status">
+        <%= message %>
+      </p>
+
+    <% } %>
+
+
+    <% if (error) { %>
+
+      <p class="error" role="alert">
+        <%= error %>
+      </p>
+
+    <% } %>
+
+
+    <% for (const form of forms) { %>
+
+      <form
+        action="<%= form.action %>"
+        method="post"
+      >
+
+        <input
+          type="hidden"
+          name="_csrf"
+          value="<%= csrf %>"
+        >
+
+
+        <% if (form.token) { %>
+
+          <input
+            type="hidden"
+            name="token"
+            value="<%= form.token %>"
+          >
+
+        <% } %>
+
+
+        <% for (const field of form.fields) { %>
+
+          <label>
+
+            <%= field.label %>
+
+            <input
+              name="<%= field.name %>"
+              type="<%= field.type %>"
+              autocomplete="<%= field.autocomplete %>"
+              value="<%= field.value %>"
+              required
+            >
+
+            <% if (field.hint) { %>
+
+              <small>
+                <%= field.hint %>
+              </small>
+
+            <% } %>
+
+          </label>
+
+        <% } %>
+
+
+        <button type="submit">
+          <%= form.button %>
+        </button>
+
+      </form>
+
+    <% } %>
+
+
+    <nav>
+
+      <% for (const link of links) { %>
+
+        <a href="<%= link.href %>">
+          <%= link.label %>
+        </a>
+
+      <% } %>
+
+    </nav>
+
+  </main>
+
+</body>
+</html>
