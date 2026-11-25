@@ -12,7 +12,7 @@ export const ForgotPasswordPage = () => {
   const [isSent, setIsSent] = useState(false);
   const { user, isChecking } = useAuth();
 
-  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrors({});
 
