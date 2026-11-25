@@ -125,6 +125,7 @@ router.post('/profile/password', userOnly, verifyCsrf, async (req, res) => {
 
 router.post('/profile/email', userOnly, verifyCsrf, async (req, res) => {
   const email = emailAddress(req.body.email);
+  const emailConfirmation = emailAddress(req.body.emailConfirmation);
 
   const reject = (error) =>
     profilePage(req, res, {
@@ -134,6 +135,10 @@ router.post('/profile/email', userOnly, verifyCsrf, async (req, res) => {
 
   if (!validEmail(email)) {
     return reject('Enter a valid email address.');
+  }
+
+  if (email !== emailConfirmation) {
+    return reject('Email addresses must match.');
   }
 
   const passwordMatches = await matchesPassword(

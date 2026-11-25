@@ -111,6 +111,7 @@ function profilePage(
 
       form('/profile/email', 'Request email change', [
         field('email', 'New email', 'email', 'email'),
+        field('emailConfirmation', 'Confirm new email', 'email', 'off'),
         currentPassword(),
       ]),
 
