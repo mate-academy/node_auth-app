@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Auth App</title>
+</head>
+
+<body>
+  <h1>Your Profile</h1>
+  <div class="profile_infrmation">
+    <form class="profile_form" action="/profile/name" method="POST">
+      <p>Name:</p>
+      <input name="name" value="{{name}}" required>
+      <button class="button_change" type="submit">Change Name</button>
+    </form>
+    <form action="/profile/email" method="POST">
+      <p>Email:</p>
+      <input type="email" name="email" value="{{email}}" required>
+      <p>Confirm new email:</p>
+      <input type="email" name="emailConfirmation" required>
+      <p>Password:</p>
+      <input type="password" name="password" placeholder="Your password" minlength="6" required>
+      <small>Password must be at least 6 characters long.</small>
+      <button class="button_change" type="submit">Change Email</button>
+    </form>
+  </div>
+  <a class="button_change" href="/changePassword">Change Password</a>
+  <a class="button_logout" href="/logout">Log out</a>
+</body>
+
+</html>
