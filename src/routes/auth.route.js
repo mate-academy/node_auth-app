@@ -8,7 +8,7 @@ export const authRouter = new express.Router();
 authRouter.get('/registration', guestMiddleware, authController.getRegister);
 authRouter.post('/registration', guestMiddleware, authController.register);
 authRouter.get('/activation', guestMiddleware, authController.getActivation);
-authRouter.get('/activate/:activationToken', authController.activate);
+authRouter.get('/activate/:activationToken', guestMiddleware, authController.activate);
 
 authRouter.get('/login', guestMiddleware, authController.getLogin);
 authRouter.post('/login', guestMiddleware, authController.login);

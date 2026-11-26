@@ -222,7 +222,7 @@ const getNewPassword = async (req, res) => {
   const user = await User.findOne({ where: { resetToken: token } });
 
   if (!user) {
-    return res.send(404);
+    return res.sendStatus(404);
   }
 
   const filePath = path.join(dirname, '../public', 'newPassword.html');
@@ -237,6 +237,10 @@ const setNewPassword = async (req, res) => {
   const { token } = req.params;
   const user = await User.findOne({ where: { resetToken: token } });
   const { password, confirmation } = req.body;
+
+  if (!user) {
+    return res.sendStatus(404);
+  }
 
   if (password.length < 6 || confirmation.length < 6) {
     return res.send('Password must be at least 6 characters');
