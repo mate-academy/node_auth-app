@@ -20,6 +20,10 @@ const register = async (req, res) => {
   const { name, email, password } = req.body;
   const activationToken = uuidv4();
 
+  if (password.length < 6) {
+    return res.send('Password must be at least 6 characters');
+  }
+
   await User.create({
     name,
     email,
@@ -50,6 +54,9 @@ const activate = async (req, res) => {
   user.isActive = true;
   user.activationToken = null;
   await user.save();
+
+
+  req.session.userId = user.id;
 
   res.redirect('/profile');
 };
@@ -109,12 +116,27 @@ const updateName = async (req, res) => {
 };
 
 const updateEmail = async (req, res) => {
-  const { email } = req.body;
+  const { email, password } = req.body;
+
+  if (password.length < 6) {
+    return res.send('Password must be at least 6 characters');
+  }
 
   const user = await User.findByPk(req.session.userId);
 
+  if (password !== user.password) {
+    return res.send('Incorrect password')
+  }
+
+  const oldEmail = user.email;
   user.email = email;
   await user.save();
+
+  await emailService.send(
+    oldEmail,
+    'Email Changed',
+    `Your email was changed to ${email}`
+  )
 
   res.redirect('/profile');
 };
@@ -133,11 +155,20 @@ const getChangePassword = async (req, res) => {
 };
 
 const changePassword = async (req, res) => {
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword, confirmation } = req.body;
+
+  if (newPassword.length < 6 || confirmation.length < 6) {
+    return res.send('Password must be at least 6 characters');
+  }
+
   const user = await User.findByPk(req.session.userId);
 
   if (oldPassword !== user.password) {
     return res.send('Old password is incorrect');
+  }
+
+  if (newPassword !== confirmation) {
+    return res.send('Passwords do not match')
   }
 
   user.password = newPassword;
@@ -198,6 +229,10 @@ const setNewPassword = async (req, res) => {
   const { token } = req.params;
   const user = await User.findOne({ where: { resetToken: token } });
   const { newPassword, confirmation } = req.body;
+
+  if (newPassword.length < 6 || confirmation.length < 6) {
+    return res.send('Password must be at least 6 characters');
+  }
 
   if (newPassword !== confirmation) {
     return res.send(400);

@@ -18,7 +18,9 @@
     </form>
     <form action="/profile/email" method="POST">
       <p>Email:</p>
-      <input name="email" value="{{email}}" required>
+      <input type="email" name="email" value="{{email}}" required>
+      <p>Password:</p>
+      <input type="password" name="password" placeholder="Your password" minlength="6" required>
       <button class="button_change" type="submit">Change Email</button>
     </form>
   </div>
