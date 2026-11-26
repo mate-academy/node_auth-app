@@ -19,12 +19,31 @@ authRouter.get('/logout', authMiddleware, authController.logout);
 authRouter.post('/profile/name', authMiddleware, authController.updateName);
 authRouter.post('/profile/email', authMiddleware, authController.updateEmail);
 
-authRouter.get('/changePassword', authMiddleware, authController.getChangePassword);
-authRouter.post('/changePassword', authMiddleware, authController.changePassword);
+authRouter.get(
+  '/changePassword',
+  authMiddleware,
+  authController.getChangePassword,
+);
+
+authRouter.post(
+  '/changePassword',
+  authMiddleware,
+  authController.changePassword,
+);
 
 authRouter.get('/reset', guestMiddleware, authController.getReset);
 authRouter.post('/reset', guestMiddleware, authController.reset);
 authRouter.get('/resetSent', guestMiddleware, authController.resetSent);
 authRouter.get('/reset/:token', guestMiddleware, authController.getNewPassword);
-authRouter.post('/reset/:token', guestMiddleware, authController.setNewPassword);
-authRouter.get('/resetSuccess', guestMiddleware, authController.getResetSuccess);
+
+authRouter.post(
+  '/reset/:token',
+  guestMiddleware,
+  authController.setNewPassword,
+);
+
+authRouter.get(
+  '/resetSuccess',
+  guestMiddleware,
+  authController.getResetSuccess,
+);
